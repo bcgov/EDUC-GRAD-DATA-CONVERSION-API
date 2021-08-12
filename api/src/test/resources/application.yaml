@@ -1,0 +1,76 @@
+#DB Properties
+spring:
+  jmx:
+    enabled: false
+  datasource:
+    hikari:
+      pool-name: dataconversion-api-cp
+      maximum-pool-size: 1
+      connection-timeout: 6000
+      max-lifetime: 600000
+    driver-class: org.h2.Driver
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    generate-ddl: true
+  mvc:
+    log-request-details: true
+  jackson:
+    deserialization:
+      fail-on-unknown-properties: false
+  security:
+    user:
+      name: ${API_USERNAME}
+      password: ${API_PASSWORD}
+  batch:
+    initialize-schema: NEVER
+    job:
+      enabled: false
+
+#Logging properties
+logging:
+  #pattern:
+  #  file: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
+  #  console: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
+  level:
+    root: INFO
+    ca:
+      bc:
+        gov:
+          educ:
+            api:
+              dataconversion: INFO
+    org:
+      springframework:
+        web: INFO
+        security: INFO
+        boot:
+          autoconfigure:
+            logging: INFO
+      hibernate: ERROR
+
+authorization:
+  user: batch-api
+  password: abc
+
+#Endpoints
+endpoint:
+  grad-graduation-status-api:
+    student-for-grad-list:
+      url: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/recalculate
+  grad-graduation-api:
+    url: https://educ-grad-graduation-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduate/studentid/%s
+  keycloack:
+    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+  graduation-status-api:
+    update-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
+    read-grad-status:
+      url: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
+  pen-student-api:
+    by-pen:
+      url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+  grad-program-management-api:
+    special-program:
+      url: https://educ-grad-program-management-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/programmanagement/specialprograms

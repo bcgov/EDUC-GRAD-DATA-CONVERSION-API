@@ -1,0 +1,25 @@
+---
+apiVersion: v1
+kind: Template
+labels:
+  template: 'educ-grad-data-conversion-api-template'
+metadata:
+  name: 'educ-grad-data-conversion-api-template'
+objects:
+  - apiVersion: v1
+    kind: BuildConfig
+    metadata:
+      labels:
+        build: educ-grad-data-conversion-api-pipeline
+      name: educ-grad-data-conversion-api-pipeline
+      namespace: 77c02f-tools
+    spec:
+      source:
+        git:
+          ref: main
+          uri: 'https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API'
+        type: Git
+      strategy:
+        jenkinsPipelineStrategy:
+          jenkinsfilePath: tools/jenkins/Jenkinsfile-api
+
