@@ -52,7 +52,7 @@ objects:
                 - configMapRef:
                     name: educ-grad-api-config-map
                 - secretRef:
-                    name: educ-grad-db-secret
+                    name: educ-grad-conv-db-secret
                 - secretRef:
                     name: grad-keycloak-pk-secret
                 - secretRef:
