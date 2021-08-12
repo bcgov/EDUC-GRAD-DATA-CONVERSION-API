@@ -16,10 +16,10 @@ spring:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-    batch:
-      username: ${BATCH_USERNAME}
-      password: ${BATCH_PASSWORD}
-      pool-name: conv-batch-cp
+    conv:
+      username: ${CONV_USERNAME}
+      password: ${CONV_PASSWORD}
+      pool-name: conv-data-conv-cp
     course:
       username: ${COURSE_USERNAME}
       password: ${COURSE_PASSWORD}
@@ -54,6 +54,15 @@ spring:
     initialize-schema: NEVER
     job:
       enabled: false
+  flyway:
+    enabled: ${ENABLE_FLYWAY}
+    baseline-on-migrate: false
+    table: FLYWAY_SCHEMA_HISTORY
+    url: ${CONNECTION_STRING}
+    schema: ${CONV_USERNAME}
+    user: ${CONV_USERNAME}
+    password: ${CONV_PASSWORD}
+    location: classpath:db/migration
 
 #Logging properties
 logging:

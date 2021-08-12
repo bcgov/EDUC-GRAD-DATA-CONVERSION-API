@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.service.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -12,9 +12,9 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DataConversionProcessor implements ItemProcessor<ConvGradStudent, ConvGradStudent> {
+public class DataConversionStudentProcessor implements ItemProcessor<ConvGradStudent, ConvGradStudent> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionStudentProcessor.class);
 
     @Autowired
 	private DataConversionService dataConversionService;

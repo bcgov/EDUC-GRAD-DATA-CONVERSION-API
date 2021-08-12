@@ -1,13 +1,14 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
-import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentRepository;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.GradBatchTestUtils;
-import ca.bc.gov.educ.api.dataconversion.rest.RestUtils;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,10 +43,10 @@ public class DataConversionServiceTest {
     RestUtils restUtils;
 
     @Autowired
-    private EducGradBatchGraduationApiConstants constants;
+    private EducGradDataConversionApiConstants constants;
 
     @Autowired
-    GradBatchTestUtils gradBatchTestUtils;
+    GradConversionTestUtils gradConversionTestUtils;
 
     @Before
     public void setUp() {
@@ -59,7 +60,7 @@ public class DataConversionServiceTest {
 
     @Test
     public void convertStudent_whenGivenData_withoutSpecialProgram_thenReturnSuccess() throws Exception {
-        gradBatchTestUtils.createConvGradStudents("mock_conv_grad_students.json");
+        gradConversionTestUtils.createConvGradStudents("mock_conv_grad_students.json");
 
         List<ConvGradStudentEntity> entities = convGradStudentRepository.findAll();
         assertThat(entities).isNotNull();
@@ -81,7 +82,7 @@ public class DataConversionServiceTest {
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isEqualTo(3);
 
-        Optional<ConvGradStudentEntity> result = convGradStudentRepository.findByPen("111222333");
+        Optional<ConvGradStudentEntity> result = convGradStudentRepository.findById(studentID);
         assertThat(result).isNotNull();
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get().getStudentID()).isEqualTo(studentID);
@@ -90,7 +91,7 @@ public class DataConversionServiceTest {
 
     @Test
     public void convertStudent_whenExceptionIsThrownInRestAPI_thenReturnNullWithErrorsInSummary() throws Exception {
-        gradBatchTestUtils.createConvGradStudents("mock_conv_grad_students.json");
+        gradConversionTestUtils.createConvGradStudents("mock_conv_grad_students.json");
 
         List<ConvGradStudentEntity> entities = convGradStudentRepository.findAll();
         assertThat(entities).isNotNull();
@@ -115,7 +116,7 @@ public class DataConversionServiceTest {
 
     @Test
     public void convertStudent_whenGivenPen_doesNotExistFromPENStudentAPI_thenReturnNullWithErrorsInSummary() throws Exception {
-        gradBatchTestUtils.createConvGradStudents("mock_conv_grad_students.json");
+        gradConversionTestUtils.createConvGradStudents("mock_conv_grad_students.json");
 
         List<ConvGradStudentEntity> entities = convGradStudentRepository.findAll();
         assertThat(entities).isNotNull();

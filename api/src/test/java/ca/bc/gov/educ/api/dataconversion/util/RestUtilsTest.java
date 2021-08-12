@@ -4,7 +4,6 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
-import ca.bc.gov.educ.api.dataconversion.rest.RestUtils;
 import lombok.val;
 import org.codehaus.jackson.JsonProcessingException;
 import org.junit.After;
@@ -45,7 +44,7 @@ public class RestUtilsTest {
     WebClient webClient;
 
     @Autowired
-    private EducGradBatchGraduationApiConstants constants;
+    private EducGradDataConversionApiConstants constants;
 
     @Mock
     private WebClient.RequestHeadersSpec requestHeadersMock;
@@ -115,9 +114,9 @@ public class RestUtilsTest {
     public void testGetSpecialProgram_givenValues_returnsGradSpecialProgram_with_APICallSuccess() throws JsonProcessingException {
         final UUID specialProgramID = UUID.randomUUID();
         final GradSpecialProgram specialProgram = new GradSpecialProgram();
-        specialProgram.setId(specialProgramID);
-        specialProgram.setProgramCode("abc");
-        specialProgram.setSpecialProgramCode("def");
+        specialProgram.setOptionalProgramID(specialProgramID);
+        specialProgram.setGraduationProgramCode("abc");
+        specialProgram.setOptProgramCode("def");
 
         when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
         when(this.requestHeadersUriMock.uri(eq(this.constants.getGradProgramManagementUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
@@ -127,7 +126,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(GradSpecialProgram.class)).thenReturn(Mono.just(specialProgram));
         val result = this.restUtils.getGradSpecialProgram("abc", "def", "123");
         assertThat(result).isNotNull();
-        assertThat(result.getProgramCode()).isEqualTo("abc");
-        assertThat(result.getSpecialProgramCode()).isEqualTo("def");
+        assertThat(result.getGraduationProgramCode()).isEqualTo("abc");
+        assertThat(result.getOptProgramCode()).isEqualTo("def");
     }
 }

@@ -14,7 +14,8 @@ public class GradStudentSpecialProgram extends BaseModel{
 
 	private UUID id;
     private String pen;
-    private UUID specialProgramID;
+    private UUID studentID;
+    private UUID optionalProgramID;
     private String studentSpecialProgramData;
     private String specialProgramCompletionDate;
     private String specialProgramName;

@@ -14,29 +14,29 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "GRAD_COURSE_RESTRICTIONS")
+@Table(name = "COURSE_RESTRICTION")
 public class GradCourseRestrictionEntity extends BaseEntity {
    
 	@Id
-	@Column(name = "ID", nullable = false)
+	@Column(name = "COURSE_RESTRICTION_ID", nullable = false)
     private UUID courseRestrictionId;
 
-	@Column(name = "CRSE_MAIN", nullable = false)
+	@Column(name = "MAIN_COURSE", nullable = false)
     private String mainCourse;  
 	
-	@Column(name = "CRSE_MAIN_LVL", nullable = true)
+	@Column(name = "MAIN_COURSE_LEVEL", nullable = true)
     private String mainCourseLevel;
 	
-	@Column(name = "CRSE_RESTRICTED", nullable = false)
+	@Column(name = "RESTRICTED_COURSE", nullable = false)
     private String restrictedCourse; 
 	
-	@Column(name = "CRSE_RESTRICTED_LVL", nullable = true)
+	@Column(name = "RESTRICTED_COURSE_LVL", nullable = true)
     private String restrictedCourseLevel;   
 	
-	@Column(name = "START_DT", nullable = true)
+	@Column(name = "RESTRICTION_EFFECTIVE_DATE", nullable = true)
     private Date restrictionStartDate; 
 	
-	@Column(name = "END_DT", nullable = true)
+	@Column(name = "RESTRICTION_EXPIRY_DATE", nullable = true)
     private Date restrictionEndDate;
 
 }

@@ -1,6 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.repository.student;
+package ca.bc.gov.educ.api.dataconversion.repository.conv;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentSpecialProgramEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentSpecialProgramEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ConvGradStudentSpecialProgramRepository extends JpaRepository<ConvGradStudentSpecialProgramEntity, UUID> {
 
-    Optional<ConvGradStudentSpecialProgramEntity> findByStudentIDAndSpecialProgramID(UUID studentID, UUID specialProgramID);
+    Optional<ConvGradStudentSpecialProgramEntity> findByStudentIDAndOptionalProgramID(UUID studentID, UUID specialProgramID);
 
 }
 

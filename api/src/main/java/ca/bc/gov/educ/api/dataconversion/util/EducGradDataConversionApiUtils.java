@@ -3,7 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-public class EducGradBatchGraduationApiUtils {
+public class EducGradDataConversionApiUtils {
 
     
     public static HttpHeaders getHeaders (String accessToken)

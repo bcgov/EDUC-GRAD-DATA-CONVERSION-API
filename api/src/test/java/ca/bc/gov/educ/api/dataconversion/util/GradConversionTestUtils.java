@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.mappers.ConvGradStudentMapper;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 @Component
 @Profile("test")
-public class GradBatchTestUtils {
+public class GradConversionTestUtils {
     @Autowired
     ConvGradStudentRepository convGradStudentRepository;
 
@@ -36,27 +36,27 @@ public class GradBatchTestUtils {
         if (entity.getStudentID() == null) {
             entity.setStudentID(UUID.randomUUID());
         }
-        if (entity.getCreatedBy() == null) {
-            entity.setCreatedBy("BATCH-GRADUATION-API");
+        if (entity.getCreateUser() == null) {
+            entity.setCreateUser(EducGradDataConversionApiConstants.DEFAULT_CREATED_BY);
         }
-        if (entity.getUpdatedBy() == null) {
-            entity.setUpdatedBy("BATCH-GRADUATION-API");
+        if (entity.getUpdateUser() == null) {
+            entity.setUpdateUser(EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY);
         }
 
-        entity.setCreatedTimestamp(new Date(System.currentTimeMillis()));
-        entity.setUpdatedTimestamp(new Date(System.currentTimeMillis()));
+        entity.setCreateDate(new Date(System.currentTimeMillis()));
+        entity.setUpdateDate(new Date(System.currentTimeMillis()));
 
         return entity;
     }
 
     public List<ConvGradStudentEntity> createConvGradStudents(final String jsonFileName) throws IOException {
         final File file = new File(
-                Objects.requireNonNull(GradBatchTestUtils.class.getClassLoader().getResource(jsonFileName)).getFile()
+                Objects.requireNonNull(GradConversionTestUtils.class.getClassLoader().getResource(jsonFileName)).getFile()
         );
         final List<ConvGradStudent> models = new ObjectMapper().readValue(file, new TypeReference<>() {
         });
         final var entities = models.stream().map(mapper::toEntity)
-                .collect(toList()).stream().map(GradBatchTestUtils::populateIdAndAuditColumns).collect(toList());
+                .collect(toList()).stream().map(GradConversionTestUtils::populateIdAndAuditColumns).collect(toList());
 
         convGradStudentRepository.saveAll(entities);
         return entities;

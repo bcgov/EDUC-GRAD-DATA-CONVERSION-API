@@ -2,9 +2,10 @@ package ca.bc.gov.educ.api.dataconversion.controller;
 
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.service.DataConversionService;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.PermissionsContants;
+import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.PermissionsConstants;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping(EducGradBatchGraduationApiConstants.GRAD_BATCH_API_ROOT_MAPPING + EducGradBatchGraduationApiConstants.GRAD_CONVERSION_API_MAPPING)
+@RequestMapping(EducGradDataConversionApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
 @CrossOrigin
 @EnableResourceServer
 public class DataConversionController {
   private static final Logger logger = LoggerFactory.getLogger(DataConversionController.class);
 
-  private final DataConversionService dataConversionService;
+  private final StudentService studentService;
+  private final CourseService courseService;
 
   private static final List<Pair<String, String>> REMOVAL_LIST = new ArrayList<>() {{
     add(Pair.of("CLEA", "CLEB"));
@@ -36,12 +38,13 @@ public class DataConversionController {
     add(Pair.of("CLEBF", "CLEAF"));
   }};
 
-  public DataConversionController(DataConversionService dataConversionService) {
-    this.dataConversionService = dataConversionService;
+  public DataConversionController(StudentService studentService, CourseService courseService) {
+    this.studentService = studentService;
+    this.courseService = courseService;
   }
 
-  @GetMapping(EducGradBatchGraduationApiConstants.EXECUTE_COURSE_RESTRICTIONS_CONVERSION_JOB)
-  @PreAuthorize(PermissionsContants.LOAD_STUDENT_IDS)
+  @GetMapping(EducGradDataConversionApiConstants.EXECUTE_COURSE_RESTRICTIONS_CONVERSION_JOB)
+  @PreAuthorize(PermissionsConstants.LOAD_STUDENT_IDS)
   public ResponseEntity<ConversionSummaryDTO> runCourseRestrictionsDataConversionJob(@RequestParam(defaultValue = "false") boolean purge) {
     logger.info("Inside runDataConversionJob");
 
@@ -50,7 +53,7 @@ public class DataConversionController {
 
     List<GradCourseRestriction> courseRestrictions;
     try {
-      courseRestrictions = dataConversionService.loadInitialRawGradCourseRestrictionsData(purge);
+      courseRestrictions = courseService.loadInitialRawGradCourseRestrictionsData(purge);
       summary.setReadCount(courseRestrictions.size());
       logger.info("01. Course Restrictions - Initial Raw Data Load is done successfully");
     } catch (Exception e) {
@@ -65,7 +68,7 @@ public class DataConversionController {
     try {
       for (GradCourseRestriction c : courseRestrictions) {
         logger.info(" Found courseRestriction[{}] in total {}", i++, summary.getReadCount());
-        dataConversionService.convertCourseRestriction(c, summary);
+        courseService.convertCourseRestriction(c, summary);
       }
 
       logger.info("02. Convert Course Restrictions done successfully");
@@ -77,7 +80,7 @@ public class DataConversionController {
     }
 
     try {
-      REMOVAL_LIST.forEach(c -> dataConversionService.removeGradCourseRestriction(c.getLeft(), c.getRight(), summary));
+      REMOVAL_LIST.forEach(c -> courseService.removeGradCourseRestriction(c.getLeft(), c.getRight(), summary));
       logger.info("03. Clean up Data for date conversion is done successfully");
     } catch (Exception e) {
       logger.info("03. Clean up Data for date conversion is failed: " + e.getLocalizedMessage());

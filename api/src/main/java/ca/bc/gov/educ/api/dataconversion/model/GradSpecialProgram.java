@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Data
@@ -11,9 +12,13 @@ import java.util.UUID;
 @Component
 public class GradSpecialProgram extends BaseModel{
 
-	private UUID id;
-    private String specialProgramName;
-    private String specialProgramCode;
-    private String programCode;
+	private UUID optionalProgramID;
+    private String optionalProgramName;
+    private String optProgramCode;
+    private String graduationProgramCode;
 
+    private String description;
+    private int displayOrder;
+    private Date effectiveDate;
+    private Date expiryDate;
 }

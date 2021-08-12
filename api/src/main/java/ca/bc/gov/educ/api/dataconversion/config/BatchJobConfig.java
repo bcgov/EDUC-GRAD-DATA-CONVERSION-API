@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
+import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -16,10 +18,9 @@ import org.springframework.context.annotation.Configuration;
 
 import ca.bc.gov.educ.api.dataconversion.listener.DataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.processor.DataConversionProcessor;
+import ca.bc.gov.educ.api.dataconversion.processor.DataConversionStudentProcessor;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionStudentReader;
-import ca.bc.gov.educ.api.dataconversion.service.DataConversionService;
-import ca.bc.gov.educ.api.dataconversion.rest.RestUtils;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
 
 @Configuration
@@ -28,20 +29,19 @@ public class BatchJobConfig {
     @Autowired
     JobRegistry jobRegistry;
 
-
     @Bean
-    public ItemReader<ConvGradStudent> dataConversionReader(DataConversionService dataConversionService, RestUtils restUtils) {
+    public ItemReader<ConvGradStudent> itemReader(DataConversionService dataConversionService, RestUtils restUtils) {
         return new DataConversionStudentReader(dataConversionService, restUtils);
     }
 
     @Bean
-    public ItemWriter<ConvGradStudent> dataConversionWriter() {
+    public ItemWriter<ConvGradStudent> itemWriter() {
         return new DataConversionStudentWriter();
     }
 
     @Bean
-    public ItemProcessor<ConvGradStudent,ConvGradStudent> dataConversionProcessor() {
-        return new DataConversionProcessor();
+    public ItemProcessor<ConvGradStudent,ConvGradStudent> itemProcessor() {
+        return new DataConversionStudentProcessor();
     }
 
     /**
@@ -63,7 +63,7 @@ public class BatchJobConfig {
     /**
     * Creates a bean that represents our batch job.
     */
-    @Bean(name="dataConversionJob")
+    @Bean
     public Job dataConversionBatchJob(Step dataConversionJobStep, DataConversionJobCompletionNotificationListener listener,
                                     JobBuilderFactory jobBuilderFactory) {
     return jobBuilderFactory.get("dataConversionBatchJob")

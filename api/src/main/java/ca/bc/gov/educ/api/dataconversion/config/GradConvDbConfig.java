@@ -21,13 +21,13 @@ import java.util.HashMap;
 @Profile("!test")
 @EnableJpaRepositories(
         basePackages = {
-            "ca.bc.gov.educ.api.dataconversion.repository.batch"
+            "ca.bc.gov.educ.api.dataconversion.repository.conv"
         },
-        entityManagerFactoryRef = "batchEntityManager",
+        entityManagerFactoryRef = "convEntityManager",
         transactionManagerRef = "batchTransactionManager"
 )
 @EnableTransactionManagement
-public class BatchDbConfig {
+public class GradConvDbConfig {
     // Hikari Pool
     @Value("${spring.db-connection.hikari.maximum-pool-size}")
     private int maxPoolSize;
@@ -41,29 +41,29 @@ public class BatchDbConfig {
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.batch.pool-name}")
-    private String batchPoolName;
+    @Value("${spring.db-connection.conv.pool-name}")
+    private String convPoolName;
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String batchUrl;
+    private String convUrl;
 
-    @Value("${spring.db-connection.batch.username}")
-    private String batchUsername;
+    @Value("${spring.db-connection.conv.username}")
+    private String convUsername;
 
-    @Value("${spring.db-connection.batch.password}")
-    private String batchPassword;
+    @Value("${spring.db-connection.conv.password}")
+    private String convPassword;
 
     @Primary
     @Bean
-    public DataSource batchDataSource() {
+    public DataSource convDataSource() {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(batchUrl);
-        config.setUsername(batchUsername);
-        config.setPassword(batchPassword);
-        config.setPoolName(batchPoolName);
+        config.setJdbcUrl(convUrl);
+        config.setUsername(convUsername);
+        config.setPassword(convPassword);
+        config.setPoolName(convPoolName);
 
         config.setMinimumIdle(2);
         config.setIdleTimeout(30000);
@@ -76,11 +76,11 @@ public class BatchDbConfig {
 
     @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean batchEntityManager() {
+    public LocalContainerEntityManagerFactoryBean convEntityManager() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(batchDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.batch"});
+        em.setDataSource(convDataSource());
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -90,16 +90,16 @@ public class BatchDbConfig {
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("batchPU");
+        em.setPersistenceUnitName("convPU");
 
         return em;
     }
 
     @Primary
     @Bean
-    public PlatformTransactionManager batchTransactionManager() {
+    public PlatformTransactionManager convTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(batchEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(convEntityManager().getObject());
         return transactionManager;
     }
 }

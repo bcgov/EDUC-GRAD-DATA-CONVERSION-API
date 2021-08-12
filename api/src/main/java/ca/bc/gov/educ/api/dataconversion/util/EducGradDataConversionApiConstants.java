@@ -8,23 +8,22 @@ import org.springframework.stereotype.Component;
 @Component
 @Getter
 @Setter
-public class EducGradBatchGraduationApiConstants {
+public class EducGradDataConversionApiConstants {
 
 	public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
-    public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/batch";
-    public static final String EXECUTE_BATCH_JOB = "/executebatchjob";
-    public static final String LOAD_STUDENT_IDS = "/loadstudentIds";
+    public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
     // Data Conversion
     public static final String EXECUTE_DATA_CONVERSION_BATCH_JOB = "/executeGradStudentDataConversionJob";
-    public static final String GRAD_CONVERSION_API_MAPPING = "/dataconversion";
     public static final String EXECUTE_COURSE_RESTRICTIONS_CONVERSION_JOB = "/courseRestrictions";
        
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
+
+    public static final String DEFAULT_CREATED_BY = "DATA_CONV";
+    public static final String DEFAULT_UPDATED_BY = "DATA_CONV";
 
     @Value("${authorization.user}")
     private String userName;

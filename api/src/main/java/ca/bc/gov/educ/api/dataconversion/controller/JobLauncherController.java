@@ -1,7 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.controller;
 
-import java.util.List;
-
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +14,13 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
-import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 
-import ca.bc.gov.educ.api.dataconversion.model.LoadStudentData;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.PermissionsContants;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 
 @RestController
-@RequestMapping(EducGradBatchGraduationApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
+@RequestMapping(EducGradDataConversionApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
 @CrossOrigin
 @EnableResourceServer
 public class JobLauncherController {
@@ -44,7 +37,7 @@ public class JobLauncherController {
         this.jobRegistry = jobRegistry;
     }
 
-    @GetMapping(EducGradBatchGraduationApiConstants.EXECUTE_DATA_CONVERSION_BATCH_JOB)
+    @GetMapping(EducGradDataConversionApiConstants.EXECUTE_DATA_CONVERSION_BATCH_JOB)
     public ResponseEntity<ConversionSummaryDTO> launchDataConversionJob( ) {
         logger.info("Inside Launch Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();

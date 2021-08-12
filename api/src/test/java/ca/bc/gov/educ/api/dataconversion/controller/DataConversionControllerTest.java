@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.controller;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
-import ca.bc.gov.educ.api.dataconversion.service.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import org.junit.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DataConversionControllerTest {
 
     @Mock
-    private DataConversionService dataConversionService;
+    private CourseService courseService;
 
     @InjectMocks
     DataConversionController dataConversionController;
@@ -43,9 +43,9 @@ public class DataConversionControllerTest {
         ConversionSummaryDTO summary = new ConversionSummaryDTO();
         summary.setTableName("GRAD_COURSE_RESTRICTIONS");
 
-        Mockito.when(dataConversionService.loadInitialRawGradCourseRestrictionsData(true)).thenReturn(Arrays.asList(gradCourseRestriction1, gradCourseRestriction2));
+        Mockito.when(courseService.loadInitialRawGradCourseRestrictionsData(true)).thenReturn(Arrays.asList(gradCourseRestriction1, gradCourseRestriction2));
         var result = dataConversionController.runCourseRestrictionsDataConversionJob(true);
-        Mockito.verify(dataConversionService).loadInitialRawGradCourseRestrictionsData(true);
+        Mockito.verify(courseService).loadInitialRawGradCourseRestrictionsData(true);
 
         assertThat(result).isNotNull();
         assertThat(result.getBody()).isNotNull();

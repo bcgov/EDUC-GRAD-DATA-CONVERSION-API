@@ -1,14 +1,12 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.util.GradDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.batch.item.ExecutionContext;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -17,9 +15,6 @@ import java.util.Date;
 public class DataConversionJobCompletionNotificationListener extends JobExecutionListenerSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionJobCompletionNotificationListener.class);
-
-    @Autowired
-    private GradDataStore gradDataStore;
     
     @Override
     public void afterJob(JobExecution jobExecution) {

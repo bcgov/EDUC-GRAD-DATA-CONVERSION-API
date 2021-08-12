@@ -1,12 +1,8 @@
-package ca.bc.gov.educ.api.dataconversion.rest;
+package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.model.AlgorithmResponse;
 import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
-import ca.bc.gov.educ.api.dataconversion.model.GraduationStatus;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -18,23 +14,22 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class RestUtils {
 
-    private final EducGradBatchGraduationApiConstants constants;
+    private final EducGradDataConversionApiConstants constants;
 
     private final WebClient webClient;
 
     @Autowired
-    public RestUtils(final EducGradBatchGraduationApiConstants constants, final WebClient webClient) {
+    public RestUtils(final EducGradDataConversionApiConstants constants, final WebClient webClient) {
         this.constants = constants;
         this.webClient = webClient;
     }
 
     public ResponseObj getTokenResponseObject() {
-        HttpHeaders httpHeadersKC = EducGradBatchGraduationApiUtils.getHeaders(
+        HttpHeaders httpHeadersKC = EducGradDataConversionApiUtils.getHeaders(
                 constants.getUserName(), constants.getPassword());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("grant_type", "client_credentials");
@@ -62,21 +57,5 @@ public class RestUtils {
                 .uri(constants.getGradProgramManagementUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(GradSpecialProgram.class).block();
-    }
-    
-    public AlgorithmResponse runGradAlgorithm(UUID studentID, String accessToken) {
-        return this.webClient.get()
-        		.uri(String.format(constants.getGraduationApiUrl(), studentID))
-                .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(AlgorithmResponse.class).block();
-    }
-    
-    public List<GraduationStatus> getStudentsForAlgorithm(String accessToken) {
-        final ParameterizedTypeReference<List<GraduationStatus>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(constants.getGradStudentForGradListUrl())
-                .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(responseType).block();
     }
 }

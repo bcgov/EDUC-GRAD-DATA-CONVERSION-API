@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity.student;
+package ca.bc.gov.educ.api.dataconversion.entity.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
 import lombok.Data;
@@ -10,20 +10,20 @@ import java.util.UUID;
 
 @Data
 @Entity
-@Table(name = "CONV_GRAD_STUDENT")
+@Table(name = "CONV_GRADUATION_STUDENT_RECORD")
 public class ConvGradStudentEntity extends BaseEntity {
 
     @Id
-    @Column(name = "STUDENT_ID", nullable = false)
+    @Column(name = "GRADUATION_STUDENT_RECORD_ID", nullable = false)
     private UUID studentID;
 
-    @Column(name = "pen", nullable = false)
+    @Transient
     private String pen;
 
-    @Column(name = "FK_GRAD_PROGRAM_CODE", nullable = true)
+    @Column(name = "GRADUATION_PROGRAM_CODE", nullable = true)
     private String program;
 
-    @Column(name = "PROGRAM_COMPLETION_DT", nullable = true)
+    @Column(name = "PROGRAM_COMPLETION_DATE", nullable = true)
     private Date programCompletionDate;
 
     @Column(name = "GPA", nullable = true)
@@ -42,13 +42,13 @@ public class ConvGradStudentEntity extends BaseEntity {
     @Column(name = "SCHOOL_OF_RECORD", nullable = true)
     private String schoolOfRecord;
 
-    @Column(name = "SCHOOL_AT_GRAD", nullable = true)
+    @Column(name = "SCHOOL_AT_GRADUATION", nullable = true)
     private String schoolAtGrad;
 
-    @Column(name = "STUD_GRADE", nullable = true)
+    @Column(name = "STUDENT_GRADE", nullable = true)
     private String studentGrade;
 
-    @Column(name = "FK_GRAD_STUDENT_STUDENT_STATUS", nullable = false)
+    @Column(name = "STUDENT_STATUS_CODE", nullable = false)
     private String studentStatus;
     
 }

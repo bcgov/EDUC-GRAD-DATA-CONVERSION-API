@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion;
 
 import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import org.modelmapper.ModelMapper;

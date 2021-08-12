@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.entity;
 
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,37 +10,43 @@ import java.util.Date;
 @Data
 @MappedSuperclass
 public class BaseEntity {
-	@Column(name = "CREATED_BY", nullable = false)
-	private String createdBy;
+	@Column(name = "CREATE_USER", nullable = true)
+	private String createUser;
 
+	@Column(name = "CREATE_DATE", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "CREATED_TIMESTAMP", nullable = false)
-	private Date createdTimestamp;
+	private Date createDate;
 
-	@Column(name = "UPDATED_BY", nullable = false)
-	private String updatedBy;
+	@Column(name = "UPDATE_USER", nullable = true)
+	private String updateUser;
 
+	@Column(name = "UPDATE_DATE", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
-	@Column(name = "UPDATED_TIMESTAMP", nullable = false)
-	private Date updatedTimestamp;
+	private Date updateDate;
 
 	@PrePersist
 	protected void onCreate() {
-		this.updatedBy = "GRADUATION";
-		this.createdBy = "GRADUATION";
-		this.createdTimestamp = new Date(System.currentTimeMillis());
-		this.updatedTimestamp = new Date(System.currentTimeMillis());
+		if (StringUtils.isBlank(createUser)) {
+			this.createUser = EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
+		}
+		if (StringUtils.isBlank(updateUser)) {
+			this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
+		}
+		this.createDate = new Date(System.currentTimeMillis());
+		this.updateDate = new Date(System.currentTimeMillis());
 	}
 
 	@PreUpdate
 	protected void onPersist() {
-		this.updatedTimestamp = new Date(System.currentTimeMillis());
-		this.updatedBy = "GRADUATION";
-		if (StringUtils.isBlank(createdBy)) {
-			createdBy = "GRADUATION";
+		this.updateDate = new Date(System.currentTimeMillis());
+		if (StringUtils.isBlank(updateUser)) {
+			this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 		}
-		if (this.createdTimestamp == null) {
-			this.createdTimestamp = new Date(System.currentTimeMillis());
+		if (StringUtils.isBlank(createUser)) {
+			this.createUser = EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
+		}
+		if (this.createDate == null) {
+			this.createDate = new Date(System.currentTimeMillis());
 		}
 	}
 }
