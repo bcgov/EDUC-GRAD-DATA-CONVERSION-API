@@ -1,12 +1,12 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.GradCourseRestrictionEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.ConvGradStudentEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.ConvGradStudentSpecialProgramEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentSpecialProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.ConvGradStudentRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.ConvGradStudentSpecialProgramRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentSpecialProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
 import ca.bc.gov.educ.api.dataconversion.rest.RestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,7 +32,7 @@ public class DataConversionService {
 		this.restUtils = restUtils;
 	}
 
-	@Transactional
+	@Transactional(transactionManager = "")
 	public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionSummaryDTO summary) {
 		summary.setProcessedCount(summary.getProcessedCount() + 1L);
 		try {

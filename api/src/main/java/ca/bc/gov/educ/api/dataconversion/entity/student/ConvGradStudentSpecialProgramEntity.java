@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity;
+package ca.bc.gov.educ.api.dataconversion.entity.student;
 
 import java.sql.Date;
 import java.util.UUID;
@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
 import org.hibernate.annotations.GenericGenerator;
 
 import lombok.Data;

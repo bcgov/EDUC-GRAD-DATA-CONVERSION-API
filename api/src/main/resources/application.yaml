@@ -9,16 +9,33 @@ security:
 spring:
   jmx:
     enabled: false
-  datasource:
+  db-connection:
+    url: ${CONNECTION_STRING}
+    driver-class: oracle.jdbc.driver.OracleDriver
     hikari:
-      pool-name: batchgraduation-api-cp
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-    url: ${JDBC_URL}
-    username: ${ORACLE_USERNAME}
-    password: ${ORACLE_PASSWORD}
-    driver-class: oracle.jdbc.driver.OracleDriver
+    batch:
+      username: ${BATCH_USERNAME}
+      password: ${BATCH_PASSWORD}
+      pool-name: conv-batch-cp
+    course:
+      username: ${COURSE_USERNAME}
+      password: ${COURSE_PASSWORD}
+      pool-name: conv-course-cp
+    program:
+      username: ${PROGRAM_USERNAME}
+      password: ${PROGRAM_PASSWORD}
+      pool-name: conv-program-cp
+    student:
+      username: ${STUDENT_USERNAME}
+      password: ${STUDENT_PASSWORD}
+      pool-name: conv-student-cp
+    trax:
+      username: ${TRAX_USERNAME}
+      password: ${TRAX_PASSWORD}
+      pool-name: conv-trax-cp
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.Oracle12cDialect
@@ -33,10 +50,10 @@ spring:
     user:
       name: ${API_USERNAME}
       password: ${API_PASSWORD}
-  batch: 
-   initialize-schema: NEVER
-   job: 
-    enabled: false
+  batch:
+    initialize-schema: NEVER
+    job:
+      enabled: false
 
 #Logging properties
 logging:
@@ -54,7 +71,7 @@ logging:
         gov:
           educ:
             api:
-              batchgraduation: ${APP_LOG_LEVEL}
+              dataconversion: ${APP_LOG_LEVEL}
     org:
       springframework:
         web: ${SPRING_WEB_LOG_LEVEL}
@@ -71,26 +88,26 @@ server:
       io: 16
   #port: ${HTTP_PORT}
 
-authorization: 
- user: ${GRAD_CLIENT_NAME}
- password: ${GRAD_CLIENT_SECRET}
+authorization:
+  user: ${GRAD_CLIENT_NAME}
+  password: ${GRAD_CLIENT_SECRET}
 
 #Endpoints
-endpoint: 
- grad-graduation-status-api: 
-  student-for-grad-list: 
-   url: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/recalculate
- grad-graduation-api: 
-  url: https://educ-grad-graduation-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduate/studentid/%s
- keycloack: 
-  getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
- graduation-status-api: 
-  update-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
-  read-grad-status:
+endpoint:
+  grad-graduation-status-api:
+    student-for-grad-list:
+      url: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/recalculate
+  grad-graduation-api:
+    url: https://educ-grad-graduation-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduate/studentid/%s
+  keycloack:
+    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+  graduation-status-api:
+    update-grad-status: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
+    read-grad-status:
       url: https://educ-grad-graduation-status-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/gradstatus/studentid/%s
- pen-student-api:
-  by-pen:
-   url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
- grad-program-management-api:
-   special-program:
-     url: https://educ-grad-program-management-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/programmanagement/specialprograms
+  pen-student-api:
+    by-pen:
+      url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+  grad-program-management-api:
+    special-program:
+      url: https://educ-grad-program-management-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/programmanagement/specialprograms

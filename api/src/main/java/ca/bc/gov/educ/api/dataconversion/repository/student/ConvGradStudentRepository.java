@@ -1,6 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.repository;
+package ca.bc.gov.educ.api.dataconversion.repository.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

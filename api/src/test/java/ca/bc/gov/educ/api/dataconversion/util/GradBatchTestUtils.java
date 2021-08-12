@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.entity.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.mappers.ConvGradStudentMapper;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.repository.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
-import ca.bc.gov.educ.api.dataconversion.repository.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.ConvGradStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradBatchGraduationApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradBatchTestUtils;
 import ca.bc.gov.educ.api.dataconversion.rest.RestUtils;

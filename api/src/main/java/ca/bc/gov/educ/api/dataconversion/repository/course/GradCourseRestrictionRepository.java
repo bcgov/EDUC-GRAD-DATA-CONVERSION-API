@@ -1,6 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.repository;
+package ca.bc.gov.educ.api.dataconversion.repository.course;
 
-import ca.bc.gov.educ.api.dataconversion.entity.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

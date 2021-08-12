@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity;
+package ca.bc.gov.educ.api.dataconversion.entity.student;
 
 import java.util.Date;
 import java.util.UUID;

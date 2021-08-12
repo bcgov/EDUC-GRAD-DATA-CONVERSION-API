@@ -1,5 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.entity;
+package ca.bc.gov.educ.api.dataconversion.entity.student;
 
+import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 

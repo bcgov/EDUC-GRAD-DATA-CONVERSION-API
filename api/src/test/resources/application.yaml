@@ -4,7 +4,7 @@ spring:
     enabled: false
   datasource:
     hikari:
-      pool-name: batchgraduation-api-cp
+      pool-name: dataconversion-api-cp
       maximum-pool-size: 1
       connection-timeout: 6000
       max-lifetime: 600000
@@ -41,7 +41,7 @@ logging:
         gov:
           educ:
             api:
-              batchgraduation: INFO
+              dataconversion: INFO
     org:
       springframework:
         web: INFO

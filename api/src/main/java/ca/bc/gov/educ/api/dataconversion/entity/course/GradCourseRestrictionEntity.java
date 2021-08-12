@@ -1,5 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.entity;
+package ca.bc.gov.educ.api.dataconversion.entity.course;
 
+import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "GRAD_COURSE_RESTRICTIONS")
-public class GradCourseRestrictionEntity extends BaseEntity  {
+public class GradCourseRestrictionEntity extends BaseEntity {
    
 	@Id
 	@Column(name = "ID", nullable = false)
