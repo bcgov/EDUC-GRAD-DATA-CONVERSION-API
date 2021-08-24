@@ -27,10 +27,23 @@ public class JobLauncherControllerTest {
     private JobLauncherController jobLauncherController;
 
     @Test
-    public void testLauchDataConversionJob_thenReturnError() {
+    public void testLauchGradStudent_DataConversionJob_thenReturnError() {
         boolean exceptionIsThrown = false;
         try {
-            jobLauncherController.launchDataConversionJob();
+            jobLauncherController.launchStudentDataConversionJob();
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+
+        assertThat(exceptionIsThrown).isTrue();
+    }
+
+
+    @Test
+    public void testLauchCourseRestriction_DataConversionJob_thenReturnError() {
+        boolean exceptionIsThrown = false;
+        try {
+            jobLauncherController.launchCourseRestrictionDataConversionJob();
         } catch (Exception e) {
             exceptionIsThrown = true;
         }

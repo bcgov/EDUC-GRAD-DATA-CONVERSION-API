@@ -45,7 +45,7 @@ public class ProgramDbConfig {
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String programUrl;
+    private String jdbcUrl;
 
     @Value("${spring.db-connection.program.username}")
     private String programUsername;
@@ -58,7 +58,7 @@ public class ProgramDbConfig {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(programUrl);
+        config.setJdbcUrl(jdbcUrl);
         config.setUsername(programUsername);
         config.setPassword(programPassword);
         config.setPoolName(programPoolName);
@@ -87,7 +87,7 @@ public class ProgramDbConfig {
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("batchPU");
+        em.setPersistenceUnitName("programPU");
 
         return em;
     }

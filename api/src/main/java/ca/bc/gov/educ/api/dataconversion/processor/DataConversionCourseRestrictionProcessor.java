@@ -2,7 +2,9 @@ package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -12,12 +14,12 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DataConversionStudentProcessor implements ItemProcessor<ConvGradStudent, ConvGradStudent> {
+public class DataConversionCourseRestrictionProcessor implements ItemProcessor<GradCourseRestriction, GradCourseRestriction> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionStudentProcessor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRestrictionProcessor.class);
 
     @Autowired
-	private DataConversionService dataConversionService;
+	private CourseService courseService;
 
 	private ConversionSummaryDTO summaryDTO;
 
@@ -25,11 +27,11 @@ public class DataConversionStudentProcessor implements ItemProcessor<ConvGradStu
 	public void retrieveSummaryDto(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		ExecutionContext jobContext = jobExecution.getExecutionContext();
-		summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+		summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
 	}
 
 	@Override
-	public ConvGradStudent process(ConvGradStudent convGradStudent) throws Exception {
-		return dataConversionService.convertStudent(convGradStudent, summaryDTO);
+	public GradCourseRestriction process(GradCourseRestriction gradCourseRestriction) throws Exception {
+		return courseService.convertCourseRestriction(gradCourseRestriction, summaryDTO);
 	}
 }

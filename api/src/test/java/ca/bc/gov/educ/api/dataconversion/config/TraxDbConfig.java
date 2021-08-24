@@ -17,7 +17,7 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Configuration
-@Profile("!test")
+@Profile("test")
 @EnableJpaRepositories(
         basePackages = {
                 "ca.bc.gov.educ.api.dataconversion.repository.trax"
@@ -28,30 +28,24 @@ import java.util.HashMap;
 @EnableTransactionManagement
 public class TraxDbConfig {
     // Hikari Pool
-    @Value("${spring.db-connection.hikari.maximum-pool-size}")
+    @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maxPoolSize;
 
-    @Value("${spring.db-connection.hikari.connection-timeout}")
+    @Value("${spring.datasource.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-life-time}")
+    @Value("${spring.datasource.hikari.max-life-time}")
     private int maxLifetime;
 
-    @Value("${spring.db-connection.driver-class}")
+    @Value("${spring.datasource.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.trax.pool-name}")
-    private String traxPoolName;
+    @Value("${spring.datasource.hikari.pool-name}")
+    private String poolName;
 
     // Connection String
-    @Value("${spring.db-connection.url}")
+    @Value("${spring.datasource.url}")
     private String jdbcUrl;
-
-    @Value("${spring.db-connection.trax.username}")
-    private String traxUsername;
-
-    @Value("${spring.db-connection.trax.password}")
-    private String traxPassword;
 
     @Bean
     public DataSource traxDataSource() {
@@ -59,9 +53,7 @@ public class TraxDbConfig {
 
         config.setDriverClassName(driverClassName);
         config.setJdbcUrl(jdbcUrl);
-        config.setUsername(traxUsername);
-        config.setPassword(traxPassword);
-        config.setPoolName(traxPoolName);
+        config.setPoolName(poolName);
 
         config.setMinimumIdle(2);
         config.setIdleTimeout(30000);
@@ -82,8 +74,8 @@ public class TraxDbConfig {
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "none");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.Oracle12cDialect");
+        properties.put("hibernate.hbm2ddl.auto", "create-drop");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 

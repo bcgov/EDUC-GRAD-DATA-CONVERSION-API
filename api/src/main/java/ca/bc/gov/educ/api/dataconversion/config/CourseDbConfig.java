@@ -45,7 +45,7 @@ public class CourseDbConfig {
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String courseUrl;
+    private String jdbcUrl;
 
     @Value("${spring.db-connection.course.username}")
     private String courseUsername;
@@ -58,7 +58,7 @@ public class CourseDbConfig {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(courseUrl);
+        config.setJdbcUrl(jdbcUrl);
         config.setUsername(courseUsername);
         config.setPassword(coursePassword);
         config.setPoolName(coursePoolName);
@@ -87,7 +87,7 @@ public class CourseDbConfig {
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("batchPU");
+        em.setPersistenceUnitName("coursePU");
 
         return em;
     }

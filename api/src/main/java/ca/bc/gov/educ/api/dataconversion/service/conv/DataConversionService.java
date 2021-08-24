@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.service.conv;
 import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentSpecialProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentSpecialProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
@@ -18,16 +19,19 @@ import java.util.*;
 public class DataConversionService {
     private final ConvGradStudentRepository convGradStudentRepository;
     private final ConvGradStudentSpecialProgramRepository convGradStudentSpecialProgramRepository;
+    private final ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository;
     private final RestUtils restUtils;
     private final CourseService courseService;
 
     @Autowired
     public DataConversionService(ConvGradStudentRepository convGradStudentRepository,
                           ConvGradStudentSpecialProgramRepository convGradStudentSpecialProgramRepository,
+                          ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository,
                           RestUtils restUtils,
                           CourseService courseService) {
         this.convGradStudentRepository = convGradStudentRepository;
         this.convGradStudentSpecialProgramRepository = convGradStudentSpecialProgramRepository;
+        this.convGradCourseRestrictionRepository = convGradCourseRestrictionRepository;
         this.restUtils = restUtils;
         this.courseService = courseService;
     }
@@ -44,14 +48,14 @@ public class DataConversionService {
                 students = restUtils.getStudentsByPen(convGradStudent.getPen(), accessToken);
             } catch (Exception e) {
                 ConversionError error = new ConversionError();
-                error.setPen(convGradStudent.getPen());
+                error.setItem(convGradStudent.getPen());
                 error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
                 summary.getErrors().add(error);
                 return null;
             }
             if (students == null || students.isEmpty()) {
                 ConversionError error = new ConversionError();
-                error.setPen(convGradStudent.getPen());
+                error.setItem(convGradStudent.getPen());
                 error.setReason("PEN does not exist: PEN Student API returns empty response.");
                 summary.getErrors().add(error);
                 return null;
@@ -72,7 +76,7 @@ public class DataConversionService {
                         processSpecialPrograms(gradStudentEntity, accessToken);
                     } catch (Exception e) {
                         ConversionError error = new ConversionError();
-                        error.setPen(convGradStudent.getPen());
+                        error.setItem(convGradStudent.getPen());
                         error.setReason("Grad Program Management API is failed: " + e.getLocalizedMessage());
                         summary.getErrors().add(error);
                     }
@@ -88,7 +92,7 @@ public class DataConversionService {
                         processSpecialPrograms(gradStudentEntity, accessToken);
                     } catch (Exception e) {
                         ConversionError error = new ConversionError();
-                        error.setPen(convGradStudent.getPen());
+                        error.setItem(convGradStudent.getPen());
                         error.setReason("Grad Program Management API is failed: " + e.getLocalizedMessage());
                         summary.getErrors().add(error);
                     }
@@ -97,7 +101,7 @@ public class DataConversionService {
             return convGradStudent;
         } catch (Exception e) {
             ConversionError error = new ConversionError();
-            error.setPen(convGradStudent.getPen());
+            error.setItem(convGradStudent.getPen());
             error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
             summary.getErrors().add(error);
             return null;
@@ -197,7 +201,7 @@ public class DataConversionService {
                 } else {
                     // error
                     ConversionError error = new ConversionError();
-                    error.setPen(student.getPen());
+                    error.setItem(student.getPen());
                     error.setReason("Program is not found for 1950 / " + student.getStudentGrade());
                     summary.getErrors().add(error);
                 }
@@ -209,5 +213,27 @@ public class DataConversionService {
             default:
                 break;
         }
+    }
+
+    @Transactional(readOnly = true, transactionManager = "convTransactionManager")
+    public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData(boolean purge) {
+        if (purge) {
+            convGradCourseRestrictionRepository.deleteAll();
+            convGradCourseRestrictionRepository.flush();
+        }
+        List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
+        List<Object[]> results = convGradCourseRestrictionRepository.loadInitialRawData();
+        results.forEach(result -> {
+            String mainCourse = (String) result[0];
+            String mainCourseLevel = (String) result[1];
+            String restrictedCourse = (String) result[2];
+            String restrictedCourseLevel = (String) result[3];
+            String startDate = (String) result[4];
+            String endDate = (String) result[5];
+            GradCourseRestriction courseRestriction = new GradCourseRestriction(
+                    mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
+            courseRestrictions.add(courseRestriction);
+        });
+        return courseRestrictions;
     }
 }

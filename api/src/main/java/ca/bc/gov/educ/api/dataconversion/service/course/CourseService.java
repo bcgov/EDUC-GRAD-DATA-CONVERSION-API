@@ -1,12 +1,13 @@
 package ca.bc.gov.educ.api.dataconversion.service.course;
 
 import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionError;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,17 @@ import java.util.*;
 @Service
 public class CourseService {
 
+    private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>() {{
+        add(Pair.of("CLEA", "CLEB"));
+        add(Pair.of("CLEA", "CLEBF"));
+        add(Pair.of("CLEAF", "CLEB"));
+        add(Pair.of("CLEAF", "CLEBF"));
+        add(Pair.of("CLEB", "CLEA"));
+        add(Pair.of("CLEB", "CLEAF"));
+        add(Pair.of("CLEBF", "CLEA"));
+        add(Pair.of("CLEBF", "CLEAF"));
+    }};
+
     private final GradCourseRestrictionRepository gradCourseRestrictionRepository;
 
     @Autowired
@@ -24,8 +36,15 @@ public class CourseService {
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
-    public void convertCourseRestriction(GradCourseRestriction courseRestriction, ConversionSummaryDTO summary) {
+    public GradCourseRestriction convertCourseRestriction(GradCourseRestriction courseRestriction, ConversionSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
+        if (isInvalidData(courseRestriction.getMainCourse(), courseRestriction.getRestrictedCourse())) {
+            ConversionError error = new ConversionError();
+            error.setItem(courseRestriction.getMainCourse() + " " + courseRestriction.getRestrictedCourse());
+            error.setReason("Skip invalid data");
+            summary.getErrors().add(error);
+            return null;
+        }
         Optional<GradCourseRestrictionEntity> optional =  gradCourseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
                 courseRestriction.getMainCourse(), courseRestriction.getMainCourseLevel(), courseRestriction.getRestrictedCourse(), courseRestriction.getRestrictedCourseLevel());
 
@@ -37,37 +56,12 @@ public class CourseService {
         } else {
             summary.setAddedCount(summary.getAddedCount() + 1L);
         }
+        return courseRestriction;
     }
 
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData(boolean purge) {
-        if (purge) {
-            gradCourseRestrictionRepository.deleteAll();
-            gradCourseRestrictionRepository.flush();
-        }
-        List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
-        List<Object[]> results = gradCourseRestrictionRepository.loadInitialRawData();
-        results.forEach(result -> {
-            String mainCourse = (String) result[0];
-            String mainCourseLevel = (String) result[1];
-            String restrictedCourse = (String) result[2];
-            String restrictedCourseLevel = (String) result[3];
-            String startDate = (String) result[4];
-            String endDate = (String) result[5];
-            GradCourseRestriction courseRestriction = new GradCourseRestriction(
-                    mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
-            courseRestrictions.add(courseRestriction);
-        });
-        return courseRestrictions;
-    }
-
-    @Transactional(transactionManager = "courseTransactionManager")
-    public void removeGradCourseRestriction(String mainCourseCode, String restrictedCourseCode, ConversionSummaryDTO summary) {
-        List<GradCourseRestrictionEntity> removalList = gradCourseRestrictionRepository.findByMainCourseAndRestrictedCourse(mainCourseCode, restrictedCourseCode);
-        removalList.forEach(c -> {
-            gradCourseRestrictionRepository.delete(c);
-            summary.setAddedCount(summary.getAddedCount() - 1L);
-        });
+    private boolean isInvalidData(String mainCourseCode, String restrictedCourseCode) {
+        Pair<String, String> pair = Pair.of(mainCourseCode, restrictedCourseCode);
+        return IGNORE_LIST.contains(pair);
     }
 
     private void convertCourseRestrictionData(GradCourseRestriction courseRestriction, GradCourseRestrictionEntity courseRestrictionEntity) {

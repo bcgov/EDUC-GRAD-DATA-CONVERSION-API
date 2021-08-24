@@ -40,7 +40,7 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
         ExecutionContext jobContext = jobExecution.getExecutionContext();
         summaryDTO = new ConversionSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
-        jobContext.put("summaryDTO", summaryDTO);
+        jobContext.put("studentSummaryDTO", summaryDTO);
     }
 
     @Override
@@ -60,8 +60,8 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
         
         if (indexForStudent < studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
-            LOGGER.info("Found student[{}] - PEN: {} in total {}", indexForStudent + 1, nextStudent.getPen(), summaryDTO.getReadCount());
             indexForStudent++;
+            LOGGER.info("Found student[{}] - PEN: {} in total {}", indexForStudent, nextStudent.getPen(), summaryDTO.getReadCount());
         }
         else {
         	indexForStudent = 0;
