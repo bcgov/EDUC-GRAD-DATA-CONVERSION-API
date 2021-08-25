@@ -12,9 +12,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 
 @Component
-public class DataConversionJobCompletionNotificationListener extends JobExecutionListenerSupport {
+public class CourseRestrictionDataConversionJobCompletionNotificationListener extends JobExecutionListenerSupport {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionJobCompletionNotificationListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CourseRestrictionDataConversionJobCompletionNotificationListener.class);
     
     @Override
     public void afterJob(JobExecution jobExecution) {
@@ -24,22 +24,17 @@ public class DataConversionJobCompletionNotificationListener extends JobExecutio
 	    	LOGGER.info("Data Conversion Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("summaryDTO");
+			ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
 
 			LOGGER.info(" Records read:		{}", summaryDTO.getReadCount());
-			LOGGER.info(" Processed count:	{}", summaryDTO.getReadCount());
+			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
 			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
 			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
 			LOGGER.info(" Errors: 			{}", summaryDTO.getErrors().size());
 			summaryDTO.getErrors().forEach(e ->
-				LOGGER.info("	Pen: {}, Reason: {}", e.getPen(), e.getReason())
+				LOGGER.info("	Course Restriction: {}, Reason: {}", e.getItem(), e.getReason())
 			);
-			LOGGER.info(" --------------------------------------------------------------------------------------");
-			summaryDTO.getProgramCountMap().entrySet().stream().forEach(e -> {
-				String key = e.getKey();
-				LOGGER.info(" {} count:	{}", key, summaryDTO.getProgramCountMap().get(key));
-			});
 			LOGGER.info("=======================================================================================");
 		}
     }

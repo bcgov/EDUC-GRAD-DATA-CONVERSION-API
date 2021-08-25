@@ -37,16 +37,36 @@ public class JobLauncherController {
         this.jobRegistry = jobRegistry;
     }
 
-    @GetMapping(EducGradDataConversionApiConstants.EXECUTE_DATA_CONVERSION_BATCH_JOB)
-    public ResponseEntity<ConversionSummaryDTO> launchDataConversionJob( ) {
-        logger.info("Inside Launch Data Conversion Job");
+    @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
+    public ResponseEntity<ConversionSummaryDTO> launchStudentDataConversionJob( ) {
+        logger.info("Inside Launch Student Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
-        builder.addString(JOB_PARAM, "dataConversionBatchJob");
+        builder.addString(JOB_PARAM, "studentDataConversionBatchJob");
         try {
-            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("dataConversionBatchJob"), builder.toJobParameters());
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("summaryDTO");
+            ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+            return ResponseEntity.ok(summaryDTO);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+                | JobParametersInvalidException | NoSuchJobException e) {
+            e.printStackTrace();
+            ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
+            summaryDTO.setException(e.getLocalizedMessage());
+            return ResponseEntity.status(500).body(summaryDTO);
+        }
+    }
+
+    @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB)
+    public ResponseEntity<ConversionSummaryDTO> launchCourseRestrictionDataConversionJob( ) {
+        logger.info("Inside Launch Course Restriction Data Conversion Job");
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
+        builder.addString(JOB_PARAM, "courseRestrictionDataConversionBatchJob");
+        try {
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("courseRestrictionDataConversionBatchJob"), builder.toJobParameters());
+            ExecutionContext jobContext = jobExecution.getExecutionContext();
+            ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
             return ResponseEntity.ok(summaryDTO);
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {

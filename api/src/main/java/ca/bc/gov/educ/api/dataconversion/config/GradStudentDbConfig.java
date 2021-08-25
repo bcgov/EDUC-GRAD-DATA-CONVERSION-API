@@ -45,7 +45,7 @@ public class GradStudentDbConfig {
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String studentUrl;
+    private String jdbcUrl;
 
     @Value("${spring.db-connection.student.username}")
     private String studentUsername;
@@ -58,13 +58,12 @@ public class GradStudentDbConfig {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(studentUrl);
+        config.setJdbcUrl(jdbcUrl);
         config.setUsername(studentUsername);
         config.setPassword(studentPassword);
         config.setPoolName(studentPoolName);
 
         config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
@@ -87,7 +86,7 @@ public class GradStudentDbConfig {
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("batchPU");
+        em.setPersistenceUnitName("studentPU");
 
         return em;
     }

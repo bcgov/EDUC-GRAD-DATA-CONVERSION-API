@@ -31,8 +31,8 @@ public class BatchJobLauncher {
     private final JobLauncher jobLauncher;
 
     @Autowired
-    public BatchJobLauncher(Job dataConversionBatchJob, JobLauncher jobLauncher) {
-        this.job = dataConversionBatchJob;
+    public BatchJobLauncher(Job studentDataConversionBatchJob, JobLauncher jobLauncher) {
+        this.job = studentDataConversionBatchJob;
         this.jobLauncher = jobLauncher;
     }
 

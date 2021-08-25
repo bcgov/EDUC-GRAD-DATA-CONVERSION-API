@@ -14,8 +14,16 @@
     <properties>
         <sonar.language>java</sonar.language>
         <sonar.exclusions>
-            src/main/resources/**,src/main/java/ca/bc/gov/educ/api/dataconversion/config/**,src/main/java/ca/bc/gov/educ/api/dataconversion/model/**,
-            src/main/java/ca/bc/gov/educ/api/dataconversion/util/**
+            src/main/resources/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/config/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/model/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/entity/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/mappers/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/util/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/listener/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/processor/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/reader/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/writer/**
         </sonar.exclusions>
         <java.version>11</java.version>
         <maven.compiler.version>3.8.0</maven.compiler.version>

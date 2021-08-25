@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -17,53 +18,47 @@ import javax.sql.DataSource;
 import java.util.HashMap;
 
 @Configuration
-@Profile("!test")
+@Profile("test")
 @EnableJpaRepositories(
         basePackages = {
-                "ca.bc.gov.educ.api.dataconversion.repository.course"
+            "ca.bc.gov.educ.api.dataconversion.repository.conv"
         },
-        entityManagerFactoryRef = "courseEntityManager",
-        transactionManagerRef = "courseTransactionManager"
+        entityManagerFactoryRef = "convEntityManager",
+        transactionManagerRef = "convTransactionManager"
 )
 @EnableTransactionManagement
-public class CourseDbConfig {
+public class GradConvDbConfig {
     // Hikari Pool
-    @Value("${spring.db-connection.hikari.maximum-pool-size}")
+    @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maxPoolSize;
 
-    @Value("${spring.db-connection.hikari.connection-timeout}")
+    @Value("${spring.datasource.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-life-time}")
+    @Value("${spring.datasource.hikari.max-life-time}")
     private int maxLifetime;
 
-    @Value("${spring.db-connection.driver-class}")
+    @Value("${spring.datasource.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.course.pool-name}")
-    private String coursePoolName;
+    @Value("${spring.datasource.hikari.pool-name}")
+    private String poolName;
 
     // Connection String
-    @Value("${spring.db-connection.url}")
+    @Value("${spring.datasource.url}")
     private String jdbcUrl;
 
-    @Value("${spring.db-connection.course.username}")
-    private String courseUsername;
-
-    @Value("${spring.db-connection.course.password}")
-    private String coursePassword;
-
+    @Primary
     @Bean
-    public DataSource courseDataSource() {
+    public DataSource convDataSource() {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
         config.setJdbcUrl(jdbcUrl);
-        config.setUsername(courseUsername);
-        config.setPassword(coursePassword);
-        config.setPoolName(coursePoolName);
+        config.setPoolName(poolName);
 
         config.setMinimumIdle(2);
+        config.setIdleTimeout(30000);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
@@ -71,30 +66,32 @@ public class CourseDbConfig {
         return new HikariDataSource(config);
     }
 
+    @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean courseEntityManager() {
+    public LocalContainerEntityManagerFactoryBean convEntityManager() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(courseDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.course"});
+        em.setDataSource(convDataSource());
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         HashMap<String, Object> properties = new HashMap<>();
-        properties.put("hibernate.hbm2ddl.auto", "none");
-        properties.put("hibernate.dialect", "org.hibernate.dialect.Oracle12cDialect");
+        properties.put("hibernate.hbm2ddl.auto", "create-drop");
+        properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("coursePU");
+        em.setPersistenceUnitName("convPU");
 
         return em;
     }
 
+    @Primary
     @Bean
-    public PlatformTransactionManager courseTransactionManager() {
+    public PlatformTransactionManager convTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(courseEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(convEntityManager().getObject());
         return transactionManager;
     }
 }

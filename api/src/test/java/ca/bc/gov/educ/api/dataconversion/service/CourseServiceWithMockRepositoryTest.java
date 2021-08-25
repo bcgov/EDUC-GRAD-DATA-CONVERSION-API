@@ -97,20 +97,4 @@ public class CourseServiceWithMockRepositoryTest {
         assertThat(summary.getUpdatedCount()).isEqualTo(1L);
     }
 
-    @Test
-    public void testLoadInitialRawGradCourseRestrictionsData() {
-        Object[] obj = new Object[] {
-                "main", "12", "test", "12", null, null
-        };
-        List<Object[]> results = new ArrayList<>();
-        results.add(obj);
-
-        when(this.gradCourseRestrictionRepository.loadInitialRawData()).thenReturn(results);
-
-        var result = courseService.loadInitialRawGradCourseRestrictionsData(true);
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        GradCourseRestriction responseCourseRestriction = result.get(0);
-        assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
-    }
 }

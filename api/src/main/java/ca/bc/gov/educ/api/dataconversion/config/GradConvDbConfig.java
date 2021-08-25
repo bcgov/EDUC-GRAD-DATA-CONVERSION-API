@@ -24,7 +24,7 @@ import java.util.HashMap;
             "ca.bc.gov.educ.api.dataconversion.repository.conv"
         },
         entityManagerFactoryRef = "convEntityManager",
-        transactionManagerRef = "batchTransactionManager"
+        transactionManagerRef = "convTransactionManager"
 )
 @EnableTransactionManagement
 public class GradConvDbConfig {
@@ -46,7 +46,7 @@ public class GradConvDbConfig {
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String convUrl;
+    private String jdbcUrl;
 
     @Value("${spring.db-connection.conv.username}")
     private String convUsername;
@@ -60,13 +60,12 @@ public class GradConvDbConfig {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(convUrl);
+        config.setJdbcUrl(jdbcUrl);
         config.setUsername(convUsername);
         config.setPassword(convPassword);
         config.setPoolName(convPoolName);
 
         config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);

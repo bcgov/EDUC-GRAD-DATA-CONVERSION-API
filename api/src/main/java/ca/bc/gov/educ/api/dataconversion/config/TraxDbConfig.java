@@ -45,7 +45,7 @@ public class TraxDbConfig {
 
     // Connection String
     @Value("${spring.db-connection.url}")
-    private String traxUrl;
+    private String jdbcUrl;
 
     @Value("${spring.db-connection.trax.username}")
     private String traxUsername;
@@ -58,13 +58,12 @@ public class TraxDbConfig {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
-        config.setJdbcUrl(traxUrl);
+        config.setJdbcUrl(jdbcUrl);
         config.setUsername(traxUsername);
         config.setPassword(traxPassword);
         config.setPoolName(traxPoolName);
 
         config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
@@ -87,7 +86,7 @@ public class TraxDbConfig {
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
 
-        em.setPersistenceUnitName("batchPU");
+        em.setPersistenceUnitName("traxPU");
 
         return em;
     }
