@@ -64,7 +64,6 @@ public class ProgramDbConfig {
         config.setPoolName(programPoolName);
 
         config.setMinimumIdle(2);
-        config.setIdleTimeout(30000);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);

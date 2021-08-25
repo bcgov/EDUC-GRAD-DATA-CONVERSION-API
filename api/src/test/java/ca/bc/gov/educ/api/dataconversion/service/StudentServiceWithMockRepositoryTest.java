@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestricti
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentSpecialProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -30,10 +30,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class DataConversionServiceWithMockRepositoryTest {
+public class StudentServiceWithMockRepositoryTest {
 
     @Autowired
-    DataConversionService dataConversionService;
+    StudentService studentService;
 
     @MockBean
     ConvGradStudentRepository convGradStudentRepository;
@@ -103,7 +103,7 @@ public class DataConversionServiceWithMockRepositoryTest {
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
         ConversionSummaryDTO summary = new ConversionSummaryDTO();
         summary.setAccessToken("123");
-        var result = dataConversionService.convertStudent(student, summary);
+        var result = studentService.convertStudent(student, summary);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -149,47 +149,13 @@ public class DataConversionServiceWithMockRepositoryTest {
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
         ConversionSummaryDTO summary = new ConversionSummaryDTO();
         summary.setAccessToken("123");
-        var result = dataConversionService.convertStudent(student, summary);
+        var result = studentService.convertStudent(student, summary);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
         assertThat(result.getRecalculateGradStatus()).isEqualTo("Y");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
-    }
-
-    @Test
-    public void testLoadInitialRawGradStudentData() {
-        Object[] obj = new Object[] {
-               "123456789", "12345678", "12345678", "12", Character.valueOf('A'), "2020", Character.valueOf('Y')
-        };
-        List<Object[]> results = new ArrayList<>();
-        results.add(obj);
-
-        when(this.convGradStudentRepository.loadInitialRawData()).thenReturn(results);
-
-        var result = dataConversionService.loadInitialRawGradStudentData(true);
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        ConvGradStudent responseStudent = result.get(0);
-        assertThat(responseStudent.getPen()).isEqualTo(obj[0]);
-    }
-
-    @Test
-    public void testLoadInitialRawGradCourseRestrictionsData() {
-        Object[] obj = new Object[] {
-                "main", "12", "test", "12", null, null
-        };
-        List<Object[]> results = new ArrayList<>();
-        results.add(obj);
-
-        when(this.convGradCourseRestrictionRepository.loadInitialRawData()).thenReturn(results);
-
-        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData(true);
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        GradCourseRestriction responseCourseRestriction = result.get(0);
-        assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
     }
 
 }

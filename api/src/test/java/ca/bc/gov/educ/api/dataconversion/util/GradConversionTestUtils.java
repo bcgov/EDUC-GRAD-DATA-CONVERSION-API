@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 import ca.bc.gov.educ.api.dataconversion.mappers.ConvGradStudentMapper;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,15 +24,12 @@ import static java.util.stream.Collectors.toList;
 @Profile("test")
 public class GradConversionTestUtils {
     @Autowired
-    ConvGradStudentRepository convGradStudentRepository;
-
-    @Autowired
-    GradCourseRestrictionRepository gradCourseRestrictionRepository;
+    GraduationStatusRepository graduationStatusRepository;
 
     @Autowired
     private ConvGradStudentMapper mapper;
 
-    public static ConvGradStudentEntity populateIdAndAuditColumns(final ConvGradStudentEntity entity) {
+    public static GraduationStatusEntity populateIdAndAuditColumns(final GraduationStatusEntity entity) {
         if (entity.getStudentID() == null) {
             entity.setStudentID(UUID.randomUUID());
         }
@@ -49,7 +46,7 @@ public class GradConversionTestUtils {
         return entity;
     }
 
-    public List<ConvGradStudentEntity> createConvGradStudents(final String jsonFileName) throws IOException {
+    public List<GraduationStatusEntity> createGradStudents(final String jsonFileName) throws IOException {
         final File file = new File(
                 Objects.requireNonNull(GradConversionTestUtils.class.getClassLoader().getResource(jsonFileName)).getFile()
         );
@@ -58,7 +55,7 @@ public class GradConversionTestUtils {
         final var entities = models.stream().map(mapper::toEntity)
                 .collect(toList()).stream().map(GradConversionTestUtils::populateIdAndAuditColumns).collect(toList());
 
-        convGradStudentRepository.saveAll(entities);
+        graduationStatusRepository.saveAll(entities);
         return entities;
     }
 

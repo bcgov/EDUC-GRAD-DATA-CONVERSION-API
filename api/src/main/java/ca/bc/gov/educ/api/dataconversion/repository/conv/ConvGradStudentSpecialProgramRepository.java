@@ -10,7 +10,7 @@ import java.util.UUID;
 @Repository
 public interface ConvGradStudentSpecialProgramRepository extends JpaRepository<ConvGradStudentSpecialProgramEntity, UUID> {
 
-    Optional<ConvGradStudentSpecialProgramEntity> findByStudentIDAndOptionalProgramID(UUID studentID, UUID specialProgramID);
+    Optional<ConvGradStudentSpecialProgramEntity> findByStudentIDAndOptionalProgramID(UUID studentID, UUID optionalProgramID);
 
 }
 

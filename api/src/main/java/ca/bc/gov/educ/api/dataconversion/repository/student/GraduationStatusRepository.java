@@ -1,19 +1,13 @@
 package ca.bc.gov.educ.api.dataconversion.repository.student;
 
-import java.util.List;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 
 @Repository
-public interface GraduationStatusRepository extends JpaRepository<GraduationStatusEntity, String> {
+public interface GraduationStatusRepository extends JpaRepository<GraduationStatusEntity, UUID> {
 
-    List<GraduationStatusEntity> findAll();
-
-	List<GraduationStatusEntity> findByRecalculateGradStatus(String recalulateFlag);
-	@Query(value="select * from grad_student where student_id is null",nativeQuery=true)
-	List<GraduationStatusEntity> findByStudentID();
 }
