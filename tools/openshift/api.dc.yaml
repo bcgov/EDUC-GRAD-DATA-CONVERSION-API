@@ -54,7 +54,7 @@ objects:
                 - configMapRef:
                     name: educ-grad-data-conversion-api-config-map
                 - secretRef:
-                    name: educ-grad-conv-db-secret
+                    name: api-grad-conv-db-secret
                 - secretRef:
                     name: grad-keycloak-pk-secret
                 - secretRef:
