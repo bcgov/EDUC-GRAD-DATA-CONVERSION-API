@@ -85,6 +85,7 @@ public class TraxDbConfig {
         properties.put("hibernate.dialect", "org.hibernate.dialect.Oracle12cDialect");
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
+        em.setJpaPropertyMap(properties);
 
         em.setPersistenceUnitName("traxPU");
 

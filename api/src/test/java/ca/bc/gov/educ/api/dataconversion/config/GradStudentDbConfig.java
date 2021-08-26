@@ -78,6 +78,7 @@ public class GradStudentDbConfig {
         properties.put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
         properties.put("hibernate.format_sql", "true");
         properties.put("hibernate.show_sql", "true");
+        em.setJpaPropertyMap(properties);
 
         em.setPersistenceUnitName("studentPU");
 
