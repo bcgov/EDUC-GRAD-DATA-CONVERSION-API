@@ -16,6 +16,10 @@ spring:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
+    batch:
+      username: ${BATCH_USERNAME}
+      password: ${BATCH_PASSWORD}
+      pool-name: conv-batch-cp
     conv:
       username: ${CONV_USERNAME}
       password: ${CONV_PASSWORD}

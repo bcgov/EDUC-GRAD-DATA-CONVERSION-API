@@ -15,7 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "COURSE_RESTRICTION")
-public class GradCourseRestrictionEntity extends BaseEntity {
+public class CourseRestrictionEntity extends BaseEntity {
    
 	@Id
 	@Column(name = "COURSE_RESTRICTION_ID", nullable = false)

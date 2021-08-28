@@ -107,8 +107,8 @@ select  trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as
 from trax_students_load l, student_master m
 where 1 = 1
 and l.stud_no = m.stud_no
-and m.grad_date = 0
-and m.archive_flag = 'A'
+--and m.grad_date = 0
+--and m.archive_flag = 'A'
 
 -- GRAD_COURSE_RESTRICTIONS
 select trim(c1.crse_code) as CRSE_MAIN, trim(c1.crse_level) as CRSE_MAIN_LVL,

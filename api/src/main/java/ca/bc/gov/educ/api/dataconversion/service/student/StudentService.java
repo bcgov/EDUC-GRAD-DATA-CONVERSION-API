@@ -113,28 +113,37 @@ public class StudentService {
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStatusEntity studentEntity, ConversionSummaryDTO summary) {
-        studentEntity.setGpa(student.getGpa());
-        studentEntity.setHonoursStanding(student.getHonoursStanding());
         determineProgram(student, summary);
         studentEntity.setProgram(student.getProgram());
-        studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
+
+        // for testing purpose
+        // always set to NULL, even for graduated students.  => GRAD grad algorithm will be run at some point
+        studentEntity.setGpa(null);
+        studentEntity.setHonoursStanding(null);
+        studentEntity.setProgramCompletionDate(null);
+        studentEntity.setStudentGradData(null);
+//        studentEntity.setGpa(student.getGpa());
+//        studentEntity.setHonoursStanding(student.getHonoursStanding());
+//        studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
+//        studentEntity.setStudentGradData(student.getStudentGradData());
+
         studentEntity.setSchoolOfRecord(student.getSchoolOfRecord());
         studentEntity.setSchoolAtGrad(student.getSchoolAtGrad());
         studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
-        studentEntity.setStudentGradData(student.getStudentGradData());
+
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(student.getStudentStatus());
     }
 
     private void processSpecialPrograms(GraduationStatusEntity student, String accessToken) {
         // French Immersion for 2018-EN
-        if (StringUtils.equals(student.getProgram(), "2018-EN")) {
-            if (courseService.isFrenchImmersionCourse(student.getPen())) {
+        if (!StringUtils.equals(student.getProgram(), "2018-PF")) {
+            if (courseService.hasTakenFRALOrFRALP(student.getPen())) {
                 StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
                 entity.setPen(student.getPen());
                 entity.setStudentID(student.getStudentID());
                 // Call Grad Program Management API
-                GradSpecialProgram gradSpecialProgram = restUtils.getGradSpecialProgram("2018-EN", "FI", accessToken);
+                GradSpecialProgram gradSpecialProgram = restUtils.getGradSpecialProgram(student.getProgram(), "FI", accessToken);
                 if (gradSpecialProgram != null && gradSpecialProgram.getOptionalProgramID() != null) {
                     entity.setOptionalProgramID(gradSpecialProgram.getOptionalProgramID());
                     Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());

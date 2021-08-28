@@ -1,10 +1,11 @@
 package ca.bc.gov.educ.api.dataconversion.service.course;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionError;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
-import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -28,11 +29,14 @@ public class CourseService {
         add(Pair.of("CLEBF", "CLEAF"));
     }};
 
-    private final GradCourseRestrictionRepository gradCourseRestrictionRepository;
+    private final CourseRestrictionRepository courseRestrictionRepository;
+    private final CourseRequirementRepository courseRequirementRepository;
 
     @Autowired
-    public CourseService(GradCourseRestrictionRepository gradCourseRestrictionRepository) {
-        this.gradCourseRestrictionRepository = gradCourseRestrictionRepository;
+    public CourseService(CourseRestrictionRepository courseRestrictionRepository,
+                         CourseRequirementRepository courseRequirementRepository) {
+        this.courseRestrictionRepository = courseRestrictionRepository;
+        this.courseRequirementRepository = courseRequirementRepository;
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
@@ -45,12 +49,12 @@ public class CourseService {
             summary.getErrors().add(error);
             return null;
         }
-        Optional<GradCourseRestrictionEntity> optional =  gradCourseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
+        Optional<CourseRestrictionEntity> optional =  courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
                 courseRestriction.getMainCourse(), courseRestriction.getMainCourseLevel(), courseRestriction.getRestrictedCourse(), courseRestriction.getRestrictedCourseLevel());
 
-        GradCourseRestrictionEntity entity = optional.orElseGet(GradCourseRestrictionEntity::new);
+        CourseRestrictionEntity entity = optional.orElseGet(CourseRestrictionEntity::new);
         convertCourseRestrictionData(courseRestriction, entity);
-        gradCourseRestrictionRepository.save(entity);
+        courseRestrictionRepository.save(entity);
         if (optional.isPresent()) {
             summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
         } else {
@@ -64,7 +68,7 @@ public class CourseService {
         return IGNORE_LIST.contains(pair);
     }
 
-    private void convertCourseRestrictionData(GradCourseRestriction courseRestriction, GradCourseRestrictionEntity courseRestrictionEntity) {
+    private void convertCourseRestrictionData(GradCourseRestriction courseRestriction, CourseRestrictionEntity courseRestrictionEntity) {
         if (courseRestrictionEntity.getCourseRestrictionId() == null) {
             courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
         }
@@ -89,7 +93,15 @@ public class CourseService {
 
     @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
     public boolean isFrenchImmersionCourse(String pen) {
-        if (this.gradCourseRestrictionRepository.countFrenchImmersionCourses(pen) > 0L) {
+        if (this.courseRestrictionRepository.countFrenchImmersionCourses(pen) > 0L) {
+            return true;
+        }
+        return false;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
+    public boolean hasTakenFRALOrFRALP(String pen) {
+        if (this.courseRequirementRepository.countFRALAndFRALPCourses(pen) > 0L) {
             return true;
         }
         return false;
