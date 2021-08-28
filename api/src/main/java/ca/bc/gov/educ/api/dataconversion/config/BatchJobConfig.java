@@ -10,8 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionW
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
@@ -28,7 +27,9 @@ import ca.bc.gov.educ.api.dataconversion.reader.DataConversionStudentReader;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
 
+
 @Configuration
+@EnableBatchProcessing
 public class BatchJobConfig {
 
     @Autowired

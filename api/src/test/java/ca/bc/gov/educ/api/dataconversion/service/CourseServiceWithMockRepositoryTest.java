@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
@@ -32,7 +32,7 @@ public class CourseServiceWithMockRepositoryTest {
     CourseService courseService;
 
     @MockBean
-    GradCourseRestrictionRepository gradCourseRestrictionRepository;
+    CourseRestrictionRepository courseRestrictionRepository;
 
     @MockBean
     RestUtils restUtils;
@@ -50,7 +50,7 @@ public class CourseServiceWithMockRepositoryTest {
 
     @After
     public void tearDown() {
-        gradCourseRestrictionRepository.deleteAll();
+        courseRestrictionRepository.deleteAll();
     }
 
     @Test
@@ -62,15 +62,15 @@ public class CourseServiceWithMockRepositoryTest {
                 "main", "12", "rest", "12", null, null
         );
 
-        GradCourseRestrictionEntity gradCourseRestrictionEntity = new GradCourseRestrictionEntity();
-        gradCourseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-        gradCourseRestrictionEntity.setMainCourse("main");
-        gradCourseRestrictionEntity.setMainCourseLevel("12");
-        gradCourseRestrictionEntity.setRestrictedCourse("rest");
-        gradCourseRestrictionEntity.setRestrictedCourseLevel("12");
+        CourseRestrictionEntity courseRestrictionEntity = new CourseRestrictionEntity();
+        courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
+        courseRestrictionEntity.setMainCourse("main");
+        courseRestrictionEntity.setMainCourseLevel("12");
+        courseRestrictionEntity.setRestrictedCourse("rest");
+        courseRestrictionEntity.setRestrictedCourseLevel("12");
 
-        when(this.gradCourseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.empty());
-        when(this.gradCourseRestrictionRepository.save(gradCourseRestrictionEntity)).thenReturn(gradCourseRestrictionEntity);
+        when(this.courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.empty());
+        when(this.courseRestrictionRepository.save(courseRestrictionEntity)).thenReturn(courseRestrictionEntity);
         courseService.convertCourseRestriction(courseRestriction, summary);
         assertThat(summary.getAddedCount()).isEqualTo(1L);
     }
@@ -84,15 +84,15 @@ public class CourseServiceWithMockRepositoryTest {
                 "main", "12", "rest", "12", null, null
         );
 
-        GradCourseRestrictionEntity gradCourseRestrictionEntity = new GradCourseRestrictionEntity();
-        gradCourseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-        gradCourseRestrictionEntity.setMainCourse("main");
-        gradCourseRestrictionEntity.setMainCourseLevel("12");
-        gradCourseRestrictionEntity.setRestrictedCourse("rest");
-        gradCourseRestrictionEntity.setRestrictedCourseLevel("12");
+        CourseRestrictionEntity courseRestrictionEntity = new CourseRestrictionEntity();
+        courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
+        courseRestrictionEntity.setMainCourse("main");
+        courseRestrictionEntity.setMainCourseLevel("12");
+        courseRestrictionEntity.setRestrictedCourse("rest");
+        courseRestrictionEntity.setRestrictedCourseLevel("12");
 
-        when(this.gradCourseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.of(gradCourseRestrictionEntity));
-        when(this.gradCourseRestrictionRepository.save(gradCourseRestrictionEntity)).thenReturn(gradCourseRestrictionEntity);
+        when(this.courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.of(courseRestrictionEntity));
+        when(this.courseRestrictionRepository.save(courseRestrictionEntity)).thenReturn(courseRestrictionEntity);
         courseService.convertCourseRestriction(courseRestriction, summary);
         assertThat(summary.getUpdatedCount()).isEqualTo(1L);
     }

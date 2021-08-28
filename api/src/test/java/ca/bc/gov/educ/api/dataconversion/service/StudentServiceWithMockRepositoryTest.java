@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentSpecialProgramRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
@@ -45,7 +45,7 @@ public class StudentServiceWithMockRepositoryTest {
     ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository;
 
     @MockBean
-    GradCourseRestrictionRepository gradCourseRestrictionRepository;
+    CourseRestrictionRepository courseRestrictionRepository;
 
     @MockBean
     RestUtils restUtils;
@@ -94,7 +94,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.convGradStudentRepository.findById(studentID)).thenReturn(Optional.of(penStudentEntity));
         when(this.convGradStudentRepository.save(penStudentEntity)).thenReturn(penStudentEntity);
-        when(this.gradCourseRestrictionRepository.countFrenchImmersionCourses(pen)).thenReturn(1L);
+        when(this.courseRestrictionRepository.countFrenchImmersionCourses(pen)).thenReturn(1L);
         when(this.convGradStudentSpecialProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
@@ -140,7 +140,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.convGradStudentRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.convGradStudentRepository.save(penStudentEntity)).thenReturn(penStudentEntity);
-        when(this.gradCourseRestrictionRepository.countFrenchImmersionCourses(pen)).thenReturn(1L);
+        when(this.courseRestrictionRepository.countFrenchImmersionCourses(pen)).thenReturn(1L);
         when(this.convGradStudentSpecialProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);

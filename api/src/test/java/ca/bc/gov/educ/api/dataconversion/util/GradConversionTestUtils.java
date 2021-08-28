@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 import ca.bc.gov.educ.api.dataconversion.mappers.ConvGradStudentMapper;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.repository.course.GradCourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

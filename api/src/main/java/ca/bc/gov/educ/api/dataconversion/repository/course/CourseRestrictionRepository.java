@@ -1,24 +1,23 @@
 package ca.bc.gov.educ.api.dataconversion.repository.course;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.GradCourseRestrictionEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface GradCourseRestrictionRepository extends JpaRepository<GradCourseRestrictionEntity, UUID> {
+public interface CourseRestrictionRepository extends JpaRepository<CourseRestrictionEntity, UUID> {
 
-	List<GradCourseRestrictionEntity> findByMainCourseAndMainCourseLevel(String courseCode, String courseLevel);
+	List<CourseRestrictionEntity> findByMainCourseAndMainCourseLevel(String courseCode, String courseLevel);
 
-	List<GradCourseRestrictionEntity> findByMainCourseAndRestrictedCourse(String mainCourseCode, String restrictedCourseCode);
+	List<CourseRestrictionEntity> findByMainCourseAndRestrictedCourse(String mainCourseCode, String restrictedCourseCode);
 
-	Optional<GradCourseRestrictionEntity> findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
+	Optional<CourseRestrictionEntity> findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
 			String courseCode, String courseLevel, String restrictedCourseCode, String restrictedCourseCodeLevel);
 
 	@Query(value="select count(*) from STUD_XCRSE sx, COURSE_REQUIREMENT cr\n" +
