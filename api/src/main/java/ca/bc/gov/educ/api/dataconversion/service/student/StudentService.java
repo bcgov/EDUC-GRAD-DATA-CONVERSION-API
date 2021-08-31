@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentSpecialProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentSpecialProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
 
 import ca.bc.gov.educ.api.dataconversion.repository.student.StudentOptionalProgramRepository;
@@ -15,13 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class StudentService {
+
+    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("FI", "AD", "BC", "BD");
 
     private final GraduationStatusRepository graduationStatusRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
@@ -68,7 +65,7 @@ public class StudentService {
             students.forEach(st -> {
                 UUID studentID = UUID.fromString(st.getStudentID());
                 Optional<GraduationStatusEntity> stuOptional = graduationStatusRepository.findById(studentID);
-                GraduationStatusEntity gradStudentEntity = null;
+                GraduationStatusEntity gradStudentEntity;
                 if (stuOptional.isPresent()) {
                     gradStudentEntity = stuOptional.get();
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
@@ -77,11 +74,11 @@ public class StudentService {
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                     // process dependencies
                     try {
-                        processSpecialPrograms(gradStudentEntity, accessToken);
+                        processSpecialPrograms(gradStudentEntity, convGradStudent.getOptionalProgramCodeList(), accessToken, summary);
                     } catch (Exception e) {
                         ConversionError error = new ConversionError();
                         error.setItem(convGradStudent.getPen());
-                        error.setReason("Grad Program Management API is failed: " + e.getLocalizedMessage());
+                        error.setReason("Grad Program API is failed: " + e.getLocalizedMessage());
                         summary.getErrors().add(error);
                     }
                 } else {
@@ -89,16 +86,19 @@ public class StudentService {
                     gradStudentEntity.setPen(st.getPen());
                     gradStudentEntity.setStudentID(studentID);
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
-                    graduationStatusRepository.save(gradStudentEntity);
-                    summary.setAddedCount(summary.getAddedCount() + 1L);
-                    // process dependencies
-                    try {
-                        processSpecialPrograms(gradStudentEntity, accessToken);
-                    } catch (Exception e) {
-                        ConversionError error = new ConversionError();
-                        error.setItem(convGradStudent.getPen());
-                        error.setReason("Grad Program Management API is failed: " + e.getLocalizedMessage());
-                        summary.getErrors().add(error);
+                    // if year "1950" without "AD" or "AN", then program is null
+                    if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
+                        graduationStatusRepository.save(gradStudentEntity);
+                        summary.setAddedCount(summary.getAddedCount() + 1L);
+                        // process dependencies
+                        try {
+                            processSpecialPrograms(gradStudentEntity, convGradStudent.getOptionalProgramCodeList(), accessToken, summary);
+                        } catch (Exception e) {
+                            ConversionError error = new ConversionError();
+                            error.setItem(convGradStudent.getPen());
+                            error.setReason("Grad Program API is failed: " + e.getLocalizedMessage());
+                            summary.getErrors().add(error);
+                        }
                     }
                 }
             });
@@ -135,22 +135,40 @@ public class StudentService {
         studentEntity.setStudentStatus(student.getStudentStatus());
     }
 
-    private void processSpecialPrograms(GraduationStatusEntity student, String accessToken) {
+    private void processSpecialPrograms(GraduationStatusEntity student, List<String> optionalProgramCodes, String accessToken, ConversionSummaryDTO summary) {
         // French Immersion for 2018-EN
-        if (!StringUtils.equals(student.getProgram(), "2018-PF")) {
-            if (courseService.hasTakenFRALOrFRALP(student.getPen())) {
-                StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
-                entity.setPen(student.getPen());
-                entity.setStudentID(student.getStudentID());
-                // Call Grad Program Management API
-                GradSpecialProgram gradSpecialProgram = restUtils.getGradSpecialProgram(student.getProgram(), "FI", accessToken);
-                if (gradSpecialProgram != null && gradSpecialProgram.getOptionalProgramID() != null) {
-                    entity.setOptionalProgramID(gradSpecialProgram.getOptionalProgramID());
-                    Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());
-                    if (!stdSpecialProgramOptional.isPresent()) {
-                        studentOptionalProgramRepository.save(entity);
-                    }
+        if (!student.getSchoolOfRecord().startsWith("093")) {
+            if (courseService.isFrenchImmersionCourse(student.getPen())) {
+                createStudentOptionalProgram("FI", student, accessToken);
+                summary.incrementOptionalProgram("FI");
+            }
+        }
+
+        if (!optionalProgramCodes.isEmpty()) {
+            for (String optionalProgramCode : optionalProgramCodes) {
+                if (isOptionalProgramCode(optionalProgramCode)) {
+                    createStudentOptionalProgram(optionalProgramCode, student, accessToken);
+                    summary.incrementOptionalProgram(optionalProgramCode);
                 }
+            }
+        }
+    }
+
+    private boolean isOptionalProgramCode(String code) {
+       return OPTIONAL_PROGRAM_CODES.contains(code);
+    }
+
+    private void createStudentOptionalProgram(String optionalProgramCode, GraduationStatusEntity student, String accessToken) {
+        StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
+        entity.setPen(student.getPen());
+        entity.setStudentID(student.getStudentID());
+        // Call Grad Program API
+        GradSpecialProgram gradSpecialProgram = restUtils.getGradSpecialProgram(student.getProgram(), optionalProgramCode, accessToken);
+        if (gradSpecialProgram != null && gradSpecialProgram.getOptionalProgramID() != null) {
+            entity.setOptionalProgramID(gradSpecialProgram.getOptionalProgramID());
+            Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());
+            if (!stdSpecialProgramOptional.isPresent()) {
+                studentOptionalProgramRepository.save(entity);
             }
         }
     }
@@ -160,42 +178,47 @@ public class StudentService {
             case "2018":
                 if (student.getSchoolOfRecord().startsWith("093")) {
                     student.setProgram("2018-PF");
-                    summary.increment("2018-PF");
+                    summary.increment("2018-PF", student.isGraduated());
                 } else {
                     student.setProgram("2018-EN");
-                    summary.increment("2018-EN");
+                    summary.increment("2018-EN", student.isGraduated());
                 }
                 break;
             case "2004":
-                student.setProgram("2004");
-                summary.increment("2004");
+                if (student.getSchoolOfRecord().startsWith("093")) {
+                    student.setProgram("2004-PF");
+                    summary.increment("2004-PF", student.isGraduated());
+                } else {
+                    student.setProgram("2004-EN");
+                    summary.increment("2004-EN", student.isGraduated());
+                }
                 break;
             case "1996":
                 student.setProgram("1996");
-                summary.increment("1996");
+                summary.increment("1996", student.isGraduated());
                 break;
             case "1986":
                 student.setProgram("1986");
-                summary.increment("1986");
+                summary.increment("1986", student.isGraduated());
                 break;
             case "1950":
                 if (StringUtils.equals(student.getStudentGrade(), "AD")) {
                     student.setProgram("1950");
-                    summary.increment("1950");
+                    summary.increment("1950", student.isGraduated());
                 } else if (StringUtils.equals(student.getStudentGrade(), "AN")) {
                     student.setProgram("NOPROG");
-                    summary.increment("NOPROG");
+                    summary.increment("NOPROG", student.isGraduated());
                 } else {
                     // error
                     ConversionError error = new ConversionError();
                     error.setItem(student.getPen());
-                    error.setReason("Program is not found for 1950 / " + student.getStudentGrade());
+                    error.setReason("Program is not found for year 1950 / grade " + student.getStudentGrade());
                     summary.getErrors().add(error);
                 }
                 break;
             case "SCCP":
                 student.setProgram("SCCP");
-                summary.increment("SCCP");
+                summary.increment("SCCP", false);
                 break;
             default:
                 break;

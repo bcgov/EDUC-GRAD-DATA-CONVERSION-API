@@ -40,6 +40,12 @@ public class StudentDataConversionJobCompletionNotificationListener extends JobE
 				String key = e.getKey();
 				LOGGER.info(" {} count:	{}", key, summaryDTO.getProgramCountMap().get(key));
 			});
+			LOGGER.info(" --------------------------------------------------------------------------------------");
+			LOGGER.info(" Optional Program Subtotals:");
+			summaryDTO.getOptionalProgramCountMap().entrySet().stream().forEach(e -> {
+				String key = e.getKey();
+				LOGGER.info("	{} count: {}", key, summaryDTO.getProgramCountMap().get(key));
+			});
 			LOGGER.info("=======================================================================================");
 		}
     }

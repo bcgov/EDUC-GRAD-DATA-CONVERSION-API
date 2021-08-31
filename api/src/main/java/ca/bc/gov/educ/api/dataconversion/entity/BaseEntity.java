@@ -39,9 +39,7 @@ public class BaseEntity {
 	@PreUpdate
 	protected void onPersist() {
 		this.updateDate = new Date(System.currentTimeMillis());
-		if (StringUtils.isBlank(updateUser)) {
-			this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
-		}
+		this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 		if (StringUtils.isBlank(createUser)) {
 			this.createUser = EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
 		}

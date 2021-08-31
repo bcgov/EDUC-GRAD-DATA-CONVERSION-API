@@ -15,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,8 @@ public class DataConversionServiceTest {
     @Test
     public void testLoadInitialRawGradStudentData() {
         Object[] obj = new Object[] {
-               "123456789", "12345678", "12345678", "12", Character.valueOf('A'), "2020", Character.valueOf('Y')
+               "123456789", "12345678", "12345678", "12", Character.valueOf('A'), "2020", Character.valueOf('Y'),
+                BigDecimal.ZERO, null, null, null, null, null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
