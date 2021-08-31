@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
@@ -74,7 +74,7 @@ public class StudentServiceTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
-        ConversionSummaryDTO summary = new ConversionSummaryDTO();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         studentService.convertStudent(student, summary);
 
@@ -105,7 +105,7 @@ public class StudentServiceTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
-        ConversionSummaryDTO summary = new ConversionSummaryDTO();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
         var result = studentService.convertStudent(student, summary);
@@ -130,7 +130,7 @@ public class StudentServiceTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
-        ConversionSummaryDTO summary = new ConversionSummaryDTO();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
 

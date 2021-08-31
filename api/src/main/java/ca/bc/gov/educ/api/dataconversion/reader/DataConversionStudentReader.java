@@ -1,11 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -25,7 +24,7 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
 
     private int indexForStudent;
     private List<ConvGradStudent> studentList;
-    private ConversionSummaryDTO summaryDTO;
+    private ConversionStudentSummaryDTO summaryDTO;
 
     public DataConversionStudentReader(DataConversionService dataConversionService, RestUtils restUtils) {
         this.dataConversionService = dataConversionService;
@@ -38,7 +37,7 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
     public void initializeSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = new ConversionSummaryDTO();
+        summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
     }

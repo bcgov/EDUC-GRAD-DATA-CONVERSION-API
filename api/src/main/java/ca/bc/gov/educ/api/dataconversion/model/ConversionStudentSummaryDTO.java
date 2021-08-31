@@ -3,24 +3,12 @@ package ca.bc.gov.educ.api.dataconversion.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
 @Data
 @NoArgsConstructor
-public class ConversionSummaryDTO {
-
-  private String tableName;
-
-  private long readCount = 0L;
-  private long processedCount = 0L;
-
-  private long addedCount = 0L;
-  private long updatedCount = 0L;
-
-  private List<ConversionError> errors = new ArrayList<>();
-  private String exception;
+public class ConversionStudentSummaryDTO extends ConversionBaseSummaryDTO {
 
   // stats
   private Map<String, Long> programCountMap = new LinkedHashMap<>() {{
@@ -50,8 +38,8 @@ public class ConversionSummaryDTO {
     put("BD", 0L);
   }};
 
-  @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-  private String accessToken;
+  // career program stats
+  private Map<String, Long> careerProgramCountMap = new HashMap<>();
 
   public void increment(String programCode, boolean isGraduated) {
     if (isGraduated) {
@@ -71,6 +59,16 @@ public class ConversionSummaryDTO {
       optionalProgramCountMap.put(optionalProgramCode, count);
     } else {
       optionalProgramCountMap.put(optionalProgramCode, 1L);
+    }
+  }
+
+  public void incrementCareerProgram(String careerProgramCode) {
+    Long count = careerProgramCountMap.get(careerProgramCode);
+    if (count != null) {
+      count++;
+      careerProgramCountMap.put(careerProgramCode, count);
+    } else {
+      careerProgramCountMap.put(careerProgramCode, 1L);
     }
   }
 }

@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.writer;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -16,13 +16,13 @@ public class DataConversionStudentWriter implements ItemWriter<ConvGradStudent> 
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionStudentWriter.class);
 
-    private ConversionSummaryDTO summaryDTO;
+    private ConversionStudentSummaryDTO summaryDTO;
 
     @BeforeStep
     public void retrieveSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+        summaryDTO = (ConversionStudentSummaryDTO)jobContext.get("studentSummaryDTO");
     }
     
     @Override

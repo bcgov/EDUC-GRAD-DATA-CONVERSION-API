@@ -55,7 +55,7 @@ public class CourseServiceWithMockRepositoryTest {
 
     @Test
     public void testConvertCourseRestriction() {
-        ConversionSummaryDTO summary = new ConversionSummaryDTO();
+        ConversionBaseSummaryDTO summary = new ConversionBaseSummaryDTO();
         summary.setAccessToken("123");
 
         GradCourseRestriction courseRestriction = new GradCourseRestriction(
@@ -77,7 +77,7 @@ public class CourseServiceWithMockRepositoryTest {
 
     @Test
     public void testConvertCourseRestriction_whenGivenRecordExists() {
-        ConversionSummaryDTO summary = new ConversionSummaryDTO();
+        ConversionBaseSummaryDTO summary = new ConversionBaseSummaryDTO();
         summary.setAccessToken("123");
 
         GradCourseRestriction courseRestriction = new GradCourseRestriction(
