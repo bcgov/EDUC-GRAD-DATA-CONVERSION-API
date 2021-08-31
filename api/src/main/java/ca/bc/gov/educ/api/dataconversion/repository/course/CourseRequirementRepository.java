@@ -10,11 +10,12 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRequirementRepository extends JpaRepository<CourseRequirementEntity, UUID> {
-
-	@Query(value="select count(*) from trax_student_courses\n" +
-			"where pen = :pen \n" +
-			"and crse_code in ('FRAL', 'FRALP') \n" +
-			"and crse_level = '10'", nativeQuery=true)
-	long countFRALAndFRALPCourses(@Param("pen") String pen);
+	@Query(value="select count(*) from TRAX_STUDENT_COURSES tsc, COURSE_REQUIREMENT cr \n" +
+			"where tsc.pen = :pen \n" +
+			"and trim(tsc.crse_code) = cr.course_code \n" +
+			"and trim(tsc.crse_level) = cr.course_level \n" +
+			"and trim(tsc.crse_code) in ('FRAL', 'FRALP') \n" +
+			"and trim(tsc.crse_level) = '10'", nativeQuery=true)
+	long countFrenchImmersionCourses(@Param("pen") String pen);
 
 }

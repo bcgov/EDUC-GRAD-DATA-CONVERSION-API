@@ -47,13 +47,13 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
     public ConvGradStudent read() {
         LOGGER.info("Reading the information of the next student");
 
-        if (indexForStudent % 300 == 0) {
-            fetchAccessToken();
-        }
-
         if (studentDataIsNotInitialized()) {
         	studentList = loadRawStudentData();
         	summaryDTO.setReadCount(studentList.size());
+        }
+
+        if (indexForStudent % 100 == 0) {
+            fetchAccessToken();
         }
 
         ConvGradStudent nextStudent = null;

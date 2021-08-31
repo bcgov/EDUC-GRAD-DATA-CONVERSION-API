@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -26,4 +28,10 @@ public class ConvGradStudent {
 
   // extra
   private String graduationRequestYear;
+
+  // optional programs
+  private List<String> optionalProgramCodeList;
+
+  // grad or non-grad
+  private boolean graduated;
 }

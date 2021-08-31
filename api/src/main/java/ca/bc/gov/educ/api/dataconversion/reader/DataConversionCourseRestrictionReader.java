@@ -46,13 +46,13 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
     public GradCourseRestriction read() {
         LOGGER.info("Reading the information of the next course restriction");
 
-        if (indexForCourseRestriction % 300 == 0) {
-            fetchAccessToken();
-        }
-
         if (courseRestrictionDataIsNotInitialized()) {
             courseRestrictionList = loadRawCourseRestrictionData();
         	summaryDTO.setReadCount(courseRestrictionList.size());
+        }
+
+        if (indexForCourseRestriction % 300 == 0) {
+            fetchAccessToken();
         }
 
         GradCourseRestriction nextCourseRestriction = null;

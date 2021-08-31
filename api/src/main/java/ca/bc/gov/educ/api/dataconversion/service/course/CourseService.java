@@ -93,15 +93,7 @@ public class CourseService {
 
     @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
     public boolean isFrenchImmersionCourse(String pen) {
-        if (this.courseRestrictionRepository.countFrenchImmersionCourses(pen) > 0L) {
-            return true;
-        }
-        return false;
-    }
-
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public boolean hasTakenFRALOrFRALP(String pen) {
-        if (this.courseRequirementRepository.countFRALAndFRALPCourses(pen) > 0L) {
+        if (this.courseRequirementRepository.countFrenchImmersionCourses(pen) > 0L) {
             return true;
         }
         return false;

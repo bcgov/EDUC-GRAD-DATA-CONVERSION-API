@@ -17,7 +17,7 @@ public class EducGradDataConversionApiConstants {
     // Data Conversion
     public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
-       
+
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
@@ -34,21 +34,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.keycloack.getToken}")
     private String tokenUrl;
 
-    @Value("${endpoint.grad-graduation-api.url}")
-    private String graduationApiUrl;
-
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
-    @Value("${endpoint.graduation-status-api.read-grad-status.url}")
-    private String gradStudentApiUrl;
-
-    @Value("${endpoint.graduation-status-api.update-grad-status}")
-    private String gradStatusUpdateUrl;
-
-    @Value("${endpoint.grad-program-management-api.special-program.url}")
+    @Value("${endpoint.grad-program-api.special-program.url}")
     private String gradProgramManagementUrl;
-
-    @Value("${endpoint.grad-graduation-status-api.student-for-grad-list.url}")
-    private String gradStudentForGradListUrl;
 }

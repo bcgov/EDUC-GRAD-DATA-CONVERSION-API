@@ -3,13 +3,12 @@ package ca.bc.gov.educ.api.dataconversion.service.conv;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentSpecialProgramRepository;
-import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
-import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -39,14 +38,35 @@ public class DataConversionService {
             Character studentStatus = (Character) result[4];
             String graduationRequestYear = (String) result[5];
             Character recalculateGradStatus = (Character) result[6];
+            // grad or non-grad
+            BigDecimal gradDate = (BigDecimal) result[7];
+
+            List<String> optionalProgramCodes = new ArrayList<>();
+            // optional program
+            populateOptionalProgramCode((String) result[8], optionalProgramCodes);
+            populateOptionalProgramCode((String) result[9], optionalProgramCodes);
+            populateOptionalProgramCode((String) result[10], optionalProgramCodes);
+            populateOptionalProgramCode((String) result[11], optionalProgramCodes);
+            populateOptionalProgramCode((String) result[12], optionalProgramCodes);
+
             ConvGradStudent student = new ConvGradStudent(
                     pen, null, null, null, null,
                     recalculateGradStatus.toString(), null, schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear);
+                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear, optionalProgramCodes, !gradDate.equals(BigDecimal.ZERO));
             students.add(student);
         });
 
         return students;
+    }
+
+    private void populateOptionalProgramCode(String code, List<String> optionalProgramCodes) {
+        if (StringUtils.isNotBlank(code)) {
+            if (code.length() > 2) {
+                optionalProgramCodes.add(StringUtils.substring(code,2));
+            } else {
+                optionalProgramCodes.add(code);
+            }
+        }
     }
 
     @Transactional(readOnly = true, transactionManager = "convTransactionManager")

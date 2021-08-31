@@ -103,7 +103,8 @@ ALTER TABLE "CONV_STUDENT_OPTIONAL_PROGRAM" ADD CONSTRAINT "FK_CONV_GRADUATION_S
 -- Initial data set from TRAX
 ------------------------------
 -- GRAD_STUDENT
-select  trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as SCHOOL_AT_GRAD, m.stud_grade as STUD_GRADE, m.stud_status as STUD_STATUS, '2018-EN', 'Y'
+select  trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as SCHOOL_AT_GRAD, m.stud_grade as STUD_GRADE, m.stud_status as STUD_STATUS, m.grad_reqt_year as GRAD_REQT_YEAR, 'Y', m.grad_date as GRAD_DATE,
+        trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5
 from trax_students_load l, student_master m
 where 1 = 1
 and l.stud_no = m.stud_no
@@ -125,9 +126,18 @@ and c1.restriction_code <> ' '
 -- Validation Queries
 ------------------------------
 -- French immersion validation by pen
+-- Old
 select count(*) from STUD_XCRSE sx, COURSE_REQUIREMENT cr
 where 1 = 1
   and sx.stud_no = '131493553'  -- pen
   and trim(sx.crse_code) = cr.course_code
   and trim(sx.crse_level) = cr.course_level
+  and cr.course_requirement_code = 202
+
+-- New
+select count(*) from TRAX_STUDENT_COURSES tsc, COURSE_REQUIREMENT cr
+where 1 = 1
+  and tsc.pen = '131493553'  -- pen
+  and trim(tsc.crse_code) = cr.course_code
+  and trim(tsc.crse_level) = cr.course_level
   and cr.course_requirement_code = 202
