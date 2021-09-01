@@ -78,6 +78,7 @@ public class StudentService {
                 GraduationStatusEntity gradStudentEntity;
                 if (stuOptional.isPresent()) {
                     gradStudentEntity = stuOptional.get();
+                    gradStudentEntity.setPen(st.getPen());
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     gradStudentEntity.setUpdateDate(new Date());
                     gradStudentEntity = graduationStatusRepository.save(gradStudentEntity);
@@ -155,7 +156,13 @@ public class StudentService {
                 if (isOptionalProgramCode(programCode)) {
                     createStudentOptionalProgram(programCode, student, accessToken, summary);
                 } else {
-                    if (createStudentCareerProgram(programCode, student, summary)) {
+                    if (StringUtils.equals(student.getProgram(), "SCCP")) {
+                        ConversionAlert error = new ConversionAlert();
+                        error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
+                        error.setItem(student.getPen());
+                        error.setReason(" [ SCCP | CP ] is found => skip both student career program and optional program creation process.");
+                        summary.getErrors().add(error);
+                    } else if (createStudentCareerProgram(programCode, student, summary)) {
                         createStudentOptionalProgram("CP", student, accessToken, summary);
                     }
                 }
@@ -264,7 +271,6 @@ public class StudentService {
                 } else {
                     // error
                     ConversionAlert error = new ConversionAlert();
-                    error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
                     error.setItem(student.getPen());
                     error.setReason("Program is not found for year 1950 / grade " + student.getStudentGrade());
                     summary.getErrors().add(error);
