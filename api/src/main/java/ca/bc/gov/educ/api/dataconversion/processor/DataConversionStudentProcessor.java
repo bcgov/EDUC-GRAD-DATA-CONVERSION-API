@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,13 +19,13 @@ public class DataConversionStudentProcessor implements ItemProcessor<ConvGradStu
     @Autowired
 	private StudentService studentService;
 
-	private ConversionSummaryDTO summaryDTO;
+	private ConversionStudentSummaryDTO summaryDTO;
 
 	@BeforeStep
 	public void retrieveSummaryDto(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		ExecutionContext jobContext = jobExecution.getExecutionContext();
-		summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+		summaryDTO = (ConversionStudentSummaryDTO)jobContext.get("studentSummaryDTO");
 	}
 
 	@Override

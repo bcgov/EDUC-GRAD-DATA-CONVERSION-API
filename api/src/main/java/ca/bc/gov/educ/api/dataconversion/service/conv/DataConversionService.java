@@ -41,25 +41,25 @@ public class DataConversionService {
             // grad or non-grad
             BigDecimal gradDate = (BigDecimal) result[7];
 
-            List<String> optionalProgramCodes = new ArrayList<>();
+            List<String> programCodes = new ArrayList<>();
             // optional program
-            populateOptionalProgramCode((String) result[8], optionalProgramCodes);
-            populateOptionalProgramCode((String) result[9], optionalProgramCodes);
-            populateOptionalProgramCode((String) result[10], optionalProgramCodes);
-            populateOptionalProgramCode((String) result[11], optionalProgramCodes);
-            populateOptionalProgramCode((String) result[12], optionalProgramCodes);
+            populateProgramCode((String) result[8], programCodes);
+            populateProgramCode((String) result[9], programCodes);
+            populateProgramCode((String) result[10], programCodes);
+            populateProgramCode((String) result[11], programCodes);
+            populateProgramCode((String) result[12], programCodes);
 
             ConvGradStudent student = new ConvGradStudent(
                     pen, null, null, null, null,
                     recalculateGradStatus.toString(), null, schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear, optionalProgramCodes, !gradDate.equals(BigDecimal.ZERO));
+                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear, programCodes, !gradDate.equals(BigDecimal.ZERO));
             students.add(student);
         });
 
         return students;
     }
 
-    private void populateOptionalProgramCode(String code, List<String> optionalProgramCodes) {
+    private void populateProgramCode(String code, List<String> optionalProgramCodes) {
         if (StringUtils.isNotBlank(code)) {
             if (code.length() > 2) {
                 optionalProgramCodes.add(StringUtils.substring(code,2));

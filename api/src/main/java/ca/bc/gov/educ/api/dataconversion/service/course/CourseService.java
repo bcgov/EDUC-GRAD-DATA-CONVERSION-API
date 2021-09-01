@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service.course;
 
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionError;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
@@ -40,10 +40,11 @@ public class CourseService {
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
-    public GradCourseRestriction convertCourseRestriction(GradCourseRestriction courseRestriction, ConversionSummaryDTO summary) {
+    public GradCourseRestriction convertCourseRestriction(GradCourseRestriction courseRestriction, ConversionBaseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         if (isInvalidData(courseRestriction.getMainCourse(), courseRestriction.getRestrictedCourse())) {
-            ConversionError error = new ConversionError();
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
             error.setItem(courseRestriction.getMainCourse() + " " + courseRestriction.getRestrictedCourse());
             error.setReason("Skip invalid data");
             summary.getErrors().add(error);

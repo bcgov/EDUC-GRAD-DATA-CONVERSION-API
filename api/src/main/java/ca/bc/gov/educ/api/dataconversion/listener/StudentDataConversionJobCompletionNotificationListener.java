@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -21,19 +21,19 @@ public class StudentDataConversionJobCompletionNotificationListener extends JobE
     	if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 	    	long elapsedTimeMillis = new Date().getTime() - jobExecution.getStartTime().getTime();
 			LOGGER.info("=======================================================================================");
-	    	LOGGER.info("Data Conversion Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
+	    	LOGGER.info("Data Conversion - Student Load Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+			ConversionStudentSummaryDTO summaryDTO = (ConversionStudentSummaryDTO)jobContext.get("studentSummaryDTO");
 
 			LOGGER.info(" Records read:		{}", summaryDTO.getReadCount());
 			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
 			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
 			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
-			LOGGER.info(" Errors: 			{}", summaryDTO.getErrors().size());
+			LOGGER.info(" Not Good: 		{}", summaryDTO.getErrors().size());
 			summaryDTO.getErrors().forEach(e ->
-				LOGGER.info("	Pen: {}, Reason: {}", e.getItem(), e.getReason())
+				LOGGER.info("  {} - Pen: {}, Reason: {}", e.getLevel(), e.getItem(), e.getReason())
 			);
 			LOGGER.info(" --------------------------------------------------------------------------------------");
 			summaryDTO.getProgramCountMap().entrySet().stream().forEach(e -> {
@@ -44,7 +44,13 @@ public class StudentDataConversionJobCompletionNotificationListener extends JobE
 			LOGGER.info(" Optional Program Subtotals:");
 			summaryDTO.getOptionalProgramCountMap().entrySet().stream().forEach(e -> {
 				String key = e.getKey();
-				LOGGER.info("	{} count: {}", key, summaryDTO.getProgramCountMap().get(key));
+				LOGGER.info("	{} count: {}", key, summaryDTO.getOptionalProgramCountMap().get(key));
+			});
+			LOGGER.info(" --------------------------------------------------------------------------------------");
+			LOGGER.info(" Career Program Subtotals:");
+			summaryDTO.getCareerProgramCountMap().entrySet().stream().forEach(e -> {
+				String key = e.getKey();
+				LOGGER.info("	{} count: {}", key, summaryDTO.getCareerProgramCountMap().get(key));
 			});
 			LOGGER.info("=======================================================================================");
 		}

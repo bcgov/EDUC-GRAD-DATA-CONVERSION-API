@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.controller;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -38,7 +38,7 @@ public class JobLauncherController {
     }
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
-    public ResponseEntity<ConversionSummaryDTO> launchStudentDataConversionJob( ) {
+    public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionJob( ) {
         logger.info("Inside Launch Student Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
@@ -46,19 +46,19 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("studentSummaryDTO");
+            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
             return ResponseEntity.ok(summaryDTO);
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
             e.printStackTrace();
-            ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
+            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
             summaryDTO.setException(e.getLocalizedMessage());
             return ResponseEntity.status(500).body(summaryDTO);
         }
     }
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB)
-    public ResponseEntity<ConversionSummaryDTO> launchCourseRestrictionDataConversionJob( ) {
+    public ResponseEntity<ConversionBaseSummaryDTO> launchCourseRestrictionDataConversionJob( ) {
         logger.info("Inside Launch Course Restriction Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
@@ -66,12 +66,12 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("courseRestrictionDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
+            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
             return ResponseEntity.ok(summaryDTO);
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
             e.printStackTrace();
-            ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
+            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
             summaryDTO.setException(e.getLocalizedMessage());
             return ResponseEntity.status(500).body(summaryDTO);
         }

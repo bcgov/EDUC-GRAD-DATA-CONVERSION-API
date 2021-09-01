@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -21,19 +21,19 @@ public class CourseRestrictionDataConversionJobCompletionNotificationListener ex
     	if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
 	    	long elapsedTimeMillis = new Date().getTime() - jobExecution.getStartTime().getTime();
 			LOGGER.info("=======================================================================================");
-	    	LOGGER.info("Data Conversion Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
+	    	LOGGER.info("Data Conversion - Course Restriction Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
+			ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
 
 			LOGGER.info(" Records read:		{}", summaryDTO.getReadCount());
 			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
 			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
 			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
-			LOGGER.info(" Errors: 			{}", summaryDTO.getErrors().size());
+			LOGGER.info(" Not good:			{}", summaryDTO.getErrors().size());
 			summaryDTO.getErrors().forEach(e ->
-				LOGGER.info("	Course Restriction: {}, Reason: {}", e.getItem(), e.getReason())
+				LOGGER.info("	{} - Course Restriction: {}, Reason: {}", e.getLevel(), e.getItem(), e.getReason())
 			);
 			LOGGER.info("=======================================================================================");
 		}

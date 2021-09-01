@@ -29,8 +29,8 @@ public class ConvGradStudent {
   // extra
   private String graduationRequestYear;
 
-  // optional programs
-  private List<String> optionalProgramCodeList;
+  // program codes for optional / career program
+  private List<String> programCodes;
 
   // grad or non-grad
   private boolean graduated;

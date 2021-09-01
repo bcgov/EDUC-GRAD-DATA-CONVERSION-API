@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.writer;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +16,13 @@ public class DataConversionCourseRestrictionWriter implements ItemWriter<GradCou
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRestrictionWriter.class);
 
-    private ConversionSummaryDTO summaryDTO;
+    private ConversionBaseSummaryDTO summaryDTO;
 
     @BeforeStep
     public void retrieveSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = (ConversionSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
+        summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
     }
     
     @Override
