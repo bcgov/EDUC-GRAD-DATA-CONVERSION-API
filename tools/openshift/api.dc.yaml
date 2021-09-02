@@ -25,6 +25,8 @@ objects:
           labels:
             app: "${APP_NAME}-${JOB_NAME}"
             deploymentConfig: "${APP_NAME}-${JOB_NAME}"
+          annotaions:
+            haproxy.router.openshift.io/timeout: 600s
         spec:
           containers:
             - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-${JOB_NAME}:${TAG}
