@@ -1,11 +1,16 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
+import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.processor.DataConversionCourseRequirementProcessor;
 import ca.bc.gov.educ.api.dataconversion.processor.DataConversionCourseRestrictionProcessor;
+import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementReader;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
+import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -46,6 +51,11 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public ItemReader<GraduationCourseEntity> courseRequirementReader(DataConversionService dataConversionService, RestUtils restUtils) {
+        return new DataConversionCourseRequirementReader(dataConversionService, restUtils);
+    }
+
+    @Bean
     public ItemWriter<ConvGradStudent> studentWriter() {
         return new DataConversionStudentWriter();
     }
@@ -56,6 +66,11 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public ItemWriter<GraduationCourseEntity> courseRequirementWriter() {
+        return new DataConversionCourseRequirementWriter();
+    }
+
+    @Bean
     public ItemProcessor<ConvGradStudent,ConvGradStudent> studentProcessor() {
         return new DataConversionStudentProcessor();
     }
@@ -63,6 +78,11 @@ public class BatchJobConfig {
     @Bean
     public ItemProcessor<GradCourseRestriction,GradCourseRestriction> courseRestrictionProcessor() {
         return new DataConversionCourseRestrictionProcessor();
+    }
+
+    @Bean
+    public ItemProcessor<GraduationCourseEntity,GraduationCourseEntity> courseRequirementProcessor() {
+        return new DataConversionCourseRequirementProcessor();
     }
 
     /**
@@ -117,12 +137,43 @@ public class BatchJobConfig {
      */
     @Bean
     public Job courseRestrictionDataConversionBatchJob(Step courseRestrictionDataConversionJobStep,
-                                                    CourseRestrictionDataConversionJobCompletionNotificationListener listener,
-                                                    JobBuilderFactory jobBuilderFactory) {
+                                                       CourseRestrictionDataConversionJobCompletionNotificationListener listener,
+                                                       JobBuilderFactory jobBuilderFactory) {
         return jobBuilderFactory.get("courseRestrictionDataConversionBatchJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(courseRestrictionDataConversionJobStep)
+                .end()
+                .build();
+    }
+
+    /**
+     * Creates a bean that represents the only steps of our batch job.
+     */
+    @Bean
+    public Step courseRequirementDataConversionJobStep(ItemReader<GraduationCourseEntity> courseRequirementReader,
+                                                       ItemProcessor<? super GraduationCourseEntity, ? extends GraduationCourseEntity> courseRequirementProcessor,
+                                                       ItemWriter<GraduationCourseEntity> courseRequirementWriter,
+                                                       StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("courseRequirementDataConversionJobStep")
+                .<GraduationCourseEntity, GraduationCourseEntity>chunk(1)
+                .reader(courseRequirementReader)
+                .processor(courseRequirementProcessor)
+                .writer(courseRequirementWriter)
+                .build();
+    }
+
+    /**
+     * Creates a bean that represents our batch job.
+     */
+    @Bean
+    public Job coursRequirementDataConversionBatchJob(Step courseRequirementDataConversionJobStep,
+                                                       CourseRequirementDataConversionJobCompletionNotificationListener listener,
+                                                       JobBuilderFactory jobBuilderFactory) {
+        return jobBuilderFactory.get("courseRequirementDataConversionBatchJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(courseRequirementDataConversionJobStep)
                 .end()
                 .build();
     }

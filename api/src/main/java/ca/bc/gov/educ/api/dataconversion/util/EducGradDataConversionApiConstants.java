@@ -17,6 +17,7 @@ public class EducGradDataConversionApiConstants {
     // Data Conversion
     public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
+    public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
