@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.mappers;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.ConvGradStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import org.modelmapper.ModelMapper;

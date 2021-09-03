@@ -74,8 +74,8 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
     }
 
     private List<GradCourseRestriction> loadRawCourseRestrictionData() {
-        LOGGER.info("Fetching Student List that need Data Conversion Processing");
-        return dataConversionService.loadInitialRawGradCourseRestrictionsData(false);
+        LOGGER.info("Fetching Course Restriction List that need Data Conversion Processing");
+        return dataConversionService.loadInitialRawGradCourseRestrictionsData();
     }
 
     private void fetchAccessToken() {

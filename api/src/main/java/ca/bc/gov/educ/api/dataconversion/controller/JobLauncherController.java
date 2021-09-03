@@ -76,4 +76,24 @@ public class JobLauncherController {
             return ResponseEntity.status(500).body(summaryDTO);
         }
     }
+
+    @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB)
+    public ResponseEntity<ConversionBaseSummaryDTO> launchCourseRequirementDataConversionJob( ) {
+        logger.info("Inside Launch Course Requirement Data Conversion Job");
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
+        builder.addString(JOB_PARAM, "courseRequirementDataConversionBatchJob");
+        try {
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("courseRequirementDataConversionBatchJob"), builder.toJobParameters());
+            ExecutionContext jobContext = jobExecution.getExecutionContext();
+            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
+            return ResponseEntity.ok(summaryDTO);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+                | JobParametersInvalidException | NoSuchJobException e) {
+            e.printStackTrace();
+            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
+            summaryDTO.setException(e.getLocalizedMessage());
+            return ResponseEntity.status(500).body(summaryDTO);
+        }
+    }
 }

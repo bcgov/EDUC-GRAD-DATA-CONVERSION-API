@@ -73,7 +73,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         studentService.convertStudent(student, summary);
@@ -104,7 +105,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenThrow(new RuntimeException("PEN Student API is failed!"));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
@@ -129,7 +131,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("333222111", "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);

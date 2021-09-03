@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.StudentCareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
@@ -29,9 +31,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
 // TODO (jsung) : needs to work on Unit Test for ProgramService & CareerProgramRepository
-//@RunWith(SpringRunner.class)
-//@SpringBootTest
-//@ActiveProfiles("test")
+@RunWith(SpringRunner.class)
+@SpringBootTest
+@ActiveProfiles("test")
 public class StudentServiceWithMockRepositoryTest {
 
     @Autowired
@@ -42,6 +44,9 @@ public class StudentServiceWithMockRepositoryTest {
 
     @MockBean
     StudentOptionalProgramRepository studentOptionalProgramRepository;
+
+    @MockBean
+    StudentCareerProgramRepository studentCareerProgramRepository;
 
     @MockBean
     ProgramService programService;
@@ -68,7 +73,7 @@ public class StudentServiceWithMockRepositoryTest {
         graduationStatusRepository.deleteAll();
     }
 
-//    @Test
+    @Test
     public void convertStudent_forExistingGradStudent_whenGivenData_withFrechImmersionSpecialProgram_thenReturnSuccess() throws Exception {
         // ID
         UUID studentID = UUID.randomUUID();
@@ -94,16 +99,23 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
         specialProgramEntity.setPen(pen);
 
+        StudentCareerProgramEntity careerProgramEntity = new StudentCareerProgramEntity();
+        careerProgramEntity.setId(UUID.randomUUID());
+        careerProgramEntity.setStudentID(studentID);
+        careerProgramEntity.setCareerProgramCode("XC");
+
         when(this.graduationStatusRepository.findById(studentID)).thenReturn(Optional.of(penStudentEntity));
         when(this.graduationStatusRepository.save(penStudentEntity)).thenReturn(penStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen)).thenReturn(true);
-        when(this.programService.getCareerProgramCode("FI")).thenReturn(null);
+        when(this.programService.getCareerProgramCode("XC")).thenReturn(null);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
+        when(this.studentCareerProgramRepository.save(careerProgramEntity)).thenReturn(careerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
@@ -115,7 +127,7 @@ public class StudentServiceWithMockRepositoryTest {
 
     }
 
-//    @Test
+    @Test
     public void convertStudent_whenGivenData_withFrechImmersionSpecialProgram_thenReturnSuccess() throws Exception {
         // ID
         UUID studentID = UUID.randomUUID();
@@ -141,16 +153,29 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
         specialProgramEntity.setPen(pen);
 
+        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
+        careerProgramEntity.setCode("XC");
+        careerProgramEntity.setDescription("XC Test");
+        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
+        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+
+        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        studentCareerProgramEntity.setId(UUID.randomUUID());
+        studentCareerProgramEntity.setStudentID(studentID);
+        studentCareerProgramEntity.setCareerProgramCode("XC");
+
         when(this.graduationStatusRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStatusRepository.save(penStudentEntity)).thenReturn(penStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen)).thenReturn(true);
-        when(this.programService.getCareerProgramCode("FI")).thenReturn(null);
+        when(this.programService.getCareerProgramCode("XC")).thenReturn(careerProgramEntity);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
+        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").build();
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);

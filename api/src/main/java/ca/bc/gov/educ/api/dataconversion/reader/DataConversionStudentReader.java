@@ -75,7 +75,7 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
 
     private List<ConvGradStudent> loadRawStudentData() {
         LOGGER.info("Fetching Student List that need Data Conversion Processing");
-        return dataConversionService.loadInitialRawGradStudentData(false);
+        return dataConversionService.loadInitialRawGradStudentData();
     }
 
     private void fetchAccessToken() {
