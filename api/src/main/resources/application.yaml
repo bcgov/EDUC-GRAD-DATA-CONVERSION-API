@@ -11,11 +11,15 @@ spring:
     enabled: false
   db-connection:
     url: ${CONNECTION_STRING}
-    driver-class: oracle.jdbc.driver.OracleDriver
+    driver-class: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
+    assessment:
+      username: ${ASSESSMENT_USERNAME}
+      password: ${ASSESSMENT_PASSWORD}
+      pool-name: conv-assessment-cp
     batch:
       username: ${BATCH_USERNAME}
       password: ${BATCH_PASSWORD}

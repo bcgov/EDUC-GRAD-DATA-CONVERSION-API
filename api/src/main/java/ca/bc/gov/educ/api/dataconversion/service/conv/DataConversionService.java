@@ -1,8 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
+import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.GraduationCourseRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.TraxStudentsLoadRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,23 +14,20 @@ import java.util.*;
 
 @Service
 public class DataConversionService {
-    private final ConvGradStudentRepository convGradStudentRepository;
-    private final ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository;
+    private final TraxStudentsLoadRepository traxStudentsLoadRepository;
+    private final GraduationCourseRepository graduationCourseRepository;
 
     @Autowired
-    public DataConversionService(ConvGradStudentRepository convGradStudentRepository, ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository) {
-        this.convGradStudentRepository = convGradStudentRepository;
-        this.convGradCourseRestrictionRepository = convGradCourseRestrictionRepository;
+    public DataConversionService(TraxStudentsLoadRepository traxStudentsLoadRepository,
+                                 GraduationCourseRepository graduationCourseRepository) {
+        this.traxStudentsLoadRepository = traxStudentsLoadRepository;
+        this.graduationCourseRepository = graduationCourseRepository;
     }
 
     @Transactional(readOnly = true, transactionManager = "convTransactionManager")
-    public List<ConvGradStudent> loadInitialRawGradStudentData(boolean purge) {
-        if (purge) {
-            convGradStudentRepository.deleteAll();
-            convGradStudentRepository.flush();
-        }
+    public List<ConvGradStudent> loadInitialRawGradStudentData() {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = convGradStudentRepository.loadInitialRawData();
+        List<Object[]> results = traxStudentsLoadRepository.loadInitialStudentRawData();
         results.forEach(result -> {
             String pen = (String) result[0];
             String schoolOfRecord = (String) result[1];
@@ -70,13 +68,9 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "convTransactionManager")
-    public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData(boolean purge) {
-        if (purge) {
-            convGradCourseRestrictionRepository.deleteAll();
-            convGradCourseRestrictionRepository.flush();
-        }
+    public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData() {
         List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
-        List<Object[]> results = convGradCourseRestrictionRepository.loadInitialRawData();
+        List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
         results.forEach(result -> {
             String mainCourse = (String) result[0];
             String mainCourseLevel = (String) result[1];
@@ -89,5 +83,10 @@ public class DataConversionService {
             courseRestrictions.add(courseRestriction);
         });
         return courseRestrictions;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "convTransactionManager")
+    public List<GraduationCourseEntity> loadInitialGradCourseRequirementsData() {
+        return graduationCourseRepository.findAll();
     }
 }

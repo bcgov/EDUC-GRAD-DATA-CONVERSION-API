@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradCourseRestrictionRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.ConvGradStudentRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
@@ -31,10 +30,7 @@ public class DataConversionServiceTest {
     DataConversionService dataConversionService;
 
     @MockBean
-    ConvGradStudentRepository convGradStudentRepository;
-
-    @MockBean
-    ConvGradCourseRestrictionRepository convGradCourseRestrictionRepository;
+    TraxStudentsLoadRepository traxStudentsLoadRepository;
 
     @MockBean
     RestUtils restUtils;
@@ -46,7 +42,6 @@ public class DataConversionServiceTest {
 
     @After
     public void tearDown() {
-        convGradStudentRepository.deleteAll();
     }
 
     @Test
@@ -58,9 +53,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.convGradStudentRepository.loadInitialRawData()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadInitialStudentRawData()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradStudentData(true);
+        var result = dataConversionService.loadInitialRawGradStudentData();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
@@ -75,9 +70,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.convGradCourseRestrictionRepository.loadInitialRawData()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData(true);
+        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         GradCourseRestriction responseCourseRestriction = result.get(0);
