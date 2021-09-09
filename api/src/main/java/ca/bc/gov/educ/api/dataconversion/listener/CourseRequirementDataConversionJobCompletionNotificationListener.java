@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -24,12 +24,16 @@ public class CourseRequirementDataConversionJobCompletionNotificationListener ex
 	    	LOGGER.info("Data Conversion - Course Requirement Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
+			ConversionCourseSummaryDTO summaryDTO = (ConversionCourseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
 
 			LOGGER.info(" Records read:		{}", summaryDTO.getReadCount());
 			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
-			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
-			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
+			LOGGER.info(" [Course Requirement]-------------------------------------------------------------------");
+			LOGGER.info("  Created count:	{}", summaryDTO.getAddedCountForCourseRequirement());
+			LOGGER.info("  Updated count:	{}", summaryDTO.getUpdatedCountForCourseRequirement());
+			LOGGER.info(" [Assessment Requirement]---------------------------------------------------------------");
+			LOGGER.info("  Created count:	{}", summaryDTO.getAddedCountForAssessmentRequirement());
+			LOGGER.info("  Updated count:	{}", summaryDTO.getUpdatedCountForAssessmentRequirement());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
 			LOGGER.info(" Not good:			{}", summaryDTO.getErrors().size());
 			summaryDTO.getErrors().forEach(e ->

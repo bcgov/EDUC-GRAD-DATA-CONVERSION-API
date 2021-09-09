@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.writer;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -16,13 +16,13 @@ public class DataConversionCourseRequirementWriter implements ItemWriter<Graduat
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementWriter.class);
 
-    private ConversionBaseSummaryDTO summaryDTO;
+    private ConversionCourseSummaryDTO summaryDTO;
 
     @BeforeStep
     public void retrieveSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
+        summaryDTO = (ConversionCourseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
     }
     
     @Override

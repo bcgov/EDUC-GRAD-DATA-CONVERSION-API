@@ -6,11 +6,13 @@ import java.util.UUID;
 import javax.persistence.*;
 
 import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
+import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.Data;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "GRADUATION_STUDENT_RECORD")
 public class GraduationStatusEntity extends BaseEntity {

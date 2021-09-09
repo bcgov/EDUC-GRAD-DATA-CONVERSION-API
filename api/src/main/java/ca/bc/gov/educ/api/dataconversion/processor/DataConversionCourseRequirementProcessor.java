@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,13 +19,13 @@ public class DataConversionCourseRequirementProcessor implements ItemProcessor<G
     @Autowired
 	private CourseService courseService;
 
-	private ConversionBaseSummaryDTO summaryDTO;
+	private ConversionCourseSummaryDTO summaryDTO;
 
 	@BeforeStep
 	public void retrieveSummaryDto(StepExecution stepExecution) {
 		JobExecution jobExecution = stepExecution.getJobExecution();
 		ExecutionContext jobContext = jobExecution.getExecutionContext();
-		summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
+		summaryDTO = (ConversionCourseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
 	}
 
 	@Override
