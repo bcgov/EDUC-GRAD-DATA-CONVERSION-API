@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -24,7 +24,7 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
 
     private int indexForCourseRequirement;
     private List<GraduationCourseEntity> courseRequirementList;
-    private ConversionBaseSummaryDTO summaryDTO;
+    private ConversionCourseSummaryDTO summaryDTO;
 
     public DataConversionCourseRequirementReader(DataConversionService dataConversionService, RestUtils restUtils) {
         this.dataConversionService = dataConversionService;
@@ -37,7 +37,7 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
     public void initializeSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = new ConversionBaseSummaryDTO();
+        summaryDTO = new ConversionCourseSummaryDTO();
         summaryDTO.setTableName("COURSE_REQUIREMENT");
         jobContext.put("courseRequirementSummaryDTO", summaryDTO);
     }
