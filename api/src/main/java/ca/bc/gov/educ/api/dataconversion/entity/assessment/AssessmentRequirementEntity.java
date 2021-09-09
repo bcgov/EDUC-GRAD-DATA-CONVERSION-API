@@ -2,13 +2,13 @@ package ca.bc.gov.educ.api.dataconversion.entity.assessment;
 
 import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
 import lombok.Data;
-import org.hibernate.annotations.Immutable;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.UUID;
 
 @Data
-@Immutable
+@EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "ASSESSMENT_REQUIREMENT")
 public class AssessmentRequirementEntity extends BaseEntity {

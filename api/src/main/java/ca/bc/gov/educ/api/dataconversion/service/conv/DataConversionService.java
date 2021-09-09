@@ -87,6 +87,6 @@ public class DataConversionService {
 
     @Transactional(readOnly = true, transactionManager = "convTransactionManager")
     public List<GraduationCourseEntity> loadInitialGradCourseRequirementsData() {
-        return graduationCourseRepository.findAll();
+        return graduationCourseRepository.findAll();  // .subList(0,1)
     }
 }
