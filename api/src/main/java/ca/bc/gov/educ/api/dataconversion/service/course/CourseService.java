@@ -369,7 +369,7 @@ public class CourseService {
 
     private CourseRequirementEntity populate(String courseCode, String courseLevel, String courseRequirementCode) {
         CourseRequirementEntity courseRequirement = new CourseRequirementEntity();
-        courseRequirement.setCourseCode(courseCode);
+        courseRequirement.setCourseCode(courseCode.trim());
         courseRequirement.setCourseLevel(StringUtils.isBlank(courseLevel)? " " :  courseLevel.trim());
 
         Optional<CourseRequirementCodeEntity> courseRequirementCodeOptional = courseRequirementCodeRepository.findById(courseRequirementCode);
