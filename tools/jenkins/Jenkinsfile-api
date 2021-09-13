@@ -1,175 +1,90 @@
 pipeline{
-  agent {
-    kubernetes {
-      label 'maven'
-      cloud 'openshift'
-      defaultContainer 'jnlp'
-      serviceAccount 'jenkins'
-      yaml """
-        kind: Pod
-        metadata:
-          name: jenkins-slave
-        spec:
-          containers:
-          - name: jnlp
-            image: registry.access.redhat.com/openshift3/jenkins-agent-maven-35-rhel7
-            privileged: false
-            alwaysPullImage: false
-            workingDir: /tmp
-            ttyEnabled: false
-            resourceRequestCpu: 3
-            resourceRequestMemory: 2Gi
-            resourceLimitCpu: 3
-            resourceLimitMemory: 2Gi
-            volumeMounts:
-            - mountPath: '/home/jenkins/.m2'
-              name: pvc
-          volumes:
-          - name: pvc
-            persistentVolumeClaim:
-              claimName: 'maven-slave-pvc'
-      """
+    agent {
+        label 'maven'
     }
-  }
-
     environment{
-      TOOLS = '77c02f-tools'
-      DEV = '77c02f-dev'
-      TEST = '77c02f-test'
-      PROD = '77c02f-prod'
+        TOOLS_NAMESPACE = '77c02f-tools'
+        DEV_NAMESPACE = '77c02f-dev'
+        TEST_NAMESPACE = '77c02f-test'
+        UAT_NAMESPACE = '77c02f-uat'
+        PROD_NAMESPACE = '77c02f-prod'
 
-      REPO_NAME = 'educ-grad-data-conversion-api'
-      OWNER = 'bcgov'
-      JOB_NAME = 'main'
-      TAG = 'dev'
+        REPO_NAME = 'educ-grad-data-conversion-api'
+        ORG = 'bcgov'
+        BRANCH = 'main'
+        TAG = 'dev'
 
-      APP_NAME = 'educ-grad-data-conversion-api'
-      APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
+        APP_NAME = 'educ-grad-data-conversion-api'
+        APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
 
-      SOURCE_REPO_RAW = 'https://github.com/${OWNER}/${REPO_NAME}/main'
-      SOURCE_REPO_REF = 'main'
-      SOURCE_REPO_URL = 'https://github.com/${OWNER}/${REPO_NAME}.git'
+        SOURCE_REPO_URL = 'https://github.com/${ORG}/${REPO_NAME}'
+        SOURCE_REPO_URL_RAW = 'https://raw.githubusercontent.com/${ORG}/${REPO_NAME}'
 
-      TOOLS_HOST_ROUTE = "${APP_NAME}-${TOOLS}.${APP_DOMAIN}"
-      DEV_HOST_ROUTE = "${APP_NAME}-${DEV}.${APP_DOMAIN}"
-      TEST_HOST_ROUTE = "${APP_NAME}-${TEST}.${APP_DOMAIN}"
-      PROD_HOST_ROUTE = "${APP_NAME}-${PROD}.${APP_DOMAIN}"
-  }
-  stages{
-    stage('Unit Tests') {
-      steps {
-        script {
-          def pom = readMavenPom file: 'api/pom.xml'
-          VERSION = pom.version
-
-          //Env variable is to fix issue where special characters in password were not being escaped properly
-          def command = $//bin/bash -c "mvn -f ./api/pom.xml test"/$
-          sh """
-            set +x
-            $command
-          """
-        }
-      }
+        DEV_HOST_ROUTE = "${APP_NAME}-${DEV_NAMESPACE}.${APP_DOMAIN}"
+        TEST_HOST_ROUTE = "${APP_NAME}-${TEST_NAMESPACE}.${APP_DOMAIN}"
+        UAT_HOST_ROUTE = "${APP_NAME}-${UAT_NAMESPACE}.${APP_DOMAIN}"
+        PROD_HOST_ROUTE = "${APP_NAME}-${PROD_NAMESPACE}.${APP_DOMAIN}"
     }
-    stage('Build App') {
-      steps {
-        script {
-          def pom = readMavenPom file: 'api/pom.xml'
-          VERSION = pom.version
-
-          sh '/bin/bash -c "mvn -f ./api/pom.xml -Dmaven.test.skip=true package"'
-        }
-      }
-    }
-    stage('Create Image Builder') {
-      when {
-        expression {
-          openshift.withCluster() {
-            return !openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").exists();
-          }
-        }
-      }
-      steps {
-        script {
-          openshift.withCluster() {
-            openshift.newBuild("--name=${REPO_NAME}-${JOB_NAME}", "--image-stream=openjdk-11-rhel8:1.0", "--binary")
-          }
-        }
-      }
-    }
-    stage('Build Image') {
-      steps {
-        script {
-          openshift.withCluster() {
-            openshift.selector("bc", "${REPO_NAME}-${JOB_NAME}").startBuild("--from-file=./api/target/${APP_NAME}-${VERSION}.jar", "--wait")
-          }
-        }
-      }
-      post {
-        success {
-          echo 'Cleanup BuildConfigs'
-          script {
-              openshift.withCluster() {
-                openshift.withProject(TOOLS) {
-                  def bcApi = openshift.selector('bc', "${REPO_NAME}-${JOB_NAME}")
-
-                  if(bcApi.exists()) {
-                      echo "Removing BuildConfig ${REPO_NAME}-${JOB_NAME}"
-                      bcApi.delete()
-                  }
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        def bcTemplate =
+                        openshift.apply(
+                                openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.bc.yaml",
+                                        "REPO_NAME=${REPO_NAME}")
+                        )
+                        openshift.selector("bc", "${REPO_NAME}-bc").startBuild('--follow')
+                    }
                 }
-              }
+            }
+            post {
+                success {
+                    echo 'Build Success'
+                }
+                failure {
+                    echo 'Build stage Failed!'
+                }
             }
         }
-        failure {
-          echo 'Build stage failed'
+        stage('Deploy to DEV') {
+            steps {
+                script {
+                    openshift.withCluster() {
+                        openshift.withProject(TOOLS_NAMESPACE) {
+                            echo "Applying Deployment ${REPO_NAME}-dc"
+                            openshift.apply(
+                                openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml",
+                                                  "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${DEV_HOST_ROUTE}")
+                            )
+                            def rollout = openshift.selector("dc", "${REPO_NAME}-dc").rollout()
+                            echo "Waiting for deployment to roll out"
+                            // Wait for deployments to roll out
+                            timeout(10) {
+                                rollout.latest()
+                                rollout.status('--watch')
+                            }
+                        }
+                    }
+                }
+            }
+            post {
+                success {
+                    echo "${REPO_NAME} successfully deployed to DEV"
+                    script {
+                        openshift.withCluster() {
+                            openshift.withProject(TOOLS_NAMESPACE) {
+                                echo "Tagging image"
+                                openshift.tag("${TOOLS_NAMESPACE}/${REPO_NAME}:latest", "${REPO_NAME}:${TAG}")
+                            }
+                        }
+                    }
+                }
+                failure {
+                    echo "${REPO_NAME} deployment to DEV Failed!"
+                }
+            }
         }
-      }
     }
-	stage('Promote to DEV') {
-      steps{
-        deployStage('Tools', TOOLS, DEV_HOST_ROUTE, 'dev')
-      }
-      post{
-        success{
-          echo 'Deployment to Dev was successful'
-        }
-        failure{
-          echo 'Deployment to Dev failed'
-        }
-      }
-    }
-  }
-}
-
-def deployStage(String stageEnv, String projectEnv, String hostRouteEnv, String tag) {
-
-  if (!stageEnv.equalsIgnoreCase('Tools')) {
-    input("Deploy to ${projectEnv}?")
-  }
-
-  openshift.withCluster() {
-    openshift.withProject(projectEnv) {
-      echo "Tagging image"
-      openshift.tag("${TOOLS}/${REPO_NAME}-${JOB_NAME}:latest", "${REPO_NAME}-${JOB_NAME}:${tag}")
-      def dcTemplate = openshift.process('-f',
-        'tools/openshift/api.dc.yaml',
-        "REPO_NAME=${REPO_NAME}",
-        "JOB_NAME=${JOB_NAME}",
-        "NAMESPACE=${projectEnv}",
-        "APP_NAME=${APP_NAME}",
-        "HOST_ROUTE=${hostRouteEnv}",
-        "TAG=${tag}"
-      )
-
-      echo "Applying Deployment ${REPO_NAME}"
-      def dc = openshift.apply(dcTemplate).narrow('dc')
-
-      echo "Waiting for deployment to roll out"
-      // Wait for deployments to roll out
-      timeout(10) {
-        dc.rollout().status('--watch=true')
-      }
-    }
-  }
 }

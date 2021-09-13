@@ -2,34 +2,34 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: "${REPO_NAME}-template"
+  template: "${REPO_NAME}-deploy-template"
 metadata:
-  name: "${REPO_NAME}-${JOB_NAME}-dc"
+  name: "${REPO_NAME}-deploy-template"
 objects:
   - apiVersion: v1
     kind: DeploymentConfig
     metadata:
       labels:
-        app: "${APP_NAME}-${JOB_NAME}"
-      name: "${APP_NAME}-${JOB_NAME}"
+        app: "${REPO_NAME}"
+        app.kubernetes.io/part-of: GRAD-Backend-API
+        app.openshift.io/runtime: spring-boot
+      name: "${REPO_NAME}-dc"
     spec:
-      replicas: 1
+      replicas: 2
       selector:
-        app: "${APP_NAME}-${JOB_NAME}"
-        deploymentConfig: "${APP_NAME}-${JOB_NAME}"
+        app: "${REPO_NAME}"
+        deploymentConfig: "${REPO_NAME}-dc"
       strategy:
         resources: {}
         type: Rolling
       template:
         metadata:
           labels:
-            app: "${APP_NAME}-${JOB_NAME}"
-            deploymentConfig: "${APP_NAME}-${JOB_NAME}"
-          annotaions:
-            haproxy.router.openshift.io/timeout: 600s
+            app: "${REPO_NAME}"
+            deploymentConfig: "${REPO_NAME}-dc"
         spec:
           containers:
-            - image: docker-registry.default.svc:5000/${NAMESPACE}/${REPO_NAME}-${JOB_NAME}:${TAG}
+            - image: image-registry.openshift-image-registry.svc:5000/77c02f-tools/${REPO_NAME}:latest
               imagePullPolicy: IfNotPresent
               readinessProbe:
                 tcpSocket:
@@ -46,7 +46,7 @@ objects:
                     - ..
                 initialDelaySeconds: 15
                 timeoutSeconds: 1
-              name: "${APP_NAME}-${JOB_NAME}"
+              name: "${REPO_NAME}"
               ports:
                 - containerPort: ${{CONTAINER_PORT}}
                   protocol: TCP
@@ -63,37 +63,26 @@ objects:
                     name: grad-client-secret
               resources: {}
       test: false
-      triggers:
-        - type: ConfigChange
-        - imageChangeParams:
-            automatic: true
-            containerNames:
-              - "${APP_NAME}-${JOB_NAME}"
-            from:
-              kind: ImageStreamTag
-              name: "${REPO_NAME}-${JOB_NAME}:${TAG}"
-              namespace: "${NAMESPACE}"
-          type: ImageChange
   - apiVersion: v1
     kind: Service
     metadata:
       labels:
-        app: "${APP_NAME}-${JOB_NAME}"
-      name: "${APP_NAME}-${JOB_NAME}"
+        app: "${REPO_NAME}"
+      name: "${REPO_NAME}"
     spec:
       ports:
         - name: ${CONTAINER_PORT}-tcp
           port: ${{CONTAINER_PORT}}
           protocol: TCP
       selector:
-        app: "${APP_NAME}-${JOB_NAME}"
-        deploymentconfig: "${APP_NAME}-${JOB_NAME}"
+        app: "${REPO_NAME}"
+        deploymentconfig: "${REPO_NAME}-dc"
   - apiVersion: v1
     kind: Route
     metadata:
       labels:
-        app: "${APP_NAME}-${JOB_NAME}"
-      name: "${APP_NAME}-${JOB_NAME}"
+        app: "${REPO_NAME}"
+      name: "${REPO_NAME}"
     spec:
       host: "${HOST_ROUTE}"
       path: ${HOST_PATH}
@@ -104,33 +93,21 @@ objects:
         termination: edge
       to:
         kind: Service
-        name: "${APP_NAME}-${JOB_NAME}"
+        name: "${REPO_NAME}"
         weight: 100
       wildcardPolicy: None
 parameters:
   - name: REPO_NAME
     description: Application repository name
     required: true
-  - name: JOB_NAME
-    description: Job identifier (i.e. 'backend' OR 'frontend')
-    required: true
-  - name: NAMESPACE
-    description: Target namespace reference (i.e. 'k8vopl-dev')
-    required: true
-  - name: APP_NAME
-    description: Application name
-    required: true
   - name: HOST_ROUTE
     description: The host the route will use to expose service outside cluster
     required: true
   - name: CONTAINER_PORT
     description: The port on which the application will be accessible
-    value: "8080"
     required: false
-  - name: TAG
-    description: The identifying tag for this specific deployment
-    required: true
+    value: "8080"
   - name: HOST_PATH
     description: The path appended to the HOST_ROUTE where the root of this project will be served
-    value: "/"
     required: false
+    value: "/"
