@@ -2,24 +2,55 @@
 apiVersion: v1
 kind: Template
 labels:
-  template: 'educ-grad-data-conversion-api-template'
+  template: '${REPO_NAME}-build-template'
 metadata:
-  name: 'educ-grad-data-conversion-api-template'
+  name: '${REPO_NAME}-build-template'
 objects:
-  - apiVersion: v1
-    kind: BuildConfig
+  - kind: BuildConfig
+    apiVersion: build.openshift.io/v1
     metadata:
       labels:
-        build: educ-grad-data-conversion-api-pipeline
-      name: educ-grad-data-conversion-api-pipeline
+        build: ${REPO_NAME}
+        app: "${REPO_NAME}"
+      name: ${REPO_NAME}-bc
       namespace: 77c02f-tools
     spec:
+      resources:
+        requests:
+          cpu: 1
+          memory: 1Gi
+        limits:
+          cpu: 2
+          memory: 3Gi
       source:
         git:
           ref: main
-          uri: 'https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API'
+          uri: 'https://github.com/bcgov/${REPO_NAME}'
         type: Git
       strategy:
-        jenkinsPipelineStrategy:
-          jenkinsfilePath: tools/jenkins/Jenkinsfile-api
-
+        dockerStrategy:
+          type: Docker
+          pullSecret:
+            name: artifactory-creds
+      output:
+        to:
+          kind: ImageStreamTag
+          name: '${REPO_NAME}:latest'
+      successfulBuildsHistoryLimit: 3
+      failedBuildsHistoryLimit: 3
+  - kind: ImageStream
+    apiVersion: image.openshift.io/v1
+    metadata:
+      name: ${REPO_NAME}
+      namespace: 77c02f-tools
+      labels:
+        build: ${REPO_NAME}
+        app: "${REPO_NAME}"
+    spec:
+      lookupPolicy:
+        local: false
+parameters:
+  - description: Name of the Git Repository
+    displayName: REPO_NAME
+    name: REPO_NAME
+    required: true
