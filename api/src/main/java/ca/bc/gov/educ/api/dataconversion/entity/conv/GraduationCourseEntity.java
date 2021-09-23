@@ -12,7 +12,7 @@ import javax.persistence.Table;
 @Data
 @Immutable
 @Entity
-@Where(clause = "GRAD_REQT_YEAR in ('2004','2018')")
+@Where(clause = "GRAD_REQT_YEAR in ('2004','2018','1950')")
 @Table(name = "TAB_GRAD_CRSE")
 public class GraduationCourseEntity {
 
