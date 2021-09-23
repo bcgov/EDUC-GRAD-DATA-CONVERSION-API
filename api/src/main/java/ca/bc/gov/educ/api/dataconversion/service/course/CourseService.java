@@ -184,6 +184,8 @@ public class CourseService {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "103"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "703"), summary);
+                } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1950")) {
+                    createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "500"), summary);
                 }
             }
         }
@@ -204,6 +206,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "105"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "705"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1950")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "502"), summary);
             }
         }
     }
@@ -223,6 +227,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "107"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "707"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1950")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "501"), summary);
             }
         }
     }
@@ -361,6 +367,13 @@ public class CourseService {
 
         // LTSTF 11
         createCourseRequirement(populate("LTSTF", "11", "201"), summary);
+
+        // Adult Work Experience
+        createCourseRequirement(populate("CPWE", "12", "506"), summary);
+        createCourseRequirement(populate("SSA", "12A", "506"), summary);
+        createCourseRequirement(populate("SSA", "12B", "506"), summary);
+        createCourseRequirement(populate("WEX", "12A", "506"), summary);
+        createCourseRequirement(populate("WEX", "12B", "506"), summary);
     }
 
     private CourseRequirementEntity populate(GraduationCourseKey key, String courseRequirementCode) {
