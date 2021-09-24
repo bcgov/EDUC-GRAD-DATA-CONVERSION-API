@@ -36,8 +36,8 @@ objects:
         to:
           kind: ImageStreamTag
           name: '${REPO_NAME}:latest'
-      successfulBuildsHistoryLimit: 3
-      failedBuildsHistoryLimit: 3
+      successfulBuildsHistoryLimit: 2
+      failedBuildsHistoryLimit: 2
   - kind: ImageStream
     apiVersion: image.openshift.io/v1
     metadata:
