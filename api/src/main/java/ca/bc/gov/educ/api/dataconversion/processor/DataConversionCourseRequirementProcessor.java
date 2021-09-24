@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import org.slf4j.Logger;

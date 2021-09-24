@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;

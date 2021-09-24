@@ -1,9 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.GraduationCourseRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class DataConversionService {
         this.graduationCourseRepository = graduationCourseRepository;
     }
 
-    @Transactional(readOnly = true, transactionManager = "convTransactionManager")
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadInitialRawGradStudentData() {
         List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadInitialStudentRawData();
@@ -67,7 +67,7 @@ public class DataConversionService {
         }
     }
 
-    @Transactional(readOnly = true, transactionManager = "convTransactionManager")
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData() {
         List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
@@ -85,7 +85,7 @@ public class DataConversionService {
         return courseRestrictions;
     }
 
-    @Transactional(readOnly = true, transactionManager = "convTransactionManager")
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<GraduationCourseEntity> loadInitialGradCourseRequirementsData() {
         return graduationCourseRepository.findAll();  // .subList(0,1)
     }

@@ -1,6 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.repository.conv;
+package ca.bc.gov.educ.api.dataconversion.repository.trax;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.TraxStudentsLoadEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentsLoadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
