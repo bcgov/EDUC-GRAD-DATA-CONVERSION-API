@@ -21,17 +21,13 @@ pipeline{
                 script {
                     openshift.withCluster() {
                         openshift.withProject(OCP_PROJECT) {
-                            echo "Applying Deployment ${REPO_NAME}-dc"
                             openshift.apply(
-                                    openshift.process('-f', '${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml',
+                                    openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml",
                                             "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${REPO_NAME}-${APP_SUBDOMAIN_SUFFIX}.${APP_DOMAIN}")
                             )
-                            def rollout = openshift.selector("dc", "${REPO_NAME}-dc").rollout()
-                            echo "Waiting for deployment to roll out"
-                            // Wait for deployments to roll out
-                            timeout(10) {
-                                rollout.latest()
-                                rollout.status('--watch')
+                            openshift.selector("dc", "${REPO_NAME}-dc").rollout().latest()
+                            timeout (time: 10, unit: 'MINUTES') {
+                                openshift.selector("dc", "${REPO_NAME}-dc").rollout().status()
                             }
                         }
                     }
