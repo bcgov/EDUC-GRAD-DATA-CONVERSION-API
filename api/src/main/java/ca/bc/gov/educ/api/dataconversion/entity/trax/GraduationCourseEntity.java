@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity.conv;
+package ca.bc.gov.educ.api.dataconversion.entity.trax;
 
 import lombok.Data;
 import org.hibernate.annotations.Immutable;

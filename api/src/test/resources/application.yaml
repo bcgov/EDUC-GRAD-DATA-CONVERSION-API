@@ -29,10 +29,6 @@ spring:
     initialize-schema: NEVER
     job:
       enabled: false
-  flyway:
-    enabled: false
-    baseline-on-migrate: false
-    table: FLYWAY_SCHEMA_HISTORY
 
 #Logging properties
 logging:

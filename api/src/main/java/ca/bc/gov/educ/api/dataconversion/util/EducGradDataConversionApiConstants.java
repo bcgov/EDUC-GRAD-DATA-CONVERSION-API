@@ -26,6 +26,8 @@ public class EducGradDataConversionApiConstants {
     public static final String DEFAULT_CREATED_BY = "DATA_CONV";
     public static final String DEFAULT_UPDATED_BY = "DATA_CONV";
 
+    public static final String DEFAULT_END_DATE_FORMAT = "20991231"; // yyyyMMdd
+
     @Value("${authorization.user}")
     private String userName;
 

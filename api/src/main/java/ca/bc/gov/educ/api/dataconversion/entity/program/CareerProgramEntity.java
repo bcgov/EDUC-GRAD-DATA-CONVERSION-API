@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.entity.program;
 
 import lombok.Data;
+import org.hibernate.annotations.Immutable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +10,7 @@ import javax.persistence.Table;
 import java.util.Date;
 
 @Data
+@Immutable
 @Entity
 @Table(name = "TAB_PRGM")
 public class CareerProgramEntity {

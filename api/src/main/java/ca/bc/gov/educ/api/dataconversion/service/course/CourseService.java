@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service.course;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.conv.GraduationCourseKey;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementCodeEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
@@ -13,6 +13,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementCode
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -102,6 +103,8 @@ public class CourseService {
             if (end != null) {
                 courseRestrictionEntity.setRestrictionEndDate(end);
             }
+        } else {
+            courseRestrictionEntity.setRestrictionEndDate(DateConversionUtils.convertStringToDate(EducGradDataConversionApiConstants.DEFAULT_END_DATE_FORMAT));
         }
     }
 
