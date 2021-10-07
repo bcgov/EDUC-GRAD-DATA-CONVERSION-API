@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
-import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStudentRecordRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
@@ -37,7 +37,7 @@ public class StudentServiceTest {
     StudentService studentService;
 
     @Autowired
-    GraduationStatusRepository graduationStatusRepository;
+    GraduationStudentRecordRepository graduationStudentRecordRepository;
 
     @MockBean
     RestUtils restUtils;
@@ -55,14 +55,14 @@ public class StudentServiceTest {
 
     @After
     public void tearDown() {
-        graduationStatusRepository.deleteAll();
+        graduationStudentRecordRepository.deleteAll();
     }
 
     @Test
     public void convertStudent_whenGivenData_withoutSpecialProgram_thenReturnSuccess() throws Exception {
         gradConversionTestUtils.createGradStudents("mock_conv_grad_students.json");
 
-        List<GraduationStatusEntity> entities = graduationStatusRepository.findAll();
+        List<GraduationStudentRecordEntity> entities = graduationStudentRecordRepository.findAll();
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isEqualTo(2);
 
@@ -79,11 +79,11 @@ public class StudentServiceTest {
         summary.setAccessToken("123");
         studentService.convertStudent(student, summary);
 
-        entities = graduationStatusRepository.findAll();
+        entities = graduationStudentRecordRepository.findAll();
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isEqualTo(3);
 
-        Optional<GraduationStatusEntity> result = graduationStatusRepository.findById(studentID);
+        Optional<GraduationStudentRecordEntity> result = graduationStudentRecordRepository.findById(studentID);
         assertThat(result).isNotNull();
         assertThat(result.isPresent()).isTrue();
         assertThat(result.get().getStudentID()).isEqualTo(studentID);
@@ -94,7 +94,7 @@ public class StudentServiceTest {
     public void convertStudent_whenExceptionIsThrownInRestAPI_thenReturnNullWithErrorsInSummary() throws Exception {
         gradConversionTestUtils.createGradStudents("mock_conv_grad_students.json");
 
-        List<GraduationStatusEntity> entities = graduationStatusRepository.findAll();
+        List<GraduationStudentRecordEntity> entities = graduationStudentRecordRepository.findAll();
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isEqualTo(2);
 
@@ -120,7 +120,7 @@ public class StudentServiceTest {
     public void convertStudent_whenGivenPen_doesNotExistFromPENStudentAPI_thenReturnNullWithErrorsInSummary() throws Exception {
         gradConversionTestUtils.createGradStudents("mock_conv_grad_students.json");
 
-        List<GraduationStatusEntity> entities = graduationStatusRepository.findAll();
+        List<GraduationStudentRecordEntity> entities = graduationStudentRecordRepository.findAll();
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isEqualTo(2);
 

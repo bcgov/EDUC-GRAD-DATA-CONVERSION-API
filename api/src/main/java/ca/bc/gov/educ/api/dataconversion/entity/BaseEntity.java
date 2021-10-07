@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.entity;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -15,6 +16,7 @@ public class BaseEntity {
 
 	@Column(name = "CREATE_DATE", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(pattern = "yyyy-mm-dd hh:mm:ss")
 	private Date createDate;
 
 	@Column(name = "UPDATE_USER", nullable = true)
@@ -22,6 +24,7 @@ public class BaseEntity {
 
 	@Column(name = "UPDATE_DATE", nullable = true)
 	@Temporal(TemporalType.TIMESTAMP)
+	@DateTimeFormat(pattern = "yyyy-mm-dd hh:mm:ss")
 	private Date updateDate;
 
 	@PrePersist

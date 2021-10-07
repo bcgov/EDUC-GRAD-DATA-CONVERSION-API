@@ -1,18 +1,15 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentCareerProgramEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
-import ca.bc.gov.educ.api.dataconversion.repository.student.StudentCareerProgramRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.student.StudentOptionalProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,24 +21,30 @@ public class StudentService {
 
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("FI", "AD", "BC", "BD");
 
-    private final GraduationStatusRepository graduationStatusRepository;
+    private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
     private final StudentCareerProgramRepository studentCareerProgramRepository;
+    private final GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository;
+    private final StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository;
 
     private final RestUtils restUtils;
     private final CourseService courseService;
     private final ProgramService programService;
 
     @Autowired
-    public StudentService(GraduationStatusRepository graduationStatusRepository,
+    public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
                           StudentOptionalProgramRepository studentOptionalProgramRepository,
                           StudentCareerProgramRepository studentCareerProgramRepository,
+                          GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository,
+                          StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository,
                           RestUtils restUtils,
                           CourseService courseService,
                           ProgramService programService) {
-        this.graduationStatusRepository = graduationStatusRepository;
+        this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
+        this.graduationStudentRecordHistoryRepository = graduationStudentRecordHistoryRepository;
+        this.studentOptionalProgramHistoryRepository = studentOptionalProgramHistoryRepository;
         this.restUtils = restUtils;
         this.courseService = courseService;
         this.programService = programService;
@@ -74,26 +77,29 @@ public class StudentService {
 
             students.forEach(st -> {
                 UUID studentID = UUID.fromString(st.getStudentID());
-                Optional<GraduationStatusEntity> stuOptional = graduationStatusRepository.findById(studentID);
-                GraduationStatusEntity gradStudentEntity;
+                Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
+                GraduationStudentRecordEntity gradStudentEntity;
                 if (stuOptional.isPresent()) {
                     gradStudentEntity = stuOptional.get();
                     gradStudentEntity.setPen(st.getPen());
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     gradStudentEntity.setUpdateDate(new Date());
-                    gradStudentEntity = graduationStatusRepository.save(gradStudentEntity);
+                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
-                    gradStudentEntity = new GraduationStatusEntity();
+                    gradStudentEntity = new GraduationStudentRecordEntity();
                     gradStudentEntity.setPen(st.getPen());
                     gradStudentEntity.setStudentID(studentID);
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     // if year "1950" without "AD" or "AN", then program is null
                     if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
-                        graduationStatusRepository.save(gradStudentEntity);
+                        gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                         summary.setAddedCount(summary.getAddedCount() + 1L);
                     }
                 }
+                // graduation status history
+                createGraduationStudentRecordHistory(gradStudentEntity);
+
                 // process dependencies
                 processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
                 processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
@@ -108,7 +114,7 @@ public class StudentService {
         }
     }
 
-    private void convertStudentData(ConvGradStudent student, GraduationStatusEntity studentEntity, ConversionStudentSummaryDTO summary) {
+    private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
         }
@@ -131,7 +137,7 @@ public class StudentService {
         studentEntity.setStudentStatus(student.getStudentStatus());
     }
 
-    private void processSpecialPrograms(GraduationStatusEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private void processSpecialPrograms(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return;
         }
@@ -149,7 +155,7 @@ public class StudentService {
         }
     }
 
-    private void processProgramCodes(GraduationStatusEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private void processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
                 if (isOptionalProgramCode(programCode)) {
@@ -173,7 +179,7 @@ public class StudentService {
        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
-    private boolean createStudentOptionalProgram(String optionalProgramCode, GraduationStatusEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private boolean createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
         entity.setPen(student.getPen());
         entity.setStudentID(student.getStudentID());
@@ -195,17 +201,19 @@ public class StudentService {
             Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());
             if (stdSpecialProgramOptional.isPresent()) {
                 StudentOptionalProgramEntity currentEntity = stdSpecialProgramOptional.get();
-                studentOptionalProgramRepository.save(currentEntity);  // touch: update_user will be updated only.
+                studentOptionalProgramRepository.save(currentEntity); // touch: update_user will be updated only.
+                createStudentOptionalProgramHistory(currentEntity); // student optional program history
             } else {
                 entity.setId(UUID.randomUUID());
                 studentOptionalProgramRepository.save(entity);
+                createStudentOptionalProgramHistory(entity); // student optional program history
             }
             summary.incrementOptionalProgram(optionalProgramCode);
         }
         return true;
     }
 
-    private boolean createStudentCareerProgram(String careerProgramCode, GraduationStatusEntity student, ConversionStudentSummaryDTO summary) {
+    private boolean createStudentCareerProgram(String careerProgramCode, GraduationStudentRecordEntity student, ConversionStudentSummaryDTO summary) {
         StudentCareerProgramEntity entity = new StudentCareerProgramEntity();
         entity.setStudentID(student.getStudentID());
 
@@ -284,6 +292,21 @@ public class StudentService {
                 return false;
         }
         return true;
+    }
+
+    private void createGraduationStudentRecordHistory(GraduationStudentRecordEntity grauationStudentRecord) {
+        final GraduationStudentRecordHistoryEntity graduationStudentRecordHistoryEntity = new GraduationStudentRecordHistoryEntity();
+        BeanUtils.copyProperties(grauationStudentRecord, graduationStudentRecordHistoryEntity);
+        graduationStudentRecordHistoryEntity.setActivityCode("DATACONVERT");
+        graduationStudentRecordHistoryRepository.save(graduationStudentRecordHistoryEntity);
+    }
+
+    private void createStudentOptionalProgramHistory(StudentOptionalProgramEntity studentOptionalProgramEntity) {
+        final StudentOptionalProgramHistoryEntity studentOptionalProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+        BeanUtils.copyProperties(studentOptionalProgramEntity, studentOptionalProgramHistoryEntity);
+        studentOptionalProgramHistoryEntity.setStudentOptionalProgramID(studentOptionalProgramEntity.getId());
+        studentOptionalProgramHistoryEntity.setActivityCode("DATACONVERT");
+        studentOptionalProgramHistoryRepository.save(studentOptionalProgramHistoryEntity);
     }
 
 }
