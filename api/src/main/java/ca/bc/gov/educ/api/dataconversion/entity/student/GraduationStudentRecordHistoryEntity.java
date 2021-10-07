@@ -1,25 +1,31 @@
 package ca.bc.gov.educ.api.dataconversion.entity.student;
 
-import java.util.Date;
-import java.util.UUID;
+import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-
-import ca.bc.gov.educ.api.dataconversion.entity.BaseEntity;
-import lombok.EqualsAndHashCode;
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.Data;
+import java.util.Date;
+import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
-@Table(name = "GRADUATION_STUDENT_RECORD")
-public class GraduationStatusEntity extends BaseEntity {
+@Table(name = "GRADUATION_STUDENT_RECORD_HISTORY")
+public class GraduationStudentRecordHistoryEntity extends BaseEntity {
 
-    @Transient
-    private String pen;
-
+	@Id
+	@GeneratedValue(generator = "UUID")
+	@GenericGenerator(
+		name = "UUID",
+		strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "GRADUATION_STUDENT_RECORD_HISTORY_ID", nullable = false)
+    private UUID historyID;
+	
+	@Column(name = "HISTORY_ACTIVITY_CODE", nullable = true)
+    private String activityCode;
+	
     @Lob
     @Column(name = "STUDENT_GRAD_DATA", columnDefinition="CLOB")
     private String studentGradData;
@@ -47,11 +53,10 @@ public class GraduationStatusEntity extends BaseEntity {
     
     @Column(name = "STUDENT_STATUS_CODE", nullable = false)
     private String studentStatus;
-
-    @Id
+    
     @Column(name = "GRADUATION_STUDENT_RECORD_ID", nullable = false)
     private UUID studentID;
-
+    
     @Column(name = "SCHOOL_AT_GRADUATION", nullable = true)
     private String schoolAtGrad;
     

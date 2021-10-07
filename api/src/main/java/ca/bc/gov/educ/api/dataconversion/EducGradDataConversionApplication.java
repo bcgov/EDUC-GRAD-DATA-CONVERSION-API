@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion;
 
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import org.modelmapper.ModelMapper;
@@ -26,8 +26,8 @@ public class EducGradDataConversionApplication {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
 
-        modelMapper.typeMap(GraduationStatusEntity.class, ConvGradStudent.class);
-        modelMapper.typeMap(ConvGradStudent.class, GraduationStatusEntity.class);
+        modelMapper.typeMap(GraduationStudentRecordEntity.class, ConvGradStudent.class);
+        modelMapper.typeMap(ConvGradStudent.class, GraduationStudentRecordEntity.class);
 
         modelMapper.typeMap(CourseRestrictionEntity.class, GradCourseRestriction.class);
         modelMapper.typeMap(GradCourseRestriction.class, CourseRestrictionEntity.class);
