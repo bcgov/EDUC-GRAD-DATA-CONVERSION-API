@@ -32,22 +32,22 @@ public class BaseEntity {
 		if (StringUtils.isBlank(createUser)) {
 			this.createUser = EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
 		}
+		this.createDate = new Date(System.currentTimeMillis());
 		if (StringUtils.isBlank(updateUser)) {
 			this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 		}
-		this.createDate = new Date(System.currentTimeMillis());
 		this.updateDate = new Date(System.currentTimeMillis());
 	}
 
 	@PreUpdate
 	protected void onPersist() {
-		this.updateDate = new Date(System.currentTimeMillis());
-		this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 		if (StringUtils.isBlank(createUser)) {
 			this.createUser = EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
 		}
 		if (this.createDate == null) {
-			this.createDate = new Date(System.currentTimeMillis());
+			this.createDate = new Date();
 		}
+		this.updateUser = EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
+		this.updateDate = new Date();
 	}
 }
