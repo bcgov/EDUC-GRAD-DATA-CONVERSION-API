@@ -83,7 +83,8 @@ public class StudentService {
                     gradStudentEntity = stuOptional.get();
                     gradStudentEntity.setPen(st.getPen());
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
-                    gradStudentEntity.setUpdateDate(new Date());
+                    gradStudentEntity.setUpdateDate(null);
+                    gradStudentEntity.setUpdateUser(null);
                     gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
@@ -201,6 +202,8 @@ public class StudentService {
             Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());
             if (stdSpecialProgramOptional.isPresent()) {
                 StudentOptionalProgramEntity currentEntity = stdSpecialProgramOptional.get();
+                currentEntity.setUpdateDate(null);
+                currentEntity.setUpdateUser(null);
                 studentOptionalProgramRepository.save(currentEntity); // touch: update_user will be updated only.
                 createStudentOptionalProgramHistory(currentEntity); // student optional program history
             } else {
@@ -223,6 +226,8 @@ public class StudentService {
             Optional<StudentCareerProgramEntity> stdCareerProgramOptional = studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(student.getStudentID(), careerProgramCode);
             if (stdCareerProgramOptional.isPresent()) {
                 StudentCareerProgramEntity currentEntity = stdCareerProgramOptional.get();
+                currentEntity.setUpdateDate(null);
+                currentEntity.setUpdateUser(null);
                 studentCareerProgramRepository.save(currentEntity);  // touch: update_user will be updated only.
             } else {
                 entity.setId(UUID.randomUUID());
