@@ -76,6 +76,7 @@ public class StudentService {
             }
 
             students.forEach(st -> {
+                boolean isStudentPersisted = false;
                 UUID studentID = UUID.fromString(st.getStudentID());
                 Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
                 GraduationStudentRecordEntity gradStudentEntity;
@@ -86,6 +87,7 @@ public class StudentService {
                     gradStudentEntity.setUpdateDate(null);
                     gradStudentEntity.setUpdateUser(null);
                     gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                    isStudentPersisted = true;
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
                     gradStudentEntity = new GraduationStudentRecordEntity();
@@ -96,14 +98,18 @@ public class StudentService {
                     if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
                         gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                         summary.setAddedCount(summary.getAddedCount() + 1L);
+                        isStudentPersisted = true;
                     }
                 }
-                // graduation status history
-                createGraduationStudentRecordHistory(gradStudentEntity);
 
-                // process dependencies
-                processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
-                processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                if (isStudentPersisted) {
+                    // graduation status history
+                    createGraduationStudentRecordHistory(gradStudentEntity);
+
+                    // process dependencies
+                    processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                    processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                }
             });
             return convGradStudent;
         } catch (Exception e) {
@@ -294,6 +300,11 @@ public class StudentService {
                 summary.increment("SCCP", false);
                 break;
             default:
+                // error
+                ConversionAlert error = new ConversionAlert();
+                error.setItem(student.getPen());
+                error.setReason("Program is not found for pen#" + student.getPen() + ", reqt_year " + student.getGraduationRequestYear());
+                summary.getErrors().add(error);
                 return false;
         }
         return true;
