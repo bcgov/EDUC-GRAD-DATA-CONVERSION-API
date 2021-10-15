@@ -107,6 +107,7 @@ public class StudentService {
                     createGraduationStudentRecordHistory(gradStudentEntity);
 
                     // process dependencies
+                    gradStudentEntity.setPen(convGradStudent.getPen());
                     processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
                     processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
                 }
@@ -303,7 +304,7 @@ public class StudentService {
                 // error
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(student.getPen());
-                error.setReason("Program is not found for pen#" + student.getPen() + ", reqt_year " + student.getGraduationRequestYear());
+                error.setReason("Program is not found for year " + student.getGraduationRequestYear() + " / grade " + student.getStudentGrade());
                 summary.getErrors().add(error);
                 return false;
         }
