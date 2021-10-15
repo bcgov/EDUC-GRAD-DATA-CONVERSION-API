@@ -21,8 +21,8 @@ public interface CourseRequirementRepository extends JpaRepository<CourseRequire
 	long countFrenchImmersionCourses(@Param("pen") String pen);
 
 	@Query(value="select count(*) from TAB_CRSE cr \n" +
-			"where trim(cr.crse_code) = :courseCode \n" +
-			"and trim(cr.crse_level) = :courseLevel \n" +
+			"where cr.crse_code = :courseCode \n" +
+			"and cr.crse_level = :courseLevel \n" +
 			"and cr.language = :lang", nativeQuery=true)
 	long countTabCourses(@Param("courseCode") String courseCode, @Param("courseLevel") String courseLevel, @Param("lang") String lang);
 
