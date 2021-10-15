@@ -304,7 +304,7 @@ public class StudentService {
                 // error
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(student.getPen());
-                error.setReason("Program is not found for year" + student.getGraduationRequestYear() + " / grade " + student.getStudentGrade());
+                error.setReason("Program is not found for year " + student.getGraduationRequestYear() + " / grade " + student.getStudentGrade());
                 summary.getErrors().add(error);
                 return false;
         }
