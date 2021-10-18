@@ -107,10 +107,10 @@ authorization:
 #Endpoints
 endpoint:
   keycloack:
-    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+    getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
   pen-student-api:
     by-pen:
-      url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+      url: ${PEN_STUDENT_API}api/v1/student?pen=%s
   grad-program-api:
     special-program:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms
+      url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
