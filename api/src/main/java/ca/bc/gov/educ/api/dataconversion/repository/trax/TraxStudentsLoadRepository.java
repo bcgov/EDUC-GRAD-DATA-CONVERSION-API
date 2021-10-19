@@ -16,7 +16,8 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5\n" +
             "from trax_students_load l, student_master m\n" +
             "where 1 = 1\n" +
-//					"and trim(l.stud_no) = '126786680'\n" +
+//			"and trim(l.stud_no) = '126786680'\n" +
+//            "and m.stud_status in ('M','D')\n" +
             "and l.stud_no = m.stud_no\n" , nativeQuery=true)
     @Transactional(readOnly = true)
     List<Object[]> loadInitialStudentRawData();
