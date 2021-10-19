@@ -134,10 +134,6 @@ public class StudentService {
         studentEntity.setProgramCompletionDate(null);
         studentEntity.setStudentGradData(null);
         studentEntity.setSchoolAtGrad(null);
-//        studentEntity.setGpa(student.getGpa());
-//        studentEntity.setHonoursStanding(student.getHonoursStanding());
-//        studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
-//        studentEntity.setStudentGradData(student.getStudentGradData());
 
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());

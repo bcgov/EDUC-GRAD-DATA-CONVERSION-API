@@ -35,7 +35,11 @@ public class DataConversionService {
             String studentGrade = (String) result[3];
             Character studentStatus = (Character) result[4];
             String graduationRequestYear = (String) result[5];
+
             Character recalculateGradStatus = (Character) result[6];
+            if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
+                recalculateGradStatus = null;
+            }
             // grad or non-grad
             BigDecimal gradDate = (BigDecimal) result[7];
 
@@ -49,8 +53,10 @@ public class DataConversionService {
 
             ConvGradStudent student = new ConvGradStudent(
                     pen, null, null, null, null,
-                    recalculateGradStatus.toString(), null, schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear, programCodes, !gradDate.equals(BigDecimal.ZERO));
+                    recalculateGradStatus != null? recalculateGradStatus.toString() : null, null,
+                    schoolOfRecord, schoolAtGrad, studentGrade,
+                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear,
+                    programCodes, !gradDate.equals(BigDecimal.ZERO));
             students.add(student);
         });
 
