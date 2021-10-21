@@ -7,25 +7,32 @@ import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
+
+import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
+import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 
 @Service
 public class StudentService {
 
-    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("FI", "AD", "BC", "BD");
+    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
 
     private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
     private final StudentCareerProgramRepository studentCareerProgramRepository;
     private final GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository;
     private final StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository;
+    private final EducGradDataConversionApiConstants constants;
 
     private final RestUtils restUtils;
     private final CourseService courseService;
@@ -37,6 +44,7 @@ public class StudentService {
                           StudentCareerProgramRepository studentCareerProgramRepository,
                           GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository,
                           StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository,
+                          EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
                           CourseService courseService,
                           ProgramService programService) {
@@ -45,6 +53,7 @@ public class StudentService {
         this.studentCareerProgramRepository = studentCareerProgramRepository;
         this.graduationStudentRecordHistoryRepository = graduationStudentRecordHistoryRepository;
         this.studentOptionalProgramHistoryRepository = studentOptionalProgramHistoryRepository;
+        this.constants = constants;
         this.restUtils = restUtils;
         this.courseService = courseService;
         this.programService = programService;
@@ -86,7 +95,7 @@ public class StudentService {
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     gradStudentEntity.setUpdateDate(null);
                     gradStudentEntity.setUpdateUser(null);
-                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+//                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                     isStudentPersisted = true;
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
@@ -106,10 +115,16 @@ public class StudentService {
                     // graduation status history
                     createGraduationStudentRecordHistory(gradStudentEntity);
 
+                    // student guid - pen
+                    if (constants.isStudentGuidPenXrefEnabled()) {
+                        saveStudentGuidPenXref(studentID, convGradStudent.getPen());
+                    }
+
                     // process dependencies
                     gradStudentEntity.setPen(convGradStudent.getPen());
-                    processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                    processSpecialPrograms(gradStudentEntity, accessToken, summary);
                     processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                    processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
                 }
             });
             return convGradStudent;
@@ -141,7 +156,7 @@ public class StudentService {
         studentEntity.setStudentStatus(student.getStudentStatus());
     }
 
-    private void processSpecialPrograms(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private void processSpecialPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return;
         }
@@ -170,12 +185,22 @@ public class StudentService {
                         error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
                         error.setItem(student.getPen());
                         error.setReason(" [ SCCP | CP ] is found => skip both student career program and optional program creation process.");
-                        summary.getErrors().add(error);
-                    } else if (createStudentCareerProgram(programCode, student, summary)) {
+//                        summary.getErrors().add(error);
+                    }
+                    if (createStudentCareerProgram(programCode, student, summary)) {
                         createStudentOptionalProgram("CP", student, accessToken, summary);
                     }
                 }
             }
+        }
+    }
+
+    private void processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+        if (StringUtils.equals(student.getProgram(), "SCCP")
+            && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
+                 && student.getSchoolOfRecord().startsWith("093") )
+        ) {
+            createStudentOptionalProgram("FR", student, accessToken, summary);
         }
     }
 
@@ -320,6 +345,15 @@ public class StudentService {
         studentOptionalProgramHistoryEntity.setStudentOptionalProgramID(studentOptionalProgramEntity.getId());
         studentOptionalProgramHistoryEntity.setActivityCode("DATACONVERT");
         studentOptionalProgramHistoryRepository.save(studentOptionalProgramHistoryEntity);
+    }
+
+    @Transactional(transactionManager = "studentTransactionManager")
+    public void saveStudentGuidPenXref(UUID studentId, String pen) {
+        if (graduationStudentRecordRepository.countStudentGuidPenXrefRecord(studentId) > 0) {
+            graduationStudentRecordRepository.updateStudentGuidPenXrefRecord(studentId, pen, DEFAULT_UPDATED_BY, LocalDateTime.now());
+        } else {
+            graduationStudentRecordRepository.createStudentGuidPenXrefRecord(studentId, pen, DEFAULT_CREATED_BY, LocalDateTime.now());
+        }
     }
 
 }
