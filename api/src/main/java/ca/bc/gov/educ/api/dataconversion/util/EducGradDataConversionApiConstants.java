@@ -34,7 +34,7 @@ public class EducGradDataConversionApiConstants {
     @Value("${authorization.password}")
     private String password;
 
-    @Value("${endpoint.keycloack.getToken}")
+    @Value("${endpoint.keycloak.getToken}")
     private String tokenUrl;
 
     @Value("${endpoint.pen-student-api.by-pen.url}")
@@ -42,4 +42,7 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-program-api.special-program.url}")
     private String gradProgramManagementUrl;
+
+    @Value("${data-conversion.student-guid-pen-xref.enabled}")
+    private boolean studentGuidPenXrefEnabled;
 }

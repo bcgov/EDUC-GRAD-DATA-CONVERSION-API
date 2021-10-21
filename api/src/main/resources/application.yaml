@@ -106,7 +106,7 @@ authorization:
 
 #Endpoints
 endpoint:
-  keycloack:
+  keycloak:
     getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
   pen-student-api:
     by-pen:
@@ -114,3 +114,8 @@ endpoint:
   grad-program-api:
     special-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+
+#Conversion option
+data-conversion:
+  student-guid-pen-xref:
+    enabled:  ${ENABLE_STUDENT_ID_PEN_XREF}
