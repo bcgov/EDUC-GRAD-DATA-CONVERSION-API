@@ -153,7 +153,23 @@ public class StudentService {
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
-        studentEntity.setStudentStatus(student.getStudentStatus());
+        studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+    }
+
+    private String determineGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
+        if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "A")) {
+            return "CUR";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) {
+            return "ARC";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "D")) {
+            return "DEC";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "M")) {
+            return "MER";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") &&
+                (StringUtils.equalsIgnoreCase(traxArchiveFlag, "A") || StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) ) {
+            return "TER";
+        }
+        return null;
     }
 
     private void processSpecialPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -232,7 +248,7 @@ public class StudentService {
                 StudentOptionalProgramEntity currentEntity = stdSpecialProgramOptional.get();
                 currentEntity.setUpdateDate(null);
                 currentEntity.setUpdateUser(null);
-                studentOptionalProgramRepository.save(currentEntity); // touch: update_user will be updated only.
+                studentOptionalProgramRepository.save(currentEntity); // touch: update_user & update_date will be updated only.
                 createStudentOptionalProgramHistory(currentEntity); // student optional program history
             } else {
                 entity.setId(UUID.randomUUID());

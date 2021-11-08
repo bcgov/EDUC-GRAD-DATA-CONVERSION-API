@@ -87,6 +87,8 @@ objects:
       labels:
         app: "${REPO_NAME}"
       name: "${REPO_NAME}"
+      annotations:
+        haproxy.router.openshift.io/timeout: 1800s
     spec:
       host: "${HOST_ROUTE}"
       path: ${HOST_PATH}

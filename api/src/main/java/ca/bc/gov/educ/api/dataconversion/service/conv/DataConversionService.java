@@ -34,29 +34,31 @@ public class DataConversionService {
             String schoolAtGrad = (String) result[2];
             String studentGrade = (String) result[3];
             Character studentStatus = (Character) result[4];
-            String graduationRequestYear = (String) result[5];
+            Character archiveFlag = (Character) result[5];
+            String graduationRequestYear = (String) result[6];
 
-            Character recalculateGradStatus = (Character) result[6];
+            Character recalculateGradStatus = (Character) result[7];
             if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
                 recalculateGradStatus = null;
             }
             // grad or non-grad
-            BigDecimal gradDate = (BigDecimal) result[7];
+            BigDecimal gradDate = (BigDecimal) result[8];
 
             List<String> programCodes = new ArrayList<>();
             // optional program
-            populateProgramCode((String) result[8], programCodes);
             populateProgramCode((String) result[9], programCodes);
             populateProgramCode((String) result[10], programCodes);
             populateProgramCode((String) result[11], programCodes);
             populateProgramCode((String) result[12], programCodes);
+            populateProgramCode((String) result[13], programCodes);
 
             ConvGradStudent student = new ConvGradStudent(
                     pen, null, null, null, null,
                     recalculateGradStatus != null? recalculateGradStatus.toString() : null, null,
                     schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null? studentStatus.toString() : null, graduationRequestYear,
-                    programCodes, !gradDate.equals(BigDecimal.ZERO));
+                    studentStatus != null? studentStatus.toString() : null,
+                    archiveFlag != null? archiveFlag.toString() : null,
+                    graduationRequestYear, programCodes, !gradDate.equals(BigDecimal.ZERO));
             students.add(student);
         });
 
