@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 @Setter
 public class EducGradDataConversionApiConstants {
 
+    public static final String API_NAME = "GRAD-DATA-CONVERSION-API";
+    public static final String CORRELATION_ID = "correlationID";
 	public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
