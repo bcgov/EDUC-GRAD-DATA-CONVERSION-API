@@ -33,6 +33,9 @@ objects:
           containers:
             - image: image-registry.openshift-image-registry.svc:5000/77c02f-tools/${REPO_NAME}:latest
               imagePullPolicy: Always
+              volumeMounts:
+              - name: log-storage
+                mountPath: /logs
               readinessProbe:
                 tcpSocket:
                   port: 8080
