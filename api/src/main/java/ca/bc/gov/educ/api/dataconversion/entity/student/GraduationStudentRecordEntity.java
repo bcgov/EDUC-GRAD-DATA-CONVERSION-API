@@ -54,5 +54,10 @@ public class GraduationStudentRecordEntity extends BaseEntity {
 
     @Column(name = "SCHOOL_AT_GRADUATION", nullable = true)
     private String schoolAtGrad;
-    
+
+    @Column(name = "RECALCULATE_PROJECTED_GRAD", nullable = true)
+    private String recalculateProjectedGrad;
+
+    @Column(name = "BATCH_ID", nullable = true)
+    private Long batchId;
 }
