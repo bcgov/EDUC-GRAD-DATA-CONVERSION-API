@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -152,6 +151,7 @@ public class StudentService {
 
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
+        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
     }

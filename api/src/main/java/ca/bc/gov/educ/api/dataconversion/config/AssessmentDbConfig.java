@@ -34,7 +34,7 @@ public class AssessmentDbConfig {
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-life-time}")
+    @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
 
     @Value("${spring.db-connection.driver-class}")
