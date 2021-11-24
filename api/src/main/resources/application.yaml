@@ -62,13 +62,17 @@ spring:
 #Logging properties
 logging:
   file:
-    max-history: 1
-    clean-history-on-start: true
-    max-size: 20MB
     name: /logs/app.log
-  #pattern:
-  #  file: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
-  #  console: %d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n
+  logback:
+    rollingpolicy:
+      max-history: 1
+      max-file-size: 5MB
+      clean-history-on-start: true
+  pattern:
+    #  file: "%d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n"
+    #  console: "%d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n"
+    file: '{"time_stamp":"%d{yyyy-MM-dd HH:mm:ss.SSS}","level":"%3p" ,"thread":"%t" ,"class":"%logger{36}","msg":"%replace(%msg){"[\n\r\"]",""}", "exception":"%replace(%rEx{10}){"[\n\r\"]",""}","http_event":%X{httpEvent:-""},"message_event":%X{messageEvent:-""}}%nopex%n'
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%5p] [%t] [%logger{36}] [%replace(%msg){'[\n\r\"]',''} %X{httpEvent} %X{messageEvent}] %replace(%rEx{10}){'[\n\r\"]',''}%nopex%n"
   level:
     ca:
       bc:
@@ -83,6 +87,9 @@ logging:
         boot:
           autoconfigure:
             logging: ${SPRING_BOOT_AUTOCONFIG_LOG_LEVEL}
+    com:
+      zaxxer:
+        hikari: ERROR
 
 #Local properties
 server:
@@ -106,11 +113,16 @@ authorization:
 
 #Endpoints
 endpoint:
-  keycloack:
-    getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
+  keycloak:
+    getToken: ${KEYCLOAK_TOKEN_URL}auth/realms/master/protocol/openid-connect/token
   pen-student-api:
     by-pen:
-      url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+      url: ${PEN_STUDENT_API}api/v1/student?pen=%s
   grad-program-api:
     special-program:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms
+      url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+
+#Conversion option
+data-conversion:
+  student-guid-pen-xref:
+    enabled:  ${ENABLE_STUDENT_ID_PEN_XREF}

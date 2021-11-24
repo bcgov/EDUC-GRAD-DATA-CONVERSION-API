@@ -1,9 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.mappers.ConvGradStudentMapper;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStudentRecordRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,12 +23,12 @@ import static java.util.stream.Collectors.toList;
 @Profile("test")
 public class GradConversionTestUtils {
     @Autowired
-    GraduationStatusRepository graduationStatusRepository;
+    GraduationStudentRecordRepository graduationStudentRecordRepository;
 
     @Autowired
     private ConvGradStudentMapper mapper;
 
-    public static GraduationStatusEntity populateIdAndAuditColumns(final GraduationStatusEntity entity) {
+    public static GraduationStudentRecordEntity populateIdAndAuditColumns(final GraduationStudentRecordEntity entity) {
         if (entity.getStudentID() == null) {
             entity.setStudentID(UUID.randomUUID());
         }
@@ -45,7 +45,7 @@ public class GradConversionTestUtils {
         return entity;
     }
 
-    public List<GraduationStatusEntity> createGradStudents(final String jsonFileName) throws IOException {
+    public List<GraduationStudentRecordEntity> createGradStudents(final String jsonFileName) throws IOException {
         final File file = new File(
                 Objects.requireNonNull(GradConversionTestUtils.class.getClassLoader().getResource(jsonFileName)).getFile()
         );
@@ -54,7 +54,7 @@ public class GradConversionTestUtils {
         final var entities = models.stream().map(mapper::toEntity)
                 .collect(toList()).stream().map(GradConversionTestUtils::populateIdAndAuditColumns).collect(toList());
 
-        graduationStatusRepository.saveAll(entities);
+        graduationStudentRecordRepository.saveAll(entities);
         return entities;
     }
 

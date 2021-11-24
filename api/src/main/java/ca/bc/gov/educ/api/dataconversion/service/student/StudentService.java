@@ -1,47 +1,58 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStatusEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentCareerProgramEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStatusRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
-import ca.bc.gov.educ.api.dataconversion.repository.student.StudentCareerProgramRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.student.StudentOptionalProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
+
+import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
+import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 
 @Service
 public class StudentService {
 
-    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("FI", "AD", "BC", "BD");
+    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
 
-    private final GraduationStatusRepository graduationStatusRepository;
+    private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
     private final StudentCareerProgramRepository studentCareerProgramRepository;
+    private final GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository;
+    private final StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository;
+    private final EducGradDataConversionApiConstants constants;
 
     private final RestUtils restUtils;
     private final CourseService courseService;
     private final ProgramService programService;
 
     @Autowired
-    public StudentService(GraduationStatusRepository graduationStatusRepository,
+    public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
                           StudentOptionalProgramRepository studentOptionalProgramRepository,
                           StudentCareerProgramRepository studentCareerProgramRepository,
+                          GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository,
+                          StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository,
+                          EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
                           CourseService courseService,
                           ProgramService programService) {
-        this.graduationStatusRepository = graduationStatusRepository;
+        this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
+        this.graduationStudentRecordHistoryRepository = graduationStudentRecordHistoryRepository;
+        this.studentOptionalProgramHistoryRepository = studentOptionalProgramHistoryRepository;
+        this.constants = constants;
         this.restUtils = restUtils;
         this.courseService = courseService;
         this.programService = programService;
@@ -73,30 +84,47 @@ public class StudentService {
             }
 
             students.forEach(st -> {
+                boolean isStudentPersisted = false;
                 UUID studentID = UUID.fromString(st.getStudentID());
-                Optional<GraduationStatusEntity> stuOptional = graduationStatusRepository.findById(studentID);
-                GraduationStatusEntity gradStudentEntity;
+                Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
+                GraduationStudentRecordEntity gradStudentEntity;
                 if (stuOptional.isPresent()) {
                     gradStudentEntity = stuOptional.get();
                     gradStudentEntity.setPen(st.getPen());
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
-                    gradStudentEntity.setUpdateDate(new Date());
-                    gradStudentEntity = graduationStatusRepository.save(gradStudentEntity);
+                    gradStudentEntity.setUpdateDate(null);
+                    gradStudentEntity.setUpdateUser(null);
+//                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                    isStudentPersisted = true;
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
-                    gradStudentEntity = new GraduationStatusEntity();
+                    gradStudentEntity = new GraduationStudentRecordEntity();
                     gradStudentEntity.setPen(st.getPen());
                     gradStudentEntity.setStudentID(studentID);
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     // if year "1950" without "AD" or "AN", then program is null
                     if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
-                        graduationStatusRepository.save(gradStudentEntity);
+                        gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                         summary.setAddedCount(summary.getAddedCount() + 1L);
+                        isStudentPersisted = true;
                     }
                 }
-                // process dependencies
-                processSpecialPrograms(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
-                processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+
+                if (isStudentPersisted) {
+                    // graduation status history
+                    createGraduationStudentRecordHistory(gradStudentEntity);
+
+                    // student guid - pen
+                    if (constants.isStudentGuidPenXrefEnabled()) {
+                        saveStudentGuidPenXref(studentID, convGradStudent.getPen());
+                    }
+
+                    // process dependencies
+                    gradStudentEntity.setPen(convGradStudent.getPen());
+                    processSpecialPrograms(gradStudentEntity, accessToken, summary);
+                    processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                    processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+                }
             });
             return convGradStudent;
         } catch (Exception e) {
@@ -108,7 +136,7 @@ public class StudentService {
         }
     }
 
-    private void convertStudentData(ConvGradStudent student, GraduationStatusEntity studentEntity, ConversionStudentSummaryDTO summary) {
+    private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
         }
@@ -120,18 +148,31 @@ public class StudentService {
         studentEntity.setProgramCompletionDate(null);
         studentEntity.setStudentGradData(null);
         studentEntity.setSchoolAtGrad(null);
-//        studentEntity.setGpa(student.getGpa());
-//        studentEntity.setHonoursStanding(student.getHonoursStanding());
-//        studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
-//        studentEntity.setStudentGradData(student.getStudentGradData());
 
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
+        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
-        studentEntity.setStudentStatus(student.getStudentStatus());
+        studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
     }
 
-    private void processSpecialPrograms(GraduationStatusEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private String determineGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
+        if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "A")) {
+            return "CUR";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) {
+            return "ARC";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "D")) {
+            return "DEC";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "M")) {
+            return "MER";
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") &&
+                (StringUtils.equalsIgnoreCase(traxArchiveFlag, "A") || StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) ) {
+            return "TER";
+        }
+        return null;
+    }
+
+    private void processSpecialPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return;
         }
@@ -149,7 +190,7 @@ public class StudentService {
         }
     }
 
-    private void processProgramCodes(GraduationStatusEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private void processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
                 if (isOptionalProgramCode(programCode)) {
@@ -160,8 +201,9 @@ public class StudentService {
                         error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
                         error.setItem(student.getPen());
                         error.setReason(" [ SCCP | CP ] is found => skip both student career program and optional program creation process.");
-                        summary.getErrors().add(error);
-                    } else if (createStudentCareerProgram(programCode, student, summary)) {
+//                        summary.getErrors().add(error);
+                    }
+                    if (createStudentCareerProgram(programCode, student, summary)) {
                         createStudentOptionalProgram("CP", student, accessToken, summary);
                     }
                 }
@@ -169,11 +211,20 @@ public class StudentService {
         }
     }
 
+    private void processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+        if (StringUtils.equals(student.getProgram(), "SCCP")
+            && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
+                 && student.getSchoolOfRecord().startsWith("093") )
+        ) {
+            createStudentOptionalProgram("FR", student, accessToken, summary);
+        }
+    }
+
     private boolean isOptionalProgramCode(String code) {
        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
-    private boolean createStudentOptionalProgram(String optionalProgramCode, GraduationStatusEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private boolean createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
         entity.setPen(student.getPen());
         entity.setStudentID(student.getStudentID());
@@ -195,17 +246,21 @@ public class StudentService {
             Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), gradSpecialProgram.getOptionalProgramID());
             if (stdSpecialProgramOptional.isPresent()) {
                 StudentOptionalProgramEntity currentEntity = stdSpecialProgramOptional.get();
-                studentOptionalProgramRepository.save(currentEntity);  // touch: update_user will be updated only.
+                currentEntity.setUpdateDate(null);
+                currentEntity.setUpdateUser(null);
+                studentOptionalProgramRepository.save(currentEntity); // touch: update_user & update_date will be updated only.
+                createStudentOptionalProgramHistory(currentEntity); // student optional program history
             } else {
                 entity.setId(UUID.randomUUID());
                 studentOptionalProgramRepository.save(entity);
+                createStudentOptionalProgramHistory(entity); // student optional program history
             }
             summary.incrementOptionalProgram(optionalProgramCode);
         }
         return true;
     }
 
-    private boolean createStudentCareerProgram(String careerProgramCode, GraduationStatusEntity student, ConversionStudentSummaryDTO summary) {
+    private boolean createStudentCareerProgram(String careerProgramCode, GraduationStudentRecordEntity student, ConversionStudentSummaryDTO summary) {
         StudentCareerProgramEntity entity = new StudentCareerProgramEntity();
         entity.setStudentID(student.getStudentID());
 
@@ -215,6 +270,8 @@ public class StudentService {
             Optional<StudentCareerProgramEntity> stdCareerProgramOptional = studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(student.getStudentID(), careerProgramCode);
             if (stdCareerProgramOptional.isPresent()) {
                 StudentCareerProgramEntity currentEntity = stdCareerProgramOptional.get();
+                currentEntity.setUpdateDate(null);
+                currentEntity.setUpdateUser(null);
                 studentCareerProgramRepository.save(currentEntity);  // touch: update_user will be updated only.
             } else {
                 entity.setId(UUID.randomUUID());
@@ -281,9 +338,38 @@ public class StudentService {
                 summary.increment("SCCP", false);
                 break;
             default:
+                // error
+                ConversionAlert error = new ConversionAlert();
+                error.setItem(student.getPen());
+                error.setReason("Program is not found for year " + student.getGraduationRequestYear() + " / grade " + student.getStudentGrade());
+                summary.getErrors().add(error);
                 return false;
         }
         return true;
+    }
+
+    private void createGraduationStudentRecordHistory(GraduationStudentRecordEntity grauationStudentRecord) {
+        final GraduationStudentRecordHistoryEntity graduationStudentRecordHistoryEntity = new GraduationStudentRecordHistoryEntity();
+        BeanUtils.copyProperties(grauationStudentRecord, graduationStudentRecordHistoryEntity);
+        graduationStudentRecordHistoryEntity.setActivityCode("DATACONVERT");
+        graduationStudentRecordHistoryRepository.save(graduationStudentRecordHistoryEntity);
+    }
+
+    private void createStudentOptionalProgramHistory(StudentOptionalProgramEntity studentOptionalProgramEntity) {
+        final StudentOptionalProgramHistoryEntity studentOptionalProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+        BeanUtils.copyProperties(studentOptionalProgramEntity, studentOptionalProgramHistoryEntity);
+        studentOptionalProgramHistoryEntity.setStudentOptionalProgramID(studentOptionalProgramEntity.getId());
+        studentOptionalProgramHistoryEntity.setActivityCode("DATACONVERT");
+        studentOptionalProgramHistoryRepository.save(studentOptionalProgramHistoryEntity);
+    }
+
+    @Transactional(transactionManager = "studentTransactionManager")
+    public void saveStudentGuidPenXref(UUID studentId, String pen) {
+        if (graduationStudentRecordRepository.countStudentGuidPenXrefRecord(studentId) > 0) {
+            graduationStudentRecordRepository.updateStudentGuidPenXrefRecord(studentId, pen, DEFAULT_UPDATED_BY, LocalDateTime.now());
+        } else {
+            graduationStudentRecordRepository.createStudentGuidPenXrefRecord(studentId, pen, DEFAULT_CREATED_BY, LocalDateTime.now());
+        }
     }
 
 }

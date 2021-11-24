@@ -25,6 +25,7 @@ public class ConvGradStudent {
   private String schoolAtGrad;
   private String studentGrade;
   private String studentStatus;
+  private String archiveFlag;
 
   // extra
   private String graduationRequestYear;

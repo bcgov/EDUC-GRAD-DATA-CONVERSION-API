@@ -15,7 +15,7 @@ import lombok.Data;
 @EqualsAndHashCode(callSuper = false)
 @Entity
 @Table(name = "GRADUATION_STUDENT_RECORD")
-public class GraduationStatusEntity extends BaseEntity {
+public class GraduationStudentRecordEntity extends BaseEntity {
 
     @Transient
     private String pen;
@@ -54,5 +54,10 @@ public class GraduationStatusEntity extends BaseEntity {
 
     @Column(name = "SCHOOL_AT_GRADUATION", nullable = true)
     private String schoolAtGrad;
-    
+
+    @Column(name = "RECALCULATE_PROJECTED_GRAD", nullable = true)
+    private String recalculateProjectedGrad;
+
+    @Column(name = "BATCH_ID", nullable = true)
+    private Long batchId;
 }

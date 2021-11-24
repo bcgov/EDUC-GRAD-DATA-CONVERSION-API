@@ -58,7 +58,7 @@ authorization:
 
 #Endpoints
 endpoint:
-  keycloack:
+  keycloak:
     getToken: https://soam-tools.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/token
   pen-student-api:
     by-pen:
@@ -66,3 +66,8 @@ endpoint:
   grad-program-api:
     special-program:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms
+
+#Conversion option
+data-conversion:
+  student-guid-pen-xref:
+    enabled:  false
