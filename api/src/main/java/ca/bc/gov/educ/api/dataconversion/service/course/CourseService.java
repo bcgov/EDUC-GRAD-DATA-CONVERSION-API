@@ -378,6 +378,19 @@ public class CourseService {
         createCourseRequirement(populate("SSA", "12B", "506"), summary);
         createCourseRequirement(populate("WEX", "12A", "506"), summary);
         createCourseRequirement(populate("WEX", "12B", "506"), summary);
+
+        createCourseRequirement(populate("SSA", "12A", "600"), summary);
+        createCourseRequirement(populate("SSA", "12B", "600"), summary);
+        createCourseRequirement(populate("SSA", "11A", "600"), summary);
+        createCourseRequirement(populate("SSA", "11B", "600"), summary);
+
+        createCourseRequirement(populate("WEX", "12A", "600"), summary);
+        createCourseRequirement(populate("WEX", "12B", "600"), summary);
+
+        createCourseRequirement(populate("WRK", "12A", "600"), summary);
+        createCourseRequirement(populate("WRK", "12B", "600"), summary);
+        createCourseRequirement(populate("WRK", "11A", "600"), summary);
+        createCourseRequirement(populate("WRK", "11B", "600"), summary);
     }
 
     private CourseRequirementEntity populate(GraduationCourseKey key, String courseRequirementCode) {
