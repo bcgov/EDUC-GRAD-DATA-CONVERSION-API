@@ -103,9 +103,10 @@ public class CourseService {
             if (end != null) {
                 courseRestrictionEntity.setRestrictionEndDate(end);
             }
-        } else {
-            courseRestrictionEntity.setRestrictionEndDate(DateConversionUtils.convertStringToDate(EducGradDataConversionApiConstants.DEFAULT_END_DATE_FORMAT));
         }
+//        else {
+//            courseRestrictionEntity.setRestrictionEndDate(DateConversionUtils.convertStringToDate(EducGradDataConversionApiConstants.DEFAULT_END_DATE_FORMAT));
+//        }
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
