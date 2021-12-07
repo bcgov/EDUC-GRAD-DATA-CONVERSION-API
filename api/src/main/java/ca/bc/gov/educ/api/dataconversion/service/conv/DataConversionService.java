@@ -86,6 +86,14 @@ public class DataConversionService {
             String restrictedCourseLevel = (String) result[3];
             String startDate = (String) result[4];
             String endDate = (String) result[5];
+
+            // check null value for course level and convert it to space
+            if (StringUtils.isBlank(mainCourseLevel)) {
+                mainCourseLevel = " ";
+            }
+            if (StringUtils.isBlank(restrictedCourseLevel)) {
+                restrictedCourseLevel = " ";
+            }
             GradCourseRestriction courseRestriction = new GradCourseRestriction(
                     mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
             courseRestrictions.add(courseRestriction);

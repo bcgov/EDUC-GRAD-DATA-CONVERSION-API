@@ -73,7 +73,7 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").archiveFlag("A")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");

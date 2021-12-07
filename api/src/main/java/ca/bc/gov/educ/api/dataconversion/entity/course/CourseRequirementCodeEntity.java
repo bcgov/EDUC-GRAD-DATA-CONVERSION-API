@@ -29,6 +29,6 @@ public class CourseRequirementCodeEntity extends BaseEntity {
     @Column(name = "EFFECTIVE_DATE", nullable = false)
     private Date effectiveDate;
 
-    @Column(name = "EXPIRY_DATE", nullable = false)
+    @Column(name = "EXPIRY_DATE", nullable = true)
     private Date expiryDate;
 }

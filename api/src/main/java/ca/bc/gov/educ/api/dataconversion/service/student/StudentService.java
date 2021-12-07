@@ -94,7 +94,7 @@ public class StudentService {
                     convertStudentData(convGradStudent, gradStudentEntity, summary);
                     gradStudentEntity.setUpdateDate(null);
                     gradStudentEntity.setUpdateUser(null);
-//                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                     isStudentPersisted = true;
                     summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
                 } else {
