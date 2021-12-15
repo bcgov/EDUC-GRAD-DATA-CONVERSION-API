@@ -54,6 +54,5 @@ public class ChoreographEventHandler {
         log.error("Exception while processing event :: {}", event, exception);
       }
     });
-
   }
 }

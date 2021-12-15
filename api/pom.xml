@@ -35,10 +35,15 @@
         <org.mapstruct.version>1.3.1.Final</org.mapstruct.version>
         <springdoc.version>1.4.3</springdoc.version>
         <log4j.version>2.17.1</log4j.version>
+<<<<<<< HEAD
         <nats.version>2.11.0</nats.version>
         <guava.version>30.1.1-jre</guava.version>
         <shedlock.version>4.20.0</shedlock.version>
         <log4j.version>2.17.1</log4j.version>
+=======
+        <guava.version>30.1.1-jre</guava.version>
+        <log4j.version>2.16.0</log4j.version>
+>>>>>>> 53fd26e... NATS subscriber is initially implemented.
     </properties>
 
     <parent>
@@ -146,6 +151,7 @@
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
         </dependency>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
@@ -162,6 +168,8 @@
             <artifactId>shedlock-provider-jdbc-template</artifactId>
             <version>${shedlock.version}</version>
         </dependency>
+=======
+>>>>>>> 53fd26e... NATS subscriber is initially implemented.
         <!-- https://mvnrepository.com/artifact/io.nats/jnats -->
         <dependency>
             <groupId>io.nats</groupId>
