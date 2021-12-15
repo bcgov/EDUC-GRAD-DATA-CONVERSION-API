@@ -17,7 +17,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "m.slp_date as SLP_DATE \n" +
             "from trax_students_load l, student_master m\n" +
             "where 1 = 1\n" +
-            "and m.grad_reqt_year in ('SCCP')\n" +
+//            "and m.grad_reqt_year in ('SCCP')\n" +
 //            "and ( trim(m.prgm_code) like '40%' or m.mincode like '093%' )\n" +
 //			"and trim(l.stud_no) = '126786680'\n" +
 //            "and m.stud_status in ('M','D')\n" +
