@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 public class EducGradDataConversionApiConstants {
 
     public static final String API_NAME = "GRAD-DATA-CONVERSION-API";
+    public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
 	public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
@@ -37,9 +38,27 @@ public class EducGradDataConversionApiConstants {
     @Value("${authorization.password}")
     private String password;
 
+    //NAT
+    /**
+     * The Server.
+     */
+    @Value("${nats.url}")
+    private String natsUrl;
+    /**
+     * The Max reconnect.
+     */
+    @Value("${nats.maxReconnect}")
+    private int maxReconnect;
+    /**
+     * The Connection name.
+     */
+    @Value("${nats.connectionName}")
+    private String connectionName;
+
     @Value("${endpoint.keycloak.getToken}")
     private String tokenUrl;
 
+    // API endpoints
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
