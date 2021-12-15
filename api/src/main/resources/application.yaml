@@ -111,6 +111,12 @@ authorization:
   user: ${GRAD_CLIENT_NAME}
   password: ${GRAD_CLIENT_SECRET}
 
+#NATS
+nats:
+  url: ${NATS}
+  maxReconnect: ${NATS_MAX_RECONNECT}
+  connectionName: GRAD-DATA-CONVERSION-API
+
 #Endpoints
 endpoint:
   keycloak:
