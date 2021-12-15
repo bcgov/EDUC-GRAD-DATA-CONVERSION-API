@@ -24,6 +24,7 @@ public class EducGradDataConversionApiConstants {
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
+    public static final String TRAX_SLP_DATE_FORMAT = "yyyyMMdd";
 
     public static final String DEFAULT_CREATED_BY = "DATA_CONV";
     public static final String DEFAULT_UPDATED_BY = "DATA_CONV";
