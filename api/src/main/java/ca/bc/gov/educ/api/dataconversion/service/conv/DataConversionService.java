@@ -43,6 +43,7 @@ public class DataConversionService {
             }
             // grad or non-grad
             BigDecimal gradDate = (BigDecimal) result[8];
+            boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
 
             List<String> programCodes = new ArrayList<>();
             // optional program
@@ -52,14 +53,22 @@ public class DataConversionService {
             populateProgramCode((String) result[12], programCodes);
             populateProgramCode((String) result[13], programCodes);
 
-            ConvGradStudent student = new ConvGradStudent(
-                    pen, null, null, null, null,
-                    recalculateGradStatus != null? recalculateGradStatus.toString() : null, null,
-                    schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null? studentStatus.toString() : null,
-                    archiveFlag != null? archiveFlag.toString() : null,
-                    graduationRequestYear, programCodes, !gradDate.equals(BigDecimal.ZERO));
-            students.add(student);
+            // slp date
+            BigDecimal slpDate = (BigDecimal) result[14];
+            String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO)? slpDate.toString() : null;
+
+            try {
+                ConvGradStudent student = new ConvGradStudent(
+                        pen, null, null, slpDateStr, null, null,
+                        recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
+                        schoolOfRecord, schoolAtGrad, studentGrade,
+                        studentStatus != null ? studentStatus.toString() : null,
+                        archiveFlag != null ? archiveFlag.toString() : null,
+                        graduationRequestYear, programCodes, isGraduated);
+                students.add(student);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
         });
 
         return students;

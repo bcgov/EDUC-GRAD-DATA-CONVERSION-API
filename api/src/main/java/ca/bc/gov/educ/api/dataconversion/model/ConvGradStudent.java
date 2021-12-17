@@ -17,6 +17,7 @@ public class ConvGradStudent {
   private String pen;
   private String program;
   private Date programCompletionDate;
+  private String slpDate;
   private String gpa;
   private String honoursStanding;
   private String recalculateGradStatus;
