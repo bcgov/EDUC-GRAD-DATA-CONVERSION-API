@@ -109,7 +109,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
         when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen)).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
         when(this.programService.getCareerProgramCode("XC")).thenReturn(null);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(careerProgramEntity)).thenReturn(careerProgramEntity);
@@ -179,7 +179,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen)).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
         when(this.programService.getCareerProgramCode("XC")).thenReturn(careerProgramEntity);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
