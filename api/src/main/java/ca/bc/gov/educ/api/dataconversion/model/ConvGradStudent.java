@@ -27,6 +27,7 @@ public class ConvGradStudent {
   private String studentGrade;
   private String studentStatus;
   private String archiveFlag;
+  private String frenchCert;
 
   // extra
   private String graduationRequestYear;

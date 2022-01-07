@@ -119,6 +119,7 @@ public class CourseService {
         processPhysEd(graduationCourseEntity, summary);
         processAppliedSkills(graduationCourseEntity, summary);
         processPortFolio(graduationCourseEntity, summary);
+        processConsEd(graduationCourseEntity, summary);
         processFineArts(graduationCourseEntity, summary);
         processCareerLiefConnections(graduationCourseEntity, summary);
         return graduationCourseEntity;
@@ -155,6 +156,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "702"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "721"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "740"), summary);
             }
             if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
@@ -183,6 +186,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "500"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "722"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "741"), summary);
             }
             if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
@@ -222,6 +227,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "502"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "723"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "742"), summary);
             }
         }
     }
@@ -245,6 +252,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "501"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "724"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "743"), summary);
             }
         }
     }
@@ -266,6 +275,8 @@ public class CourseService {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "709"), summary);
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "725"), summary);
+            } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "744"), summary);
             }
         }
     }
@@ -326,6 +337,15 @@ public class CourseService {
         }
     }
 
+    private void processConsEd(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
+        // portfolio
+        if (StringUtils.isNotBlank(graduationCourseEntity.getConsEd()) && StringUtils.equals(graduationCourseEntity.getConsEd(), "Y")) {
+            if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
+                createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "745"), summary);
+            }
+        }
+    }
+
     private void processFineArts(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
         // portfolio
         if (StringUtils.isNotBlank(graduationCourseEntity.getFineArts()) && StringUtils.equals(graduationCourseEntity.getFineArts(), "Y")) {
@@ -351,22 +371,27 @@ public class CourseService {
         createCourseRequirement(populate("FRAL", "12", "900"), summary);
         createCourseRequirement(populate("FRAL", "12", "819"), summary);
         createCourseRequirement(populate("FRAL", "12", "910"), summary);
+        createCourseRequirement(populate("FRAL", "12", "915"), summary);
 
         // FRALP 12
         createCourseRequirement(populate("FRALP", "12", "910"), summary);
+        createCourseRequirement(populate("FRALP", "12", "915"), summary);
 
         // QFRAL 12
         createCourseRequirement(populate("QFRAL", "12", "200"), summary);
         createCourseRequirement(populate("QFRAL", "12", "900"), summary);
         createCourseRequirement(populate("QFRAL", "12", "819"), summary);
         createCourseRequirement(populate("QFRAL", "12", "910"), summary);
+        createCourseRequirement(populate("QFRAL", "12", "915"), summary);
 
         // QFRALP 12
         createCourseRequirement(populate("QFRALP", "12", "910"), summary);
+        createCourseRequirement(populate("QFRALP", "12", "915"), summary);
 
         // ZFRAL 12
         createCourseRequirement(populate("ZFRAL", "12", "819"), summary);
         createCourseRequirement(populate("ZFRAL", "12", "910"), summary);
+        createCourseRequirement(populate("ZFRAL", "12", "915"), summary);
 
         // IBFAS 12
         createCourseRequirement(populate("IBFAS", "12", "200"), summary);
@@ -381,16 +406,19 @@ public class CourseService {
         createCourseRequirement(populate("FRAL", "11", "901"), summary);
         createCourseRequirement(populate("FRAL", "11", "818"), summary);
         createCourseRequirement(populate("FRAL", "11", "911"), summary);
+        createCourseRequirement(populate("FRAL", "11", "916"), summary);
 
         // IBFAS 11
         createCourseRequirement(populate("IBFAS", "11", "201"), summary);
         createCourseRequirement(populate("IBFAS", "11", "901"), summary);
         createCourseRequirement(populate("IBFAS", "11", "911"), summary);
+        createCourseRequirement(populate("IBFAS", "11", "916"), summary);
 
         // FRALP 11
         createCourseRequirement(populate("FRALP", "11", "201"), summary);
         createCourseRequirement(populate("FRALP", "11", "901"), summary);
         createCourseRequirement(populate("FRALP", "11", "911"), summary);
+        createCourseRequirement(populate("FRALP", "11", "916"), summary);
 
         // FRAL 10
         createCourseRequirement(populate("FRAL", "10", "202"), summary);
@@ -508,4 +536,12 @@ public class CourseService {
         }
         return false;
     }
+    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
+    public boolean isFrenchImmersionCourseForEN(String pen, String courseLevel) {
+        if (this.courseRequirementRepository.countFrenchImmersionCourse(pen, courseLevel) > 0L) {
+            return true;
+        }
+        return false;
+    }
+
 }
