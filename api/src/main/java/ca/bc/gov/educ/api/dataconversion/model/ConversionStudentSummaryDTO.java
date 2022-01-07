@@ -24,8 +24,8 @@ public class ConversionStudentSummaryDTO extends ConversionBaseSummaryDTO {
     put("1996-EN Grad", 0L);
     put("1996-PF", 0L);
     put("1996-PF Grad", 0L);
-    put("1986", 0L);
-    put("1986 Grad", 0L);
+    put("1986-EN", 0L);
+    put("1986-EN Grad", 0L);
     put("1950", 0L);
     put("1950 Grad", 0L);
     put("NOPROG", 0L);
