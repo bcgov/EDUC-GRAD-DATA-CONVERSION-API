@@ -57,6 +57,9 @@ public class DataConversionService {
             BigDecimal slpDate = (BigDecimal) result[14];
             String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO)? slpDate.toString() : null;
 
+            // french cert
+            String frenchCert = (String) result[15];
+
             try {
                 ConvGradStudent student = new ConvGradStudent(
                         pen, null, null, slpDateStr, null, null,
@@ -64,6 +67,7 @@ public class DataConversionService {
                         schoolOfRecord, schoolAtGrad, studentGrade,
                         studentStatus != null ? studentStatus.toString() : null,
                         archiveFlag != null ? archiveFlag.toString() : null,
+                        StringUtils.isNotBlank(frenchCert)? frenchCert.trim() : null,
                         graduationRequestYear, programCodes, isGraduated);
                 students.add(student);
             } catch (Exception ex) {

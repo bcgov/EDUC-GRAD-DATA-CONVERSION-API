@@ -159,6 +159,9 @@ public class StudentService {
         studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        // Mappings with Student_Master
+        studentEntity.setFrenchCert(student.getFrenchCert());
     }
 
     private String determineGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
@@ -194,6 +197,12 @@ public class StudentService {
             }
         } else if (student.getProgram().equals("1996-EN")) {
             if (courseService.isFrenchImmersionCourse(student.getPen(), "11")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        } else if (student.getProgram().equals("1986-EN")) {
+            if (StringUtils.equalsIgnoreCase("F", student.getFrenchCert())) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            } else if (courseService.isFrenchImmersionCourseForEN(student.getPen(), "11")) {
                 createStudentOptionalProgram("FI", student, accessToken, summary);
             }
         }
@@ -319,8 +328,8 @@ public class StudentService {
                 }
                 break;
             case "1986":
-                student.setProgram("1986");
-                summary.increment("1986", student.isGraduated());
+                student.setProgram("1986-EN");
+                summary.increment("1986-EN", student.isGraduated());
                 break;
             case "1950":
                 if (StringUtils.equals(student.getStudentGrade(), "AD")) {
