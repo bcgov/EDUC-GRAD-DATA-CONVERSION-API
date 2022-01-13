@@ -137,6 +137,33 @@ public class StudentService {
         }
     }
 
+    public GraduationStudentRecordEntity populateGraduationStudentRecord(ConvGradStudent student) {
+        GraduationStudentRecordEntity studentEntity = new GraduationStudentRecordEntity();
+
+        // Grad Program
+        if (determineProgram(student, null)) {
+            studentEntity.setProgram(student.getProgram());
+        }
+
+        // Mincode Grad
+        studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
+        // Mincode
+        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        // Student Grade
+        studentEntity.setStudentGrade(student.getStudentGrade());
+        // Student Status
+        studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
+        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
+
+        // Populate courses & assessments
+
+        // Populate optional programs ( prgm_codeX )
+
+        return studentEntity;
+    }
+
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
@@ -303,33 +330,33 @@ public class StudentService {
             case "2018":
                 if (student.getSchoolOfRecord().startsWith("093")) {
                     student.setProgram("2018-PF");
-                    summary.increment("2018-PF", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "2018-PF", student.isGraduated());
                 } else {
                     student.setProgram("2018-EN");
-                    summary.increment("2018-EN", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "2018-EN", student.isGraduated());
                 }
                 break;
             case "2004":
                 if (student.getSchoolOfRecord().startsWith("093")) {
                     student.setProgram("2004-PF");
-                    summary.increment("2004-PF", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "2004-PF", student.isGraduated());
                 } else {
                     student.setProgram("2004-EN");
-                    summary.increment("2004-EN", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "2004-EN", student.isGraduated());
                 }
                 break;
             case "1996":
                 if (student.getSchoolOfRecord().startsWith("093")) {
                     student.setProgram("1996-PF");
-                    summary.increment("1996-PF", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "1996-PF", student.isGraduated());
                 } else {
                     student.setProgram("1996-EN");
-                    summary.increment("1996-EN", student.isGraduated());
+                    updateProgramCountsInSummary(summary, "1996-EN", student.isGraduated());
                 }
                 break;
             case "1986":
                 student.setProgram("1986-EN");
-                summary.increment("1986-EN", student.isGraduated());
+                updateProgramCountsInSummary(summary, "1986-EN", student.isGraduated());
                 break;
             case "1950":
                 student.setProgram("1950");
@@ -337,7 +364,7 @@ public class StudentService {
                 break;
             case "SCCP":
                 student.setProgram("SCCP");
-                summary.increment("SCCP", false);
+                updateProgramCountsInSummary(summary, "SCCP", false);
                 break;
             default:
                 // error
@@ -348,6 +375,12 @@ public class StudentService {
                 return false;
         }
         return true;
+    }
+
+    private void updateProgramCountsInSummary(ConversionStudentSummaryDTO summary, String programCode, boolean isGraduated) {
+        if (summary != null) {
+            summary.increment(programCode, isGraduated);
+        }
     }
 
     private void createGraduationStudentRecordHistory(GraduationStudentRecordEntity grauationStudentRecord) {

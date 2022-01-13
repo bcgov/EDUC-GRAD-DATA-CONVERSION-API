@@ -75,7 +75,7 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
 
     private List<GraduationCourseEntity> loadCourseRequirementData() {
         LOGGER.info("Fetching Course Requirement List that need Data Conversion Processing");
-        return dataConversionService.loadInitialGradCourseRequirementsData();
+        return dataConversionService.loadGradCourseRequirementsDataFromTrax();
     }
 
     private void fetchAccessToken() {

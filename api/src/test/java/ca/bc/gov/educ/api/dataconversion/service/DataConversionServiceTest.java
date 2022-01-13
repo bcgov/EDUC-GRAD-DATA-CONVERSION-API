@@ -55,9 +55,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.traxStudentsLoadRepository.loadInitialStudentRawData()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadAllTraxStudents()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradStudentData();
+        var result = dataConversionService.loadGradStudentsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
@@ -74,7 +74,7 @@ public class DataConversionServiceTest {
 
         when(this.traxStudentsLoadRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData();
+        var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         GradCourseRestriction responseCourseRestriction = result.get(0);

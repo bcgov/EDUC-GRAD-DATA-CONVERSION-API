@@ -15,17 +15,17 @@ import java.util.List;
 @NoArgsConstructor
 public class ConvGradStudent {
   private String pen;
-  private String program;
+  private String program; // inc
   private Date programCompletionDate;
-  private String slpDate;
+  private String slpDate; // inc
   private String gpa;
   private String honoursStanding;
   private String recalculateGradStatus;
   private String studentGradData;
-  private String schoolOfRecord;
-  private String schoolAtGrad;
-  private String studentGrade;
-  private String studentStatus;
+  private String schoolOfRecord; // inc
+  private String schoolAtGrad; // inc
+  private String studentGrade; // inc
+  private String studentStatus; // inc
   private String archiveFlag;
   private String frenchCert;
 
