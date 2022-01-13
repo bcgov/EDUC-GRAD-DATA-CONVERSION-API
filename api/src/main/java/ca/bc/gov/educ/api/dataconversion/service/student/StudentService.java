@@ -147,6 +147,33 @@ public class StudentService extends StudentBaseService {
         }
     }
 
+    public GraduationStudentRecordEntity populateGraduationStudentRecord(ConvGradStudent student) {
+        GraduationStudentRecordEntity studentEntity = new GraduationStudentRecordEntity();
+
+        // Grad Program
+        if (determineProgram(student, null)) {
+            studentEntity.setProgram(student.getProgram());
+        }
+
+        // Mincode Grad
+        studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
+        // Mincode
+        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        // Student Grade
+        studentEntity.setStudentGrade(student.getStudentGrade());
+        // Student Status
+        studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
+        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
+
+        // Populate courses & assessments
+
+        // Populate optional programs ( prgm_codeX )
+
+        return studentEntity;
+    }
+
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());

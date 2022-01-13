@@ -46,6 +46,20 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
+        List<ConvGradStudent> students = new ArrayList<>();
+        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        results.forEach(result -> {
+            ConvGradStudent student = populateConvGradStudent(result);
+            if (student != null) {
+                students.add(student);
+            }
+        });
+
+        return students;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadAllTraxStudentData() {
         List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();

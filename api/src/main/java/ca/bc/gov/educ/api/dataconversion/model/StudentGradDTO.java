@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-
 @Data
 public class StudentGradDTO extends  StudentCommonDTO {
     private UUID studentID;
@@ -23,4 +22,5 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     private List<String> addedProgramCodes = new ArrayList<>();
     private List<String> removedProgramCodes = new ArrayList<>();
+
 }
