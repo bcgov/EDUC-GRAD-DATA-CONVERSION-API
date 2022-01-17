@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
@@ -34,29 +36,4 @@ public class StudentContext {
         gradStudent.setStudentID(studentID);
     }
 
-    // Optional Programs
-    public List<String> getAddedOptionalPrograms() {
-        List<String> newOptionalPrograms = new ArrayList<>();
-
-        return newOptionalPrograms;
-    }
-
-    public List<String> getRemovedOptionalPrograms() {
-        List<String> removedOptionalPrograms = new ArrayList<>();
-
-        return removedOptionalPrograms;
-    }
-
-    // Career Programs
-    public List<String> getAddedCareerPrograms() {
-        List<String> newCareerPrograms = new ArrayList<>();
-
-        return newCareerPrograms;
-    }
-
-    public List<String> getRemovedCareerPrograms() {
-        List<String> removedCareerPrograms = new ArrayList<>();
-
-        return removedCareerPrograms;
-    }
 }

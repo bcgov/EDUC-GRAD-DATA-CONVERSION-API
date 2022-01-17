@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.course;
 
+import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementCodeEntity;
@@ -12,6 +13,7 @@ import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementCodeRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.course.StudentCourseRepository;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -42,14 +44,17 @@ public class CourseService {
     private final CourseRestrictionRepository courseRestrictionRepository;
     private final CourseRequirementRepository courseRequirementRepository;
     private final CourseRequirementCodeRepository courseRequirementCodeRepository;
+    private final StudentCourseRepository studentCourseRepository;
 
     @Autowired
     public CourseService(CourseRestrictionRepository courseRestrictionRepository,
                          CourseRequirementRepository courseRequirementRepository,
-                         CourseRequirementCodeRepository courseRequirementCodeRepository) {
+                         CourseRequirementCodeRepository courseRequirementCodeRepository,
+                         StudentCourseRepository studentCourseRepository) {
         this.courseRestrictionRepository = courseRestrictionRepository;
         this.courseRequirementRepository = courseRequirementRepository;
         this.courseRequirementCodeRepository = courseRequirementCodeRepository;
+        this.studentCourseRepository = studentCourseRepository;
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
@@ -556,6 +561,10 @@ public class CourseService {
             return true;
         }
         return false;
+    }
+
+    public List<StudentCourseEntity> getStudentCourses(String pen) {
+        return this.studentCourseRepository.findByPen(pen);
     }
 
 }
