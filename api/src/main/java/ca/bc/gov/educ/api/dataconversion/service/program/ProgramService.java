@@ -41,6 +41,7 @@ public class ProgramService {
             return null;
         }
     }
+<<<<<<< HEAD
 
     @Transactional(readOnly = true, transactionManager = "programTransactionManager")
     public OptionalProgramEntity findOptionalProgram(UUID optionalProgramID) {
@@ -59,4 +60,6 @@ public class ProgramService {
         }
         return false;
     }
+=======
+>>>>>>> 9e1a14b... second commit
 }

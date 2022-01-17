@@ -4,6 +4,10 @@ import lombok.Data;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+<<<<<<< HEAD
+=======
+import javax.validation.constraints.Size;
+>>>>>>> 9e1a14b... second commit
 import java.io.Serializable;
 
 /**
@@ -22,6 +26,7 @@ public class StudentCourseId implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+<<<<<<< HEAD
 //    @Size(max = 10)
     @Column(name = "PEN", insertable = false, updatable = false)
     private String pen;
@@ -35,6 +40,21 @@ public class StudentCourseId implements Serializable {
     @Column(name = "CRSE_SESSION", insertable = false, updatable = false)
     private String sessionDate;
 //    @Size(max = 1)
+=======
+    @Size(max = 10)
+    @Column(name = "PEN", insertable = false, updatable = false)
+    private String pen;
+    @Size(max = 5)
+    @Column(name = "CRSE_CODE", insertable = false, updatable = false)
+    private String courseCode;
+    @Size(max = 3)
+    @Column(name = "CRSE_LEVEL", insertable = false, updatable = false)
+    private String courseLevel;
+    @Size(max = 9)
+    @Column(name = "CRSE_SESSION", insertable = false, updatable = false)
+    private String sessionDate;
+    @Size(max = 1)
+>>>>>>> 9e1a14b... second commit
     @Column(name = "PROV_EXAM_CRSE", insertable = false, updatable = false)
     private String provExamCourse;
     public StudentCourseId() {

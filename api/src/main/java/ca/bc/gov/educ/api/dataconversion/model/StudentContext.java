@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import java.util.UUID;
