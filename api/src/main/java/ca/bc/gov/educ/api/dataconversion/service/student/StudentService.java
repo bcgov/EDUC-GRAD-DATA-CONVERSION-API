@@ -1,10 +1,13 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
+import ca.bc.gov.educ.api.dataconversion.entity.assessment.StudentAssessmentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
+import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -35,6 +38,7 @@ public class StudentService {
     private final EducGradDataConversionApiConstants constants;
 
     private final RestUtils restUtils;
+    private final AssessmentService assessmentService;
     private final CourseService courseService;
     private final ProgramService programService;
 
@@ -46,6 +50,7 @@ public class StudentService {
                           StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository,
                           EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
+                          AssessmentService assessmentService,
                           CourseService courseService,
                           ProgramService programService) {
         this.graduationStudentRecordRepository = graduationStudentRecordRepository;
@@ -55,6 +60,7 @@ public class StudentService {
         this.studentOptionalProgramHistoryRepository = studentOptionalProgramHistoryRepository;
         this.constants = constants;
         this.restUtils = restUtils;
+        this.assessmentService = assessmentService;
         this.courseService = courseService;
         this.programService = programService;
     }
@@ -135,33 +141,6 @@ public class StudentService {
             summary.getErrors().add(error);
             return null;
         }
-    }
-
-    public GraduationStudentRecordEntity populateGraduationStudentRecord(ConvGradStudent student) {
-        GraduationStudentRecordEntity studentEntity = new GraduationStudentRecordEntity();
-
-        // Grad Program
-        if (determineProgram(student, null)) {
-            studentEntity.setProgram(student.getProgram());
-        }
-
-        // Mincode Grad
-        studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
-        // Mincode
-        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
-        // Student Grade
-        studentEntity.setStudentGrade(student.getStudentGrade());
-        // Student Status
-        studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
-
-        studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
-        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
-
-        // Populate courses & assessments
-
-        // Populate optional programs ( prgm_codeX )
-
-        return studentEntity;
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
@@ -405,6 +384,51 @@ public class StudentService {
         } else {
             graduationStudentRecordRepository.createStudentGuidPenXrefRecord(studentId, pen, DEFAULT_CREATED_BY, LocalDateTime.now());
         }
+    }
+
+    @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
+    public List<StudentOptionalProgramEntity> getStudentOptionalPrograms(UUID studentID) {
+        return this.studentOptionalProgramRepository.findByStudentID(studentID);
+    }
+
+    @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
+    public List<StudentCareerProgramEntity> getStudentCareerPrograms(UUID studentID) {
+        return this.studentCareerProgramRepository.findByStudentID(studentID);
+    }
+
+    @Transactional(readOnly = true)
+    public StudentCommonDTO loadStudentData(String pen) {
+        UUID studentID = graduationStudentRecordRepository.findStudentID(pen);
+        if (studentID == null) {
+            return null;
+        }
+        StudentCommonDTO studentData = new StudentCommonDTO();
+        Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
+        if (gradStatusOptional.isPresent()) {
+            GraduationStudentRecordEntity entity = gradStatusOptional.get();
+            studentData.setProgram(entity.getProgram());
+            studentData.setStudentGrade(entity.getStudentGrade());
+            studentData.setStudentStatus(entity.getStudentStatus());
+            studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
+            studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
+        } else {
+            return null;
+        }
+
+        // optional programs
+        List<StudentOptionalProgramEntity> optionalPrograms = studentOptionalProgramRepository.findByStudentID(studentID);
+        studentData.getOptionalPrograms().addAll(optionalPrograms);
+        // career programs
+        List<StudentCareerProgramEntity> careerPrograms = studentCareerProgramRepository.findByStudentID(studentID);
+        studentData.getCareerPrograms().addAll(careerPrograms);
+        // courses
+        List<StudentCourseEntity> courses = courseService.getStudentCourses(pen);
+        studentData.getCourses().addAll(courses);
+        // assessments
+        List<StudentAssessmentEntity> assessments = assessmentService.getStudentAssessments(pen);
+        studentData.getAssessments().addAll(assessments);
+
+        return studentData;
     }
 
 }
