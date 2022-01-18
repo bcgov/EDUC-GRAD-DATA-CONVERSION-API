@@ -103,9 +103,6 @@ public class CourseService {
                 courseRestrictionEntity.setRestrictionEndDate(end);
             }
         }
-//        else {
-//            courseRestrictionEntity.setRestrictionEndDate(DateConversionUtils.convertStringToDate(EducGradDataConversionApiConstants.DEFAULT_END_DATE_FORMAT));
-//        }
     }
 
     @Transactional(transactionManager = "courseTransactionManager")
@@ -325,7 +322,7 @@ public class CourseService {
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 if (StringUtils.isNotBlank(graduationCourseEntity.getFineArts()) && StringUtils.equals(graduationCourseEntity.getFineArts(), "Y")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "732"), summary);
-                } else {
+                } else if (isValidCourseForRule727(graduationCourseEntity.getGraduationCourseKey())) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "727"), summary);
                 }
             }
@@ -517,6 +514,17 @@ public class CourseService {
             courseRequirementRepository.save(courseRequirementEntity);
             summary.setAddedCountForCourseRequirement(summary.getAddedCountForCourseRequirement() + 1L);
         }
+    }
+
+    private boolean isValidCourseForRule727(GraduationCourseKey courseKey) {
+        if ( (StringUtils.equals(courseKey.getCourseCode().trim(), "AC") && StringUtils.equals(courseKey.getCourseLevel(), "11 "))
+            || (StringUtils.equals(courseKey.getCourseCode().trim(), "ACC") && StringUtils.equals(courseKey.getCourseLevel(), "12 "))
+            || (StringUtils.equals(courseKey.getCourseCode().trim(), "COP") && StringUtils.equals(courseKey.getCourseLevel(), "11 "))
+            || (StringUtils.equals(courseKey.getCourseCode().trim(), "COP") && StringUtils.equals(courseKey.getCourseLevel(), "12 "))
+            || (StringUtils.equals(courseKey.getCourseCode().trim(), "FA") && StringUtils.equals(courseKey.getCourseLevel(), "12 ")) ) {
+            return false;
+        }
+        return true;
     }
 
     @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
