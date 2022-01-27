@@ -48,7 +48,6 @@ pipeline{
             steps {
                 script {
                     BRANCH = params.BRANCH_PARAM.substring(7)
-
                     openshift.withCluster() {
                         def bcTemplate =
                         openshift.apply(
@@ -91,10 +90,11 @@ pipeline{
                 success {
                     echo "${REPO_NAME} successfully deployed to DEV"
                     script {
+                        def branch_tag = BRANCH.replace("/", "-")
                         openshift.withCluster() {
                             openshift.withProject(TOOLS_NAMESPACE) {
                                 echo "Tagging image"
-                                openshift.tag("${TOOLS_NAMESPACE}/${REPO_NAME}:latest", "${REPO_NAME}:${TAG}", "${REPO_NAME}:${BRANCH}")
+                                openshift.tag("${TOOLS_NAMESPACE}/${REPO_NAME}:latest", "${REPO_NAME}:${TAG}", "${REPO_NAME}:${branch_tag}")
                             }
                         }
                     }
