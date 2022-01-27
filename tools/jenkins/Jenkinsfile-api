@@ -9,12 +9,12 @@ pipeline{
         UAT_NAMESPACE = '77c02f-uat'
         PROD_NAMESPACE = '77c02f-prod'
 
-        REPO_NAME = 'educ-grad-algorithm-api'
+        REPO_NAME = 'educ-grad-data-conversion-api'
         ORG = 'bcgov'
         BRANCH = 'main'
         TAG = 'dev'
 
-        APP_NAME = 'educ-grad-algorithm-api'
+        APP_NAME = 'educ-grad-data-conversion-api'
         APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
 
         SOURCE_REPO_URL = 'https://github.com/${ORG}/${REPO_NAME}'

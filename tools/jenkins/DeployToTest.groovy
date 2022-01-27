@@ -9,7 +9,7 @@ pipeline{
         APP_SUBDOMAIN_SUFFIX = '77c02f-test'
         APP_DOMAIN = 'apps.silver.devops.gov.bc.ca'
         TAG = 'test'
-        REPO_NAME = 'educ-grad-algorithm-api'
+        REPO_NAME = 'educ-grad-data-conversion-api'
         ORG = 'bcgov'
         BRANCH = 'main'
         SOURCE_REPO_URL = 'https://github.com/${ORG}/${REPO_NAME}'
