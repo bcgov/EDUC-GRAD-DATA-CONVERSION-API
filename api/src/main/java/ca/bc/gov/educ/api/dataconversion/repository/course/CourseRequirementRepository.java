@@ -17,8 +17,16 @@ public interface CourseRequirementRepository extends JpaRepository<CourseRequire
 			"and trim(tsc.crse_code) = cr.course_code \n" +
 			"and trim(tsc.crse_level) = cr.course_level \n" +
 			"and trim(tsc.crse_code) in ('FRAL', 'FRALP') \n" +
-			"and trim(tsc.crse_level) = '10'", nativeQuery=true)
-	long countFrenchImmersionCourses(@Param("pen") String pen);
+			"and trim(tsc.crse_level) = :level ", nativeQuery=true)
+	long countFrenchImmersionCourses(@Param("pen") String pen, @Param("level") String level);
+
+	@Query(value="select count(*) from TRAX_STUDENT_COURSES tsc, COURSE_REQUIREMENT cr \n" +
+			"where tsc.pen = :pen \n" +
+			"and trim(tsc.crse_code) = cr.course_code \n" +
+			"and trim(tsc.crse_level) = cr.course_level \n" +
+			"and trim(tsc.crse_code) = 'FRAL' \n" +
+			"and trim(tsc.crse_level) = :level ", nativeQuery=true)
+	long countFrenchImmersionCourse(@Param("pen") String pen, @Param("level") String level);
 
 	@Query(value="select count(*) from TAB_CRSE cr \n" +
 			"where cr.crse_code = :courseCode \n" +

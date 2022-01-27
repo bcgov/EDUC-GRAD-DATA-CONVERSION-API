@@ -8,6 +8,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -145,7 +146,11 @@ public class StudentService {
         // always set to NULL, even for graduated students.  => GRAD grad algorithm will be run at some point
         studentEntity.setGpa(null);
         studentEntity.setHonoursStanding(null);
-        studentEntity.setProgramCompletionDate(null);
+        if (studentEntity.getProgram().equals("SCCP")) {
+            studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
+        } else {
+            studentEntity.setProgramCompletionDate(null);
+        }
         studentEntity.setStudentGradData(null);
         studentEntity.setSchoolAtGrad(null);
 
@@ -154,6 +159,9 @@ public class StudentService {
         studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(determineGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        // Mappings with Student_Master
+        studentEntity.setFrenchCert(student.getFrenchCert());
     }
 
     private String determineGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
@@ -183,8 +191,18 @@ public class StudentService {
         }
 
         // French Immersion for 2018-EN, 2004-EN
-        if (student.getProgram().endsWith("-EN")) {
-            if (courseService.isFrenchImmersionCourse(student.getPen())) {
+        if (student.getProgram().equals("2018-EN") || student.getProgram().equals("2004-EN")) {
+            if (courseService.isFrenchImmersionCourse(student.getPen(), "10")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        } else if (student.getProgram().equals("1996-EN")) {
+            if (courseService.isFrenchImmersionCourse(student.getPen(), "11")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        } else if (student.getProgram().equals("1986-EN")) {
+            if (StringUtils.equalsIgnoreCase("F", student.getFrenchCert())) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            } else if (courseService.isFrenchImmersionCourseForEN(student.getPen(), "11")) {
                 createStudentOptionalProgram("FI", student, accessToken, summary);
             }
         }
@@ -195,17 +213,8 @@ public class StudentService {
             for (String programCode : programCodes) {
                 if (isOptionalProgramCode(programCode)) {
                     createStudentOptionalProgram(programCode, student, accessToken, summary);
-                } else {
-                    if (StringUtils.equals(student.getProgram(), "SCCP")) {
-                        ConversionAlert error = new ConversionAlert();
-                        error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
-                        error.setItem(student.getPen());
-                        error.setReason(" [ SCCP | CP ] is found => skip both student career program and optional program creation process.");
-//                        summary.getErrors().add(error);
-                    }
-                    if (createStudentCareerProgram(programCode, student, summary)) {
-                        createStudentOptionalProgram("CP", student, accessToken, summary);
-                    }
+                } else if (createStudentCareerProgram(programCode, student, summary)) {
+                    createStudentOptionalProgram("CP", student, accessToken, summary);
                 }
             }
         }
@@ -310,12 +319,17 @@ public class StudentService {
                 }
                 break;
             case "1996":
-                student.setProgram("1996");
-                summary.increment("1996", student.isGraduated());
+                if (student.getSchoolOfRecord().startsWith("093")) {
+                    student.setProgram("1996-PF");
+                    summary.increment("1996-PF", student.isGraduated());
+                } else {
+                    student.setProgram("1996-EN");
+                    summary.increment("1996-EN", student.isGraduated());
+                }
                 break;
             case "1986":
-                student.setProgram("1986");
-                summary.increment("1986", student.isGraduated());
+                student.setProgram("1986-EN");
+                summary.increment("1986-EN", student.isGraduated());
                 break;
             case "1950":
                 if (StringUtils.equals(student.getStudentGrade(), "AD")) {
