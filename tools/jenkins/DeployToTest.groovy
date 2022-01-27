@@ -15,6 +15,12 @@ pipeline{
         SOURCE_REPO_URL = 'https://github.com/${ORG}/${REPO_NAME}'
         SOURCE_REPO_URL_RAW = 'https://raw.githubusercontent.com/${ORG}/${REPO_NAME}'
     }
+    options {
+        buildDiscarder(logRotator(daysToKeepStr: '', numToKeepStr: '5'))
+    }
+    parameters {
+        choice( name: 'IMAGE_TAG', choices: ['latest', 'main', 'release-1.0.0', 'dev' ] )
+    }
     stages{
         stage('Deploy to TEST') {
             steps{
@@ -23,7 +29,8 @@ pipeline{
                         openshift.withProject(OCP_PROJECT) {
                             openshift.apply(
                                     openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml",
-                                            "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${REPO_NAME}-${APP_SUBDOMAIN_SUFFIX}.${APP_DOMAIN}")
+                                            "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${REPO_NAME}-${APP_SUBDOMAIN_SUFFIX}.${APP_DOMAIN}",
+                                            "TAG_NAME=${params.IMAGE_TAG}")
                             )
                             openshift.selector("dc", "${REPO_NAME}-dc").rollout().latest()
                             timeout (time: 10, unit: 'MINUTES') {

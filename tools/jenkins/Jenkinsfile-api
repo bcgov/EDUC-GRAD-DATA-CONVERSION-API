@@ -25,15 +25,34 @@ pipeline{
         UAT_HOST_ROUTE = "${APP_NAME}-${UAT_NAMESPACE}.${APP_DOMAIN}"
         PROD_HOST_ROUTE = "${APP_NAME}-${PROD_NAMESPACE}.${APP_DOMAIN}"
     }
+    options {
+        buildDiscarder(logRotator(daysToKeepStr: '', numToKeepStr: '5'))
+    }
+    parameters {
+        gitParameter(
+          branch: '',
+          branchFilter: ".*",
+          defaultValue: "origin/main",
+          description: '',
+          listSize: '10',
+          name: 'BRANCH_PARAM',
+          quickFilterEnabled: false,
+          selectedValue: 'DEFAULT',
+          sortMode: 'ASCENDING_SMART',
+          tagFilter: "BRANCH",
+          type: 'PT_BRANCH_TAG')
+
+    }
     stages {
         stage('Build') {
             steps {
                 script {
+                    BRANCH = params.BRANCH_PARAM.substring(7)
                     openshift.withCluster() {
                         def bcTemplate =
                         openshift.apply(
                                 openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.bc.yaml",
-                                        "REPO_NAME=${REPO_NAME}")
+                                        "REPO_NAME=${REPO_NAME}", "BRANCH_NAME=${BRANCH}")
                         )
                         def buildSelector = openshift.selector("bc", "${REPO_NAME}-bc").startBuild()
                         sleep(20)
@@ -71,10 +90,11 @@ pipeline{
                 success {
                     echo "${REPO_NAME} successfully deployed to DEV"
                     script {
+                        def branch_tag = BRANCH.replace("/", "-")
                         openshift.withCluster() {
                             openshift.withProject(TOOLS_NAMESPACE) {
                                 echo "Tagging image"
-                                openshift.tag("${TOOLS_NAMESPACE}/${REPO_NAME}:latest", "${REPO_NAME}:${TAG}")
+                                openshift.tag("${TOOLS_NAMESPACE}/${REPO_NAME}:latest", "${REPO_NAME}:${TAG}", "${REPO_NAME}:${branch_tag}")
                             }
                         }
                     }

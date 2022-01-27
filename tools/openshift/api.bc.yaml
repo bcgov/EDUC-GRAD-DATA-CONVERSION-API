@@ -24,7 +24,7 @@ objects:
           memory: 3Gi
       source:
         git:
-          ref: main
+          ref: ${BRANCH_NAME}
           uri: 'https://github.com/bcgov/${REPO_NAME}'
         type: Git
       strategy:
@@ -32,6 +32,7 @@ objects:
           type: Docker
           pullSecret:
             name: artifactory-creds
+      runPolicy: SerialLatestOnly
       output:
         to:
           kind: ImageStreamTag
@@ -53,4 +54,8 @@ parameters:
   - description: Name of the Git Repository
     displayName: REPO_NAME
     name: REPO_NAME
+    required: true
+  - description: Branch from the Git Repository
+    displayName: BRANCH_NAME
+    name: BRANCH_NAME
     required: true

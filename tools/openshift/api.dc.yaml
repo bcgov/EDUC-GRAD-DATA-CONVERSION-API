@@ -31,7 +31,7 @@ objects:
             deploymentConfig: "${REPO_NAME}-dc"
         spec:
           containers:
-            - image: image-registry.openshift-image-registry.svc:5000/77c02f-tools/${REPO_NAME}:latest
+            - image: image-registry.openshift-image-registry.svc:5000/77c02f-tools/${REPO_NAME}:${TAG_NAME}
               imagePullPolicy: Always
               volumeMounts:
               - name: log-storage
@@ -153,6 +153,10 @@ parameters:
   - name: REPO_NAME
     description: Application repository name
     required: true
+  - name: TAG_NAME
+    description: Imagestream tag name
+    required: false
+    value: latest
   - name: HOST_ROUTE
     description: The host the route will use to expose service outside cluster
     required: true
