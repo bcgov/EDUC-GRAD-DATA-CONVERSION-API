@@ -18,9 +18,9 @@ public class EducGradDataConversionApiConstants {
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
     // Data Conversion
-    public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";P
+    public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
-    public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";P
+    public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
 
     // Util
     public static final String READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB = "/addNewPen";

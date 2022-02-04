@@ -18,12 +18,7 @@ public class StudentCommonDTO {
     private String studentGrade;
     private String studentStatus;
 
-    // optional program codes
-    private List<StudentOptionalProgramEntity> optionalPrograms = new ArrayList<>();
-
-    // career program codes
-    private List<StudentCareerProgramEntity> careerPrograms = new ArrayList<>();
-
+    // all program codes
     private List<String> programCodes = new ArrayList<>();
 
     // courses

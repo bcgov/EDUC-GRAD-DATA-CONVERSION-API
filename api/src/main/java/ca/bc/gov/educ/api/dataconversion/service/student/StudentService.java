@@ -391,10 +391,12 @@ public class StudentService extends StudentBaseService {
 
         // optional programs
         List<StudentOptionalProgramEntity> optionalPrograms = studentOptionalProgramRepository.findByStudentID(studentID);
-        studentData.getOptionalPrograms().addAll(optionalPrograms);
+        studentData.getProgramCodes().addAll(getOptionalProgramCodes(optionalPrograms));
+
         // career programs
         List<StudentCareerProgramEntity> careerPrograms = studentCareerProgramRepository.findByStudentID(studentID);
-        studentData.getCareerPrograms().addAll(careerPrograms);
+        studentData.getProgramCodes().addAll(getCareerProgramCodes(careerPrograms));
+
         // courses
         List<StudentCourseEntity> courses = courseService.getStudentCourses(pen);
         studentData.getCourses().addAll(courses);
