@@ -32,7 +32,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,\n" +
             "m.slp_date as SLP_DATE, m.french_cert as FRENCH_CERT \n" +
             "from student_master m\n" +
-            "where trim(m.stud_no) = :pen \n", nativeQuery=true)
+            "where m.stud_no = :pen \n", nativeQuery=true)
     @Transactional(readOnly = true)
     List<Object[]> loadTraxStudent(@Param("pen") String pen);
 

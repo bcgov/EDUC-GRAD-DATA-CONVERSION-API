@@ -21,13 +21,13 @@ import java.util.HashMap;
 @Profile("!test")
 @EnableJpaRepositories(
         basePackages = {
-                "ca.bc.gov.educ.api.dataconversion.repository.trax"
+                "ca.bc.gov.educ.api.dataconversion.repository.conv"
         },
-        entityManagerFactoryRef = "traxEntityManager",
-        transactionManagerRef = "traxTransactionManager"
+        entityManagerFactoryRef = "convEntityManager",
+        transactionManagerRef = "convTransactionManager"
 )
 @EnableTransactionManagement
-public class TraxDbConfig {
+public class ConvDbConfig {
     // Hikari Pool
     @Value("${spring.db-connection.hikari.maximum-pool-size}")
     private int maxPoolSize;
@@ -35,34 +35,35 @@ public class TraxDbConfig {
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-lifetime}")
+    @Value("${spring.db-connection.hikari.max-life-time}")
     private int maxLifetime;
 
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.trax.pool-name}")
-    private String traxPoolName;
+    @Value("${spring.db-connection.conv.pool-name}")
+    private String convPoolName;
 
     // Connection String
     @Value("${spring.db-connection.url}")
     private String jdbcUrl;
 
-    @Value("${spring.db-connection.trax.username}")
-    private String traxUsername;
+    @Value("${spring.db-connection.conv.username}")
+    private String convUsername;
 
-    @Value("${spring.db-connection.trax.password}")
-    private String traxPassword;
+    @Value("${spring.db-connection.conv.password}")
+    private String convPassword;
 
+    @Primary
     @Bean
-    public DataSource traxDataSource() {
+    public DataSource convDataSource() {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
         config.setJdbcUrl(jdbcUrl);
-        config.setUsername(traxUsername);
-        config.setPassword(traxPassword);
-        config.setPoolName(traxPoolName);
+        config.setUsername(convUsername);
+        config.setPassword(convPassword);
+        config.setPoolName(convPoolName);
 
         config.setMinimumIdle(2);
         config.setMaximumPoolSize(maxPoolSize);
@@ -72,12 +73,13 @@ public class TraxDbConfig {
         return new HikariDataSource(config);
     }
 
+    @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean traxEntityManager() {
+    public LocalContainerEntityManagerFactoryBean convEntityManager() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(traxDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.trax"});
+        em.setDataSource(convDataSource());
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -88,15 +90,16 @@ public class TraxDbConfig {
         properties.put("hibernate.show_sql", "false");
         em.setJpaPropertyMap(properties);
 
-        em.setPersistenceUnitName("traxPU");
+        em.setPersistenceUnitName("convPU");
 
         return em;
     }
 
+    @Primary
     @Bean
-    public PlatformTransactionManager traxTransactionManager() {
+    public PlatformTransactionManager convTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(traxEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(convEntityManager().getObject());
         return transactionManager;
     }
 }

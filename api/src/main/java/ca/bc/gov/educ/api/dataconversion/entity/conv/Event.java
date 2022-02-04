@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity.trax;
+package ca.bc.gov.educ.api.dataconversion.entity.conv;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "REPLICATION_EVENT")
+@Table(name = "TRAX_UPDATED_SUB_EVENT")
 @Data
 @DynamicUpdate
 public class Event {
