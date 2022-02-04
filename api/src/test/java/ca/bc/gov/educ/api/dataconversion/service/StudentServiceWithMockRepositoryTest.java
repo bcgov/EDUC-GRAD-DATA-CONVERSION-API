@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.service;
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
@@ -50,6 +51,9 @@ public class StudentServiceWithMockRepositoryTest {
 
     @MockBean
     StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @MockBean
     ProgramService programService;

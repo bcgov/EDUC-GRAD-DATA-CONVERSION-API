@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -31,6 +32,9 @@ public class DataConversionServiceTest {
 
     @MockBean
     TraxStudentsLoadRepository traxStudentsLoadRepository;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @MockBean
     RestUtils restUtils;

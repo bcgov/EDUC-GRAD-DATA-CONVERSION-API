@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -33,6 +34,9 @@ public class CourseServiceWithMockRepositoryTest {
 
     @MockBean
     CourseRestrictionRepository courseRestrictionRepository;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @MockBean
     RestUtils restUtils;
