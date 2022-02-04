@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ProgramService {
@@ -22,7 +23,7 @@ public class ProgramService {
     }
 
     @Transactional(readOnly = true, transactionManager = "programTransactionManager")
-    public CareerProgramEntity getCareerProgramCode(String cpc) {
+    public CareerProgramEntity getCareerProgram(String cpc) {
         Optional<CareerProgramEntity> entity = careerProgramRepository.findById(StringUtils.toRootUpperCase(cpc));
         if (entity.isPresent()) {
             return entity.get();
@@ -39,5 +40,23 @@ public class ProgramService {
         } else {
             return null;
         }
+    }
+
+    @Transactional(readOnly = true, transactionManager = "programTransactionManager")
+    public OptionalProgramEntity findOptionalProgram(UUID optionalProgramID) {
+        Optional<OptionalProgramEntity> entity = optionalProgramRepository.findById(optionalProgramID);
+        if (entity.isPresent()) {
+            return entity.get();
+        } else {
+            return null;
+        }
+    }
+
+    @Transactional(readOnly = true, transactionManager = "programTransactionManager")
+    public boolean isOptionalProgramCode(String programCode) {
+        if (optionalProgramRepository.countOptionalProgram(programCode) > 0L) {
+            return true;
+        }
+        return false;
     }
 }

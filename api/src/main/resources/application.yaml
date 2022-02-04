@@ -28,6 +28,10 @@ spring:
       username: ${COURSE_USERNAME}
       password: ${COURSE_PASSWORD}
       pool-name: conv-course-cp
+    conv:
+      username: ${CONV_USERNAME}
+      password: ${CONV_PASSWORD}
+      pool-name: conv-primary-cp
     program:
       username: ${PROGRAM_USERNAME}
       password: ${PROGRAM_PASSWORD}
@@ -117,6 +121,16 @@ nats:
   maxReconnect: ${NATS_MAX_RECONNECT}
   connectionName: GRAD-DATA-CONVERSION-API
 
+#Scheduler
+cron:
+  scheduled:
+    process:
+      events:
+        stan:
+          run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
+          lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
+
 #Endpoints
 endpoint:
   keycloak:
@@ -135,3 +149,8 @@ endpoint:
 data-conversion:
   student-guid-pen-xref:
     enabled:  ${ENABLE_STUDENT_ID_PEN_XREF}
+
+#Incremental Grad Update
+grad:
+  update:
+    enabled: ${ENABLE_GRAD_UPDATE}

@@ -1,7 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.choreographer;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.model.TraxUpdateInGrad;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
+import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
+
+import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_STUDENT_MASTER;
 
 /**
  * This class is responsible to handle different choreographed events related student by calling different services.
@@ -39,8 +43,8 @@ public class ChoreographEventHandler {
         switch (event.getEventType()) {
           case "UPDATE_TRAX_STUDENT_MASTER":
             log.info("Processing CREATE_GRAD_STATUS event record :: {} ", event);
-//            final GraduationStatus gradStatusCreate = JsonUtil.getJsonObjectFromString(GraduationStatus.class, event.getEventPayload());
-//            this.eventServiceMap.get(CREATE_GRAD_STATUS.toString()).processEvent(gradStatusCreate, event);
+            final TraxUpdateInGrad traxUpdateInGrad = JsonUtil.getJsonObjectFromString(TraxUpdateInGrad.class, event.getEventPayload());
+            this.eventServiceMap.get(UPDATE_TRAX_STUDENT_MASTER.toString()).processEvent(traxUpdateInGrad, event);
             break;
           default:
             log.warn("Silently ignoring event: {}", event);
@@ -50,7 +54,6 @@ public class ChoreographEventHandler {
         log.error("Exception while processing event :: {}", event, exception);
       }
     });
-
 
   }
 }

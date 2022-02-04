@@ -34,7 +34,8 @@
         <log4j.version>2.17.1</log4j.version>
         <nats.version>2.11.0</nats.version>
         <guava.version>30.1.1-jre</guava.version>
-        <log4j.version>2.16.0</log4j.version>
+        <shedlock.version>4.20.0</shedlock.version>
+        <log4j.version>2.17.1</log4j.version>
     </properties>
 
     <parent>
@@ -141,6 +142,22 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>${guava.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-spring -->
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-spring</artifactId>
+            <version>${shedlock.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-provider-jdbc-template -->
+        <dependency>
+            <groupId>net.javacrumbs.shedlock</groupId>
+            <artifactId>shedlock-provider-jdbc-template</artifactId>
+            <version>${shedlock.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.nats/jnats -->
         <dependency>
