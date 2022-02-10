@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -77,6 +79,95 @@ public class DataConversionServiceTest {
         assertThat(result.size()).isEqualTo(1);
         GradCourseRestriction responseCourseRestriction = result.get(0);
         assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
+    }
+
+    @Test
+    public void testGetStudentDemographicsDataFromTrax() {
+        Object[] obj = new Object[] {
+                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        when(this.traxStudentsLoadRepository.loadStudentDemographicsData("123456789")).thenReturn(results);
+
+        var result = dataConversionService.getStudentDemographicsDataFromTrax("123456789");
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0).getPen()).isEqualTo("123456789");
+    }
+
+    @Test
+    public void testReadTraxStudentAndAddNewPen_whenPenAlreadyExists() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "123456789";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        // Trax Student Input
+        ConvGradStudent convGradStudent = new ConvGradStudent();
+        convGradStudent.setPen(pen);
+        convGradStudent.setSchoolOfRecord("12345678");
+        convGradStudent.setSchoolAtGrad("12345678");
+        convGradStudent.setArchiveFlag("A");
+        convGradStudent.setStudentStatus("A");
+        convGradStudent.setGraduationRequestYear("2018");
+
+        Object[] obj = new Object[] {
+                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        when(this.traxStudentsLoadRepository.loadStudentDemographicsData(pen)).thenReturn(results);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testReadTraxStudentAndAddNewPen() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "123456789";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        // Trax Student Input
+        ConvGradStudent convGradStudent = new ConvGradStudent();
+        convGradStudent.setPen(pen);
+        convGradStudent.setSchoolOfRecord("12345678");
+        convGradStudent.setSchoolAtGrad("12345678");
+        convGradStudent.setArchiveFlag("A");
+        convGradStudent.setStudentStatus("A");
+        convGradStudent.setGraduationRequestYear("2018");
+
+        Object[] obj = new Object[] {
+                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        when(this.traxStudentsLoadRepository.loadStudentDemographicsData(pen)).thenReturn(results);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
+        when(this.restUtils.addNewPen(any(Student.class), eq("123"))).thenReturn(penStudent);
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
     }
 
 }

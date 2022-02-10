@@ -121,6 +121,9 @@ endpoint:
   grad-program-api:
     special-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+  grad-student-api:
+    add-new-pen:
+      url: ${GRAD_STUDENT_API}api/v1/student
 
 #Conversion option
 data-conversion:
