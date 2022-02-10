@@ -96,4 +96,24 @@ public class JobLauncherController {
             return ResponseEntity.status(500).body(summaryDTO);
         }
     }
+
+    @GetMapping(EducGradDataConversionApiConstants.READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB)
+    public ResponseEntity<ConversionBaseSummaryDTO> launchReadTraxAndAddNewPenIfNotExistsJob() {
+        logger.info("Inside Launch Read Trax Student & Add a New PEN Job");
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
+        builder.addString(JOB_PARAM, "readTraxAndAddNewPenBatchJob");
+        try {
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("readTraxAndAddNewPenBatchJob"), builder.toJobParameters());
+            ExecutionContext jobContext = jobExecution.getExecutionContext();
+            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
+            return ResponseEntity.ok(summaryDTO);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+                | JobParametersInvalidException | NoSuchJobException e) {
+            e.printStackTrace();
+            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
+            summaryDTO.setException(e.getLocalizedMessage());
+            return ResponseEntity.status(500).body(summaryDTO);
+        }
+    }
 }

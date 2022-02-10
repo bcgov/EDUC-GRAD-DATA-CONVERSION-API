@@ -58,4 +58,13 @@ public class RestUtils {
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(GradSpecialProgram.class).block();
     }
+
+    public Student addNewPen(Student student, String accessToken) {
+        return webClient.post()
+                .uri(constants.getAddNewPenFromGradStudentApiUrl())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(student))
+                .retrieve().bodyToMono(Student.class).block();
+    }
+
 }
