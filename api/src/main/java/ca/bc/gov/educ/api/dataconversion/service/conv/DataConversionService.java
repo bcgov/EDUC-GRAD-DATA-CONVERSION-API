@@ -164,11 +164,13 @@ public class DataConversionService {
                         if (penMergedToStudent == null) {
                             // Create MergedToStudent
                             penMergedToStudent = readTraxStudent(traxStudent.getTruePen());
-                            penMergedToStudent.setDemogCode("A");
-                            penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
+                            if (penMergedToStudent != null) {
+                                penMergedToStudent.setDemogCode("A");
+                                penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
+                            }
                         }
                         // TrueStudentID
-                        traxStudent.setTrueStudentID(penMergedToStudent.getStudentID());
+                        traxStudent.setTrueStudentID(penMergedToStudent != null? penMergedToStudent.getStudentID() : null);
                         traxStudent.setDemogCode("A");
                     }
                     // MergedFromStudent
