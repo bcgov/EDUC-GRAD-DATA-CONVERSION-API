@@ -20,7 +20,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "where 1 = 1\n" +
 //            "and m.grad_reqt_year in ('1996','1986')\n" +
 //            "and ( trim(m.prgm_code) like '40%' or m.mincode like '093%' )\n" +
-			"and l.stud_no = '149661399'\n" +
+//			"and l.stud_no = '149661399'\n" +
 //            "and m.stud_status in ('M','D')\n" +
 //            "and m.french_cert = 'F'\n" +
             "and l.stud_no = m.stud_no\n" , nativeQuery=true)
@@ -29,7 +29,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
 
     @Query(value="select trim(m.stud_no) as PEN, m.stud_given as LEGAL_FIRST_NAME, m.stud_surname as LEGAL_LAST_NAME, m.stud_middle as LEGAL_MIDDLE_NAME,\n" +
             "m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG, m.mincode as SCHOOL_OF_RECORD, m.stud_grade as STUDENT_GRADE, m.postal as POSTAL_CODE,\n" +
-            "m.stud_sex as SEX_CODE, m.stud_birth as BIRTH_DATE, m.grad_date as GRAD_DATE, m.stud_true_no as TRUE_PEN \n" +
+            "m.stud_sex as SEX_CODE, m.stud_birth as BIRTH_DATE, m.grad_date as GRAD_DATE, m.stud_true_no as TRUE_PEN, m.stud_local_id as LOCAL_ID \n" +
             "from student_master m\n" +
             "where 1 = 1\n" +
 			"and m.stud_no = :pen", nativeQuery=true)

@@ -84,7 +84,7 @@ public class DataConversionServiceTest {
     @Test
     public void testGetStudentDemographicsDataFromTrax() {
         Object[] obj = new Object[] {
-                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -153,7 +153,7 @@ public class DataConversionServiceTest {
         convGradStudent.setGraduationRequestYear("2018");
 
         Object[] obj = new Object[] {
-                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);

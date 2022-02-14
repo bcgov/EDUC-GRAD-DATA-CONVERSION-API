@@ -104,7 +104,7 @@ public class DataConversionService {
             }
             log.info(" TRAX - PEN mapping : stud_status [{}] => status code [{}]", studStatus,  studentStatusCode);
 
-            Character archiveFlag = (Character) result[5];
+//            Character archiveFlag = (Character) result[5];
             String schoolOfRecord = (String) result[6];
             String studGrade = (String) result[7];
             String studentGrade;
@@ -119,11 +119,13 @@ public class DataConversionService {
             String birthDate = (String) result[10];
             String formattedBirthDate = birthDate.substring(0, 4) + "-" + birthDate.substring(4, 6) + "-" + birthDate.substring(6, 8);
 
-            BigDecimal gradDate = (BigDecimal) result[11];
-            String gradYearStr = gradDate != null && !gradDate.equals(BigDecimal.ZERO)? gradDate.toString().substring(0, 4) : null;
+//            BigDecimal gradDate = (BigDecimal) result[11];
+//            String gradYearStr = gradDate != null && !gradDate.equals(BigDecimal.ZERO)? gradDate.toString().substring(0, 4) : null;
 
             String truePen = (String) result[12];
             truePen = truePen != null && StringUtils.isNotBlank(truePen)? truePen.trim() : null;
+
+            String localID = (String) result[13];
 
             Student student = Student.builder()
                     .pen(pen)
@@ -139,10 +141,10 @@ public class DataConversionService {
                     .mincode(schoolOfRecord)
                     .postalCode(postal)
                     .dob(formattedBirthDate)
-                    .gradeYear(gradYearStr)
                     .gradeCode(studentGrade)
                     .emailVerified("Y")
                     .truePen(truePen)
+                    .localID(localID)
                     .build();
             students.add(student);
         });
@@ -159,19 +161,21 @@ public class DataConversionService {
                 Student traxStudent = readTraxStudent(convGradStudent.getPen());
                 if (traxStudent != null) {
                     if (StringUtils.equals(traxStudent.getStatusCode(), "M") && StringUtils.isNotBlank(traxStudent.getTruePen())) {
-                        // MergedToStudent
-                        Student penMergedToStudent = getPenStudent(traxStudent.getTruePen(), accessToken, summary);
-                        if (penMergedToStudent == null) {
-                            // Create MergedToStudent
-                            penMergedToStudent = readTraxStudent(traxStudent.getTruePen());
-                            if (penMergedToStudent != null) {
-                                penMergedToStudent.setDemogCode("A");
-                                penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
-                            }
-                        }
-                        // TrueStudentID
-                        traxStudent.setTrueStudentID(penMergedToStudent != null? penMergedToStudent.getStudentID() : null);
-                        traxStudent.setDemogCode("A");
+                        log.info("Merged student is skipped: pen# {}", traxStudent.getPen());
+                        return convGradStudent;
+//                        // MergedToStudent
+//                        Student penMergedToStudent = getPenStudent(traxStudent.getTruePen(), accessToken, summary);
+//                        if (penMergedToStudent == null) {
+//                            // Create MergedToStudent
+//                            penMergedToStudent = readTraxStudent(traxStudent.getTruePen());
+//                            if (penMergedToStudent != null) {
+//                                penMergedToStudent.setDemogCode("A");
+//                                penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
+//                            }
+//                        }
+//                        // TrueStudentID
+//                        traxStudent.setTrueStudentID(penMergedToStudent != null? penMergedToStudent.getStudentID() : null);
+//                        traxStudent.setDemogCode("A");
                     }
                     // MergedFromStudent
                     createNewPen(traxStudent, accessToken, summary);
@@ -218,6 +222,7 @@ public class DataConversionService {
         }
         Student newStudent = restUtils.addNewPen(student, accessToken);
         if (newStudent != null) {
+            log.info("Add missing student: pen# {} => studentID {}", student.getPen(), newStudent.getStudentID());
             ConversionAlert warning = new ConversionAlert();
             warning.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
             warning.setItem(student.getPen());
