@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.assessment.AssessmentRequirement
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementCodeRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
@@ -40,6 +41,9 @@ public class AssessmentServiceTest {
 
     @MockBean
     AssessmentRequirementCodeRepository assessmentRequirementCodeRepository;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @MockBean
     RestUtils restUtils;

@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
