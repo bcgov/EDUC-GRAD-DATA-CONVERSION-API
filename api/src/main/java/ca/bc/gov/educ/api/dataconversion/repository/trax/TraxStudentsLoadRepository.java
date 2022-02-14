@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.repository.trax;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentsLoadEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,12 +20,21 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
             "where 1 = 1\n" +
 //            "and m.grad_reqt_year in ('1996','1986')\n" +
 //            "and ( trim(m.prgm_code) like '40%' or m.mincode like '093%' )\n" +
-//			"and trim(l.stud_no) = '126786680'\n" +
+//			"and l.stud_no = '149661399'\n" +
 //            "and m.stud_status in ('M','D')\n" +
 //            "and m.french_cert = 'F'\n" +
             "and l.stud_no = m.stud_no\n" , nativeQuery=true)
     @Transactional(readOnly = true)
     List<Object[]> loadInitialStudentRawData();
+
+    @Query(value="select trim(m.stud_no) as PEN, m.stud_given as LEGAL_FIRST_NAME, m.stud_surname as LEGAL_LAST_NAME, m.stud_middle as LEGAL_MIDDLE_NAME,\n" +
+            "m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG, m.mincode as SCHOOL_OF_RECORD, m.stud_grade as STUDENT_GRADE, m.postal as POSTAL_CODE,\n" +
+            "m.stud_sex as SEX_CODE, m.stud_birth as BIRTH_DATE, m.grad_date as GRAD_DATE, m.stud_true_no as TRUE_PEN, m.stud_local_id as LOCAL_ID \n" +
+            "from student_master m\n" +
+            "where 1 = 1\n" +
+			"and m.stud_no = :pen", nativeQuery=true)
+    @Transactional(readOnly = true)
+    List<Object[]> loadStudentDemographicsData(@Param("pen") String pen);
 
     @Query(value="select trim(c1.crse_code) as CRSE_MAIN, trim(c1.crse_level) as CRSE_MAIN_LVL,\n" +
             " trim(c2.crse_code) as CRSE_RESTRICTED, trim(c2.crse_level) as CRSE_RESTRICTED_LVL,\n" +

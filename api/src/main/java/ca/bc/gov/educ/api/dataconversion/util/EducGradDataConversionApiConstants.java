@@ -21,6 +21,9 @@ public class EducGradDataConversionApiConstants {
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
 
+    // Util
+    public static final String READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB = "/addNewPen";
+
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
@@ -45,6 +48,9 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-program-api.special-program.url}")
     private String gradProgramManagementUrl;
+
+    @Value("${endpoint.grad-student-api.add-new-pen.url}")
+    private String addNewPenFromGradStudentApiUrl;
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

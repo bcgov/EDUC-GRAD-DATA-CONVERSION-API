@@ -93,6 +93,11 @@ public class BatchJobConfig {
         return new CourseRequirementCreator();
     }
 
+    @Bean
+    public ItemProcessor<ConvGradStudent,ConvGradStudent> addNewPenProcessor() {
+        return new ReadTraxStudentAndAddNewPenProcessor();
+    }
+
     /**
     * Creates a bean that represents the only steps of our batch job.
     */
@@ -208,5 +213,36 @@ public class BatchJobConfig {
         JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
         postProcessor.setJobRegistry(jobRegistry);
         return postProcessor;
+    }
+
+    /**
+     * Creates a bean that represents the only steps of our batch job.
+     */
+    @Bean
+    public Step readTraxAndAddNewPenJobStep(ItemReader<ConvGradStudent> studentReader,
+                                             ItemProcessor<? super ConvGradStudent, ? extends ConvGradStudent> addNewPenProcessor,
+                                             ItemWriter<ConvGradStudent> studentWriter,
+                                             StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("readTraxAndAddNewPenJobStep")
+                .<ConvGradStudent, ConvGradStudent>chunk(1)
+                .reader(studentReader)
+                .processor(addNewPenProcessor)
+                .writer(studentWriter)
+                .build();
+    }
+
+    /**
+     * Creates a bean that represents our batch job.
+     */
+    @Bean
+    public Job readTraxAndAddNewPenBatchJob(Step readTraxAndAddNewPenJobStep,
+                                             StudentDataConversionJobCompletionNotificationListener listener,
+                                             JobBuilderFactory jobBuilderFactory) {
+        return jobBuilderFactory.get("readTraxAndAddNewPenBatchJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(readTraxAndAddNewPenJobStep)
+                .end()
+                .build();
     }
 }

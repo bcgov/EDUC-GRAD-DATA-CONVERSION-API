@@ -118,7 +118,7 @@ public class CourseService {
         processPortFolio(graduationCourseEntity, summary);
         processConsEd(graduationCourseEntity, summary);
         processFineArts(graduationCourseEntity, summary);
-        processCareerLiefConnections(graduationCourseEntity, summary);
+        processCareerLifeConnections(graduationCourseEntity, summary);
         return graduationCourseEntity;
     }
 
@@ -339,7 +339,7 @@ public class CourseService {
     }
 
     private void processConsEd(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
-        // portfolio
+        // consEd
         if (StringUtils.isNotBlank(graduationCourseEntity.getConsEd()) && StringUtils.equals(graduationCourseEntity.getConsEd(), "Y")) {
             if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "745"), summary);
@@ -348,7 +348,7 @@ public class CourseService {
     }
 
     private void processFineArts(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
-        // portfolio
+        // fineArts
         if (StringUtils.isNotBlank(graduationCourseEntity.getFineArts()) && StringUtils.equals(graduationCourseEntity.getFineArts(), "Y")) {
             if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1996")) {
                 if (StringUtils.isBlank(graduationCourseEntity.getAppliedSkills()) || !StringUtils.equals(graduationCourseEntity.getAppliedSkills(), "Y")) {
@@ -358,7 +358,7 @@ public class CourseService {
         }
     }
 
-    private void processCareerLiefConnections(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
+    private void processCareerLifeConnections(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
         // careerLifeConnections
         if (StringUtils.isNotBlank(graduationCourseEntity.getCareerLifeConnections()) && StringUtils.equals(graduationCourseEntity.getCareerLifeConnections(), "Y")) {
             if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
