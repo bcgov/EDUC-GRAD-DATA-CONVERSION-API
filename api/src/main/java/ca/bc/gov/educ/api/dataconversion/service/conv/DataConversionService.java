@@ -88,7 +88,7 @@ public class DataConversionService {
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadAllTraxStudentData() {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadInitialStudentRawData();
+        List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();
         results.forEach(result -> {
             String pen = (String) result[0];
             String schoolOfRecord = (String) result[1];
@@ -273,6 +273,9 @@ public class DataConversionService {
     private Student createNewPen(Student student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getHistoryActivityCode())) {
             student.setHistoryActivityCode("REQNEW");
+        }
+        if (StringUtils.isBlank(student.getDemogCode())) {
+            student.setDemogCode("A");
         }
         Student newStudent = restUtils.addNewPen(student, accessToken);
         if (newStudent != null) {
