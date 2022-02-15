@@ -27,11 +27,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
     @Transactional(readOnly = true)
     List<Object[]> loadInitialStudentRawData();
 
-    @Query(value="select trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as SCHOOL_AT_GRADUATION, m.stud_grade as STUDENT_GRADE, m.stud_status as STUDENT_STATUS_CODE,\n" +
-            "m.archive_flag as ARCHIVE_FLAG, m.grad_reqt_year as GRAD_REQT_YEAR, 'Y' as RECALCULATE_GRAD_STATUS, m.grad_date as GRAD_DATE,\n" +
-            "trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,\n" +
-            "m.slp_date as SLP_DATE, m.french_cert as FRENCH_CERT \n" +
-            "from student_master m\n", nativeQuery=true)
+    @Query(value="select p.stud_no from trax_students_pen_update p\n", nativeQuery=true)
     @Transactional(readOnly = true)
     List<Object[]> loadAlTraxStudents();
 
