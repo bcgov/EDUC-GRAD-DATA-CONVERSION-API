@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.dataconversion.processor;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
