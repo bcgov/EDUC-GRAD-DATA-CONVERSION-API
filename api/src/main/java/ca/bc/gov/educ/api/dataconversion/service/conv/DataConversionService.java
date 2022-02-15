@@ -50,10 +50,10 @@ public class DataConversionService {
         List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();
         results.forEach(result -> {
-            ConvGradStudent student = populateGradStudent(result);
-            if (student != null) {
-                students.add(student);
-            }
+            ConvGradStudent student = new ConvGradStudent();
+            String pen = (String) result[0];
+            student.setPen(pen);
+            students.add(student);
         });
 
         return students;
