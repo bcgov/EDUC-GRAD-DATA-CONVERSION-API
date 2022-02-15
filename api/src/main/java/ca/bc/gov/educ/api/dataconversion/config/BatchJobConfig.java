@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversio
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
+import ca.bc.gov.educ.api.dataconversion.reader.DataConversionAllTraxStudentsReader;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementReader;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
@@ -51,6 +52,11 @@ public class BatchJobConfig {
     @Bean
     public ItemReader<GraduationCourseEntity> courseRequirementReader(DataConversionService dataConversionService, RestUtils restUtils) {
         return new DataConversionCourseRequirementReader(dataConversionService, restUtils);
+    }
+
+    @Bean
+    public ItemReader<ConvGradStudent> addMissingPenReader(DataConversionService dataConversionService, RestUtils restUtils) {
+        return new DataConversionAllTraxStudentsReader(dataConversionService, restUtils);
     }
 
     @Bean
@@ -219,13 +225,13 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step readTraxAndAddNewPenJobStep(ItemReader<ConvGradStudent> studentReader,
+    public Step readTraxAndAddNewPenJobStep(ItemReader<ConvGradStudent> addMissingPenReader,
                                              ItemProcessor<? super ConvGradStudent, ? extends ConvGradStudent> addNewPenProcessor,
                                              ItemWriter<ConvGradStudent> studentWriter,
                                              StepBuilderFactory stepBuilderFactory) {
         return stepBuilderFactory.get("readTraxAndAddNewPenJobStep")
                 .<ConvGradStudent, ConvGradStudent>chunk(1)
-                .reader(studentReader)
+                .reader(addMissingPenReader)
                 .processor(addNewPenProcessor)
                 .writer(studentWriter)
                 .build();

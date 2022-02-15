@@ -2,7 +2,6 @@
 -- Initial data set from TRAX
 ------------------------------
 -- GRAD_STUDENT
--- GRAD_STUDENT
 select trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as SCHOOL_AT_GRADUATION, m.stud_grade as STUDENT_GRADE,
        m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG,
        m.grad_reqt_year as GRAD_REQT_YEAR, 'Y' as RECALCULATE_GRAD_STATUS, m.grad_date as GRAD_DATE,
