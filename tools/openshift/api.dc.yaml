@@ -15,7 +15,7 @@ objects:
         app.openshift.io/runtime: spring-boot
       name: "${REPO_NAME}-dc"
     spec:
-      replicas: 2
+      replicas: 1
       revisionHistoryLimit: 1
       triggers: []
       selector:
