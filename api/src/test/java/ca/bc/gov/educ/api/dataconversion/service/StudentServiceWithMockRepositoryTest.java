@@ -77,7 +77,7 @@ public class StudentServiceWithMockRepositoryTest {
     }
 
     @Test
-    public void convertStudent_forExistingGradStudent_whenGivenData_withFrechImmersionSpecialProgram_thenReturnSuccess() throws Exception {
+    public void convertStudent_forExistingGradStudent_whenGivenData_withFrenchImmersionSpecialProgram_thenReturnSuccess() throws Exception {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -89,6 +89,9 @@ public class StudentServiceWithMockRepositoryTest {
         GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("2018-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
 
         GradSpecialProgram specialProgram = new GradSpecialProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -131,7 +134,7 @@ public class StudentServiceWithMockRepositoryTest {
     }
 
     @Test
-    public void convertStudent_whenGivenData_withFrechImmersionSpecialProgram_thenReturnSuccess() throws Exception {
+    public void convertStudent_whenGivenData_withFrenchImmersionSpecialProgram_thenReturnSuccess() throws Exception {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -143,6 +146,9 @@ public class StudentServiceWithMockRepositoryTest {
         GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("2018-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
 
         GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
         BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
@@ -190,6 +196,157 @@ public class StudentServiceWithMockRepositoryTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .programCodes(Arrays.asList("XC")).build();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getRecalculateGradStatus()).isEqualTo("Y");
+        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertStudent_whenGiven1996Data_withFrenchImmersionSpecialProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("1996-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
+
+        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+
+        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        specialProgram.setOptionalProgramID(UUID.randomUUID());
+        specialProgram.setGraduationProgramCode("1996-EN");
+        specialProgram.setOptProgramCode("FI");
+        specialProgram.setOptionalProgramName("French Immersion");
+
+        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        specialProgramEntity.setId(UUID.randomUUID());
+        specialProgramEntity.setStudentID(studentID);
+        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setPen(pen);
+
+        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
+        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
+        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+
+        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
+        careerProgramEntity.setCode("XC");
+        careerProgramEntity.setDescription("XC Test");
+        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
+        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+
+        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        studentCareerProgramEntity.setId(UUID.randomUUID());
+        studentCareerProgramEntity.setStudentID(studentID);
+        studentCareerProgramEntity.setCareerProgramCode("XC");
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
+        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.programService.getCareerProgramCode("XC")).thenReturn(careerProgramEntity);
+        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
+        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
+        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
+        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getGradSpecialProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN").recalculateGradStatus("Y")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("1996")
+                .programCodes(Arrays.asList("XC")).build();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getRecalculateGradStatus()).isEqualTo("Y");
+        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertStudent_whenGiven1986Data_withFrenchImmersionSpecialProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("1986-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
+
+        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+
+        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        specialProgram.setOptionalProgramID(UUID.randomUUID());
+        specialProgram.setGraduationProgramCode("1986-EN");
+        specialProgram.setOptProgramCode("FI");
+        specialProgram.setOptionalProgramName("French Immersion");
+
+        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        specialProgramEntity.setId(UUID.randomUUID());
+        specialProgramEntity.setStudentID(studentID);
+        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setPen(pen);
+
+        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
+        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
+        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+
+        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
+        careerProgramEntity.setCode("XC");
+        careerProgramEntity.setDescription("XC Test");
+        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
+        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+
+        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        studentCareerProgramEntity.setId(UUID.randomUUID());
+        studentCareerProgramEntity.setStudentID(studentID);
+        studentCareerProgramEntity.setCareerProgramCode("XC");
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
+        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.programService.getCareerProgramCode("XC")).thenReturn(careerProgramEntity);
+        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
+        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
+        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
+        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getGradSpecialProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN").recalculateGradStatus("Y")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");

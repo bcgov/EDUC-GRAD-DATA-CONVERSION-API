@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversio
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
+import ca.bc.gov.educ.api.dataconversion.reader.DataConversionAllTraxStudentsReader;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementReader;
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
@@ -54,6 +55,11 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public ItemReader<ConvGradStudent> addMissingPenReader(DataConversionService dataConversionService, RestUtils restUtils) {
+        return new DataConversionAllTraxStudentsReader(dataConversionService, restUtils);
+    }
+
+    @Bean
     public ItemWriter<ConvGradStudent> studentWriter() {
         return new DataConversionStudentWriter();
     }
@@ -91,6 +97,11 @@ public class BatchJobConfig {
     @Bean
     public CourseRequirementCreator courseRequirementCreator() {
         return new CourseRequirementCreator();
+    }
+
+    @Bean
+    public ItemProcessor<ConvGradStudent,ConvGradStudent> addNewPenProcessor() {
+        return new ReadTraxStudentAndAddNewPenProcessor();
     }
 
     /**
@@ -208,5 +219,36 @@ public class BatchJobConfig {
         JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
         postProcessor.setJobRegistry(jobRegistry);
         return postProcessor;
+    }
+
+    /**
+     * Creates a bean that represents the only steps of our batch job.
+     */
+    @Bean
+    public Step readTraxAndAddNewPenJobStep(ItemReader<ConvGradStudent> addMissingPenReader,
+                                             ItemProcessor<? super ConvGradStudent, ? extends ConvGradStudent> addNewPenProcessor,
+                                             ItemWriter<ConvGradStudent> studentWriter,
+                                             StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("readTraxAndAddNewPenJobStep")
+                .<ConvGradStudent, ConvGradStudent>chunk(1)
+                .reader(addMissingPenReader)
+                .processor(addNewPenProcessor)
+                .writer(studentWriter)
+                .build();
+    }
+
+    /**
+     * Creates a bean that represents our batch job.
+     */
+    @Bean
+    public Job readTraxAndAddNewPenBatchJob(Step readTraxAndAddNewPenJobStep,
+                                             StudentDataConversionJobCompletionNotificationListener listener,
+                                             JobBuilderFactory jobBuilderFactory) {
+        return jobBuilderFactory.get("readTraxAndAddNewPenBatchJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(readTraxAndAddNewPenJobStep)
+                .end()
+                .build();
     }
 }

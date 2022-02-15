@@ -4,7 +4,10 @@ import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,15 +16,19 @@ import java.math.BigDecimal;
 import java.util.*;
 
 @Service
+@Slf4j
 public class DataConversionService {
     private final TraxStudentsLoadRepository traxStudentsLoadRepository;
     private final GraduationCourseRepository graduationCourseRepository;
+    private final RestUtils restUtils;
 
     @Autowired
     public DataConversionService(TraxStudentsLoadRepository traxStudentsLoadRepository,
-                                 GraduationCourseRepository graduationCourseRepository) {
+                                 GraduationCourseRepository graduationCourseRepository,
+                                 RestUtils restUtils) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
         this.graduationCourseRepository = graduationCourseRepository;
+        this.restUtils = restUtils;
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
@@ -29,53 +36,226 @@ public class DataConversionService {
         List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadInitialStudentRawData();
         results.forEach(result -> {
-            String pen = (String) result[0];
-            String schoolOfRecord = (String) result[1];
-            String schoolAtGrad = (String) result[2];
-            String studentGrade = (String) result[3];
-            Character studentStatus = (Character) result[4];
-            Character archiveFlag = (Character) result[5];
-            String graduationRequestYear = (String) result[6];
-
-            Character recalculateGradStatus = (Character) result[7];
-            if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
-                recalculateGradStatus = null;
-            }
-            // grad or non-grad
-            BigDecimal gradDate = (BigDecimal) result[8];
-            boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
-
-            List<String> programCodes = new ArrayList<>();
-            // optional program
-            populateProgramCode((String) result[9], programCodes);
-            populateProgramCode((String) result[10], programCodes);
-            populateProgramCode((String) result[11], programCodes);
-            populateProgramCode((String) result[12], programCodes);
-            populateProgramCode((String) result[13], programCodes);
-
-            // slp date
-            BigDecimal slpDate = (BigDecimal) result[14];
-            String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO)? slpDate.toString() : null;
-
-            // french cert
-            String frenchCert = (String) result[15];
-
-            try {
-                ConvGradStudent student = new ConvGradStudent(
-                        pen, null, null, slpDateStr, null, null,
-                        recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
-                        schoolOfRecord, schoolAtGrad, studentGrade,
-                        studentStatus != null ? studentStatus.toString() : null,
-                        archiveFlag != null ? archiveFlag.toString() : null,
-                        StringUtils.isNotBlank(frenchCert)? frenchCert.trim() : null,
-                        graduationRequestYear, programCodes, isGraduated);
+            ConvGradStudent student = populateGradStudent(result);
+            if (student != null) {
                 students.add(student);
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         });
 
         return students;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<ConvGradStudent> loadAllTraxStudentData() {
+        List<ConvGradStudent> students = new ArrayList<>();
+        List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();
+        results.forEach(result -> {
+            ConvGradStudent student = populateGradStudent(result);
+            if (student != null) {
+                students.add(student);
+            }
+        });
+
+        return students;
+    }
+
+    private ConvGradStudent populateGradStudent(Object[] result) {
+        String pen = (String) result[0];
+        String schoolOfRecord = (String) result[1];
+        String schoolAtGrad = (String) result[2];
+        String studentGrade = (String) result[3];
+        Character studentStatus = (Character) result[4];
+        Character archiveFlag = (Character) result[5];
+        String graduationRequestYear = (String) result[6];
+
+        Character recalculateGradStatus = (Character) result[7];
+        if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
+            recalculateGradStatus = null;
+        }
+        // grad or non-grad
+        BigDecimal gradDate = (BigDecimal) result[8];
+        boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
+
+        List<String> programCodes = new ArrayList<>();
+        // optional program
+        populateProgramCode((String) result[9], programCodes);
+        populateProgramCode((String) result[10], programCodes);
+        populateProgramCode((String) result[11], programCodes);
+        populateProgramCode((String) result[12], programCodes);
+        populateProgramCode((String) result[13], programCodes);
+
+        // slp date
+        BigDecimal slpDate = (BigDecimal) result[14];
+        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO)? slpDate.toString() : null;
+
+        // french cert
+        String frenchCert = (String) result[15];
+
+        try {
+            ConvGradStudent student = new ConvGradStudent(
+                    pen, null, null, slpDateStr, null, null,
+                    recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
+                    schoolOfRecord, schoolAtGrad, studentGrade,
+                    studentStatus != null ? studentStatus.toString() : null,
+                    archiveFlag != null ? archiveFlag.toString() : null,
+                    StringUtils.isNotBlank(frenchCert)? frenchCert.trim() : null,
+                    graduationRequestYear, programCodes, isGraduated);
+            return student;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<Student> getStudentDemographicsDataFromTrax(String pen) {
+        List<Student> students = new ArrayList<>();
+        List<Object[]> results = traxStudentsLoadRepository.loadStudentDemographicsData(pen);
+        results.forEach(result -> {
+            String legalFirstName = (String) result[1];
+            legalFirstName = StringUtils.isNotBlank(legalFirstName)? legalFirstName.trim() : null;
+            String legalLastName = (String) result[2];
+            legalLastName = StringUtils.isNotBlank(legalLastName)? legalLastName.trim() : null;
+            String legalMiddleName = (String) result[3];
+            legalMiddleName = StringUtils.isNotBlank(legalMiddleName)? legalMiddleName.trim() : null;
+
+            Character studStatus = (Character) result[4];
+            String studentStatusCode = studStatus != null? studStatus.toString() : null;
+            if (StringUtils.equals(studentStatusCode, "T")) {
+                studentStatusCode = "A";
+            }
+            log.info(" TRAX - PEN mapping : stud_status [{}] => status code [{}]", studStatus,  studentStatusCode);
+
+//            Character archiveFlag = (Character) result[5];
+            String schoolOfRecord = (String) result[6];
+            String studGrade = (String) result[7];
+            String studentGrade;
+            if (!NumberUtils.isCreatable(studGrade)) {
+                studentGrade = "11";
+            } else {
+                studentGrade = studGrade;
+            }
+            log.info(" TRAX - PEN mapping : stud_grade [{}] => grade code [{}]", studGrade,  studentGrade);
+            String postal = (String) result[8];
+            Character sexCode = (Character) result[9];
+            String birthDate = (String) result[10];
+            String formattedBirthDate = birthDate.substring(0, 4) + "-" + birthDate.substring(4, 6) + "-" + birthDate.substring(6, 8);
+
+//            BigDecimal gradDate = (BigDecimal) result[11];
+//            String gradYearStr = gradDate != null && !gradDate.equals(BigDecimal.ZERO)? gradDate.toString().substring(0, 4) : null;
+
+            String truePen = (String) result[12];
+            truePen = truePen != null && StringUtils.isNotBlank(truePen)? truePen.trim() : null;
+
+            String localID = (String) result[13];
+
+            Student student = Student.builder()
+                    .pen(pen)
+                    .legalFirstName(legalFirstName)
+                    .legalLastName(legalLastName)
+                    .legalMiddleNames(legalMiddleName)
+                    .usualFirstName(legalFirstName)
+                    .usualLastName(legalLastName)
+                    .usualMiddleNames(legalMiddleName)
+                    .statusCode(studentStatusCode)
+                    .genderCode(sexCode.toString())
+                    .sexCode(sexCode.toString())
+                    .mincode(schoolOfRecord)
+                    .postalCode(postal)
+                    .dob(formattedBirthDate)
+                    .gradeCode(studentGrade)
+                    .emailVerified("Y")
+                    .truePen(truePen)
+                    .localID(localID)
+                    .build();
+            students.add(student);
+        });
+        return students;
+    }
+
+    @Transactional(transactionManager = "traxTransactionManager")
+    public ConvGradStudent readTraxStudentAndAddNewPen(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        summary.setProcessedCount(summary.getProcessedCount() + 1L);
+        try {
+            String accessToken = summary.getAccessToken();
+            Student penStudent = getPenStudent(convGradStudent.getPen(), accessToken, summary);
+            if (penStudent == null) {
+                Student traxStudent = readTraxStudent(convGradStudent.getPen());
+                if (traxStudent != null) {
+                    if (StringUtils.equals(traxStudent.getStatusCode(), "M") && StringUtils.isNotBlank(traxStudent.getTruePen())) {
+                        log.info("Merged student is skipped: pen# {}", traxStudent.getPen());
+                        return convGradStudent;
+//                        // MergedToStudent
+//                        Student penMergedToStudent = getPenStudent(traxStudent.getTruePen(), accessToken, summary);
+//                        if (penMergedToStudent == null) {
+//                            // Create MergedToStudent
+//                            penMergedToStudent = readTraxStudent(traxStudent.getTruePen());
+//                            if (penMergedToStudent != null) {
+//                                penMergedToStudent.setDemogCode("A");
+//                                penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
+//                            }
+//                        }
+//                        // TrueStudentID
+//                        traxStudent.setTrueStudentID(penMergedToStudent != null? penMergedToStudent.getStudentID() : null);
+//                        traxStudent.setDemogCode("A");
+                    }
+                    // MergedFromStudent
+                    createNewPen(traxStudent, accessToken, summary);
+                }
+            }
+            return convGradStudent;
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setItem(convGradStudent.getPen());
+            error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
+            summary.getErrors().add(error);
+            return null;
+        }
+    }
+
+    private Student readTraxStudent(String pen) {
+        List<Student> students = getStudentDemographicsDataFromTrax(pen);
+        if (students != null && !students.isEmpty()) {
+            return students.get(0);
+        }
+        return null;
+    }
+
+    private Student getPenStudent(String pen, String accessToken, ConversionStudentSummaryDTO summary) {
+        Student student = null;
+        try {
+            // Call PEN Student API
+            List<Student> students = restUtils.getStudentsByPen(pen, accessToken);
+            if (students != null && !students.isEmpty()) {
+                student = students.get(0);
+            }
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setItem(pen);
+            error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
+            summary.getErrors().add(error);
+        }
+        return student;
+    }
+
+    private Student createNewPen(Student student, String accessToken, ConversionStudentSummaryDTO summary) {
+        if (StringUtils.isBlank(student.getHistoryActivityCode())) {
+            student.setHistoryActivityCode("REQNEW");
+        }
+        if (StringUtils.isBlank(student.getDemogCode())) {
+            student.setDemogCode("A");
+        }
+        Student newStudent = restUtils.addNewPen(student, accessToken);
+        if (newStudent != null) {
+            log.info("Add missing student: pen# {} => studentID {}", student.getPen(), newStudent.getStudentID());
+            ConversionAlert warning = new ConversionAlert();
+            warning.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
+            warning.setItem(student.getPen());
+            warning.setReason("PEN does not exist: Add a new PEN - studentID = " + newStudent.getStudentID());
+            summary.getErrors().add(warning);
+            summary.setAddedCount(summary.getAddedCount() + 1L);
+        }
+        return newStudent;
     }
 
     private void populateProgramCode(String code, List<String> optionalProgramCodes) {

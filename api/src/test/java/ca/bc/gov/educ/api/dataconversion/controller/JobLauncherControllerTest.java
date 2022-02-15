@@ -27,7 +27,7 @@ public class JobLauncherControllerTest {
     private JobLauncherController jobLauncherController;
 
     @Test
-    public void testLauchGradStudent_DataConversionJob_thenReturnError() {
+    public void testLaunchGradStudent_DataConversionJob_thenReturnError() {
         boolean exceptionIsThrown = false;
         try {
             jobLauncherController.launchStudentDataConversionJob();
@@ -40,10 +40,34 @@ public class JobLauncherControllerTest {
 
 
     @Test
-    public void testLauchCourseRestriction_DataConversionJob_thenReturnError() {
+    public void testLaunchCourseRestriction_DataConversionJob_thenReturnError() {
         boolean exceptionIsThrown = false;
         try {
             jobLauncherController.launchCourseRestrictionDataConversionJob();
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+
+        assertThat(exceptionIsThrown).isTrue();
+    }
+
+    @Test
+    public void testLaunchCourseRequirement_DataConversionJob_thenReturnError() {
+        boolean exceptionIsThrown = false;
+        try {
+            jobLauncherController.launchCourseRequirementDataConversionJob();
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+
+        assertThat(exceptionIsThrown).isTrue();
+    }
+
+    @Test
+    public void testReadTraxAndAddNewPenIfNotExists_Job_thenReturnError() {
+        boolean exceptionIsThrown = false;
+        try {
+            jobLauncherController.launchReadTraxAndAddNewPenIfNotExistsJob();
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
