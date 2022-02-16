@@ -197,6 +197,8 @@ public class DataConversionService {
                     // MergedFromStudent
                     createNewPen(traxStudent, accessToken, summary);
                 }
+            } else {
+                log.info("Student already exists : pen# {} => studentID {}", convGradStudent.getPen(), penStudent.getStudentID());
             }
             return convGradStudent;
         } catch (Exception e) {

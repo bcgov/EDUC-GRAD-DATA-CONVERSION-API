@@ -134,7 +134,7 @@ public class DataConversionServiceTest {
         convGradStudent.setGraduationRequestYear("2018");
 
         Object[] obj = new Object[] {
-                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null
+                pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -260,4 +260,35 @@ public class DataConversionServiceTest {
         assertThat(result.getPen()).isEqualTo(pen);
     }
 
+    @Test
+    public void testReadTraxStudentAndAddNewPen_whenStudentIsMerged() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "123456789";
+
+        // Trax Student Input
+        ConvGradStudent convGradStudent = new ConvGradStudent();
+        convGradStudent.setPen(pen);
+        convGradStudent.setSchoolOfRecord("12345678");
+        convGradStudent.setSchoolAtGrad("12345678");
+        convGradStudent.setArchiveFlag("A");
+        convGradStudent.setStudentStatus("M");
+        convGradStudent.setGraduationRequestYear("2018");
+
+        Object[] obj = new Object[] {
+                pen, "Test", "QA", "", Character.valueOf('M'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), "987654321", "            "
+        };
+        List<Object[]> results = new ArrayList<>();
+        results.add(obj);
+
+        when(this.traxStudentsLoadRepository.loadStudentDemographicsData(pen)).thenReturn(results);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+    }
 }
