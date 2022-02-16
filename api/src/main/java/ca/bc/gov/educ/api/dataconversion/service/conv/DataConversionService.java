@@ -69,7 +69,7 @@ public class DataConversionService {
         String graduationRequestYear = (String) result[6];
 
         Character recalculateGradStatus = (Character) result[7];
-        if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
+        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
             recalculateGradStatus = null;
         }
         // grad or non-grad
@@ -92,7 +92,7 @@ public class DataConversionService {
         String frenchCert = (String) result[15];
 
         try {
-            ConvGradStudent student = new ConvGradStudent(
+            return new ConvGradStudent(
                     pen, null, null, slpDateStr, null, null,
                     recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
                     schoolOfRecord, schoolAtGrad, studentGrade,
@@ -100,7 +100,6 @@ public class DataConversionService {
                     archiveFlag != null ? archiveFlag.toString() : null,
                     StringUtils.isNotBlank(frenchCert)? frenchCert.trim() : null,
                     graduationRequestYear, programCodes, isGraduated);
-            return student;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -124,9 +123,8 @@ public class DataConversionService {
             if (StringUtils.equals(studentStatusCode, "T")) {
                 studentStatusCode = "A";
             }
-            log.info(" TRAX - PEN mapping : stud_status [{}] => status code [{}]", studStatus,  studentStatusCode);
+            log.debug(" TRAX - PEN mapping : stud_status [{}] => status code [{}]", studStatus,  studentStatusCode);
 
-//            Character archiveFlag = (Character) result[5];
             String schoolOfRecord = (String) result[6];
             String studGrade = (String) result[7];
             String studentGrade;
@@ -135,17 +133,14 @@ public class DataConversionService {
             } else {
                 studentGrade = studGrade;
             }
-            log.info(" TRAX - PEN mapping : stud_grade [{}] => grade code [{}]", studGrade,  studentGrade);
+            log.debug(" TRAX - PEN mapping : stud_grade [{}] => grade code [{}]", studGrade,  studentGrade);
             String postal = (String) result[8];
             Character sexCode = (Character) result[9];
             String birthDate = (String) result[10];
             String formattedBirthDate = birthDate.substring(0, 4) + "-" + birthDate.substring(4, 6) + "-" + birthDate.substring(6, 8);
 
-//            BigDecimal gradDate = (BigDecimal) result[11];
-//            String gradYearStr = gradDate != null && !gradDate.equals(BigDecimal.ZERO)? gradDate.toString().substring(0, 4) : null;
-
             String truePen = (String) result[12];
-            truePen = truePen != null && StringUtils.isNotBlank(truePen)? truePen.trim() : null;
+            truePen = StringUtils.isNotBlank(truePen)? truePen.trim() : null;
 
             String localID = (String) result[13];
 
@@ -248,11 +243,6 @@ public class DataConversionService {
         Student newStudent = restUtils.addNewPen(student, accessToken);
         if (newStudent != null) {
             log.info("Add missing student: pen# {} => studentID {}", student.getPen(), newStudent.getStudentID());
-            ConversionAlert warning = new ConversionAlert();
-            warning.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
-            warning.setItem(student.getPen());
-            warning.setReason("PEN does not exist: Add a new PEN - studentID = " + newStudent.getStudentID());
-            summary.getErrors().add(warning);
             summary.setAddedCount(summary.getAddedCount() + 1L);
         }
         return newStudent;
