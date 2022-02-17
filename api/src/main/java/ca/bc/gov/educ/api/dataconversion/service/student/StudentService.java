@@ -332,20 +332,8 @@ public class StudentService {
                 summary.increment("1986-EN", student.isGraduated());
                 break;
             case "1950":
-                if (StringUtils.equals(student.getStudentGrade(), "AD")) {
-                    student.setProgram("1950");
-                    summary.increment("1950", student.isGraduated());
-                } else if (StringUtils.equals(student.getStudentGrade(), "AN")) {
-                    student.setProgram("NOPROG");
-                    summary.increment("NOPROG", student.isGraduated());
-                } else {
-                    // error
-                    ConversionAlert error = new ConversionAlert();
-                    error.setItem(student.getPen());
-                    error.setReason("Program is not found for year 1950 / grade " + student.getStudentGrade());
-                    summary.getErrors().add(error);
-                    return false;
-                }
+                student.setProgram("1950");
+                summary.increment("1950", student.isGraduated());
                 break;
             case "SCCP":
                 student.setProgram("SCCP");

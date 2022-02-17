@@ -51,7 +51,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
             summaryDTO.setReadCount(studentList.size());
         }
 
-        if (indexForStudent % 100 == 0) {
+        if (indexForStudent % 1000 == 0) {
             fetchAccessToken();
         }
 
