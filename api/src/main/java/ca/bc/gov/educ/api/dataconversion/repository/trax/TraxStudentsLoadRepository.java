@@ -38,7 +38,7 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
 
     @Query(value="select p.stud_no from trax_students_pen_update p\n", nativeQuery=true)
     @Transactional(readOnly = true)
-    List<Object[]> loadAlTraxStudents();
+    List<Object[]> loadAllTraxStudentsForPenUpdate();
 
     @Query(value="select trim(m.stud_no) as PEN, m.stud_given as LEGAL_FIRST_NAME, m.stud_surname as LEGAL_LAST_NAME, m.stud_middle as LEGAL_MIDDLE_NAME,\n" +
             "m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG, m.mincode as SCHOOL_OF_RECORD, m.stud_grade as STUDENT_GRADE, m.postal as POSTAL_CODE,\n" +

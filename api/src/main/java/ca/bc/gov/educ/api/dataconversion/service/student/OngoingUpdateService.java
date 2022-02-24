@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static ca.bc.gov.educ.api.dataconversion.constant.EventStatus.PROCESSED;
 import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_STUDENT_MASTER;
@@ -83,8 +86,8 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                         processFrenchImmersion(requestStudent, currentStudent, true);
                         break;
                     case "COURSE":
-                        break;
                     case "ASSESSMENT":
+                        studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
                         break;
                     default:
                         break;
@@ -139,6 +142,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), requestStudent.getPen());
             studentService.saveGraduationStudent(currentStudent);
+            studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         }
     }
 
@@ -179,6 +183,8 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
             log.info(" => [CP] optional program will be removed if exist.");
             studentService.removeStudentOptionalProgram("CP", currentStudent);
         }
+
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
     }
 
     public void processFrenchImmersion(ConvGradStudent requestStudent, StudentGradDTO currentStudent, boolean isDelete) {
@@ -186,9 +192,11 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         if (isDelete && !studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
             log.info(" => remove FI optional program");
             studentService.removeStudentOptionalProgram("FI", currentStudent);
+            studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         } else if (!isDelete && studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
             log.info(" => create FI optional program");
             studentService.addStudentOptionalProgram("FI", currentStudent);
+            studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         }
     }
 

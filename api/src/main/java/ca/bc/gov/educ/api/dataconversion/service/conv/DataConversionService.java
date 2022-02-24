@@ -60,9 +60,9 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadAllTraxStudentData() {
+    public List<ConvGradStudent> loadAllTraxStudentDataForPenUpdate() {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();
+        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate();
         results.forEach(result -> {
             ConvGradStudent student = new ConvGradStudent();
             String pen = (String) result[0];

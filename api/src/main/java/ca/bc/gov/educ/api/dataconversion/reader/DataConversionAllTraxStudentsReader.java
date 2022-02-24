@@ -75,7 +75,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
 
     private List<ConvGradStudent> loadAllTraxStudents() {
         LOGGER.info("Fetching Student List that need Add Missing Students Processing");
-        return dataConversionService.loadAllTraxStudentData();
+        return dataConversionService.loadAllTraxStudentDataForPenUpdate();
     }
 
     private void fetchAccessToken() {

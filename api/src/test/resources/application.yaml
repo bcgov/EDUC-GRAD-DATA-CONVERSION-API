@@ -29,7 +29,8 @@ spring:
     initialize-schema: NEVER
     job:
       enabled: false
-
+  flyway:
+    enabled: false
 #Logging properties
 logging:
   #pattern:

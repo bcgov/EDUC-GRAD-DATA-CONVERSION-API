@@ -147,33 +147,6 @@ public class StudentService extends StudentBaseService {
         }
     }
 
-    public GraduationStudentRecordEntity populateGraduationStudentRecord(ConvGradStudent student) {
-        GraduationStudentRecordEntity studentEntity = new GraduationStudentRecordEntity();
-
-        // Grad Program
-        if (determineProgram(student, null)) {
-            studentEntity.setProgram(student.getProgram());
-        }
-
-        // Mincode Grad
-        studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
-        // Mincode
-        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
-        // Student Grade
-        studentEntity.setStudentGrade(student.getStudentGrade());
-        // Student Status
-        studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
-
-        studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
-        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
-
-        // Populate courses & assessments
-
-        // Populate optional programs ( prgm_codeX )
-
-        return studentEntity;
-    }
-
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
@@ -215,21 +188,21 @@ public class StudentService extends StudentBaseService {
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert())) {
             createStudentOptionalProgram("FI", student, accessToken, summary);
         }
-//        if (student.getProgram().equals("2018-EN") || student.getProgram().equals("2004-EN")) {
-//            if (courseService.isFrenchImmersionCourse(student.getPen(), "10")) {
-//                createStudentOptionalProgram("FI", student, accessToken, summary);
-//            }
-//        } else if (student.getProgram().equals("1996-EN")) {
-//            if (courseService.isFrenchImmersionCourse(student.getPen(), "11")) {
-//                createStudentOptionalProgram("FI", student, accessToken, summary);
-//            }
-//        } else if (student.getProgram().equals("1986-EN")) {
-//            if (StringUtils.equalsIgnoreCase("F", student.getFrenchCert())) {
-//                createStudentOptionalProgram("FI", student, accessToken, summary);
-//            } else if (courseService.isFrenchImmersionCourseForEN(student.getPen(), "11")) {
-//                createStudentOptionalProgram("FI", student, accessToken, summary);
-//            }
-//        }
+        if (student.getProgram().equals("2018-EN") || student.getProgram().equals("2004-EN")) {
+            if (courseService.isFrenchImmersionCourse(student.getPen(), "10")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        } else if (student.getProgram().equals("1996-EN")) {
+            if (courseService.isFrenchImmersionCourse(student.getPen(), "11")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        } else if (student.getProgram().equals("1986-EN")) {
+            if (StringUtils.equalsIgnoreCase("F", student.getFrenchCert())) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            } else if (courseService.isFrenchImmersionCourseForEN(student.getPen(), "11")) {
+                createStudentOptionalProgram("FI", student, accessToken, summary);
+            }
+        }
     }
 
     protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert) {
@@ -521,6 +494,23 @@ public class StudentService extends StudentBaseService {
             return true;
         }
         return false;
+    }
+
+    @Transactional(transactionManager = "studentTransactionManager")
+    public void triggerGraduationBatchRun(UUID studentID) {
+        Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
+        if (gradStatusOptional.isPresent()) {
+            GraduationStudentRecordEntity graduationStudentRecordEntity = gradStatusOptional.get();
+            if (StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "MER")
+                || StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "DEC")) {
+                graduationStudentRecordEntity.setRecalculateGradStatus(null);
+                graduationStudentRecordEntity.setRecalculateProjectedGrad(null);
+            } else {
+                graduationStudentRecordEntity.setRecalculateGradStatus("Y");
+                graduationStudentRecordEntity.setRecalculateProjectedGrad("Y");
+            }
+            graduationStudentRecordRepository.save(graduationStudentRecordEntity);
+        }
     }
 
 }

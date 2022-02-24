@@ -93,9 +93,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.traxStudentsLoadRepository.loadAlTraxStudents()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate()).thenReturn(results);
 
-        var result = dataConversionService.loadAllTraxStudentData();
+        var result = dataConversionService.loadAllTraxStudentDataForPenUpdate();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
