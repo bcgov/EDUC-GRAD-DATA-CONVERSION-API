@@ -21,4 +21,3 @@ public interface OptionalProgramRepository extends JpaRepository<OptionalProgram
 	long countOptionalProgram(@Param("programCode") String programCode);
 
 }
-

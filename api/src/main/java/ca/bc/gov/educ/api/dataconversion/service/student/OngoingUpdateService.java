@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static ca.bc.gov.educ.api.dataconversion.constant.EventStatus.PROCESSED;
 import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_STUDENT_MASTER;
@@ -183,7 +180,6 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
             log.info(" => [CP] optional program will be removed if exist.");
             studentService.removeStudentOptionalProgram("CP", currentStudent);
         }
-
         studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
     }
 

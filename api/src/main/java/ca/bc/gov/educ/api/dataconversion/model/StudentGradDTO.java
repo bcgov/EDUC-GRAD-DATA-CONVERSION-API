@@ -23,5 +23,4 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     private List<String> addedProgramCodes = new ArrayList<>();
     private List<String> removedProgramCodes = new ArrayList<>();
-
 }

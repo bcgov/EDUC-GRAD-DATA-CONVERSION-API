@@ -188,21 +188,6 @@ public class StudentService extends StudentBaseService {
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert())) {
             createStudentOptionalProgram("FI", student, accessToken, summary);
         }
-        if (student.getProgram().equals("2018-EN") || student.getProgram().equals("2004-EN")) {
-            if (courseService.isFrenchImmersionCourse(student.getPen(), "10")) {
-                createStudentOptionalProgram("FI", student, accessToken, summary);
-            }
-        } else if (student.getProgram().equals("1996-EN")) {
-            if (courseService.isFrenchImmersionCourse(student.getPen(), "11")) {
-                createStudentOptionalProgram("FI", student, accessToken, summary);
-            }
-        } else if (student.getProgram().equals("1986-EN")) {
-            if (StringUtils.equalsIgnoreCase("F", student.getFrenchCert())) {
-                createStudentOptionalProgram("FI", student, accessToken, summary);
-            } else if (courseService.isFrenchImmersionCourseForEN(student.getPen(), "11")) {
-                createStudentOptionalProgram("FI", student, accessToken, summary);
-            }
-        }
     }
 
     protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert) {
