@@ -33,30 +33,25 @@ public class DataConversionService {
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadGradStudentsDataFromTrax() {
-        List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudents();
-        results.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result);
-            if (student != null) {
-                students.add(student);
-            }
-        });
-
-        return students;
+        return buildConversionGradStudents(results);
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
-        List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
-        results.forEach(result -> {
+        return buildConversionGradStudents(results);
+    }
+
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
+        List<ConvGradStudent> students = new ArrayList<>();
+        traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result);
             if (student != null) {
                 students.add(student);
             }
         });
-
-        return students;
+        return students;  // .subList(0,1)
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
