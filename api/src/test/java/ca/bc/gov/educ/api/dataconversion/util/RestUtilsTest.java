@@ -4,6 +4,7 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import lombok.val;
 import org.codehaus.jackson.JsonProcessingException;
 import org.junit.After;
@@ -42,6 +43,9 @@ public class RestUtilsTest {
 
     @MockBean
     WebClient webClient;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @Autowired
     private EducGradDataConversionApiConstants constants;

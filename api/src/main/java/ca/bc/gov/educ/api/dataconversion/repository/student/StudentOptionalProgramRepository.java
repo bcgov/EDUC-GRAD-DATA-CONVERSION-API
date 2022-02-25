@@ -4,13 +4,14 @@ import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEn
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface StudentOptionalProgramRepository extends JpaRepository<StudentOptionalProgramEntity, UUID> {
-
-    Optional<StudentOptionalProgramEntity> findByStudentIDAndOptionalProgramID(UUID studentID, UUID specialProgramID);
-
+    List<StudentOptionalProgramEntity> findByStudentID(UUID studentID);
+    Optional<StudentOptionalProgramEntity> findByStudentIDAndOptionalProgramID(UUID studentID,UUID optionalProgramID);
+    void deleteByStudentID(UUID studentID);
 }
 

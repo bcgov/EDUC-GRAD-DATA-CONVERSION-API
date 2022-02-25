@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -35,6 +36,9 @@ public class DataConversionServiceTest {
     TraxStudentsLoadRepository traxStudentsLoadRepository;
 
     @MockBean
+    EventRepository eventRepository;
+
+    @MockBean
     RestUtils restUtils;
 
     @Before
@@ -55,9 +59,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.traxStudentsLoadRepository.loadInitialStudentRawData()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadAllTraxStudents()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradStudentData();
+        var result = dataConversionService.loadGradStudentsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
@@ -74,7 +78,7 @@ public class DataConversionServiceTest {
 
         when(this.traxStudentsLoadRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData();
+        var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         GradCourseRestriction responseCourseRestriction = result.get(0);
@@ -89,9 +93,9 @@ public class DataConversionServiceTest {
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.traxStudentsLoadRepository.loadAlTraxStudents()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate()).thenReturn(results);
 
-        var result = dataConversionService.loadAllTraxStudentData();
+        var result = dataConversionService.loadAllTraxStudentDataForPenUpdate();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
