@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.listener.AddMissingStudentsJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
@@ -242,7 +243,7 @@ public class BatchJobConfig {
      */
     @Bean
     public Job readTraxAndAddNewPenBatchJob(Step readTraxAndAddNewPenJobStep,
-                                             StudentDataConversionJobCompletionNotificationListener listener,
+                                             AddMissingStudentsJobCompletionNotificationListener listener,
                                              JobBuilderFactory jobBuilderFactory) {
         return jobBuilderFactory.get("readTraxAndAddNewPenBatchJob")
                 .incrementer(new RunIdIncrementer())

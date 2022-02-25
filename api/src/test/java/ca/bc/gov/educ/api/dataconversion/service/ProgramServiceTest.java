@@ -58,7 +58,7 @@ public class ProgramServiceTest {
         CareerProgramEntity entity = new CareerProgramEntity();
         entity.setCode("CS");
         entity.setDescription("Career Skill Test");
-        entity.setStartDate(new Date());
+        entity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
 
         when(this.careerProgramRepository.findById("CS")).thenReturn(Optional.of(entity));
 
