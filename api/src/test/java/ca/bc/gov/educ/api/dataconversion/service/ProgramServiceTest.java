@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.program.CareerProgramRepository;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -35,6 +36,9 @@ public class ProgramServiceTest {
     CareerProgramRepository careerProgramRepository;
 
     @MockBean
+    EventRepository eventRepository;
+
+    @MockBean
     RestUtils restUtils;
 
     @Autowired
@@ -62,7 +66,7 @@ public class ProgramServiceTest {
 
         when(this.careerProgramRepository.findById("CS")).thenReturn(Optional.of(entity));
 
-        var result = programService.getCareerProgramCode("CS");
+        var result = programService.getCareerProgram("CS");
         assertThat(result).isNotNull();
         assertThat(result.getCode()).isEqualTo("CS");
     }
@@ -71,7 +75,7 @@ public class ProgramServiceTest {
     public void testGetCareerProgramCode_whenNoDataExists() {
         when(this.careerProgramRepository.findById("CS")).thenReturn(Optional.empty());
 
-        var result = programService.getCareerProgramCode("CS");
+        var result = programService.getCareerProgram("CS");
         assertThat(result).isNull();
     }
 }

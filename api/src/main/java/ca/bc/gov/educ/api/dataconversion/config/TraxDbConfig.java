@@ -54,7 +54,6 @@ public class TraxDbConfig {
     @Value("${spring.db-connection.trax.password}")
     private String traxPassword;
 
-    @Primary
     @Bean
     public DataSource traxDataSource() {
         HikariConfig config = new HikariConfig();
@@ -73,7 +72,6 @@ public class TraxDbConfig {
         return new HikariDataSource(config);
     }
 
-    @Primary
     @Bean
     public LocalContainerEntityManagerFactoryBean traxEntityManager() {
         LocalContainerEntityManagerFactoryBean em
@@ -95,7 +93,6 @@ public class TraxDbConfig {
         return em;
     }
 
-    @Primary
     @Bean
     public PlatformTransactionManager traxTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();

@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordE
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStudentRecordRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -38,6 +39,9 @@ public class StudentServiceTest {
 
     @Autowired
     GraduationStudentRecordRepository graduationStudentRecordRepository;
+
+    @MockBean
+    EventRepository eventRepository;
 
     @MockBean
     RestUtils restUtils;

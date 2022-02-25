@@ -32,11 +32,11 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadInitialRawGradStudentData() {
+    public List<ConvGradStudent> loadGradStudentsDataFromTrax() {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadInitialStudentRawData();
+        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudents();
         results.forEach(result -> {
-            ConvGradStudent student = populateGradStudent(result);
+            ConvGradStudent student = populateConvGradStudent(result);
             if (student != null) {
                 students.add(student);
             }
@@ -46,9 +46,23 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadAllTraxStudentData() {
+    public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadAlTraxStudents();
+        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        results.forEach(result -> {
+            ConvGradStudent student = populateConvGradStudent(result);
+            if (student != null) {
+                students.add(student);
+            }
+        });
+
+        return students;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<ConvGradStudent> loadAllTraxStudentDataForPenUpdate() {
+        List<ConvGradStudent> students = new ArrayList<>();
+        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate();
         results.forEach(result -> {
             ConvGradStudent student = new ConvGradStudent();
             String pen = (String) result[0];
@@ -59,51 +73,52 @@ public class DataConversionService {
         return students;
     }
 
-    private ConvGradStudent populateGradStudent(Object[] result) {
-        String pen = (String) result[0];
-        String schoolOfRecord = (String) result[1];
-        String schoolAtGrad = (String) result[2];
-        String studentGrade = (String) result[3];
-        Character studentStatus = (Character) result[4];
-        Character archiveFlag = (Character) result[5];
-        String graduationRequestYear = (String) result[6];
+    private ConvGradStudent populateConvGradStudent(Object[] fields) {
+        String pen = (String) fields[0];
+        String schoolOfRecord = (String) fields[1];
+        String schoolAtGrad = (String) fields[2];
+        String studentGrade = (String) fields[3];
+        Character studentStatus = (Character) fields[4];
+        Character archiveFlag = (Character) fields[5];
+        String graduationRequestYear = (String) fields[6];
 
-        Character recalculateGradStatus = (Character) result[7];
-        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
+        Character recalculateGradStatus = (Character) fields[7];
+        if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
             recalculateGradStatus = null;
         }
         // grad or non-grad
-        BigDecimal gradDate = (BigDecimal) result[8];
+        BigDecimal gradDate = (BigDecimal) fields[8];
         boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
 
         List<String> programCodes = new ArrayList<>();
-        // optional program
-        populateProgramCode((String) result[9], programCodes);
-        populateProgramCode((String) result[10], programCodes);
-        populateProgramCode((String) result[11], programCodes);
-        populateProgramCode((String) result[12], programCodes);
-        populateProgramCode((String) result[13], programCodes);
+        // student optional programs
+        populateProgramCode((String) fields[9], programCodes);
+        populateProgramCode((String) fields[10], programCodes);
+        populateProgramCode((String) fields[11], programCodes);
+        populateProgramCode((String) fields[12], programCodes);
+        populateProgramCode((String) fields[13], programCodes);
 
         // slp date
-        BigDecimal slpDate = (BigDecimal) result[14];
-        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO)? slpDate.toString() : null;
+        BigDecimal slpDate = (BigDecimal) fields[14];
+        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
 
         // french cert
-        String frenchCert = (String) result[15];
+        String frenchCert = (String) fields[15];
 
+        ConvGradStudent student = null;
         try {
-            return new ConvGradStudent(
+            student = new ConvGradStudent(
                     pen, null, null, slpDateStr, null, null,
                     recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
                     schoolOfRecord, schoolAtGrad, studentGrade,
                     studentStatus != null ? studentStatus.toString() : null,
                     archiveFlag != null ? archiveFlag.toString() : null,
-                    StringUtils.isNotBlank(frenchCert)? frenchCert.trim() : null,
+                    StringUtils.isNotBlank(frenchCert) ? frenchCert.trim() : null,
                     graduationRequestYear, programCodes, isGraduated);
         } catch (Exception ex) {
             ex.printStackTrace();
-            return null;
         }
+        return student;
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
@@ -261,7 +276,7 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<GradCourseRestriction> loadInitialRawGradCourseRestrictionsData() {
+    public List<GradCourseRestriction> loadGradCourseRestrictionsDataFromTrax() {
         List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
         results.forEach(result -> {
@@ -287,7 +302,7 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<GraduationCourseEntity> loadInitialGradCourseRequirementsData() {
+    public List<GraduationCourseEntity> loadGradCourseRequirementsDataFromTrax() {
         return graduationCourseRepository.findAll();  // .subList(0,1)
     }
 }

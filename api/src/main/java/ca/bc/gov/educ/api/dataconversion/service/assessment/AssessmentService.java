@@ -2,15 +2,19 @@ package ca.bc.gov.educ.api.dataconversion.service.assessment;
 
 import ca.bc.gov.educ.api.dataconversion.entity.assessment.AssessmentRequirementCodeEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.assessment.AssessmentRequirementEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.assessment.StudentAssessmentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementCodeRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.assessment.StudentAssessmentRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -21,12 +25,15 @@ public class AssessmentService {
 
     private final AssessmentRequirementCodeRepository assessmentRequirementCodeRepository;
     private final AssessmentRequirementRepository assessmentRequirementRepository;
+    private final StudentAssessmentRepository studentAssessmentRepository;
 
     @Autowired
     public AssessmentService(AssessmentRequirementCodeRepository assessmentRequirementCodeRepository,
-                             AssessmentRequirementRepository assessmentRequirementRepository) {
+                             AssessmentRequirementRepository assessmentRequirementRepository,
+                             StudentAssessmentRepository studentAssessmentRepository) {
         this.assessmentRequirementCodeRepository = assessmentRequirementCodeRepository;
         this.assessmentRequirementRepository = assessmentRequirementRepository;
+        this.studentAssessmentRepository = studentAssessmentRepository;
     }
 
     @Transactional(transactionManager = "assessmentTransactionManager")
@@ -81,5 +88,10 @@ public class AssessmentService {
         }
         assessmentRequirement.setAssessmentRequirementId(UUID.randomUUID());
         return assessmentRequirement;
+    }
+
+    @Transactional(transactionManager = "assessmentTransactionManager", readOnly = true)
+    public List<StudentAssessmentEntity> getStudentAssessments(String pen) {
+       return studentAssessmentRepository.findByPen(pen);
     }
 }
