@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,14 +21,17 @@ import java.util.*;
 @Slf4j
 public class DataConversionService {
     private final TraxStudentsLoadRepository traxStudentsLoadRepository;
+    private final TraxStudentRepository traxStudentRepository;
     private final GraduationCourseRepository graduationCourseRepository;
     private final RestUtils restUtils;
 
     @Autowired
     public DataConversionService(TraxStudentsLoadRepository traxStudentsLoadRepository,
+                                 TraxStudentRepository traxStudentRepository,
                                  GraduationCourseRepository graduationCourseRepository,
                                  RestUtils restUtils) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
+        this.traxStudentRepository = traxStudentRepository;
         this.graduationCourseRepository = graduationCourseRepository;
         this.restUtils = restUtils;
     }
@@ -51,7 +56,21 @@ public class DataConversionService {
                 students.add(student);
             }
         });
-        return students;  // .subList(0,1)
+//        return students.subList(0,10);
+        return students;
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<ConvGradStudent> loadAllTraxStudentsForPenUpdate() {
+        List<ConvGradStudent> students = new ArrayList<>();
+        List<TraxStudentEntity> results = traxStudentRepository.findAll();
+        results.forEach(result -> {
+            ConvGradStudent student = new ConvGradStudent();
+            student.setPen(result.getStudNo().trim());
+            students.add(student);
+        });
+
+        return students;
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
