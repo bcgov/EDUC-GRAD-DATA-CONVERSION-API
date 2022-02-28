@@ -67,13 +67,7 @@ public class StudentBaseService {
                 gradProgram = "1986-EN";
                 break;
             case "1950":
-                if (StringUtils.equals(studentGrade, "AD")) {
-                    gradProgram = "1950";
-                } else if (StringUtils.equals(studentGrade, "AN")) {
-                    gradProgram = "NOPROG";
-                } else {
-                   return null;
-                }
+                gradProgram = "1950";
                 break;
             case "SCCP":
                 gradProgram = "SCCP";

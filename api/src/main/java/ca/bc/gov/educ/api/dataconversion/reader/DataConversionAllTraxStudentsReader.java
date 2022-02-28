@@ -30,7 +30,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
         this.dataConversionService = dataConversionService;
         this.restUtils = restUtils;
 
-        indexForStudent = 0;
+        indexForStudent = 1;
     }
 
     @BeforeStep
@@ -57,13 +57,13 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
 
         ConvGradStudent nextStudent = null;
 
-        if (indexForStudent < studentList.size()) {
+        if (indexForStudent <= studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
             indexForStudent++;
             LOGGER.info("Found student[{}] - PEN: {} in total {}", indexForStudent, nextStudent.getPen(), summaryDTO.getReadCount());
         }
         else {
-            indexForStudent = 0;
+            indexForStudent = 1;
             studentList = null;
         }
         return nextStudent;
@@ -75,7 +75,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
 
     private List<ConvGradStudent> loadAllTraxStudents() {
         LOGGER.info("Fetching Student List that need Add Missing Students Processing");
-        return dataConversionService.loadAllTraxStudentDataForPenUpdate();
+        return dataConversionService.loadAllTraxStudentsForPenUpdate();
     }
 
     private void fetchAccessToken() {

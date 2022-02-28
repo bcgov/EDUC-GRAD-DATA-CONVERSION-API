@@ -1,8 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -19,41 +21,53 @@ import java.util.*;
 @Slf4j
 public class DataConversionService {
     private final TraxStudentsLoadRepository traxStudentsLoadRepository;
+    private final TraxStudentRepository traxStudentRepository;
     private final GraduationCourseRepository graduationCourseRepository;
     private final RestUtils restUtils;
 
     @Autowired
     public DataConversionService(TraxStudentsLoadRepository traxStudentsLoadRepository,
+                                 TraxStudentRepository traxStudentRepository,
                                  GraduationCourseRepository graduationCourseRepository,
                                  RestUtils restUtils) {
         this.traxStudentsLoadRepository = traxStudentsLoadRepository;
+        this.traxStudentRepository = traxStudentRepository;
         this.graduationCourseRepository = graduationCourseRepository;
         this.restUtils = restUtils;
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<ConvGradStudent> loadGradStudentsDataFromTrax() {
-        List<ConvGradStudent> students = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudents();
-        results.forEach(result -> {
+        return buildConversionGradStudents(results);
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
+        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        return buildConversionGradStudents(results);
+    }
+
+    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
+        List<ConvGradStudent> students = new ArrayList<>();
+        traxStudents.forEach(result -> {
             ConvGradStudent student = populateConvGradStudent(result);
             if (student != null) {
                 students.add(student);
             }
         });
-
+//        return students.subList(0,10);
         return students;
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
+    public List<ConvGradStudent> loadAllTraxStudentsForPenUpdate() {
         List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
+        List<TraxStudentEntity> results = traxStudentRepository.findAll();
         results.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result);
-            if (student != null) {
-                students.add(student);
-            }
+            ConvGradStudent student = new ConvGradStudent();
+            student.setPen(result.getStudNo().trim());
+            students.add(student);
         });
 
         return students;
