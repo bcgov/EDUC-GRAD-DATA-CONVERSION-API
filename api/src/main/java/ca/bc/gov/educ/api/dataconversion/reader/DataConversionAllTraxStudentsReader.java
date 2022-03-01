@@ -12,17 +12,22 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradStudent> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionStudentReader.class);
+    private static final int PAGE_SIZE = 1000;
 
     private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
 
     private int indexForStudent;
+    private int page;
     private List<ConvGradStudent> studentList;
     private ConversionStudentSummaryDTO summaryDTO;
 
@@ -30,7 +35,8 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
         this.dataConversionService = dataConversionService;
         this.restUtils = restUtils;
 
-        indexForStudent = 1;
+        indexForStudent = 0;
+        page = 0;
     }
 
     @BeforeStep
@@ -46,24 +52,24 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
     public ConvGradStudent read() {
         LOGGER.info("Reading the information of the next student");
 
-        if (studentDataIsNotInitialized()) {
-            studentList = loadAllTraxStudents();
-            summaryDTO.setReadCount(studentList.size());
-        }
+        if (indexForStudent % PAGE_SIZE == 0) {
+            // next page
+            Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("studNo").ascending());
+            studentList = loadAllTraxStudents(pageable);
+            summaryDTO.setReadCount(summaryDTO.getReadCount() + studentList.size());
 
-        if (indexForStudent % 1000 == 0) {
+            page++;
+            indexForStudent = 0;
             fetchAccessToken();
         }
 
         ConvGradStudent nextStudent = null;
-
-        if (indexForStudent <= studentList.size()) {
+        if (indexForStudent < studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
             indexForStudent++;
-            LOGGER.info("Found student[{}] - PEN: {} in total {}", indexForStudent, nextStudent.getPen(), summaryDTO.getReadCount());
-        }
-        else {
-            indexForStudent = 1;
+            LOGGER.info("Found student[{}] - PEN: {} in total {}",((page - 1)*PAGE_SIZE) + indexForStudent, nextStudent.getPen(), summaryDTO.getReadCount());
+        } else {
+            indexForStudent = 0;
             studentList = null;
         }
         return nextStudent;
@@ -73,9 +79,9 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
         return this.studentList == null;
     }
 
-    private List<ConvGradStudent> loadAllTraxStudents() {
-        LOGGER.info("Fetching Student List that need Add Missing Students Processing");
-        return dataConversionService.loadAllTraxStudentsForPenUpdate();
+    private List<ConvGradStudent> loadAllTraxStudents(Pageable pageable) {
+        LOGGER.info("Fetching Student List that need Add Missing Students Processing - page:{}, size:{}", pageable.getPageNumber(), pageable.getPageSize());
+        return dataConversionService.loadAllTraxStudentsForPenUpdate(pageable);
     }
 
     private void fetchAccessToken() {
@@ -83,7 +89,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
         ResponseObj res = restUtils.getTokenResponseObject();
         if (res != null) {
             summaryDTO.setAccessToken(res.getAccess_token());
-            LOGGER.info("Setting the new access token in summaryDTO.");
+            LOGGER.debug("Setting the new access token in summaryDTO.");
         }
     }
 }
