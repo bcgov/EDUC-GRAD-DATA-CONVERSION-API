@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
@@ -129,13 +130,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -151,7 +147,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -165,13 +161,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -188,7 +179,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -202,13 +193,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -238,13 +224,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -261,7 +242,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -271,13 +252,8 @@ public class DataConversionServiceTest {
         String pen = "123456789";
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("M");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('M'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), "987654321", "            "
@@ -293,6 +269,6 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 }

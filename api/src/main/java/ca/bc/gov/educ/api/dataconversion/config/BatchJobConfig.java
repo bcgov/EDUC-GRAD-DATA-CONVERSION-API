@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.listener.AddMissingStudentsJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
@@ -11,6 +12,7 @@ import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementR
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
+import ca.bc.gov.educ.api.dataconversion.writer.DataConversionAllTraxStudentsWriter;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
 import org.springframework.batch.core.Job;
@@ -56,7 +58,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemReader<ConvGradStudent> addMissingPenReader(DataConversionService dataConversionService, RestUtils restUtils) {
+    public ItemReader<TraxStudentEntity> addMissingPenReader(DataConversionService dataConversionService, RestUtils restUtils) {
         return new DataConversionAllTraxStudentsReader(dataConversionService, restUtils);
     }
 
@@ -73,6 +75,11 @@ public class BatchJobConfig {
     @Bean
     public ItemWriter<GraduationCourseEntity> courseRequirementWriter() {
         return new DataConversionCourseRequirementWriter();
+    }
+
+    @Bean
+    public ItemWriter<TraxStudentEntity> addMissingPenWriter() {
+        return new DataConversionAllTraxStudentsWriter();
     }
 
     @Bean
@@ -101,7 +108,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemProcessor<ConvGradStudent,ConvGradStudent> addNewPenProcessor() {
+    public ItemProcessor<TraxStudentEntity,TraxStudentEntity> addNewPenProcessor() {
         return new ReadTraxStudentAndAddNewPenProcessor();
     }
 
@@ -226,15 +233,15 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step readTraxAndAddNewPenJobStep(ItemReader<ConvGradStudent> addMissingPenReader,
-                                             ItemProcessor<? super ConvGradStudent, ? extends ConvGradStudent> addNewPenProcessor,
-                                             ItemWriter<ConvGradStudent> studentWriter,
+    public Step readTraxAndAddNewPenJobStep(ItemReader<TraxStudentEntity> addMissingPenReader,
+                                             ItemProcessor<? super TraxStudentEntity, ? extends TraxStudentEntity> addNewPenProcessor,
+                                             ItemWriter<TraxStudentEntity> addMissingPenWriter,
                                              StepBuilderFactory stepBuilderFactory) {
         return stepBuilderFactory.get("readTraxAndAddNewPenJobStep")
-                .<ConvGradStudent, ConvGradStudent>chunk(1)
+                .<TraxStudentEntity, TraxStudentEntity>chunk(1)
                 .reader(addMissingPenReader)
                 .processor(addNewPenProcessor)
-                .writer(studentWriter)
+                .writer(addMissingPenWriter)
                 .build();
     }
 

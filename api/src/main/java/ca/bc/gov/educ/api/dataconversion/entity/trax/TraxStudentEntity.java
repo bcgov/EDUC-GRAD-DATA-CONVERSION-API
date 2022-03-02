@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -20,4 +21,7 @@ public class TraxStudentEntity {
     @Id
     @Column(name = "STUD_NO", unique = true, updatable = false)
     private String studNo;
+
+    @Column(name = "STATUS", nullable = false)
+    private String status;
 }

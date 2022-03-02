@@ -1,12 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.LogHelper;
 import io.netty.handler.logging.LogLevel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
@@ -30,14 +27,6 @@ public class RestWebClient {
                 .codecs(configurer -> configurer
                         .defaultCodecs()
                         .maxInMemorySize(10 * 1024 * 1024))  // 10MB
-                .build())
-                .filter(this.log())
-                .build();
-    }
-
-    private ExchangeFilterFunction log() {
-        return (clientRequest, next) ->
-                next.exchange(clientRequest)
-                        .doOnNext((clientResponse -> LogHelper.logClientHttpReqResponseDetails(clientRequest.method(), clientRequest.url().toString(), clientResponse.rawStatusCode(), clientRequest.headers().get(EducGradDataConversionApiConstants.CORRELATION_ID))));
+                .build()).build();
     }
 }

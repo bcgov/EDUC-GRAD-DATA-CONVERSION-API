@@ -1,10 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
@@ -12,9 +10,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ReadTraxStudentAndAddNewPenProcessor implements ItemProcessor<ConvGradStudent, ConvGradStudent> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReadTraxStudentAndAddNewPenProcessor.class);
+public class ReadTraxStudentAndAddNewPenProcessor implements ItemProcessor<TraxStudentEntity, TraxStudentEntity> {
 
     @Autowired
 	private DataConversionService dataConversionService;
@@ -29,7 +25,7 @@ public class ReadTraxStudentAndAddNewPenProcessor implements ItemProcessor<ConvG
 	}
 
 	@Override
-	public ConvGradStudent process(ConvGradStudent convGradStudent) throws Exception {
-		return dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summaryDTO);
+	public TraxStudentEntity process(TraxStudentEntity traxStudentEntity) throws Exception {
+		return dataConversionService.readTraxStudentAndAddNewPen(traxStudentEntity, summaryDTO);
 	}
 }
