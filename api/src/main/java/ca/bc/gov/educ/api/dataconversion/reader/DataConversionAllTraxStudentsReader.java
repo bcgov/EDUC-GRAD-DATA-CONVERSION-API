@@ -67,7 +67,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
         if (indexForStudent < studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
             indexForStudent++;
-            LOGGER.info("Found student[{}] - PEN: {} in total {}",((page - 1)*PAGE_SIZE) + indexForStudent, nextStudent.getStudNo(), summaryDTO.getReadCount());
+            LOGGER.debug("Found student[{}] - PEN: {} in total {}",((page - 1)*PAGE_SIZE) + indexForStudent, nextStudent.getStudNo(), summaryDTO.getReadCount());
         } else {
             indexForStudent = 0;
             studentList = null;

@@ -29,7 +29,7 @@ public class DataConversionAllTraxStudentsWriter implements ItemWriter<TraxStude
     public void write(List<? extends TraxStudentEntity> list) {
         if (!list.isEmpty()) {
             TraxStudentEntity gradStudent = list.get(0);
-            LOGGER.info("Process is done.");
+            LOGGER.info("Processed student[{}] - PEN: {} in total {}", summaryDTO.getProcessedCount(), gradStudent.getStudNo(), summaryDTO.getReadCount());
         }
     }
 }
