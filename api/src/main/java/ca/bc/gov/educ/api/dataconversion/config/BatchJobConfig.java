@@ -12,6 +12,7 @@ import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementR
 import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionAllTraxStudentsWriter;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
@@ -58,8 +59,8 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemReader<TraxStudentEntity> addMissingPenReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        return new DataConversionAllTraxStudentsReader(dataConversionService, restUtils);
+    public ItemReader<TraxStudentEntity> addMissingPenReader(DataConversionService dataConversionService, EducGradDataConversionApiConstants constants, RestUtils restUtils) {
+        return new DataConversionAllTraxStudentsReader(dataConversionService, constants, restUtils);
     }
 
     @Bean
