@@ -66,7 +66,8 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
             studentList = loadAllTraxStudents(pageable);
             summaryDTO.setReadCount(summaryDTO.getReadCount() + studentList.size());
 
-            page++;
+            // initialize
+            page = 0;
             indexForStudent = 0;
             fetchAccessToken();
         }
