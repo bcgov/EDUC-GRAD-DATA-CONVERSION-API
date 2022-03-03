@@ -52,6 +52,8 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
         summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
+
+        // initialize
         indexForStudent = 0;
         page = 0;
     }
@@ -62,12 +64,11 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
 
         if (indexForStudent % PAGE_SIZE == 0) {
             // next page
-            Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by("studNo").ascending());
+            Pageable pageable = PageRequest.of(0, PAGE_SIZE, Sort.by("studNo").ascending());
             studentList = loadAllTraxStudents(pageable);
             summaryDTO.setReadCount(summaryDTO.getReadCount() + studentList.size());
 
-            // initialize
-            page = 0;
+            page++;
             indexForStudent = 0;
             fetchAccessToken();
         }
