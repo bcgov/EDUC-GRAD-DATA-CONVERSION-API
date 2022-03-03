@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,22 +22,27 @@ import java.util.List;
 public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStudentEntity> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionAllTraxStudentsReader.class);
-    private static final int PAGE_SIZE = 1000;
 
     private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
+    private final EducGradDataConversionApiConstants constants;
 
     private int indexForStudent;
     private int page;
+    private int PAGE_SIZE = 1000;  // by default
     private List<TraxStudentEntity> studentList;
     private ConversionStudentSummaryDTO summaryDTO;
 
-    public DataConversionAllTraxStudentsReader(DataConversionService dataConversionService, RestUtils restUtils) {
+    public DataConversionAllTraxStudentsReader(DataConversionService dataConversionService,
+                                               EducGradDataConversionApiConstants constants,
+                                               RestUtils restUtils) {
         this.dataConversionService = dataConversionService;
+        this.constants = constants;
         this.restUtils = restUtils;
 
         indexForStudent = 0;
         page = 0;
+        PAGE_SIZE = constants.getPageSize();
     }
 
     @BeforeStep

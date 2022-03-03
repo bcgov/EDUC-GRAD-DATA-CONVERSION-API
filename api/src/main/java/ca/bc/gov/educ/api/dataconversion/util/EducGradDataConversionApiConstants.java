@@ -77,4 +77,8 @@ public class EducGradDataConversionApiConstants {
     // Incremental Grad Update
     @Value("${grad.update.enabled}")
     private boolean gradUpdateEnabled;
+
+    // Page Size
+    @Value("${batch.page.size}")
+    private int pageSize;
 }
