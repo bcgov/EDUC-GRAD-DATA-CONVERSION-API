@@ -40,6 +40,10 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
         summaryDTO = new ConversionBaseSummaryDTO();
         summaryDTO.setTableName("COURSE_RESTRICTION");
         jobContext.put("courseRestrictionSummaryDTO", summaryDTO);
+
+        // initialize
+        courseRestrictionList = null;
+        indexForCourseRestriction = 0;
     }
 
     @Override

@@ -104,3 +104,8 @@ data-conversion:
 grad:
   update:
     enabled: true
+
+#Page Size
+batch:
+  page:
+    size: 2000

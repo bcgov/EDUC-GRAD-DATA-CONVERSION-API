@@ -33,7 +33,6 @@ public class RestUtils {
                 constants.getUserName(), constants.getPassword());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("grant_type", "client_credentials");
-        System.out.println("url = " + constants.getTokenUrl());
         return this.webClient.post().uri(constants.getTokenUrl())
                 .headers(h -> h.addAll(httpHeadersKC))
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -45,7 +44,6 @@ public class RestUtils {
     public List<Student> getStudentsByPen(String pen, String accessToken) {
         final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
         };
-        System.out.println("url = " + constants.getPenStudentApiByPenUrl());
         return this.webClient.get()
                 .uri(String.format(constants.getPenStudentApiByPenUrl(), pen))
                 .headers(h -> h.setBearerAuth(accessToken))

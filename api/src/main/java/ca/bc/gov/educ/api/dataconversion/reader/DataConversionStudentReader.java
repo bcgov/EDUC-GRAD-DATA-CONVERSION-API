@@ -40,6 +40,10 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
         summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
+
+        // initialize
+        studentList = null;
+        indexForStudent = 0;
     }
 
     @Override
