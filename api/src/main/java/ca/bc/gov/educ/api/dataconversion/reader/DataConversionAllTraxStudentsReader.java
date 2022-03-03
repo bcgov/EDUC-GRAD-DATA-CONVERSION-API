@@ -52,6 +52,8 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
         summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
+        indexForStudent = 0;
+        page = 0;
     }
 
     @Override
