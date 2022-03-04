@@ -1,9 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,25 +13,36 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemReader;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
-public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradStudent> {
+public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStudentEntity> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionStudentReader.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionAllTraxStudentsReader.class);
 
     private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
+    private final EducGradDataConversionApiConstants constants;
 
     private int indexForStudent;
-    private List<ConvGradStudent> studentList;
+    private int page;
+    private int PAGE_SIZE = 1000;  // by default
+    private List<TraxStudentEntity> studentList;
     private ConversionStudentSummaryDTO summaryDTO;
 
-    public DataConversionAllTraxStudentsReader(DataConversionService dataConversionService, RestUtils restUtils) {
+    public DataConversionAllTraxStudentsReader(DataConversionService dataConversionService,
+                                               EducGradDataConversionApiConstants constants,
+                                               RestUtils restUtils) {
         this.dataConversionService = dataConversionService;
+        this.constants = constants;
         this.restUtils = restUtils;
 
         indexForStudent = 0;
+        page = 0;
+        PAGE_SIZE = constants.getPageSize();
     }
 
     @BeforeStep
@@ -40,50 +52,50 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<ConvGradS
         summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
+
+        // initialize
+        indexForStudent = 0;
+        page = 0;
     }
 
     @Override
-    public ConvGradStudent read() {
-        LOGGER.info("Reading the information of the next student");
+    public TraxStudentEntity read() {
+        LOGGER.debug("Reading the information of the next student");
 
-        if (studentDataIsNotInitialized()) {
-            studentList = loadAllTraxStudents();
-            summaryDTO.setReadCount(studentList.size());
-        }
+        if (indexForStudent % PAGE_SIZE == 0) {
+            // next page
+            Pageable pageable = PageRequest.of(0, PAGE_SIZE, Sort.by("studNo").ascending());
+            studentList = loadAllTraxStudents(pageable);
+            summaryDTO.setReadCount(summaryDTO.getReadCount() + studentList.size());
 
-        if (indexForStudent % 1000 == 0) {
+            page++;
+            indexForStudent = 0;
             fetchAccessToken();
         }
 
-        ConvGradStudent nextStudent = null;
-
+        TraxStudentEntity nextStudent = null;
         if (indexForStudent < studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
             indexForStudent++;
-            LOGGER.info("Found student[{}] - PEN: {} in total {}", indexForStudent, nextStudent.getPen(), summaryDTO.getReadCount());
-        }
-        else {
+            LOGGER.debug("Found student[{}] - PEN: {} in total {}",((page - 1)*PAGE_SIZE) + indexForStudent, nextStudent.getStudNo(), summaryDTO.getReadCount());
+        } else {
             indexForStudent = 0;
             studentList = null;
         }
         return nextStudent;
     }
 
-    private boolean studentDataIsNotInitialized() {
-        return this.studentList == null;
-    }
-
-    private List<ConvGradStudent> loadAllTraxStudents() {
-        LOGGER.info("Fetching Student List that need Add Missing Students Processing");
-        return dataConversionService.loadAllTraxStudentDataForPenUpdate();
+    private List<TraxStudentEntity> loadAllTraxStudents(Pageable pageable) {
+        LOGGER.info("Fetching Student List that need Add Missing Students Processing - page:{}, size:{}", pageable.getPageNumber(), pageable.getPageSize());
+        return dataConversionService.loadAllTraxStudentsForPenUpdate(pageable);
     }
 
     private void fetchAccessToken() {
-        LOGGER.info("Fetching the access token from KeyCloak API");
+        LOGGER.debug("Fetching the access token from KeyCloak API");
         ResponseObj res = restUtils.getTokenResponseObject();
         if (res != null) {
             summaryDTO.setAccessToken(res.getAccess_token());
-            LOGGER.info("Setting the new access token in summaryDTO.");
+            LOGGER.debug("Setting the new access token in summaryDTO.");
         }
     }
 }

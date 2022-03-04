@@ -20,7 +20,7 @@ public class StudentCareerProgramEntity extends BaseEntity {
 	@Column(name = "CAREER_PROGRAM_CODE", nullable = false)
     private String careerProgramCode;
 	
-	@Column(name = "GRADUTION_STUDENT_RECORD_ID", nullable = false)
+	@Column(name = "GRADUATION_STUDENT_RECORD_ID", nullable = false)
     private UUID studentID;
 	
 }

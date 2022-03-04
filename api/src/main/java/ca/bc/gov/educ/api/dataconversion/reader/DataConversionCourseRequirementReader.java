@@ -40,6 +40,10 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
         summaryDTO = new ConversionCourseSummaryDTO();
         summaryDTO.setTableName("COURSE_REQUIREMENT");
         jobContext.put("courseRequirementSummaryDTO", summaryDTO);
+
+        // initialize
+        courseRequirementList = null;
+        indexForCourseRequirement = 0;
     }
 
     @Override
