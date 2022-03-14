@@ -27,7 +27,7 @@ import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_S
 public class ChoreographEventHandler {
   private final ObjectMapper mapper = new ObjectMapper();
   private final Executor singleTaskExecutor = new EnhancedQueueExecutor.Builder()
-      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("task-executor-%d").build())
+      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("single-task-executor-%d").build())
       .setCorePoolSize(1).setMaximumPoolSize(1).build();
   private final Map<String, EventService> eventServiceMap;
 

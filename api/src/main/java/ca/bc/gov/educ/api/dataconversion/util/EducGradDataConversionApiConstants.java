@@ -24,6 +24,7 @@ public class EducGradDataConversionApiConstants {
 
     // Util
     public static final String READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB = "/addNewPen";
+    public static final String PEN_UPDATES_BATCH_JOB = "/penUpdates";
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";

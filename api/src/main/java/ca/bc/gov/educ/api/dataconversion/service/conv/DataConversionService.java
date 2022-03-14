@@ -64,7 +64,7 @@ public class DataConversionService {
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
-        return traxStudentRepository.findAllByStatus(null, pageable).toList();
+        return traxStudentRepository.findAllByStatus("Y", pageable).toList();
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
@@ -222,7 +222,7 @@ public class DataConversionService {
                     saveTraxStudent(traxStudentNo.getStudNo(), "C");
                 }
             } else {
-                log.debug("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
+                log.info("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
                 saveTraxStudent(traxStudentNo.getStudNo(), "Y");
             }
             return traxStudentNo;
