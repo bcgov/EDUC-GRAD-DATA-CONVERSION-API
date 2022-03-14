@@ -31,7 +31,7 @@ public class PenUpdatesPartitioner extends SimplePartitioner {
         for (int i = 0; i < gridSize; i++) {
             ExecutionContext executionContext = new ExecutionContext();
             ConversionStudentSummaryDTO summaryDTO = new ConversionStudentSummaryDTO();
-            List<String> data = loadPenNumbers(i, 100);
+            List<String> data = loadPenNumbers(i, 2000);
             executionContext.put("data", data);
             summaryDTO.setReadCount(data.size());
             executionContext.put("summary", summaryDTO);

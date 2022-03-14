@@ -259,7 +259,7 @@ public class BatchJobConfig {
         return stepBuilderFactory.get("masterStep")
                 .partitioner(slaveStep(stepBuilderFactory).getName(), partitioner(dataConversionService))
                 .step(slaveStep(stepBuilderFactory))
-                .gridSize(10)
+                .gridSize(5)
                 .taskExecutor(taskExecutor())
                 .build();
     }

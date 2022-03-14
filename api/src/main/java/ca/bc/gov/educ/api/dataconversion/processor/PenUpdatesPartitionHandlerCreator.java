@@ -36,7 +36,7 @@ public class PenUpdatesPartitionHandlerCreator implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(d -> {
-            if (summaryDTO.getProcessedCount() % 50 == 0) {
+            if (summaryDTO.getProcessedCount() % 100 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
             System.out.println(Thread.currentThread().getName() + " processing partitionData = " + d);
@@ -55,13 +55,14 @@ public class PenUpdatesPartitionHandlerCreator implements Tasklet {
         ConversionStudentSummaryDTO totalSummaryDTO = (ConversionStudentSummaryDTO)contribution.getStepExecution().getJobExecution().getExecutionContext().get("penUpdatesSummaryDTO");
         if (totalSummaryDTO == null) {
             totalSummaryDTO = new ConversionStudentSummaryDTO();
-            totalSummaryDTO.setReadCount(summaryDTO.getReadCount());
-            totalSummaryDTO.setProcessedCount(summaryDTO.getProcessedCount());
             contribution.getStepExecution().getJobExecution().getExecutionContext().put("penUpdatesSummaryDTO", totalSummaryDTO);
-        } else {
-            totalSummaryDTO.setReadCount(totalSummaryDTO.getReadCount() + summaryDTO.getReadCount());
-            totalSummaryDTO.setProcessedCount(totalSummaryDTO.getProcessedCount() + summaryDTO.getProcessedCount());
         }
+
+        totalSummaryDTO.setReadCount(summaryDTO.getReadCount());
+        totalSummaryDTO.setProcessedCount(summaryDTO.getProcessedCount());
+        totalSummaryDTO.setAddedCount(summaryDTO.getAddedCount());
+        totalSummaryDTO.setUpdatedCount(summaryDTO.getUpdatedCount());
+        totalSummaryDTO.getErrors().addAll(summaryDTO.getErrors());
     }
 
     private String fetchAccessToken() {

@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentsLoadEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentRepository;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,7 @@ public class DataConversionService {
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
-        return traxStudentRepository.findAllByStatus("Y", pageable).toList();
+        return traxStudentRepository.findAllByStatus(null, pageable).toList();
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
