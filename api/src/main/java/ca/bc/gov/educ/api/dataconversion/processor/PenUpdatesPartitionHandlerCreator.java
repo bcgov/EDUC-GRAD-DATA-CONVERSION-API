@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
+import java.util.Map;
 
 public class PenUpdatesPartitionHandlerCreator implements Tasklet {
 
@@ -58,11 +59,15 @@ public class PenUpdatesPartitionHandlerCreator implements Tasklet {
             contribution.getStepExecution().getJobExecution().getExecutionContext().put("penUpdatesSummaryDTO", totalSummaryDTO);
         }
 
-        totalSummaryDTO.setReadCount(summaryDTO.getReadCount());
-        totalSummaryDTO.setProcessedCount(summaryDTO.getProcessedCount());
-        totalSummaryDTO.setAddedCount(summaryDTO.getAddedCount());
-        totalSummaryDTO.setUpdatedCount(summaryDTO.getUpdatedCount());
+        totalSummaryDTO.setReadCount(totalSummaryDTO.getReadCount() + summaryDTO.getReadCount());
+        totalSummaryDTO.setProcessedCount(totalSummaryDTO.getProcessedCount() + summaryDTO.getProcessedCount());
+        totalSummaryDTO.setAddedCount(totalSummaryDTO.getAddedCount() + summaryDTO.getAddedCount());
+        totalSummaryDTO.setUpdatedCount(totalSummaryDTO.getUpdatedCount() + summaryDTO.getUpdatedCount());
         totalSummaryDTO.getErrors().addAll(summaryDTO.getErrors());
+
+        mergeMapCounts(totalSummaryDTO.getProgramCountMap(), summaryDTO.getProgramCountMap());
+        mergeMapCounts(totalSummaryDTO.getOptionalProgramCountMap(), summaryDTO.getOptionalProgramCountMap());
+        mergeMapCounts(totalSummaryDTO.getCareerProgramCountMap(), summaryDTO.getCareerProgramCountMap());
     }
 
     private String fetchAccessToken() {
@@ -72,5 +77,15 @@ public class PenUpdatesPartitionHandlerCreator implements Tasklet {
             return res.getAccess_token();
         }
         return null;
+    }
+
+    private void mergeMapCounts(Map<String, Long> total, Map<String, Long> current) {
+        current.forEach((k,v) -> {
+            if (total.containsKey(k)) {
+                total.put(k, total.get(k) + v);
+            } else {
+                total.put(k, v);
+            }
+        });
     }
 }
