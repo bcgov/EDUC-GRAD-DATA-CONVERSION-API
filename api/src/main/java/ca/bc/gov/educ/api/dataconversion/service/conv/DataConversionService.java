@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.dataconversion.service.conv;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentsLoadEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentRepository;
@@ -65,6 +64,11 @@ public class DataConversionService {
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
         return traxStudentRepository.findAllByStatus(null, pageable).toList();
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public Integer getTotalNumberOfTraxStudents() {
+        return traxStudentRepository.countAllByStatus(null);
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")

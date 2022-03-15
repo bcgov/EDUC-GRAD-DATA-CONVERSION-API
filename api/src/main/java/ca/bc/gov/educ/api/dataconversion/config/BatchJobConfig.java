@@ -27,6 +27,10 @@ import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.time.Duration;
 
 @Configuration
 @EnableBatchProcessing
@@ -297,8 +301,14 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public SimpleAsyncTaskExecutor taskExecutor() {
-        return new SimpleAsyncTaskExecutor();
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(50);
+        executor.setThreadNamePrefix("partition_task_executor_thread-");
+        executor.initialize();
+
+        return executor;
     }
 
 }

@@ -27,11 +27,15 @@ public class PenUpdatesPartitioner extends SimplePartitioner {
 
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
+        Integer total = dataConversionService.getTotalNumberOfTraxStudents();
+        Integer pageSize = (total / gridSize) + 1;
+        LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, pageSize);
+
         Map<String, ExecutionContext> map = new HashMap<>(gridSize);
         for (int i = 0; i < gridSize; i++) {
             ExecutionContext executionContext = new ExecutionContext();
             ConversionStudentSummaryDTO summaryDTO = new ConversionStudentSummaryDTO();
-            List<String> data = loadPenNumbers(i, 2000);
+            List<String> data = loadPenNumbers(i, pageSize);
             executionContext.put("data", data);
             summaryDTO.setReadCount(data.size());
             executionContext.put("summary", summaryDTO);

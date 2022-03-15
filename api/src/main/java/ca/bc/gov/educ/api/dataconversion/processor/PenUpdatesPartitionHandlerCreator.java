@@ -35,17 +35,22 @@ public class PenUpdatesPartitionHandlerCreator implements Tasklet {
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+        System.out.println("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(d -> {
-            if (summaryDTO.getProcessedCount() % 100 == 0) {
+            if (summaryDTO.getProcessedCount() % 500 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            System.out.println(Thread.currentThread().getName() + " processing partitionData = " + d);
+            System.out.println("  ==> [" + Thread.currentThread().getName() + "] processing partitionData = " + d);
             TraxStudentEntity st = new TraxStudentEntity();
             st.setStudNo(d);
-            dataConversionService.readTraxStudentAndAddNewPen(st, summaryDTO);
+            try {
+                dataConversionService.readTraxStudentAndAddNewPen(st, summaryDTO);
+            } catch (Exception e) {
+                LOGGER.error("unknown exception: " + e.getLocalizedMessage());
+            }
         });
-        System.out.println(Thread.currentThread().getName() + " summary processed count = " + summaryDTO.getProcessedCount());
+        System.out.println("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
 
         // Aggregate summary
         aggregate(contribution);

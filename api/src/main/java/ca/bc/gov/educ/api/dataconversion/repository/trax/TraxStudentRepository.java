@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TraxStudentRepository extends PagingAndSortingRepository<TraxStudentEntity, String> {
     Page<TraxStudentEntity> findAllByStatus(String status, Pageable pageable);
+    Integer countAllByStatus(String status);
 }
