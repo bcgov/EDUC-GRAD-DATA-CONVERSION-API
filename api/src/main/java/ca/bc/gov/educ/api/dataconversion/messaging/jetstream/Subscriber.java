@@ -60,10 +60,6 @@ public class Subscriber {
    * this is the source of truth for all the topics this api subscribes to.
    */
   private void initializeStreamTopicMap() {
-//    final List<String> gradStatusEventsTopics = new ArrayList<>();
-//    gradStatusEventsTopics.add(Topics.GRAD_STATUS_EVENTS_TOPIC.name());
-//    this.streamTopicsMap.put(EducGradDataConversionApiConstants.GRAD_STREAM_NAME, gradStatusEventsTopics);
-
     final List<String> traxStatusEventsTopics = new ArrayList<>();
     traxStatusEventsTopics.add(Topics.TRAX_UPDATE_EVENTS_TOPIC.name());
     this.streamTopicsMap.put(EducGradDataConversionApiConstants.TRAX_STREAM_NAME, traxStatusEventsTopics);

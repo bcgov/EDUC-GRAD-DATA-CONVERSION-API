@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +64,11 @@ public class DataConversionService {
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
     public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
         return traxStudentRepository.findAllByStatus(null, pageable).toList();
+    }
+
+    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
+    public Integer getTotalNumberOfTraxStudents() {
+        return traxStudentRepository.countAllByStatus(null);
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
@@ -222,7 +226,7 @@ public class DataConversionService {
                     saveTraxStudent(traxStudentNo.getStudNo(), "C");
                 }
             } else {
-                log.debug("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
+                log.info("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
                 saveTraxStudent(traxStudentNo.getStudNo(), "Y");
             }
             return traxStudentNo;

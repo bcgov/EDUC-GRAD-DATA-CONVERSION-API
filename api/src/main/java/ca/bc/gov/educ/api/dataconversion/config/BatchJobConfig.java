@@ -2,14 +2,10 @@ package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
-import ca.bc.gov.educ.api.dataconversion.listener.AddMissingStudentsJobCompletionNotificationListener;
-import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
-import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
+import ca.bc.gov.educ.api.dataconversion.listener.*;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionAllTraxStudentsReader;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementReader;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
+import ca.bc.gov.educ.api.dataconversion.reader.*;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -22,19 +18,19 @@ import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import ca.bc.gov.educ.api.dataconversion.listener.StudentDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionStudentReader;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.time.Duration;
 
 @Configuration
 @EnableBatchProcessing
@@ -260,4 +256,59 @@ public class BatchJobConfig {
                 .end()
                 .build();
     }
+
+    // Partitioning for pen updates
+    @Bean
+    public Step masterStep(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService) {
+        return stepBuilderFactory.get("masterStep")
+                .partitioner(slaveStep(stepBuilderFactory).getName(), partitioner(dataConversionService))
+                .step(slaveStep(stepBuilderFactory))
+                .gridSize(5)
+                .taskExecutor(taskExecutor())
+                .build();
+    }
+
+    @Bean
+    public PenUpdatesPartitioner partitioner(DataConversionService dataConversionService) {
+        // Reader to feed input data for each partition
+        return new PenUpdatesPartitioner(dataConversionService);
+    }
+
+    @Bean
+    public Step slaveStep(StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("slaveStep")
+                .tasklet(penUpdatesPartitionHandler())
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public PenUpdatesPartitionHandlerCreator penUpdatesPartitionHandler() {
+        // Processor for each partition
+        return new PenUpdatesPartitionHandlerCreator();
+    }
+
+    @Bean
+    public Job penUpdatesJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                             DataConversionService dataConversionService,
+                             PenUpdatesJobCompletionNotificationListener listener) {
+        return jobBuilderFactory.get("penUpdatesJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(masterStep(stepBuilderFactory, dataConversionService))
+                .end()
+                .build();
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(50);
+        executor.setThreadNamePrefix("partition_task_executor_thread-");
+        executor.initialize();
+
+        return executor;
+    }
+
 }
