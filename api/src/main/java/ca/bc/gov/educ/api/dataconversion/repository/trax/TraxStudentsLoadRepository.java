@@ -60,4 +60,8 @@ public interface TraxStudentsLoadRepository extends JpaRepository<TraxStudentsLo
     @Transactional(readOnly = true)
     List<Object[]> loadInitialCourseRestrictionRawData();
 
+    @Query(value="select count(*) from TAB_SCHOOL sc \n" +
+            "where sc.mincode = :minCode \n", nativeQuery=true)
+    long countTabSchools(@Param("minCode") String minCode);
+
 }

@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.model.Student;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.GraduationStudentRecordRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.service.trax.TraxService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -44,6 +45,9 @@ public class StudentServiceTest {
     EventRepository eventRepository;
 
     @MockBean
+    TraxService traxService;
+
+    @MockBean
     RestUtils restUtils;
 
     @Autowired
@@ -75,6 +79,7 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen("111222333");
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.traxService.existsSchool("222333")).thenReturn(true);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").archiveFlag("A")
@@ -107,6 +112,7 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen("111222333");
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenThrow(new RuntimeException("PEN Student API is failed!"));
+        when(this.traxService.existsSchool("222333")).thenReturn(true);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
@@ -133,6 +139,7 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen("111222333");
         when(this.restUtils.getStudentsByPen("333222111", "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.traxService.existsSchool("222333")).thenReturn(true);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")

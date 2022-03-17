@@ -11,6 +11,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
+import ca.bc.gov.educ.api.dataconversion.service.trax.TraxService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -45,6 +46,7 @@ public class StudentService extends StudentBaseService {
     private final AssessmentService assessmentService;
     private final CourseService courseService;
     private final ProgramService programService;
+    private final TraxService traxService;
 
     @Autowired
     public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
@@ -56,7 +58,8 @@ public class StudentService extends StudentBaseService {
                           RestUtils restUtils,
                           AssessmentService assessmentService,
                           CourseService courseService,
-                          ProgramService programService) {
+                          ProgramService programService,
+                          TraxService traxService) {
         this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
@@ -67,14 +70,23 @@ public class StudentService extends StudentBaseService {
         this.assessmentService = assessmentService;
         this.courseService = courseService;
         this.programService = programService;
+        this.traxService = traxService;
     }
 
     @Transactional(transactionManager = "studentTransactionManager")
     public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
-            String accessToken = summary.getAccessToken();
+            // School validation
+            if (!traxService.existsSchool(convGradStudent.getSchoolOfRecord())) {
+                ConversionAlert error = new ConversionAlert();
+                error.setItem(convGradStudent.getPen());
+                error.setReason("Invalid school of record " + convGradStudent.getSchoolOfRecord());
+                summary.getErrors().add(error);
+                return null;
+            }
 
+            String accessToken = summary.getAccessToken();
             List<Student> students;
             try {
                 // Call PEN Student API
