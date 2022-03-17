@@ -121,6 +121,26 @@ public class JobLauncherController {
         }
     }
 
+    @GetMapping(EducGradDataConversionApiConstants.LOAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
+    public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionPartitionJob( ) {
+        logger.info("Inside Launch Student Data Conversion Partition Job - Parallel Processing");
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
+        builder.addString(JOB_PARAM, "studentLoadJob");
+        try {
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentLoadJob"), builder.toJobParameters());
+            ExecutionContext jobContext = jobExecution.getExecutionContext();
+            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
+            return ResponseEntity.ok(summaryDTO);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+                | JobParametersInvalidException | NoSuchJobException e) {
+            e.printStackTrace();
+            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
+            summaryDTO.setException(e.getLocalizedMessage());
+            return ResponseEntity.status(500).body(summaryDTO);
+        }
+    }
+
     @GetMapping(EducGradDataConversionApiConstants.PEN_UPDATES_BATCH_JOB)
     public ResponseEntity<ConversionBaseSummaryDTO> launchPenUpdatesJob() {
         logger.info("Inside Launch PEN Updates Job");

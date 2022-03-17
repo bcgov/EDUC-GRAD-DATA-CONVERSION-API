@@ -1,8 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -10,38 +11,46 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreator {
+import java.util.List;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PenUpdatesPartitionHandlerCreator.class);
+public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudentPartitionHandlerCreator.class);
 
     @Autowired
     DataConversionService dataConversionService;
+
+    @Autowired
+    StudentService studentService;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         System.out.println("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(pen -> {
-            if (summaryDTO.getProcessedCount() % 500 == 0) {
+            if (summaryDTO.getProcessedCount() % 100 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
             System.out.println("  ==> [" + Thread.currentThread().getName() + "] processing partitionData = " + pen);
-            TraxStudentEntity st = new TraxStudentEntity();
-            st.setStudNo(pen);
             try {
-                dataConversionService.readTraxStudentAndAddNewPen(st, summaryDTO);
+                List<ConvGradStudent> students = dataConversionService.loadGradStudentDataFromTrax(pen);
+                if (students != null && !students.isEmpty()) {
+                    students.forEach(st -> studentService.convertStudent(st, summaryDTO));
+                }
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(pen);
                 error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
                 summaryDTO.getErrors().add(error);
                 LOGGER.error("unknown exception: " + e.getLocalizedMessage());
+            } finally {
+                dataConversionService.saveTraxStudent(pen, "Y");
             }
         });
         System.out.println("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
 
         // Aggregate summary
-        aggregate(contribution, "PEN_UPDATES", "penUpdatesSummaryDTO");
+        aggregate(contribution, "STUDENT_LOAD", "studentSummaryDTO");
         return RepeatStatus.FINISHED;
     }
 }

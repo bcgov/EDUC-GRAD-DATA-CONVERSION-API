@@ -87,7 +87,7 @@ public class DataConversionAllTraxStudentsReader implements ItemReader<TraxStude
 
     private List<TraxStudentEntity> loadAllTraxStudents(Pageable pageable) {
         LOGGER.info("Fetching Student List that need Add Missing Students Processing - page:{}, size:{}", pageable.getPageNumber(), pageable.getPageSize());
-        return dataConversionService.loadAllTraxStudentsForPenUpdate(pageable);
+        return dataConversionService.loadTraxStudentEntitiesByPage(pageable);
     }
 
     private void fetchAccessToken() {
