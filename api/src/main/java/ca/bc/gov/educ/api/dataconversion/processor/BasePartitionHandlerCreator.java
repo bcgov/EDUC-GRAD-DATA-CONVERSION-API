@@ -27,7 +27,7 @@ public abstract class BasePartitionHandlerCreator implements Tasklet {
     ConversionStudentSummaryDTO summaryDTO;
 
     protected void aggregate(StepContribution contribution, String tableName, String summaryContextName) {
-        ConversionStudentSummaryDTO totalSummaryDTO = (ConversionStudentSummaryDTO)contribution.getStepExecution().getJobExecution().getExecutionContext().get("penUpdatesSummaryDTO");
+        ConversionStudentSummaryDTO totalSummaryDTO = (ConversionStudentSummaryDTO)contribution.getStepExecution().getJobExecution().getExecutionContext().get(summaryContextName);
         if (totalSummaryDTO == null) {
             totalSummaryDTO = new ConversionStudentSummaryDTO();
             totalSummaryDTO.setTableName(tableName);
