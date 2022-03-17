@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -20,13 +21,13 @@ import java.util.HashMap;
 @Profile("test")
 @EnableJpaRepositories(
         basePackages = {
-                "ca.bc.gov.educ.api.dataconversion.repository.trax"
+                "ca.bc.gov.educ.api.dataconversion.repository.conv"
         },
-        entityManagerFactoryRef = "traxEntityManager",
-        transactionManagerRef = "traxTransactionManager"
+        entityManagerFactoryRef = "convEntityManager",
+        transactionManagerRef = "convTransactionManager"
 )
 @EnableTransactionManagement
-public class TraxDbConfig {
+public class ConvDbConfig {
     // Hikari Pool
     @Value("${spring.datasource.hikari.maximum-pool-size}")
     private int maxPoolSize;
@@ -47,8 +48,9 @@ public class TraxDbConfig {
     @Value("${spring.datasource.url}")
     private String jdbcUrl;
 
+    @Primary
     @Bean
-    public DataSource traxDataSource() {
+    public DataSource convDataSource() {
         HikariConfig config = new HikariConfig();
 
         config.setDriverClassName(driverClassName);
@@ -64,12 +66,13 @@ public class TraxDbConfig {
         return new HikariDataSource(config);
     }
 
+    @Primary
     @Bean
-    public LocalContainerEntityManagerFactoryBean traxEntityManager() {
+    public LocalContainerEntityManagerFactoryBean convEntityManager() {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
-        em.setDataSource(traxDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.trax"});
+        em.setDataSource(convDataSource());
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
@@ -80,15 +83,16 @@ public class TraxDbConfig {
         properties.put("hibernate.show_sql", "true");
         em.setJpaPropertyMap(properties);
 
-        em.setPersistenceUnitName("traxPU");
+        em.setPersistenceUnitName("coursePU");
 
         return em;
     }
 
+    @Primary
     @Bean
-    public PlatformTransactionManager traxTransactionManager() {
+    public PlatformTransactionManager convTransactionManager() {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
-        transactionManager.setEntityManagerFactory(traxEntityManager().getObject());
+        transactionManager.setEntityManagerFactory(convEntityManager().getObject());
         return transactionManager;
     }
 }
