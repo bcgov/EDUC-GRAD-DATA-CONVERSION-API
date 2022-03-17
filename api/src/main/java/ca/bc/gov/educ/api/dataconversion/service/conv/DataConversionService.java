@@ -57,17 +57,16 @@ public class DataConversionService {
                 students.add(student);
             }
         });
-//        return students.subList(0,10);
-        return students;
+        return students; // .subList(0,10);
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
+    public List<TraxStudentEntity> loadTraxStudentEntitiesByPage(Pageable pageable) {
         return traxStudentRepository.findAllByStatus(null, pageable).toList();
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public Integer getTotalNumberOfTraxStudents() {
+    public Integer getTotalNumberOfTraxStudentEntities() {
         return traxStudentRepository.countAllByStatus(null);
     }
 
@@ -95,7 +94,7 @@ public class DataConversionService {
         String graduationRequestYear = (String) fields[6];
 
         Character recalculateGradStatus = (Character) fields[7];
-        if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
+        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
             recalculateGradStatus = null;
         }
         // grad or non-grad
@@ -289,7 +288,8 @@ public class DataConversionService {
         }
     }
 
-    private void saveTraxStudent(String studNo, String status) {
+    @Transactional(transactionManager = "traxTransactionManager")
+    public void saveTraxStudent(String studNo, String status) {
         TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
         traxStudentEntity.setStudNo(studNo);
         traxStudentEntity.setStatus(status);

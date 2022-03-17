@@ -19,6 +19,7 @@ public class EducGradDataConversionApiConstants {
 
     // Data Conversion
     public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
+    public static final String LOAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/studentLoad";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
 

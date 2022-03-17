@@ -15,19 +15,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class PenUpdatesPartitioner extends SimplePartitioner {
+public class StudentLoadPartitioner extends SimplePartitioner {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(PenUpdatesPartitioner.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudentLoadPartitioner.class);
 
     private final DataConversionService dataConversionService;
 
-    public PenUpdatesPartitioner(DataConversionService dataConversionService) {
+    public StudentLoadPartitioner(DataConversionService dataConversionService) {
         this.dataConversionService = dataConversionService;
     }
 
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
-        Integer total = dataConversionService.getTotalNumberOfTraxStudents();
+        Integer total = dataConversionService.getTotalNumberOfTraxStudentEntities();
         Integer pageSize = (total / gridSize) + 1;
         LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, pageSize);
 
@@ -47,6 +47,6 @@ public class PenUpdatesPartitioner extends SimplePartitioner {
 
     private List<String> loadPenNumbers(int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("studNo").ascending());
-        return dataConversionService.loadAllTraxStudentsForPenUpdate(pageable).stream().map(r -> r.getStudNo()).collect(Collectors.toList());
+        return dataConversionService.loadTraxStudentEntitiesByPage(pageable).stream().map(r -> r.getStudNo()).collect(Collectors.toList());
     }
 }

@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Configuration;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -257,26 +256,26 @@ public class BatchJobConfig {
                 .build();
     }
 
-    // Partitioning for pen updates
+    // Partitioning for pen updates ---------------------------------------------------------------------------
     @Bean
-    public Step masterStep(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService) {
-        return stepBuilderFactory.get("masterStep")
-                .partitioner(slaveStep(stepBuilderFactory).getName(), partitioner(dataConversionService))
-                .step(slaveStep(stepBuilderFactory))
+    public Step masterStepForPenUpdates(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService) {
+        return stepBuilderFactory.get("masterStepForPenUpdates")
+                .partitioner(slaveStepForPenUpdates(stepBuilderFactory).getName(), partitioner(dataConversionService))
+                .step(slaveStepForPenUpdates(stepBuilderFactory))
                 .gridSize(5)
                 .taskExecutor(taskExecutor())
                 .build();
     }
 
     @Bean
-    public PenUpdatesPartitioner partitioner(DataConversionService dataConversionService) {
+    public StudentLoadPartitioner partitioner(DataConversionService dataConversionService) {
         // Reader to feed input data for each partition
-        return new PenUpdatesPartitioner(dataConversionService);
+        return new StudentLoadPartitioner(dataConversionService);
     }
 
     @Bean
-    public Step slaveStep(StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("slaveStep")
+    public Step slaveStepForPenUpdates(StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("slaveStepForPenUpdates")
                 .tasklet(penUpdatesPartitionHandler())
                 .build();
     }
@@ -295,7 +294,44 @@ public class BatchJobConfig {
         return jobBuilderFactory.get("penUpdatesJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStep(stepBuilderFactory, dataConversionService))
+                .flow(masterStepForPenUpdates(stepBuilderFactory, dataConversionService))
+                .end()
+                .build();
+    }
+
+    // Partitioning for student load ---------------------------------------------------------------------------
+    @Bean
+    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService) {
+        return stepBuilderFactory.get("masterStepForStudent")
+                .partitioner(slaveStepForStudent(stepBuilderFactory).getName(), partitioner(dataConversionService))
+                .step(slaveStepForStudent(stepBuilderFactory))
+                .gridSize(5)
+                .taskExecutor(taskExecutor())
+                .build();
+    }
+
+    @Bean
+    public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("slaveStepForStudent")
+                .tasklet(studentPartitionHandler())
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionHandlerCreator studentPartitionHandler() {
+        // Processor for each partition
+        return new StudentPartitionHandlerCreator();
+    }
+
+    @Bean
+    public Job studentLoadJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                              DataConversionService dataConversionService,
+                              StudentDataConversionJobCompletionNotificationListener listener) {
+        return jobBuilderFactory.get("studentLoadJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(masterStepForStudent(stepBuilderFactory, dataConversionService))
                 .end()
                 .build();
     }
