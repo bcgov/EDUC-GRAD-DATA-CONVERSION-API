@@ -25,13 +25,13 @@ public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator 
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        System.out.println("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
+        LOGGER.info("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(pen -> {
             if (summaryDTO.getProcessedCount() % 100 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            System.out.println("  ==> [" + Thread.currentThread().getName() + "] processing partitionData = " + pen);
+            LOGGER.info("  ==> [" + Thread.currentThread().getName() + "] processing partitionData : pen = " + pen);
             try {
                 List<ConvGradStudent> students = dataConversionService.loadGradStudentDataFromTrax(pen);
                 if (students != null && !students.isEmpty()) {
@@ -47,7 +47,7 @@ public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator 
                 dataConversionService.saveTraxStudent(pen, "Y");
             }
         });
-        System.out.println("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
+        LOGGER.info("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
 
         // Aggregate summary
         aggregate(contribution, "STUDENT_LOAD", "studentSummaryDTO");
