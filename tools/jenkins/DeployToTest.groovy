@@ -19,7 +19,7 @@ pipeline{
         buildDiscarder(logRotator(daysToKeepStr: '', numToKeepStr: '5'))
     }
     parameters {
-        choice( name: 'IMAGE_TAG', choices: ['latest', 'main', 'release-1.0.0',, 'release-1.1.0', 'dev' ] )
+        choice( name: 'IMAGE_TAG', choices: ['latest', 'main', 'release-1.0.0',, 'release-1.1.0', 'release-1.1.1', 'dev' ] )
     }
     stages{
         stage('Deploy to TEST') {
