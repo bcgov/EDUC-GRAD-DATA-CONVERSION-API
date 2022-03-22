@@ -42,7 +42,7 @@ public class ChoreographEventHandler {
       try {
         switch (event.getEventType()) {
           case "UPDATE_TRAX_STUDENT_MASTER":
-            log.info("Processing CREATE_GRAD_STATUS event record :: {} ", event);
+            log.debug("Processing CREATE_GRAD_STATUS event record :: {} ", event);
             final TraxUpdateInGrad traxUpdateInGrad = JsonUtil.getJsonObjectFromString(TraxUpdateInGrad.class, event.getEventPayload());
             this.eventServiceMap.get(UPDATE_TRAX_STUDENT_MASTER.toString()).processEvent(traxUpdateInGrad, event);
             break;
