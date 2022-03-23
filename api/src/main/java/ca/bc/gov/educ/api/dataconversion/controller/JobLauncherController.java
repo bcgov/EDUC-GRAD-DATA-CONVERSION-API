@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.controller;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class JobLauncherController {
     }
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
+    @Operation(summary = "Initial Load of Students", description = "Loading students from TRAX into GRAD using the list of TRAX_STUDENTS_LOAD", tags = { "Students" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionJob( ) {
         logger.info("Inside Launch Student Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
@@ -62,6 +64,7 @@ public class JobLauncherController {
     }
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB)
+    @Operation(summary = "Initial Load of Course Restrictions", description = "Loading Course Restrictions from TRAX into GRAD", tags = { "Courses" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchCourseRestrictionDataConversionJob( ) {
         logger.info("Inside Launch Course Restriction Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
@@ -82,6 +85,7 @@ public class JobLauncherController {
     }
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB)
+    @Operation(summary = "Initial Load of Course Requirements", description = "Loading Course Requirements from TRAX into GRAD", tags = { "Courses" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchCourseRequirementDataConversionJob( ) {
         logger.info("Inside Launch Course Requirement Data Conversion Job");
         JobParametersBuilder builder = new JobParametersBuilder();
@@ -102,6 +106,7 @@ public class JobLauncherController {
     }
 
     @GetMapping(EducGradDataConversionApiConstants.READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB)
+    @Operation(summary = "Pen Updates", description = "Add missing students into PEN - getting all PEN numbers from TRAX_STUDENT_NO table", tags = { "Utils" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchReadTraxAndAddNewPenIfNotExistsJob() {
         logger.info("Inside Launch Read Trax Student & Add a New PEN Job");
         JobParametersBuilder builder = new JobParametersBuilder();
@@ -121,7 +126,8 @@ public class JobLauncherController {
         }
     }
 
-    @GetMapping(EducGradDataConversionApiConstants.LOAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
+    @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB)
+    @Operation(summary = "Initial Load of Students in Async Parallel Processing", description = "Loading students from TRAX into GRAD in Parallel using the partitions that are getting the paginated list from TRAX_STUDENT_NO table", tags = { "Students" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionPartitionJob( ) {
         logger.info("Inside Launch Student Data Conversion Partition Job - Parallel Processing");
         JobParametersBuilder builder = new JobParametersBuilder();
@@ -141,7 +147,8 @@ public class JobLauncherController {
         }
     }
 
-    @GetMapping(EducGradDataConversionApiConstants.PEN_UPDATES_BATCH_JOB)
+    @GetMapping(EducGradDataConversionApiConstants.PEN_UPDATES_PARALLEL_BATCH_JOB)
+    @Operation(summary = "Pen Updates in Async Parallel Processing", description = "Add missing students into PEN in Parallel using the partitions that are getting the paginated list from TRAX_STUDENT_NO table", tags = { "Utils" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchPenUpdatesJob() {
         logger.info("Inside Launch PEN Updates Job");
         JobParametersBuilder builder = new JobParametersBuilder();

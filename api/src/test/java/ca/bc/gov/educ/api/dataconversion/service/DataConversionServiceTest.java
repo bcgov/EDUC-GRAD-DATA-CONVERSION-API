@@ -87,23 +87,6 @@ public class DataConversionServiceTest {
     }
 
     @Test
-    public void testLoadAllTraxStudentData() {
-        Object[] obj = new Object[] {
-                "123456789"
-        };
-        List<Object[]> results = new ArrayList<>();
-        results.add(obj);
-
-        when(this.traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate()).thenReturn(results);
-
-        var result = dataConversionService.loadAllTraxStudentDataForPenUpdate();
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        ConvGradStudent responseStudent = result.get(0);
-        assertThat(responseStudent.getPen()).isEqualTo(obj[0]);
-    }
-
-    @Test
     public void testGetStudentDemographicsDataFromTrax() {
         Object[] obj = new Object[] {
                 "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
