@@ -70,20 +70,6 @@ public class DataConversionService {
         return traxStudentRepository.countAllByStatus(null);
     }
 
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadAllTraxStudentDataForPenUpdate() {
-        List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate();
-        results.forEach(result -> {
-            ConvGradStudent student = new ConvGradStudent();
-            String pen = (String) result[0];
-            student.setPen(pen);
-            students.add(student);
-        });
-
-        return students;
-    }
-
     private ConvGradStudent populateConvGradStudent(Object[] fields) {
         String pen = (String) fields[0];
         String schoolOfRecord = (String) fields[1];
