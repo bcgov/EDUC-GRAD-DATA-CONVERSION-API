@@ -46,12 +46,12 @@ public class EventHandlerDelegatorService {
             final var persistedEvent = this.choreographedEventPersistenceService.persistEventToDB(choreographedEvent);
             if (message.isJetStream()) {
                 message.ack(); // acknowledge to Jet Stream that api got the message and it is now in DB.
-                log.info("acknowledged to Jet Stream...");
+                log.warn("acknowledged to Jet Stream...");
             }
             this.choreographer.handleEvent(persistedEvent);
         } catch (final BusinessException businessException) {
             message.ack(); // acknowledge to Jet Stream that api got the message already...
-            log.info("acknowledged to Jet Stream...");
+            log.error("acknowledged to Jet Stream...");
         }
     }
 }
