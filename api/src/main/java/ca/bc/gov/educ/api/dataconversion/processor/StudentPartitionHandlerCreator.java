@@ -32,7 +32,7 @@ public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator 
             if (summaryDTO.getProcessedCount() % 100 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            LOGGER.info("  ==> processing partitionData : pen = " + pen);
+            LOGGER.info(" ==> pen = " + pen);
             try {
                 List<ConvGradStudent> students = dataConversionService.loadGradStudentDataFromTrax(pen);
                 if (students != null && !students.isEmpty()) {

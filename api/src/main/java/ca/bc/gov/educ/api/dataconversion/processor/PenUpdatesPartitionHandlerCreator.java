@@ -25,7 +25,7 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
             if (summaryDTO.getProcessedCount() % 500 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            LOGGER.info("  ==> processing partitionData = " + pen);
+            LOGGER.info(" ==> pen = " + pen);
             TraxStudentEntity st = new TraxStudentEntity();
             st.setStudNo(pen);
             try {
