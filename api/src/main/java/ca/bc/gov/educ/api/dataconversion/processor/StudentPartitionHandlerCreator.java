@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
@@ -25,17 +26,20 @@ public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator 
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        LOGGER.info("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
+        LOGGER.info("=======> start partition : read count = " + partitionData.size());
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(pen -> {
             if (summaryDTO.getProcessedCount() % 100 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            LOGGER.info("  ==> [" + Thread.currentThread().getName() + "] processing partitionData : pen = " + pen);
+            LOGGER.info(" ==> pen = " + pen);
             try {
                 List<ConvGradStudent> students = dataConversionService.loadGradStudentDataFromTrax(pen);
                 if (students != null && !students.isEmpty()) {
-                    students.forEach(st -> studentService.convertStudent(st, summaryDTO));
+                    students.forEach(st -> {
+                        ConvGradStudent responseStudent = studentService.convertStudent(st, summaryDTO);
+                        dataConversionService.saveTraxStudent(pen, responseStudent.getResult().toString());
+                    });
                 }
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
@@ -43,11 +47,9 @@ public class StudentPartitionHandlerCreator extends BasePartitionHandlerCreator 
                 error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
                 summaryDTO.getErrors().add(error);
                 LOGGER.error("unknown exception: " + e.getLocalizedMessage());
-            } finally {
-                dataConversionService.saveTraxStudent(pen, "Y");
             }
         });
-        LOGGER.info("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
+        LOGGER.info("=======> end partition : processed count = " + summaryDTO.getProcessedCount());
 
         // Aggregate summary
         aggregate(contribution, "STUDENT_LOAD", "studentSummaryDTO");

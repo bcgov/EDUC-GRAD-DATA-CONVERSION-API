@@ -19,13 +19,13 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        System.out.println("=======> " + Thread.currentThread().getName() + " start partition : read count = " + partitionData.size());
+        LOGGER.info("=======> start partition : read count = " + partitionData.size());
         // Process partitioned data in parallel asynchronously
         partitionData.stream().forEach(pen -> {
             if (summaryDTO.getProcessedCount() % 500 == 0) {
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
-            System.out.println("  ==> [" + Thread.currentThread().getName() + "] processing partitionData = " + pen);
+            LOGGER.info(" ==> pen = " + pen);
             TraxStudentEntity st = new TraxStudentEntity();
             st.setStudNo(pen);
             try {
@@ -38,7 +38,7 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
                 LOGGER.error("unknown exception: " + e.getLocalizedMessage());
             }
         });
-        System.out.println("=======> " +Thread.currentThread().getName() + " end partition : processed count = " + summaryDTO.getProcessedCount());
+        LOGGER.info("=======> end partition : processed count = " + summaryDTO.getProcessedCount());
 
         // Aggregate summary
         aggregate(contribution, "PEN_UPDATES", "penUpdatesSummaryDTO");

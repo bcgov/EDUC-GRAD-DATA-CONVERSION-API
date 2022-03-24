@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -111,7 +112,7 @@ public class DataConversionService {
                     studentStatus != null ? studentStatus.toString() : null,
                     archiveFlag != null ? archiveFlag.toString() : null,
                     StringUtils.isNotBlank(frenchCert) ? frenchCert.trim() : null,
-                    graduationRequestYear, programCodes, isGraduated);
+                    graduationRequestYear, programCodes, isGraduated, ConversionResultType.SUCCESS);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

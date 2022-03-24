@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.assessment.StudentAssessmentEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
@@ -83,7 +84,8 @@ public class StudentService extends StudentBaseService {
                 error.setItem(convGradStudent.getPen());
                 error.setReason("Invalid school of record " + convGradStudent.getSchoolOfRecord());
                 summary.getErrors().add(error);
-                return null;
+                convGradStudent.setResult(ConversionResultType.FAILURE);
+                return convGradStudent;
             }
 
             String accessToken = summary.getAccessToken();
@@ -96,18 +98,21 @@ public class StudentService extends StudentBaseService {
                 error.setItem(convGradStudent.getPen());
                 error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
                 summary.getErrors().add(error);
-                return null;
+                convGradStudent.setResult(ConversionResultType.FAILURE);
+                return convGradStudent;
             }
             if (students == null || students.isEmpty()) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convGradStudent.getPen());
                 error.setReason("PEN does not exist: PEN Student API returns empty response.");
                 summary.getErrors().add(error);
-                return null;
+                convGradStudent.setResult(ConversionResultType.FAILURE);
+                return convGradStudent;
             }
 
             students.forEach(st -> {
                 boolean isStudentPersisted = false;
+                ConversionResultType result = ConversionResultType.SUCCESS;
                 UUID studentID = UUID.fromString(st.getStudentID());
                 Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
                 GraduationStudentRecordEntity gradStudentEntity;
@@ -144,10 +149,15 @@ public class StudentService extends StudentBaseService {
 
                     // process dependencies
                     gradStudentEntity.setPen(convGradStudent.getPen());
-                    processSpecialPrograms(gradStudentEntity, accessToken, summary);
-                    processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
-                    processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+                    result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
+                    if (result != ConversionResultType.FAILURE) {
+                        result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+                    }
+                    if (result != ConversionResultType.FAILURE) {
+                        result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+                    }
                 }
+                convGradStudent.setResult(result);
             });
             return convGradStudent;
         } catch (Exception e) {
@@ -155,7 +165,8 @@ public class StudentService extends StudentBaseService {
             error.setItem(convGradStudent.getPen());
             error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
             summary.getErrors().add(error);
-            return null;
+            convGradStudent.setResult(ConversionResultType.FAILURE);
+            return convGradStudent;
         }
     }
 
@@ -186,20 +197,22 @@ public class StudentService extends StudentBaseService {
         studentEntity.setFrenchCert(student.getFrenchCert());
     }
 
-    private void processSpecialPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processOptionalPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
-            return;
+            return ConversionResultType.SUCCESS;
         }
 
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF")) {
-            createStudentOptionalProgram("DD", student, accessToken, summary);
+            return createStudentOptionalProgram("DD", student, accessToken, summary);
         }
 
         // French Immersion for 2018-EN, 2004-EN
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert())) {
-            createStudentOptionalProgram("FI", student, accessToken, summary);
+            return createStudentOptionalProgram("FI", student, accessToken, summary);
         }
+
+        return ConversionResultType.SUCCESS;
     }
 
     protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert) {
@@ -223,32 +236,39 @@ public class StudentService extends StudentBaseService {
         return frenchImmersion;
     }
 
-    private void processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
                 if (isOptionalProgramCode(programCode)) {
-                    createStudentOptionalProgram(programCode, student, accessToken, summary);
-                } else if (createStudentCareerProgram(programCode, student, summary)) {
-                    createStudentOptionalProgram("CP", student, accessToken, summary);
+                    return createStudentOptionalProgram(programCode, student, accessToken, summary);
+                } else {
+                    ConversionResultType result = createStudentCareerProgram(programCode, student, summary);
+                    if (result == ConversionResultType.SUCCESS) {
+                        return createStudentOptionalProgram("CP", student, accessToken, summary);
+                    } else {
+                        return result;
+                    }
                 }
             }
         }
+        return ConversionResultType.SUCCESS;
     }
 
-    private void processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.equals(student.getProgram(), "SCCP")
             && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
                  && student.getSchoolOfRecord().startsWith("093") )
         ) {
-            createStudentOptionalProgram("FR", student, accessToken, summary);
+            return createStudentOptionalProgram("FR", student, accessToken, summary);
         }
+        return ConversionResultType.SUCCESS;
     }
 
     private boolean isOptionalProgramCode(String code) {
        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
-    private boolean createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
         entity.setPen(student.getPen());
         entity.setStudentID(student.getStudentID());
@@ -263,7 +283,7 @@ public class StudentService extends StudentBaseService {
             error.setItem(student.getPen());
             error.setReason("Grad Program API is failed: " + e.getLocalizedMessage());
             summary.getErrors().add(error);
-            return false;
+            return ConversionResultType.WARNING;
         }
         if (gradSpecialProgram != null && gradSpecialProgram.getOptionalProgramID() != null) {
             entity.setOptionalProgramID(gradSpecialProgram.getOptionalProgramID());
@@ -281,10 +301,10 @@ public class StudentService extends StudentBaseService {
             }
             summary.incrementOptionalProgram(optionalProgramCode);
         }
-        return true;
+        return ConversionResultType.SUCCESS;
     }
 
-    private boolean createStudentCareerProgram(String careerProgramCode, GraduationStudentRecordEntity student, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType createStudentCareerProgram(String careerProgramCode, GraduationStudentRecordEntity student, ConversionStudentSummaryDTO summary) {
         StudentCareerProgramEntity entity = new StudentCareerProgramEntity();
         entity.setStudentID(student.getStudentID());
 
@@ -302,14 +322,14 @@ public class StudentService extends StudentBaseService {
                 studentCareerProgramRepository.save(entity);
             }
             summary.incrementCareerProgram(careerProgramCode);
-            return true;
+            return ConversionResultType.SUCCESS;
         } else {
             ConversionAlert error = new ConversionAlert();
             error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
             error.setItem(student.getPen());
             error.setReason("Career Program Code does not exist: " + careerProgramCode);
             summary.getErrors().add(error);
-            return false;
+            return ConversionResultType.WARNING;
         }
     }
 
