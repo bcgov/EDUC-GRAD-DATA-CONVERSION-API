@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
