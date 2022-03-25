@@ -308,19 +308,11 @@ public class BatchJobConfig {
     @Bean
     public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils) {
         return stepBuilderFactory.get("slaveStepForStudent")
-//                .tasklet(studentPartitionHandler())
                 .<String, ConvGradStudent>chunk(1)
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())
                 .build();
-    }
-
-    @Bean
-    @StepScope
-    public StudentPartitionHandlerCreator studentPartitionHandler() {
-        // Processor for each partition
-        return new StudentPartitionHandlerCreator();
     }
 
     @Bean

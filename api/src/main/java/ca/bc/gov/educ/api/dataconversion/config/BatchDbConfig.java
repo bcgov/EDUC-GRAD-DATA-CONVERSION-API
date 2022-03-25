@@ -67,6 +67,8 @@ public class BatchDbConfig {
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
+        config.setKeepaliveTime(maxLifetime - 1000);
+        config.addDataSourceProperty("socketTimeout", maxLifetime);
 
         return new HikariDataSource(config);
     }
