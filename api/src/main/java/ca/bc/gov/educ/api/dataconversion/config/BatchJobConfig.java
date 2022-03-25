@@ -9,9 +9,7 @@ import ca.bc.gov.educ.api.dataconversion.reader.*;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionAllTraxStudentsWriter;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
+import ca.bc.gov.educ.api.dataconversion.writer.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -25,11 +23,8 @@ import org.springframework.context.annotation.Configuration;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-
-import java.time.Duration;
 
 @Configuration
 @EnableBatchProcessing
@@ -301,19 +296,23 @@ public class BatchJobConfig {
 
     // Partitioning for student load ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService) {
+    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService, RestUtils restUtils) {
         return stepBuilderFactory.get("masterStepForStudent")
-                .partitioner(slaveStepForStudent(stepBuilderFactory).getName(), partitioner(dataConversionService))
-                .step(slaveStepForStudent(stepBuilderFactory))
+                .partitioner(slaveStepForStudent(stepBuilderFactory, restUtils).getName(), partitioner(dataConversionService))
+                .step(slaveStepForStudent(stepBuilderFactory, restUtils))
                 .gridSize(5)
                 .taskExecutor(taskExecutor())
                 .build();
     }
 
     @Bean
-    public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory) {
+    public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils) {
         return stepBuilderFactory.get("slaveStepForStudent")
-                .tasklet(studentPartitionHandler())
+//                .tasklet(studentPartitionHandler())
+                .<String, ConvGradStudent>chunk(1)
+                .reader(studentPartitionReader(restUtils))
+                .processor(studentPartitionProcessor())
+                .writer(studentPartitionWriter())
                 .build();
     }
 
@@ -325,13 +324,31 @@ public class BatchJobConfig {
     }
 
     @Bean
+    @StepScope
+    public StudentPartitionReader studentPartitionReader(RestUtils restUtils) {
+        return new StudentPartitionReader(restUtils);
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionProcessor studentPartitionProcessor() {
+        return new StudentPartitionProcessor();
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionWriter studentPartitionWriter() {
+        return new StudentPartitionWriter();
+    }
+
+    @Bean
     public Job studentLoadJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-                              DataConversionService dataConversionService,
+                              DataConversionService dataConversionService, RestUtils restUtils,
                               StudentDataConversionJobCompletionNotificationListener listener) {
         return jobBuilderFactory.get("studentLoadJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForStudent(stepBuilderFactory, dataConversionService))
+                .flow(masterStepForStudent(stepBuilderFactory, dataConversionService, restUtils))
                 .end()
                 .build();
     }
@@ -339,9 +356,10 @@ public class BatchJobConfig {
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(50);
-        executor.setThreadNamePrefix("partition_task_executor_thread-");
+
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(5);
+        executor.setThreadNamePrefix("task_thread-");
         executor.initialize();
 
         return executor;

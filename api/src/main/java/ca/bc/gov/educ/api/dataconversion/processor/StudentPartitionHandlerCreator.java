@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;

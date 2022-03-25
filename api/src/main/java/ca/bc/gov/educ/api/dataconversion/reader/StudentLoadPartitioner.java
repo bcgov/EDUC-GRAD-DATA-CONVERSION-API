@@ -39,6 +39,7 @@ public class StudentLoadPartitioner extends SimplePartitioner {
             executionContext.put("data", data);
             summaryDTO.setReadCount(data.size());
             executionContext.put("summary", summaryDTO);
+            executionContext.put("index", Integer.valueOf(0));
             String key = "partition" + i;
             map.put(key, executionContext);
         }
