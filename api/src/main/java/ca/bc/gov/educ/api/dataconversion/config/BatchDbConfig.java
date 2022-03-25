@@ -37,6 +37,9 @@ public class BatchDbConfig {
     @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
 
+    @Value("${spring.db-connection.hikari.keepalive-time}")
+    private int keepAliveTime;
+
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
 
@@ -67,7 +70,7 @@ public class BatchDbConfig {
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
-        config.setKeepaliveTime(maxLifetime - 1000);
+        config.setKeepaliveTime(keepAliveTime);
         config.addDataSourceProperty("socketTimeout", maxLifetime);
 
         return new HikariDataSource(config);
