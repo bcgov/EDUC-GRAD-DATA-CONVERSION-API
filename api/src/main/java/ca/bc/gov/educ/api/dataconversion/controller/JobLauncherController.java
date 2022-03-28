@@ -105,27 +105,6 @@ public class JobLauncherController {
         }
     }
 
-    @GetMapping(EducGradDataConversionApiConstants.READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB)
-    @Operation(summary = "Pen Updates", description = "Add missing students into PEN - getting all PEN numbers from TRAX_STUDENT_NO table", tags = { "Utils" })
-    public ResponseEntity<ConversionBaseSummaryDTO> launchReadTraxAndAddNewPenIfNotExistsJob() {
-        logger.info("Inside Launch Read Trax Student & Add a New PEN Job");
-        JobParametersBuilder builder = new JobParametersBuilder();
-        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
-        builder.addString(JOB_PARAM, "readTraxAndAddNewPenBatchJob");
-        try {
-            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("readTraxAndAddNewPenBatchJob"), builder.toJobParameters());
-            ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
-        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
-                | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
-        }
-    }
-
     @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB)
     @Operation(summary = "Initial Load of Students in Async Parallel Processing", description = "Loading students from TRAX into GRAD in Parallel using the partitions that are getting the paginated list from TRAX_STUDENT_NO table", tags = { "Students" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionPartitionJob( ) {

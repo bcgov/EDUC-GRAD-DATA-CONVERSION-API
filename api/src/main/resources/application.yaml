@@ -167,5 +167,5 @@ grad:
 
 #Page Size
 batch:
-  page:
-    size: ${PAGE_SIZE}
+  partitions:
+    number: ${NUMBER_OF_PARTITIONS}
