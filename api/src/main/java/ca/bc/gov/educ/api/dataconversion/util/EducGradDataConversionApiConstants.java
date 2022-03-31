@@ -19,11 +19,12 @@ public class EducGradDataConversionApiConstants {
 
     // Data Conversion
     public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
+    public static final String GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB = "/student/parallel";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
 
     // Util
-    public static final String READ_TRAX_AND_ADD_NEW_PEN_BATCH_JOB = "/addNewPen";
+    public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
@@ -78,7 +79,7 @@ public class EducGradDataConversionApiConstants {
     @Value("${grad.update.enabled}")
     private boolean gradUpdateEnabled;
 
-    // Page Size
-    @Value("${batch.page.size}")
-    private int pageSize;
+    // Number of Partitions
+    @Value("${batch.partitions.number}")
+    private int numberOfPartitions;
 }

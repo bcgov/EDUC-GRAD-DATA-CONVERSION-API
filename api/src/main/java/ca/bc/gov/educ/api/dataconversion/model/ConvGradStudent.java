@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,4 +38,7 @@ public class ConvGradStudent {
 
   // grad or non-grad
   private boolean graduated;
+
+  // data conversion status after being processed.
+  private ConversionResultType result;
 }

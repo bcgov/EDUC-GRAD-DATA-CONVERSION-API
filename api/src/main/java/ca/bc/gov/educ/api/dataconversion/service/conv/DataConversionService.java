@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -11,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,27 +58,17 @@ public class DataConversionService {
                 students.add(student);
             }
         });
-//        return students.subList(0,10);
-        return students;
+        return students; // .subList(0,10);
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<TraxStudentEntity> loadAllTraxStudentsForPenUpdate(Pageable pageable) {
+    public List<TraxStudentEntity> loadTraxStudentEntitiesByPage(Pageable pageable) {
         return traxStudentRepository.findAllByStatus(null, pageable).toList();
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadAllTraxStudentDataForPenUpdate() {
-        List<ConvGradStudent> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudentsForPenUpdate();
-        results.forEach(result -> {
-            ConvGradStudent student = new ConvGradStudent();
-            String pen = (String) result[0];
-            student.setPen(pen);
-            students.add(student);
-        });
-
-        return students;
+    public Integer getTotalNumberOfTraxStudentEntities() {
+        return traxStudentRepository.countAllByStatus(null);
     }
 
     private ConvGradStudent populateConvGradStudent(Object[] fields) {
@@ -91,7 +81,7 @@ public class DataConversionService {
         String graduationRequestYear = (String) fields[6];
 
         Character recalculateGradStatus = (Character) fields[7];
-        if (studentStatus != null && (studentStatus.charValue() == 'M' || studentStatus.charValue() == 'D')) {
+        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
             recalculateGradStatus = null;
         }
         // grad or non-grad
@@ -122,7 +112,7 @@ public class DataConversionService {
                     studentStatus != null ? studentStatus.toString() : null,
                     archiveFlag != null ? archiveFlag.toString() : null,
                     StringUtils.isNotBlank(frenchCert) ? frenchCert.trim() : null,
-                    graduationRequestYear, programCodes, isGraduated);
+                    graduationRequestYear, programCodes, isGraduated, ConversionResultType.SUCCESS);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -222,7 +212,7 @@ public class DataConversionService {
                     saveTraxStudent(traxStudentNo.getStudNo(), "C");
                 }
             } else {
-                log.debug("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
+                log.info("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
                 saveTraxStudent(traxStudentNo.getStudNo(), "Y");
             }
             return traxStudentNo;
@@ -285,7 +275,8 @@ public class DataConversionService {
         }
     }
 
-    private void saveTraxStudent(String studNo, String status) {
+    @Transactional(transactionManager = "traxTransactionManager")
+    public void saveTraxStudent(String studNo, String status) {
         TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
         traxStudentEntity.setStudNo(studNo);
         traxStudentEntity.setStatus(status);

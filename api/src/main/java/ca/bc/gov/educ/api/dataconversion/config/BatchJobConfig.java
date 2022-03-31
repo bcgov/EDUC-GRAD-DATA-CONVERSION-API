@@ -1,40 +1,29 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
-import ca.bc.gov.educ.api.dataconversion.listener.AddMissingStudentsJobCompletionNotificationListener;
-import ca.bc.gov.educ.api.dataconversion.listener.CourseRequirementDataConversionJobCompletionNotificationListener;
-import ca.bc.gov.educ.api.dataconversion.listener.CourseRestrictionDataConversionJobCompletionNotificationListener;
+import ca.bc.gov.educ.api.dataconversion.listener.*;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionAllTraxStudentsReader;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRequirementReader;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionCourseRestrictionReader;
+import ca.bc.gov.educ.api.dataconversion.reader.*;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionAllTraxStudentsWriter;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
+import ca.bc.gov.educ.api.dataconversion.writer.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
-import org.springframework.batch.item.ItemWriter;
+import org.springframework.batch.item.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import ca.bc.gov.educ.api.dataconversion.listener.StudentDataConversionJobCompletionNotificationListener;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.reader.DataConversionStudentReader;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
-import ca.bc.gov.educ.api.dataconversion.writer.DataConversionStudentWriter;
-
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableBatchProcessing
@@ -59,11 +48,6 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemReader<TraxStudentEntity> addMissingPenReader(DataConversionService dataConversionService, EducGradDataConversionApiConstants constants, RestUtils restUtils) {
-        return new DataConversionAllTraxStudentsReader(dataConversionService, constants, restUtils);
-    }
-
-    @Bean
     public ItemWriter<ConvGradStudent> studentWriter() {
         return new DataConversionStudentWriter();
     }
@@ -76,11 +60,6 @@ public class BatchJobConfig {
     @Bean
     public ItemWriter<GraduationCourseEntity> courseRequirementWriter() {
         return new DataConversionCourseRequirementWriter();
-    }
-
-    @Bean
-    public ItemWriter<TraxStudentEntity> addMissingPenWriter() {
-        return new DataConversionAllTraxStudentsWriter();
     }
 
     @Bean
@@ -106,11 +85,6 @@ public class BatchJobConfig {
     @Bean
     public CourseRequirementCreator courseRequirementCreator() {
         return new CourseRequirementCreator();
-    }
-
-    @Bean
-    public ItemProcessor<TraxStudentEntity,TraxStudentEntity> addNewPenProcessor() {
-        return new ReadTraxStudentAndAddNewPenProcessor();
     }
 
     /**
@@ -230,34 +204,112 @@ public class BatchJobConfig {
         return postProcessor;
     }
 
-    /**
-     * Creates a bean that represents the only steps of our batch job.
-     */
+    // Partitioning for pen updates ---------------------------------------------------------------------------
     @Bean
-    public Step readTraxAndAddNewPenJobStep(ItemReader<TraxStudentEntity> addMissingPenReader,
-                                             ItemProcessor<? super TraxStudentEntity, ? extends TraxStudentEntity> addNewPenProcessor,
-                                             ItemWriter<TraxStudentEntity> addMissingPenWriter,
-                                             StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("readTraxAndAddNewPenJobStep")
-                .<TraxStudentEntity, TraxStudentEntity>chunk(1)
-                .reader(addMissingPenReader)
-                .processor(addNewPenProcessor)
-                .writer(addMissingPenWriter)
+    public Step masterStepForPenUpdates(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService, EducGradDataConversionApiConstants constants) {
+        return stepBuilderFactory.get("masterStepForPenUpdates")
+                .partitioner(slaveStepForPenUpdates(stepBuilderFactory).getName(), partitioner(dataConversionService))
+                .step(slaveStepForPenUpdates(stepBuilderFactory))
+                .gridSize(constants.getNumberOfPartitions())
+                .taskExecutor(taskExecutor(constants))
                 .build();
     }
 
-    /**
-     * Creates a bean that represents our batch job.
-     */
     @Bean
-    public Job readTraxAndAddNewPenBatchJob(Step readTraxAndAddNewPenJobStep,
-                                             AddMissingStudentsJobCompletionNotificationListener listener,
-                                             JobBuilderFactory jobBuilderFactory) {
-        return jobBuilderFactory.get("readTraxAndAddNewPenBatchJob")
+    public StudentLoadPartitioner partitioner(DataConversionService dataConversionService) {
+        // Reader to feed input data for each partition
+        return new StudentLoadPartitioner(dataConversionService);
+    }
+
+    @Bean
+    public Step slaveStepForPenUpdates(StepBuilderFactory stepBuilderFactory) {
+        return stepBuilderFactory.get("slaveStepForPenUpdates")
+                .tasklet(penUpdatesPartitionHandler())
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public PenUpdatesPartitionHandlerCreator penUpdatesPartitionHandler() {
+        // Processor for each partition
+        return new PenUpdatesPartitionHandlerCreator();
+    }
+
+    @Bean
+    public Job penUpdatesJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                             DataConversionService dataConversionService,
+                             EducGradDataConversionApiConstants constants,
+                             PenUpdatesJobCompletionNotificationListener listener) {
+        return jobBuilderFactory.get("penUpdatesJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(readTraxAndAddNewPenJobStep)
+                .flow(masterStepForPenUpdates(stepBuilderFactory, dataConversionService, constants))
                 .end()
                 .build();
     }
+
+    // Partitioning for student load ---------------------------------------------------------------------------
+    @Bean
+    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
+        return stepBuilderFactory.get("masterStepForStudent")
+                .partitioner(slaveStepForStudent(stepBuilderFactory, restUtils).getName(), partitioner(dataConversionService))
+                .step(slaveStepForStudent(stepBuilderFactory, restUtils))
+                .gridSize(constants.getNumberOfPartitions())
+                .taskExecutor(taskExecutor(constants))
+                .build();
+    }
+
+    @Bean
+    public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils) {
+        return stepBuilderFactory.get("slaveStepForStudent")
+                .<String, ConvGradStudent>chunk(1)
+                .reader(studentPartitionReader(restUtils))
+                .processor(studentPartitionProcessor())
+                .writer(studentPartitionWriter())
+                .build();
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionReader studentPartitionReader(RestUtils restUtils) {
+        return new StudentPartitionReader(restUtils);
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionProcessor studentPartitionProcessor() {
+        return new StudentPartitionProcessor();
+    }
+
+    @Bean
+    @StepScope
+    public StudentPartitionWriter studentPartitionWriter() {
+        return new StudentPartitionWriter();
+    }
+
+    @Bean
+    public Job studentLoadJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
+                              DataConversionService dataConversionService, RestUtils restUtils,
+                              EducGradDataConversionApiConstants constants,
+                              StudentDataConversionJobCompletionNotificationListener listener) {
+        return jobBuilderFactory.get("studentLoadJob")
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(masterStepForStudent(stepBuilderFactory, dataConversionService, restUtils,constants))
+                .end()
+                .build();
+    }
+
+    @Bean
+    public TaskExecutor taskExecutor(EducGradDataConversionApiConstants constants) {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+
+        executor.setCorePoolSize(constants.getNumberOfPartitions());
+        executor.setMaxPoolSize(constants.getNumberOfPartitions());
+        executor.setThreadNamePrefix("task_thread-");
+        executor.initialize();
+
+        return executor;
+    }
+
 }

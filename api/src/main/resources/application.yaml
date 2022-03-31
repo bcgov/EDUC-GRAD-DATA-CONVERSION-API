@@ -16,6 +16,7 @@ spring:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
+      keepalive-time: ${KEEP_ALIVE_TIME}
     assessment:
       username: ${ASSESSMENT_USERNAME}
       password: ${ASSESSMENT_PASSWORD}
@@ -100,9 +101,9 @@ logging:
         boot:
           autoconfigure:
             logging: ${SPRING_BOOT_AUTOCONFIG_LOG_LEVEL}
-    com:
-      zaxxer:
-        hikari: ERROR
+#    com:
+#      zaxxer:
+#        hikari: ERROR
 
 #Local properties
 server:
@@ -166,5 +167,5 @@ grad:
 
 #Page Size
 batch:
-  page:
-    size: ${PAGE_SIZE}
+  partitions:
+    number: ${NUMBER_OF_PARTITIONS}

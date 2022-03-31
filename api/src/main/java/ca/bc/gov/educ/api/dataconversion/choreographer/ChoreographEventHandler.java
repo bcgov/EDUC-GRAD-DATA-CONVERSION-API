@@ -27,7 +27,7 @@ import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_S
 public class ChoreographEventHandler {
   private final ObjectMapper mapper = new ObjectMapper();
   private final Executor singleTaskExecutor = new EnhancedQueueExecutor.Builder()
-      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("task-executor-%d").build())
+      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("single-task-executor-%d").build())
       .setCorePoolSize(1).setMaximumPoolSize(1).build();
   private final Map<String, EventService> eventServiceMap;
 
@@ -42,7 +42,7 @@ public class ChoreographEventHandler {
       try {
         switch (event.getEventType()) {
           case "UPDATE_TRAX_STUDENT_MASTER":
-            log.info("Processing CREATE_GRAD_STATUS event record :: {} ", event);
+            log.debug("Processing CREATE_GRAD_STATUS event record :: {} ", event);
             final TraxUpdateInGrad traxUpdateInGrad = JsonUtil.getJsonObjectFromString(TraxUpdateInGrad.class, event.getEventPayload());
             this.eventServiceMap.get(UPDATE_TRAX_STUDENT_MASTER.toString()).processEvent(traxUpdateInGrad, event);
             break;
