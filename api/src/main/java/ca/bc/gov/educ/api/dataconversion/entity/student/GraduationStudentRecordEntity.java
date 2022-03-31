@@ -61,6 +61,9 @@ public class GraduationStudentRecordEntity extends BaseEntity {
     @Column(name = "BATCH_ID", nullable = true)
     private Long batchId;
 
+    @Column(name = "CONSUMER_EDUC_REQT_MET", nullable = true)
+    private String consumerEducationRequirementMet;
+
     // Mappings for Student_Master
     @Transient
     private String frenchCert;

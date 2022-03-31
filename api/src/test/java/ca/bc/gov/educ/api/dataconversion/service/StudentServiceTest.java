@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
@@ -121,7 +122,8 @@ public class StudentServiceTest {
         summary.setAccessToken("123");
 
         var result = studentService.convertStudent(student, summary);
-        assertThat(result).isNull();
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
         assertThat(summary.getErrors().isEmpty()).isFalse();
         assertThat(summary.getErrors().get(0).getReason().startsWith("PEN Student API is failed")).isTrue();
     }
@@ -148,7 +150,8 @@ public class StudentServiceTest {
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
 
-        assertThat(result).isNull();
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
         assertThat(summary.getErrors().isEmpty()).isFalse();
         assertThat(summary.getErrors().get(0).getReason()).isEqualTo("PEN does not exist: PEN Student API returns empty response.");
     }

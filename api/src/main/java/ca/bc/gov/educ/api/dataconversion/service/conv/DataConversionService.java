@@ -103,16 +103,27 @@ public class DataConversionService {
         // french cert
         String frenchCert = (String) fields[15];
 
+        // consumer education requirement met
+        String consumerEducationRequirementMet = (String) fields[16];
+
         ConvGradStudent student = null;
         try {
-            student = new ConvGradStudent(
-                    pen, null, null, slpDateStr, null, null,
-                    recalculateGradStatus != null ? recalculateGradStatus.toString() : null, null,
-                    schoolOfRecord, schoolAtGrad, studentGrade,
-                    studentStatus != null ? studentStatus.toString() : null,
-                    archiveFlag != null ? archiveFlag.toString() : null,
-                    StringUtils.isNotBlank(frenchCert) ? frenchCert.trim() : null,
-                    graduationRequestYear, programCodes, isGraduated, ConversionResultType.SUCCESS);
+            student = ConvGradStudent.builder()
+                    .pen(pen)
+                    .slpDate(slpDateStr)
+                    .recalculateGradStatus(recalculateGradStatus != null ? recalculateGradStatus.toString() : null)
+                    .schoolOfRecord(schoolOfRecord)
+                    .schoolAtGrad(schoolAtGrad)
+                    .studentGrade(studentGrade)
+                    .studentStatus(studentStatus != null? studentStatus.toString() : null)
+                    .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)
+                    .frenchCert(frenchCert)
+                    .graduationRequestYear(graduationRequestYear)
+                    .programCodes(programCodes)
+                    .graduated(isGraduated)
+                    .consumerEducationRequirementMet(consumerEducationRequirementMet)
+                    .result(ConversionResultType.SUCCESS)
+                    .build();
         } catch (Exception ex) {
             ex.printStackTrace();
         }
