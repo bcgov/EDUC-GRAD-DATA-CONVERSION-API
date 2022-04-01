@@ -121,7 +121,7 @@ public class DataConversionService {
                     .graduationRequestYear(graduationRequestYear)
                     .programCodes(programCodes)
                     .graduated(isGraduated)
-                    .consumerEducationRequirementMet(consumerEducationRequirementMet)
+                    .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
                     .result(ConversionResultType.SUCCESS)
                     .build();
         } catch (Exception ex) {
