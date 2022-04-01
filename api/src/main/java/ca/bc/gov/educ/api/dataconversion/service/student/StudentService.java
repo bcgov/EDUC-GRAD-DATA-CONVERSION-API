@@ -195,6 +195,7 @@ public class StudentService extends StudentBaseService {
 
         // Mappings with Student_Master
         studentEntity.setFrenchCert(student.getFrenchCert());
+        studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
     }
 
     private ConversionResultType processOptionalPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {

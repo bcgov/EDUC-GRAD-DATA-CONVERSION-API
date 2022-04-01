@@ -69,6 +69,8 @@ public class TraxDbConfig {
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
 
+        System.out.println("==> TRAX DB : POOL SIZE = " + maxPoolSize);
+
         return new HikariDataSource(config);
     }
 

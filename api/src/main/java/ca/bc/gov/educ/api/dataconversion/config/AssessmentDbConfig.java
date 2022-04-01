@@ -28,8 +28,8 @@ import java.util.HashMap;
 @EnableTransactionManagement
 public class AssessmentDbConfig {
     // Hikari Pool
-    @Value("${spring.db-connection.hikari.maximum-pool-size}")
-    private int maxPoolSize;
+    @Value("${batch.partitions.number}")
+    private int numberOfPartitions;
 
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
@@ -64,9 +64,11 @@ public class AssessmentDbConfig {
         config.setPoolName(assessmentPoolName);
 
         config.setMinimumIdle(2);
-        config.setMaximumPoolSize(maxPoolSize);
+        config.setMaximumPoolSize(numberOfPartitions);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
+
+        System.out.println("==> ASSMT DB : POOL SIZE = " + numberOfPartitions);
 
         return new HikariDataSource(config);
     }
