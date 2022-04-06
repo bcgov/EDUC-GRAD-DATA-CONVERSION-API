@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.entity.assessment.StudentAssessmentEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.program.OptionalProgramEntity;
