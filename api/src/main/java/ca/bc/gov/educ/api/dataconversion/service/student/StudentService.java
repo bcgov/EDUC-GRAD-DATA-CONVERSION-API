@@ -359,7 +359,7 @@ public class StudentService extends StudentBaseService {
     }
 
     @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
-    public StudentGradDTO loadStudentData(String pen) {
+    public StudentGradDTO loadStudentData(String pen, String accessToken) {
         byte[] rawGUID = graduationStudentRecordRepository.findStudentID(pen);
         if (rawGUID == null) {
             return null;
@@ -392,7 +392,7 @@ public class StudentService extends StudentBaseService {
         List<StudentCourseEntity> courses = courseService.getStudentCourses(pen);
         studentData.getCourses().addAll(courses);
         // assessments
-        List<StudentAssessmentEntity> assessments = assessmentService.getStudentAssessments(pen);
+        List<StudentAssessment> assessments = assessmentService.getStudentAssessments(pen, accessToken);
         studentData.getAssessments().addAll(assessments);
 
         return studentData;

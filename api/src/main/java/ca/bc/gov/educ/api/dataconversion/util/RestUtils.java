@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
-import ca.bc.gov.educ.api.dataconversion.model.Student;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -63,6 +61,23 @@ public class RestUtils {
                 .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(student))
                 .retrieve().bodyToMono(Student.class).block();
+    }
+
+    public AssessmentRequirement addAssessmentRequirement(AssessmentRequirement assessmentRequirement, String accessToken) {
+        return webClient.post()
+                .uri(constants.getAddAssessmentRequirementApiUrl())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(assessmentRequirement))
+                .retrieve().bodyToMono(AssessmentRequirement.class).block();
+    }
+
+    public List<StudentAssessment> getStudentAssessmentsByPen(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(String.format(constants.getStudentAssessmentsByPenApiUrl(), pen))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(responseType).block();
     }
 
 }

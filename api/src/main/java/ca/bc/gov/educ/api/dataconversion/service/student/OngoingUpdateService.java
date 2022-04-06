@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     private final StudentService studentService;
     private final ProgramService programService;
     private final DataConversionService dataConversionService;
+    private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
@@ -35,11 +37,13 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                                 StudentService studentService,
                                 ProgramService programService,
                                 DataConversionService dataConversionService,
+                                RestUtils restUtils,
                                 EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
         this.studentService = studentService;
         this.programService = programService;
         this.dataConversionService = dataConversionService;
+        this.restUtils = restUtils;
         this.constants = constants;
     }
 
@@ -57,7 +61,15 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         }
 
         if (requestStudent != null && constants.isGradUpdateEnabled()) {
+            // Get Access Token
+            ResponseObj res = restUtils.getTokenResponseObject();
+            String accessToken = null;
+            if (res != null) {
+                accessToken = res.getAccess_token();
+            }
             if (StringUtils.equals(traxUpdateInGrad.getUpdateType(), "NEWSTUDENT")) {
+                ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+                summary.setAccessToken(accessToken);
                 studentService.convertStudent(requestStudent, new ConversionStudentSummaryDTO());
             } else {
                 // get Grad Program & Student Status for trax student
@@ -65,7 +77,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                 requestStudent.setStudentStatus(getGradStudentStatus(requestStudent.getStudentStatus(), requestStudent.getArchiveFlag()));
 
                 // Load grad student
-                StudentGradDTO currentStudent = studentService.loadStudentData(requestStudent.getPen());
+                StudentGradDTO currentStudent = studentService.loadStudentData(requestStudent.getPen(), accessToken);
                 log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
                 switch (traxUpdateInGrad.getUpdateType()) {
                     case "STUDENT":

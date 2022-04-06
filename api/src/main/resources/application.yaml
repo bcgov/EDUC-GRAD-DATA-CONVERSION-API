@@ -17,10 +17,6 @@ spring:
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
       keepalive-time: ${KEEP_ALIVE_TIME}
-    assessment:
-      username: ${ASSESSMENT_USERNAME}
-      password: ${ASSESSMENT_PASSWORD}
-      pool-name: conv-assessment-cp
     batch:
       username: ${BATCH_USERNAME}
       password: ${BATCH_PASSWORD}
@@ -154,6 +150,12 @@ endpoint:
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
+  grad-assessment-api:
+    assessment-requirement:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement
+    student-assessments-by-pen:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen/%s
+
 
 #Conversion option
 data-conversion:

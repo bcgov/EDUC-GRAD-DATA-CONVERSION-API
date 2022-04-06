@@ -94,6 +94,11 @@ endpoint:
   grad-student-api:
     add-new-pen:
       url: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student
+  grad-assessment-api:
+    assessment-requirement:
+      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
+    student-assessments-by-pen:
+      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen/%s
 
 #Conversion option
 data-conversion:

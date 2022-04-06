@@ -1,9 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 
-import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
-import ca.bc.gov.educ.api.dataconversion.model.Student;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import lombok.val;
 import org.codehaus.jackson.JsonProcessingException;
@@ -132,5 +130,82 @@ public class RestUtilsTest {
         assertThat(result).isNotNull();
         assertThat(result.getGraduationProgramCode()).isEqualTo("abc");
         assertThat(result.getOptProgramCode()).isEqualTo("def");
+    }
+
+    @Test
+    public void testGetStudentAssessments_givenValues_returnsStudentAssessments_withAPICallSuccess() throws JsonProcessingException {
+        final String pen = "123456789";
+        final String assmtCode = "assmtCode";
+
+        final Assessment assessment = new Assessment();
+        assessment.setAssessmentCode(assmtCode);
+        assessment.setAssessmentName(assmtCode + " Test Name");
+
+        final StudentAssessment studentAssessment = new StudentAssessment();
+        studentAssessment.setPen(pen);
+        studentAssessment.setAssessmentCode(assmtCode);
+        studentAssessment.setAssessmentDetails(assessment);
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getStudentAssessmentsByPenApiUrl(), pen))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(studentAssessment)));
+
+        val result = this.restUtils.getStudentAssessmentsByPen(pen, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.size() > 0).isTrue();
+        assertThat(result.get(0).getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testAddNewPen_returnsToken_with_APICallSuccess() {
+        final String studentID = UUID.randomUUID().toString();
+        final Student student = new Student();
+        final String pen = "123456789";
+        student.setStudentID(studentID);
+        student.setPen(pen);
+
+        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(constants.getAddNewPenFromGradStudentApiUrl())).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(Student.class)).thenReturn(Mono.just(student));
+
+        val result = this.restUtils.addNewPen(student, "123");
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testAddAssessRequirement_returnsToken_with_APICallSuccess() {
+        final String pen = "123456789";
+        final String assmtCode = "assmtCode";
+        final String assmtReqCode = "ruleCode";
+
+        final AssessmentRequirementCode ruleCode = new AssessmentRequirementCode();
+        ruleCode.setAssmtRequirementCode(assmtReqCode);
+
+        final AssessmentRequirement assessmentRequirement = new AssessmentRequirement();
+        assessmentRequirement.setAssessmentCode(assmtCode);
+        assessmentRequirement.setRuleCode(ruleCode);
+
+        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(constants.getAddAssessmentRequirementApiUrl())).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(AssessmentRequirement.class)).thenReturn(Mono.just(assessmentRequirement));
+
+        val result = this.restUtils.addAssessmentRequirement(assessmentRequirement, "123");
+        assertThat(result).isNotNull();
+        assertThat(result.getAssessmentCode()).isEqualTo(assmtCode);
+        assertThat(result.getRuleCode().getAssmtRequirementCode()).isEqualTo(assmtReqCode);
     }
 }

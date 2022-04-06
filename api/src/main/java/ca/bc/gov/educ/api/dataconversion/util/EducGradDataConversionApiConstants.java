@@ -72,6 +72,11 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
 
+    @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
+    private String addAssessmentRequirementApiUrl;
+
+    @Value("${endpoint.grad-assessment-api.student-assessments-by-pen.url}")
+    private String studentAssessmentsByPenApiUrl;
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;
 
