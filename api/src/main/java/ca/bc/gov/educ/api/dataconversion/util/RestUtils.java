@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class RestUtils {
@@ -48,11 +49,26 @@ public class RestUtils {
                 .retrieve().bodyToMono(responseType).block();
     }
 
-    public GradSpecialProgram getGradSpecialProgram(String programCode, String specialProgramCode, String accessToken) {
+    public OptionalProgram getOptionalProgram(String programCode, String specialProgramCode, String accessToken) {
         return this.webClient.get()
-                .uri(constants.getGradProgramManagementUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
+                .uri(constants.getGradOptionalProgramUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
                 .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(GradSpecialProgram.class).block();
+                .retrieve().bodyToMono(OptionalProgram.class).block();
+    }
+
+    public OptionalProgram getOptionalProgramByID(UUID optionalProgramID, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getGradOptionalProgramByIDUrl(), uri -> uri.path("/{optionalProgramID}").build(optionalProgramID))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(OptionalProgram.class).block();
+    }
+
+
+    public CareerProgram getCareerProgram(String careerProgramCode, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getGradCareerProgramUrl(), uri -> uri.path("/{careerProgramCode}").build(careerProgramCode))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(CareerProgram.class).block();
     }
 
     public Student addNewPen(Student student, String accessToken) {

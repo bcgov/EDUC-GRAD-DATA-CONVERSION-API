@@ -29,10 +29,6 @@ spring:
       username: ${CONV_USERNAME}
       password: ${CONV_PASSWORD}
       pool-name: conv-primary-cp
-    program:
-      username: ${PROGRAM_USERNAME}
-      password: ${PROGRAM_PASSWORD}
-      pool-name: conv-program-cp
     student:
       username: ${STUDENT_USERNAME}
       password: ${STUDENT_PASSWORD}
@@ -147,6 +143,10 @@ endpoint:
   grad-program-api:
     special-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+    optional-program-by-id:
+      url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms/id
+    career-program:
+      url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student

@@ -5,7 +5,6 @@ import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
-import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +25,6 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     private final EventRepository eventRepository;
 
     private final StudentService studentService;
-    private final ProgramService programService;
     private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
 
@@ -35,13 +33,11 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     @Autowired
     public OngoingUpdateService(EventRepository eventRepository,
                                 StudentService studentService,
-                                ProgramService programService,
                                 DataConversionService dataConversionService,
                                 RestUtils restUtils,
                                 EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
         this.studentService = studentService;
-        this.programService = programService;
         this.dataConversionService = dataConversionService;
         this.restUtils = restUtils;
         this.constants = constants;
@@ -81,18 +77,18 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                 log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
                 switch (traxUpdateInGrad.getUpdateType()) {
                     case "STUDENT":
-                        processStudent(requestStudent, currentStudent);
+                        processStudent(requestStudent, currentStudent, accessToken);
                         break;
                     case "XPROGRAM":
-                        processOptionalAndCareerPrograms(requestStudent, currentStudent);
+                        processOptionalAndCareerPrograms(requestStudent, currentStudent, accessToken);
                         break;
                     case "FI10ADD":
                     case "FI11ADD":
-                        processFrenchImmersion(requestStudent, currentStudent, false);
+                        processFrenchImmersion(requestStudent, currentStudent, accessToken, false);
                         break;
                     case "FI10DELETE":
                     case "FI11DELETE":
-                        processFrenchImmersion(requestStudent, currentStudent, true);
+                        processFrenchImmersion(requestStudent, currentStudent, accessToken, true);
                         break;
                     case "COURSE":
                     case "ASSESSMENT":
@@ -112,7 +108,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         });
     }
 
-    public void processStudent(ConvGradStudent requestStudent, StudentGradDTO currentStudent) {
+    public void processStudent(ConvGradStudent requestStudent, StudentGradDTO currentStudent, String accessToken) {
         boolean isChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), requestStudent.getPen());
@@ -150,12 +146,12 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), requestStudent.getPen());
-            studentService.saveGraduationStudent(currentStudent);
+            studentService.saveGraduationStudent(currentStudent, accessToken);
             studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         }
     }
 
-    public void processOptionalAndCareerPrograms(ConvGradStudent requestStudent, StudentGradDTO currentStudent) {
+    public void processOptionalAndCareerPrograms(ConvGradStudent requestStudent, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process Optional & Career Programs : studentID = {}, pen = {}", currentStudent.getStudentID(), requestStudent.getPen());
 
         handleOptionalAndCareerProgramChange(requestStudent.getProgramCodes(), currentStudent.getProgramCodes(), currentStudent);
@@ -165,9 +161,10 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         }
 
         currentStudent.getRemovedProgramCodes().forEach(p -> {
-            if (programService.isOptionalProgramCode(p)) {
+            OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
+            if (optionalProgram != null) {
                 log.info(" => removed optional program code : {}", p);
-                studentService.removeStudentOptionalProgram(p, currentStudent);
+                studentService.removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent);
             } else {
                 log.info(" => removed career program code : {}", p);
                 studentService.removeStudentCareerProgram(p, currentStudent);
@@ -175,9 +172,10 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         });
 
         currentStudent.getAddedProgramCodes().forEach(p -> {
-            if (programService.isOptionalProgramCode(p)) {
+            OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
+            if (optionalProgram != null) {
                 log.info(" => new optional program code : {}", p);
-                studentService.addStudentOptionalProgram(p, currentStudent);
+                studentService.addStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent);
             } else {
                 log.info(" => new career program code : {}", p);
                 studentService.addStudentCareerProgram(p, currentStudent);
@@ -187,23 +185,23 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         // No Career Program?  then remove CP optional program
         if (studentService.existsCareerProgram(currentStudent.getStudentID())) {
             log.info(" => [CP] optional program will be added if not exist.");
-            studentService.addStudentOptionalProgram("CP", currentStudent);
+            studentService.addStudentOptionalProgram("CP", currentStudent, accessToken);
         } else {
             log.info(" => [CP] optional program will be removed if exist.");
-            studentService.removeStudentOptionalProgram("CP", currentStudent);
+            studentService.removeStudentOptionalProgram("CP", currentStudent, accessToken);
         }
         studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
     }
 
-    public void processFrenchImmersion(ConvGradStudent requestStudent, StudentGradDTO currentStudent, boolean isDelete) {
+    public void processFrenchImmersion(ConvGradStudent requestStudent, StudentGradDTO currentStudent, String accessToken, boolean isDelete) {
         log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(), isDelete? "DELETE" : "ADD");
         if (isDelete && !studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
             log.info(" => remove FI optional program");
-            studentService.removeStudentOptionalProgram("FI", currentStudent);
+            studentService.removeStudentOptionalProgram("FI", currentStudent, accessToken);
             studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         } else if (!isDelete && studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
             log.info(" => create FI optional program");
-            studentService.addStudentOptionalProgram("FI", currentStudent);
+            studentService.addStudentOptionalProgram("FI", currentStudent, accessToken);
             studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
         }
     }

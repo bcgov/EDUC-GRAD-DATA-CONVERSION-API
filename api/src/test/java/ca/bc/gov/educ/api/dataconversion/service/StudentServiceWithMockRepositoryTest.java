@@ -1,12 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.program.CareerProgramEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
-import ca.bc.gov.educ.api.dataconversion.service.program.ProgramService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.service.trax.TraxService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -57,9 +55,6 @@ public class StudentServiceWithMockRepositoryTest {
     EventRepository eventRepository;
 
     @MockBean
-    ProgramService programService;
-
-    @MockBean
     CourseService courseService;
 
     @MockBean
@@ -101,7 +96,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setStudentGrade("12");
         gradStudentEntity.setStudentStatus("CUR");
 
-        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
         specialProgram.setGraduationProgramCode("2018-EN");
         specialProgram.setOptProgramCode("FI");
@@ -121,12 +116,12 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
         when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
-        when(this.programService.getCareerProgram("XC")).thenReturn(null);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(careerProgramEntity)).thenReturn(careerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
@@ -164,7 +159,7 @@ public class StudentServiceWithMockRepositoryTest {
 //        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
         gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
-        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
         specialProgram.setGraduationProgramCode("2018-EN");
         specialProgram.setOptProgramCode("FI");
@@ -181,11 +176,11 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
         specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
-        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
-        careerProgramEntity.setCode("XC");
-        careerProgramEntity.setDescription("XC Test");
-        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
-        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
         StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
         studentCareerProgramEntity.setId(UUID.randomUUID());
@@ -195,14 +190,14 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
-        when(this.programService.getCareerProgram("XC")).thenReturn(careerProgramEntity);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
         when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getGradSpecialProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
@@ -240,7 +235,7 @@ public class StudentServiceWithMockRepositoryTest {
 //        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
         gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
-        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
         specialProgram.setGraduationProgramCode("1996-EN");
         specialProgram.setOptProgramCode("FI");
@@ -257,11 +252,11 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
         specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
-        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
-        careerProgramEntity.setCode("XC");
-        careerProgramEntity.setDescription("XC Test");
-        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
-        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
         StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
         studentCareerProgramEntity.setId(UUID.randomUUID());
@@ -271,14 +266,14 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
-        when(this.programService.getCareerProgram("XC")).thenReturn(careerProgramEntity);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
         when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getGradSpecialProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN").recalculateGradStatus("Y")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("1996")
@@ -316,7 +311,7 @@ public class StudentServiceWithMockRepositoryTest {
 //        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
         gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
-        GradSpecialProgram specialProgram = new GradSpecialProgram();
+        OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
         specialProgram.setGraduationProgramCode("1986-EN");
         specialProgram.setOptProgramCode("FI");
@@ -333,11 +328,11 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
         specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
-        CareerProgramEntity careerProgramEntity = new CareerProgramEntity();
-        careerProgramEntity.setCode("XC");
-        careerProgramEntity.setDescription("XC Test");
-        careerProgramEntity.setStartDate(new Date(System.currentTimeMillis() - 100000L));
-        careerProgramEntity.setEndDate(new Date(System.currentTimeMillis() + 100000L));
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
         StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
         studentCareerProgramEntity.setId(UUID.randomUUID());
@@ -347,14 +342,14 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
-        when(this.programService.getCareerProgram("XC")).thenReturn(careerProgramEntity);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
         when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getGradSpecialProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN").recalculateGradStatus("Y")

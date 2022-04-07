@@ -115,18 +115,18 @@ public class RestUtilsTest {
     @Test
     public void testGetSpecialProgram_givenValues_returnsGradSpecialProgram_with_APICallSuccess() throws JsonProcessingException {
         final UUID specialProgramID = UUID.randomUUID();
-        final GradSpecialProgram specialProgram = new GradSpecialProgram();
+        final OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(specialProgramID);
         specialProgram.setGraduationProgramCode("abc");
         specialProgram.setOptProgramCode("def");
 
         when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradProgramManagementUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradOptionalProgramUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 
-        when(this.responseMock.bodyToMono(GradSpecialProgram.class)).thenReturn(Mono.just(specialProgram));
-        val result = this.restUtils.getGradSpecialProgram("abc", "def", "123");
+        when(this.responseMock.bodyToMono(OptionalProgram.class)).thenReturn(Mono.just(specialProgram));
+        val result = this.restUtils.getOptionalProgram("abc", "def", "123");
         assertThat(result).isNotNull();
         assertThat(result.getGraduationProgramCode()).isEqualTo("abc");
         assertThat(result.getOptProgramCode()).isEqualTo("def");

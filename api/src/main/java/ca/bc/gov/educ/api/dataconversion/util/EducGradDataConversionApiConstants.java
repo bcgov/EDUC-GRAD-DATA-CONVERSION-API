@@ -67,7 +67,13 @@ public class EducGradDataConversionApiConstants {
     private String penStudentApiByPenUrl;
 
     @Value("${endpoint.grad-program-api.special-program.url}")
-    private String gradProgramManagementUrl;
+    private String gradOptionalProgramUrl;
+
+    @Value("${endpoint.grad-program-api.optional-program-by-id.url}")
+    private String gradOptionalProgramByIDUrl;
+
+    @Value("${endpoint.grad-program-api.career-program.url}")
+    private String gradCareerProgramUrl;
 
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
