@@ -88,6 +88,25 @@ endpoint:
   pen-student-api:
     by-pen:
       url: https://student-api-75e61b-tools.apps.silver.devops.gov.bc.ca/api/v1/student?pen=%s
+  grad-course-api:
+    course-restriction:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/course-restriction
+    save-course-restriction:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/save-course-restriction
+    course-requirement:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/course-requirement
+    save-course-requirement:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/save-course-requirement
+    student-courses-by-pen:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/studentcourse/pen
+    check-french-immersion-course:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/studentcourse/check-french-immersion-course
+    check-french-immersion-course-for-en:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/studentcourse/check-french-immersion-course-for-en
+    check-blank-language-course:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/check-blank-language-course
+    check-french-language-course:
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/api/v1/course/check-french-language-course
   grad-program-api:
     special-program:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms
@@ -102,7 +121,7 @@ endpoint:
     assessment-requirement:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
     student-assessments-by-pen:
-      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen/%s
+      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen
 
 #Conversion option
 data-conversion:

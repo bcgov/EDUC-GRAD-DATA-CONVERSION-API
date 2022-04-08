@@ -115,7 +115,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
         when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
@@ -189,7 +189,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
@@ -265,7 +265,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
@@ -341,7 +341,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.traxService.existsSchool("222333")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);

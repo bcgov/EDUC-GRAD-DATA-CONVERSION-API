@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
@@ -202,28 +201,28 @@ public class StudentService extends StudentBaseService {
         }
 
         // French Immersion for 2018-EN, 2004-EN
-        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert())) {
+        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert(), accessToken)) {
             return createStudentOptionalProgram("FI", student, accessToken, summary);
         }
 
         return ConversionResultType.SUCCESS;
     }
 
-    protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert) {
+    protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
         boolean frenchImmersion = false;
         // French Immersion for 2018-EN, 2004-EN
         if (program.equals("2018-EN") || program.equals("2004-EN")) {
-            if (courseService.isFrenchImmersionCourse(pen, "10")) {
+            if (courseService.isFrenchImmersionCourse(pen, "10", accessToken)) {
                 frenchImmersion = true;
             }
         } else if (program.equals("1996-EN")) {
-            if (courseService.isFrenchImmersionCourse(pen, "11")) {
+            if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) {
                 frenchImmersion = true;
             }
         } else if (program.equals("1986-EN")) {
             if (StringUtils.equalsIgnoreCase("F", frenchCert)) {
                 frenchImmersion = true;
-            } else if (courseService.isFrenchImmersionCourseForEN(pen, "11")) {
+            } else if (courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) {
                 frenchImmersion = true;
             }
         }
@@ -393,7 +392,7 @@ public class StudentService extends StudentBaseService {
         studentData.getProgramCodes().addAll(getCareerProgramCodes(careerPrograms));
 
         // courses
-        List<StudentCourseEntity> courses = courseService.getStudentCourses(pen);
+        List<StudentCourse> courses = courseService.getStudentCourses(pen, accessToken);
         studentData.getCourses().addAll(courses);
         // assessments
         List<StudentAssessment> assessments = assessmentService.getStudentAssessments(pen, accessToken);

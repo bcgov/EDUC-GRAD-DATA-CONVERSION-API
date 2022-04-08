@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.listener.*;
-import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
 import ca.bc.gov.educ.api.dataconversion.reader.*;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
@@ -38,7 +38,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemReader<GradCourseRestriction> courseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
+    public ItemReader<CourseRestriction> courseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
         return new DataConversionCourseRestrictionReader(dataConversionService, restUtils);
     }
 
@@ -53,7 +53,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemWriter<GradCourseRestriction> courseRestrictionWriter() {
+    public ItemWriter<CourseRestriction> courseRestrictionWriter() {
         return new DataConversionCourseRestrictionWriter();
     }
 
@@ -68,7 +68,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemProcessor<GradCourseRestriction,GradCourseRestriction> courseRestrictionProcessor() {
+    public ItemProcessor<CourseRestriction, CourseRestriction> courseRestrictionProcessor() {
         return new DataConversionCourseRestrictionProcessor();
     }
 
@@ -122,12 +122,12 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step courseRestrictionDataConversionJobStep(ItemReader<GradCourseRestriction> courseRestrictionReader,
-                                                    ItemProcessor<? super GradCourseRestriction, ? extends GradCourseRestriction> courseRestrictionProcessor,
-                                                    ItemWriter<GradCourseRestriction> courseRestrictionWriter,
+    public Step courseRestrictionDataConversionJobStep(ItemReader<CourseRestriction> courseRestrictionReader,
+                                                    ItemProcessor<? super CourseRestriction, ? extends CourseRestriction> courseRestrictionProcessor,
+                                                    ItemWriter<CourseRestriction> courseRestrictionWriter,
                                                     StepBuilderFactory stepBuilderFactory) {
         return stepBuilderFactory.get("courseRestrictionDataConversionJobStep")
-                .<GradCourseRestriction, GradCourseRestriction>chunk(1)
+                .<CourseRestriction, CourseRestriction>chunk(1)
                 .reader(courseRestrictionReader)
                 .processor(courseRestrictionProcessor)
                 .writer(courseRestrictionWriter)

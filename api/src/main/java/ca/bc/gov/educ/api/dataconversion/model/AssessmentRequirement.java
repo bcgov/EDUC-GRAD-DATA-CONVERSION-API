@@ -2,14 +2,12 @@ package ca.bc.gov.educ.api.dataconversion.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-@Component
 public class AssessmentRequirement {
 
 	private UUID assessmentRequirementId;

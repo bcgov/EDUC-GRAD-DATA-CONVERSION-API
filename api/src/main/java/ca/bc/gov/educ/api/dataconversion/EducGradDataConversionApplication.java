@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
-import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
@@ -39,9 +38,6 @@ public class EducGradDataConversionApplication {
 
         modelMapper.typeMap(GraduationStudentRecordEntity.class, ConvGradStudent.class);
         modelMapper.typeMap(ConvGradStudent.class, GraduationStudentRecordEntity.class);
-
-        modelMapper.typeMap(CourseRestrictionEntity.class, GradCourseRestriction.class);
-        modelMapper.typeMap(GradCourseRestriction.class, CourseRestrictionEntity.class);
 
         return modelMapper;
     }

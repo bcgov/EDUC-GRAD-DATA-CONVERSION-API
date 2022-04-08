@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class StudentCommonDTO {
     private List<String> programCodes = new ArrayList<>();
 
     // courses
-    private List<StudentCourseEntity> courses = new ArrayList<>();
+    private List<StudentCourse> courses = new ArrayList<>();
 
     // assessments
     private List<StudentAssessment> assessments = new ArrayList<>();

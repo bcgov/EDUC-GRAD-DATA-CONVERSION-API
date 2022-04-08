@@ -1,15 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementCodeEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementCodeRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
@@ -39,15 +33,6 @@ public class CourseServiceTest {
     CourseService courseService;
 
     @MockBean
-    CourseRestrictionRepository courseRestrictionRepository;
-
-    @MockBean
-    CourseRequirementRepository courseRequirementRepository;
-
-    @MockBean
-    CourseRequirementCodeRepository courseRequirementCodeRepository;
-
-    @MockBean
     EventRepository eventRepository;
 
     @MockBean
@@ -66,62 +51,61 @@ public class CourseServiceTest {
 
     @After
     public void tearDown() {
-        courseRestrictionRepository.deleteAll();
-        courseRequirementRepository.deleteAll();
-        courseRequirementCodeRepository.deleteAll();
     }
 
     @Test
     public void testConvertCourseRestriction() {
-        ConversionBaseSummaryDTO summary = new ConversionBaseSummaryDTO();
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GradCourseRestriction courseRestriction = new GradCourseRestriction(
-                "main", "12", "rest", "12", null, null
+        CourseRestriction courseRestriction = new CourseRestriction(
+               null, "main", "12", "rest", "12", null, null
         );
 
-        CourseRestrictionEntity courseRestrictionEntity = new CourseRestrictionEntity();
-        courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-        courseRestrictionEntity.setMainCourse("main");
-        courseRestrictionEntity.setMainCourseLevel("12");
-        courseRestrictionEntity.setRestrictedCourse("rest");
-        courseRestrictionEntity.setRestrictedCourseLevel("12");
+        CourseRestriction savedCourseRestriction = new CourseRestriction();
+        savedCourseRestriction.setCourseRestrictionId(UUID.randomUUID());
+        savedCourseRestriction.setMainCourse("main");
+        savedCourseRestriction.setMainCourseLevel("12");
+        savedCourseRestriction.setRestrictedCourse("rest");
+        savedCourseRestriction.setRestrictedCourseLevel("12");
 
-        when(this.courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.empty());
-        when(this.courseRestrictionRepository.save(courseRestrictionEntity)).thenReturn(courseRestrictionEntity);
+        when(this.restUtils.getCourseRestriction("main", "12", "rest", "12", "123")).thenReturn(null);
+        when(this.restUtils.saveCourseRestriction(courseRestriction, "123")).thenReturn(savedCourseRestriction);
+
         courseService.convertCourseRestriction(courseRestriction, summary);
-        assertThat(summary.getAddedCount()).isEqualTo(1L);
+        assertThat(summary.getAddedCountForCourseRestriction()).isEqualTo(1L);
     }
 
     @Test
     public void testConvertCourseRestriction_whenGivenRecordExists() {
-        ConversionBaseSummaryDTO summary = new ConversionBaseSummaryDTO();
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GradCourseRestriction courseRestriction = new GradCourseRestriction(
-                "main", "12", "rest", "12", null, null
+        CourseRestriction courseRestriction = new CourseRestriction(
+                null, "main", "12", "rest", "12", null, null
         );
 
-        CourseRestrictionEntity courseRestrictionEntity = new CourseRestrictionEntity();
-        courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-        courseRestrictionEntity.setMainCourse("main");
-        courseRestrictionEntity.setMainCourseLevel("12");
-        courseRestrictionEntity.setRestrictedCourse("rest");
-        courseRestrictionEntity.setRestrictedCourseLevel("12");
+        CourseRestriction savedCourseRestriction = new CourseRestriction();
+        savedCourseRestriction.setCourseRestrictionId(UUID.randomUUID());
+        savedCourseRestriction.setMainCourse("main");
+        savedCourseRestriction.setMainCourseLevel("12");
+        savedCourseRestriction.setRestrictedCourse("rest");
+        savedCourseRestriction.setRestrictedCourseLevel("12");
 
-        when(this.courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel("main", "12", "rest", "12")).thenReturn(Optional.of(courseRestrictionEntity));
-        when(this.courseRestrictionRepository.save(courseRestrictionEntity)).thenReturn(courseRestrictionEntity);
+        when(this.restUtils.getCourseRestriction("main", "12", "rest", "12", "123")).thenReturn(savedCourseRestriction);
+        when(this.restUtils.saveCourseRestriction(courseRestriction, "123")).thenReturn(savedCourseRestriction);
+
         courseService.convertCourseRestriction(courseRestriction, summary);
-        assertThat(summary.getUpdatedCount()).isEqualTo(1L);
+        assertThat(summary.getUpdatedCountForCourseRestriction()).isEqualTo(1L);
     }
 
     @Test
     public void testConvertCourseRestriction_whenInvalidCourseIsProvided_throwsError() {
-        ConversionBaseSummaryDTO summary = new ConversionBaseSummaryDTO();
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GradCourseRestriction courseRestriction = new GradCourseRestriction(
-                "CLEA", "12", "CLEB", "12", null, null
+        CourseRestriction courseRestriction = new CourseRestriction(
+                null, "CLEA", "12", "CLEB", "12", null, null
         );
 
         courseService.convertCourseRestriction(courseRestriction, summary);
@@ -906,25 +890,31 @@ public class CourseServiceTest {
         GraduationCourseEntity traxCourseEntity = new GraduationCourseEntity();
         traxCourseEntity.setGraduationCourseKey(courseKey);
 
-        CourseRequirementCodeEntity ruleCodeEntity = new CourseRequirementCodeEntity();
+        CourseRequirementCodeDTO ruleCodeEntity = new CourseRequirementCodeDTO();
         ruleCodeEntity.setCourseRequirementCode(ruleCode);
         ruleCodeEntity.setLabel(courseCode + " " + courseLevel);
         ruleCodeEntity.setDescription("Credits must be earned in " + courseCode + " " + courseLevel);
 
-        CourseRequirementEntity entity = new CourseRequirementEntity();
+        CourseRequirement entity = new CourseRequirement();
         entity.setCourseRequirementId(UUID.randomUUID());
         entity.setCourseCode(courseCode);
         entity.setCourseLevel(courseLevel);
         entity.setRuleCode(ruleCodeEntity);
 
-        when(this.courseRequirementCodeRepository.findById(ruleCode)).thenReturn(Optional.of(ruleCodeEntity));
-        when(this.courseRequirementRepository.findByCourseCodeAndCourseLevelAndRuleCode(courseCode, courseLevel, ruleCodeEntity)).thenReturn(isUpdateMode? entity : null);
-        when(this.courseRequirementRepository.save(entity)).thenReturn(entity);
+        CourseRequirements courseRequirements = new CourseRequirements();
+        courseRequirements.setCourseRequirementList(Arrays.asList(entity));
 
-        if (lang != null && (lang == " " || lang == "F")) {
-            when(this.courseRequirementRepository.countTabCourses(courseCode, courseLevel, lang)).thenReturn(1L);
-        } else {
-            when(this.courseRequirementRepository.countTabCourses(courseCode, courseLevel, lang)).thenReturn(0L);
+//        when(this.courseRequirementCodeRepository.findById(ruleCode)).thenReturn(Optional.of(ruleCodeEntity));
+        when(this.restUtils.getCourseRequirements(courseCode, courseLevel, "123")).thenReturn(isUpdateMode? courseRequirements : null);
+        when(this.restUtils.saveCourseRequirement(entity, "123")).thenReturn(entity);
+
+        if (lang != null) {
+            if (lang == " ") {
+                when(this.restUtils.checkBlankLanguageCourse(courseCode, courseLevel, "123")).thenReturn(true);
+            }
+            if (lang == "F") {
+                when(this.restUtils.checkFrenchLanguageCourse(courseCode, courseLevel, "123")).thenReturn(true);
+            }
         }
 
         return traxCourseEntity;

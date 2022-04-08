@@ -162,7 +162,7 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testAddNewPen_returnsToken_with_APICallSuccess() {
+    public void testAddNewPen_returnsStudent_with_APICallSuccess() {
         final String studentID = UUID.randomUUID().toString();
         final Student student = new Student();
         final String pen = "123456789";
@@ -183,8 +183,7 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testAddAssessRequirement_returnsToken_with_APICallSuccess() {
-        final String pen = "123456789";
+    public void testAddAssessRequirement_returnsAssessmentRequirement_with_APICallSuccess() {
         final String assmtCode = "assmtCode";
         final String assmtReqCode = "ruleCode";
 
@@ -207,5 +206,185 @@ public class RestUtilsTest {
         assertThat(result).isNotNull();
         assertThat(result.getAssessmentCode()).isEqualTo(assmtCode);
         assertThat(result.getRuleCode().getAssmtRequirementCode()).isEqualTo(assmtReqCode);
+    }
+
+    @Test
+    public void testSaveCourseRestriction_returnsCourseRestriction_with_APICallSuccess() {
+        final String courseCode = "courseCode";
+        final String courseLevel = "11";
+        final String restrictedCourseCode = "rest code";
+        final String restrictedCourseLevel = "11";
+
+        final CourseRestriction courseRestriction = new CourseRestriction();
+        courseRestriction.setMainCourse(courseCode);
+        courseRestriction.setMainCourseLevel(courseLevel);
+        courseRestriction.setRestrictedCourse(restrictedCourseCode);
+        courseRestriction.setRestrictedCourseLevel(restrictedCourseLevel);
+
+        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(constants.getSaveCourseRestrictionApiUrl())).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(CourseRestriction.class)).thenReturn(Mono.just(courseRestriction));
+
+        val result = this.restUtils.saveCourseRestriction(courseRestriction, "123");
+        assertThat(result).isNotNull();
+        assertThat(result.getMainCourse()).isEqualTo(courseCode);
+        assertThat(result.getMainCourseLevel()).isEqualTo(courseLevel);
+        assertThat(result.getRestrictedCourse()).isEqualTo(restrictedCourseCode);
+        assertThat(result.getRestrictedCourseLevel()).isEqualTo(restrictedCourseLevel);
+    }
+
+
+    @Test
+    public void testSaveCourseRequirement_returnsCourseRequirement_with_APICallSuccess() {
+        final String courseCode = "courseCode";
+        final String courseLevel = "11";
+        final String courseReqCode = "ruleCode";
+
+        final CourseRequirementCodeDTO ruleCode = new CourseRequirementCodeDTO();
+        ruleCode.setCourseRequirementCode(courseReqCode);
+
+        final CourseRequirement courseRequirement = new CourseRequirement();
+        courseRequirement.setCourseCode(courseCode);
+        courseRequirement.setCourseLevel(courseLevel);
+        courseRequirement.setRuleCode(ruleCode);
+
+        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.uri(constants.getSaveCourseRequirementApiUrl())).thenReturn(this.requestBodyUriMock);
+        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
+        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+        when(this.responseMock.bodyToMono(CourseRequirement.class)).thenReturn(Mono.just(courseRequirement));
+
+        val result = this.restUtils.saveCourseRequirement(courseRequirement, "123");
+        assertThat(result).isNotNull();
+        assertThat(result.getCourseCode()).isEqualTo(courseCode);
+        assertThat(result.getRuleCode().getCourseRequirementCode()).isEqualTo(courseReqCode);
+    }
+
+    @Test
+    public void testGetCourseRequirements_returnsCourseRequirements_with_APICallSuccess() {
+        final String courseCode = "courseCode";
+        final String courseLevel = "11";
+        final String courseReqCode = "ruleCode";
+
+        final CourseRequirementCodeDTO ruleCode = new CourseRequirementCodeDTO();
+        ruleCode.setCourseRequirementCode(courseReqCode);
+
+        final CourseRequirement courseRequirement = new CourseRequirement();
+        courseRequirement.setCourseCode(courseCode);
+        courseRequirement.setCourseLevel(courseLevel);
+        courseRequirement.setRuleCode(ruleCode);
+
+        final CourseRequirements courseRequirements = new CourseRequirements();
+        courseRequirements.setCourseRequirementList(Arrays.asList(courseRequirement));
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradCourseRequirementApiUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        when(this.responseMock.bodyToMono(CourseRequirements.class)).thenReturn(Mono.just(courseRequirements));
+        val result = this.restUtils.getCourseRequirements(courseCode, courseLevel, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.getCourseRequirementList().size() > 0).isTrue();
+        assertThat(result.getCourseRequirementList().get(0).getCourseCode()).isEqualTo(courseCode);
+        assertThat(result.getCourseRequirementList().get(0).getCourseLevel()).isEqualTo(courseLevel);
+    }
+
+    @Test
+    public void testCheckFrenchImmersionCourse_returnsTrue_with_APICallSuccess() {
+        final String studentID = UUID.randomUUID().toString();
+        final Student student = new Student();
+        final String pen = "123456789";
+        student.setStudentID(studentID);
+        student.setPen(pen);
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(), pen))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(student)));
+
+        val result = this.restUtils.getStudentsByPen(pen, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.size() > 0).isTrue();
+        assertThat(result.get(0).getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testCheckFrenchImmersionCourseFor1986EN_returnsTrue_with_APICallSuccess() {
+        final String studentID = UUID.randomUUID().toString();
+        final Student student = new Student();
+        final String pen = "123456789";
+        student.setStudentID(studentID);
+        student.setPen(pen);
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(), pen))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(student)));
+
+        val result = this.restUtils.getStudentsByPen(pen, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.size() > 0).isTrue();
+        assertThat(result.get(0).getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testCheckBlankLanguageCourse_returnsTrue_with_APICallSuccess() {
+        final String studentID = UUID.randomUUID().toString();
+        final Student student = new Student();
+        final String pen = "123456789";
+        student.setStudentID(studentID);
+        student.setPen(pen);
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(), pen))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(student)));
+
+        val result = this.restUtils.getStudentsByPen(pen, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.size() > 0).isTrue();
+        assertThat(result.get(0).getPen()).isEqualTo(pen);
+    }
+
+    @Test
+    public void testCheckFrenchLanguageCourse_returnsTrue_with_APICallSuccess() {
+        final String studentID = UUID.randomUUID().toString();
+        final Student student = new Student();
+        final String pen = "123456789";
+        student.setStudentID(studentID);
+        student.setPen(pen);
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getPenStudentApiByPenUrl(), pen))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(student)));
+
+        val result = this.restUtils.getStudentsByPen(pen, "abc");
+        assertThat(result).isNotNull();
+        assertThat(result.size() > 0).isTrue();
+        assertThat(result.get(0).getPen()).isEqualTo(pen);
     }
 }

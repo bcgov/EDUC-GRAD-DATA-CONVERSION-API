@@ -82,7 +82,7 @@ public class DataConversionServiceTest {
         var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
-        GradCourseRestriction responseCourseRestriction = result.get(0);
+        CourseRestriction responseCourseRestriction = result.get(0);
         assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
     }
 

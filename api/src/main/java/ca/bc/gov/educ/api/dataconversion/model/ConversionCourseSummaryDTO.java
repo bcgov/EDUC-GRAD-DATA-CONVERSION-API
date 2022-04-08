@@ -14,6 +14,9 @@ public class ConversionCourseSummaryDTO extends ConversionBaseSummaryDTO {
   private long addedCountForCourseRequirement = 0L;
   private long updatedCountForCourseRequirement = 0L;
 
+  private long addedCountForCourseRestriction = 0L;
+  private long updatedCountForCourseRestriction = 0L;
+
   private long addedCountForAssessmentRequirement = 0L;
   private long updatedCountForAssessmentRequirement = 0L;
 

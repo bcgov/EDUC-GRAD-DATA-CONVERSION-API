@@ -195,11 +195,11 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
 
     public void processFrenchImmersion(ConvGradStudent requestStudent, StudentGradDTO currentStudent, String accessToken, boolean isDelete) {
         log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(), isDelete? "DELETE" : "ADD");
-        if (isDelete && !studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
+        if (isDelete && !studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert(), accessToken)) {
             log.info(" => remove FI optional program");
             studentService.removeStudentOptionalProgram("FI", currentStudent, accessToken);
             studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
-        } else if (!isDelete && studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert())) {
+        } else if (!isDelete && studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), requestStudent.getPen(), requestStudent.getFrenchCert(), accessToken)) {
             log.info(" => create FI optional program");
             studentService.addStudentOptionalProgram("FI", currentStudent, accessToken);
             studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
