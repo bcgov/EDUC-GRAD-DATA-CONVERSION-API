@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -40,7 +39,6 @@ public class CourseService {
         this.restUtils = restUtils;
     }
 
-    @Transactional(transactionManager = "courseTransactionManager")
     public CourseRestriction convertCourseRestriction(CourseRestriction courseRestriction, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         if (isInvalidData(courseRestriction.getMainCourse(), courseRestriction.getRestrictedCourse())) {
@@ -124,7 +122,6 @@ public class CourseService {
 //        }
 //    }
 
-    @Transactional(transactionManager = "courseTransactionManager")
     public GraduationCourseEntity convertCourseRequirement(GraduationCourseEntity courseRequirement, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         processEnglish(courseRequirement, summary);
@@ -386,7 +383,6 @@ public class CourseService {
         }
     }
 
-    @Transactional(transactionManager = "courseTransactionManager")
     public void createCourseRequirementsForFrenchImmersion(ConversionCourseSummaryDTO summary) {
         // FRAL 12
         createCourseRequirement(populate("FRAL", "12", "200"), summary);
