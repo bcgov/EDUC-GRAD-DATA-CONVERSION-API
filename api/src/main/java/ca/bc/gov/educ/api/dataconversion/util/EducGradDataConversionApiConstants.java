@@ -67,10 +67,49 @@ public class EducGradDataConversionApiConstants {
     private String penStudentApiByPenUrl;
 
     @Value("${endpoint.grad-program-api.special-program.url}")
-    private String gradProgramManagementUrl;
+    private String gradOptionalProgramUrl;
+
+    @Value("${endpoint.grad-program-api.optional-program-by-id.url}")
+    private String gradOptionalProgramByIDUrl;
+
+    @Value("${endpoint.grad-program-api.career-program.url}")
+    private String gradCareerProgramUrl;
 
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
+
+    @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
+    private String addAssessmentRequirementApiUrl;
+
+    @Value("${endpoint.grad-assessment-api.student-assessments-by-pen.url}")
+    private String studentAssessmentsByPenApiUrl;
+
+    @Value("${endpoint.grad-course-api.student-courses-by-pen.url}")
+    private String studentCoursesByPenApiUrl;
+
+    @Value("${endpoint.grad-course-api.course-restriction.url}")
+    private String gradCourseRestrictionApiUrl;
+
+    @Value("${endpoint.grad-course-api.save-course-restriction.url}")
+    private String saveCourseRestrictionApiUrl;
+
+    @Value("${endpoint.grad-course-api.course-requirement.url}")
+    private String gradCourseRequirementApiUrl;
+
+    @Value("${endpoint.grad-course-api.save-course-requirement.url}")
+    private String saveCourseRequirementApiUrl;
+
+    @Value("${endpoint.grad-course-api.check-french-immersion-course.url}")
+    private String checkFrenchImmersionCourse;
+
+    @Value("${endpoint.grad-course-api.check-french-immersion-course-for-en.url}")
+    private String checkFrenchImmersionCourseForEN;
+
+    @Value("${endpoint.grad-course-api.check-blank-language-course.url}")
+    private String checkBlankLanguageCourse;
+
+    @Value("${endpoint.grad-course-api.check-french-language-course.url}")
+    private String checkFrenchLanguageCourse;
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

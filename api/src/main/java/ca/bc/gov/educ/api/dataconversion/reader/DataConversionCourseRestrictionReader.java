@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -15,7 +15,7 @@ import org.springframework.batch.item.ItemReader;
 
 import java.util.List;
 
-public class DataConversionCourseRestrictionReader implements ItemReader<GradCourseRestriction> {
+public class DataConversionCourseRestrictionReader implements ItemReader<CourseRestriction> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRestrictionReader.class);
 
@@ -23,7 +23,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
     private final RestUtils restUtils;
 
     private int indexForCourseRestriction;
-    private List<GradCourseRestriction> courseRestrictionList;
+    private List<CourseRestriction> courseRestrictionList;
     private ConversionBaseSummaryDTO summaryDTO;
 
     public DataConversionCourseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
@@ -47,7 +47,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
     }
 
     @Override
-    public GradCourseRestriction read() {
+    public CourseRestriction read() {
         LOGGER.info("Reading the information of the next course restriction");
 
         if (courseRestrictionDataIsNotInitialized()) {
@@ -59,7 +59,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
             fetchAccessToken();
         }
 
-        GradCourseRestriction nextCourseRestriction = null;
+        CourseRestriction nextCourseRestriction = null;
         
         if (indexForCourseRestriction < courseRestrictionList.size()) {
             nextCourseRestriction = courseRestrictionList.get(indexForCourseRestriction);
@@ -77,7 +77,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<GradCou
         return this.courseRestrictionList == null;
     }
 
-    private List<GradCourseRestriction> loadRawCourseRestrictionData() {
+    private List<CourseRestriction> loadRawCourseRestrictionData() {
         LOGGER.info("Fetching Course Restriction List that need Data Conversion Processing");
         return dataConversionService.loadGradCourseRestrictionsDataFromTrax();
     }

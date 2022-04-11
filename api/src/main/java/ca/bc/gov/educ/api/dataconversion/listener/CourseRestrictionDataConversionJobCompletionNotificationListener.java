@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -24,12 +25,12 @@ public class CourseRestrictionDataConversionJobCompletionNotificationListener ex
 	    	LOGGER.info("Data Conversion - Course Restriction Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
+			ConversionCourseSummaryDTO summaryDTO = (ConversionCourseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
 
 			LOGGER.info(" Records read:		{}", summaryDTO.getReadCount());
 			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
-			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
-			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
+			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCountForCourseRestriction());
+			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCountForCourseRestriction());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
 			LOGGER.info(" Not good:			{}", summaryDTO.getErrors().size());
 			summaryDTO.getErrors().forEach(e ->

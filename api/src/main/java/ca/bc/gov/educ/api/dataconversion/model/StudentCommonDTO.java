@@ -1,9 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
-import ca.bc.gov.educ.api.dataconversion.entity.assessment.StudentAssessmentEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.course.StudentCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentCareerProgramEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.student.StudentOptionalProgramEntity;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -22,8 +18,8 @@ public class StudentCommonDTO {
     private List<String> programCodes = new ArrayList<>();
 
     // courses
-    private List<StudentCourseEntity> courses = new ArrayList<>();
+    private List<StudentCourse> courses = new ArrayList<>();
 
     // assessments
-    private List<StudentAssessmentEntity> assessments = new ArrayList<>();
+    private List<StudentAssessment> assessments = new ArrayList<>();
 }

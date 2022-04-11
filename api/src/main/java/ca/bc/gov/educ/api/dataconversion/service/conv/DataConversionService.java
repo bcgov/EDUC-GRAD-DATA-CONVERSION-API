@@ -295,8 +295,8 @@ public class DataConversionService {
     }
 
     @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<GradCourseRestriction> loadGradCourseRestrictionsDataFromTrax() {
-        List<GradCourseRestriction> courseRestrictions = new ArrayList<>();
+    public List<CourseRestriction> loadGradCourseRestrictionsDataFromTrax() {
+        List<CourseRestriction> courseRestrictions = new ArrayList<>();
         List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
         results.forEach(result -> {
             String mainCourse = (String) result[0];
@@ -313,8 +313,8 @@ public class DataConversionService {
             if (StringUtils.isBlank(restrictedCourseLevel)) {
                 restrictedCourseLevel = " ";
             }
-            GradCourseRestriction courseRestriction = new GradCourseRestriction(
-                    mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
+            CourseRestriction courseRestriction = new CourseRestriction(
+                    null, mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
             courseRestrictions.add(courseRestriction);
         });
         return courseRestrictions;

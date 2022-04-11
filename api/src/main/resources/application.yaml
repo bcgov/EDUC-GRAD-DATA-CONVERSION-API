@@ -17,10 +17,6 @@ spring:
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
       keepalive-time: ${KEEP_ALIVE_TIME}
-    assessment:
-      username: ${ASSESSMENT_USERNAME}
-      password: ${ASSESSMENT_PASSWORD}
-      pool-name: conv-assessment-cp
     batch:
       username: ${BATCH_USERNAME}
       password: ${BATCH_PASSWORD}
@@ -33,10 +29,6 @@ spring:
       username: ${CONV_USERNAME}
       password: ${CONV_PASSWORD}
       pool-name: conv-primary-cp
-    program:
-      username: ${PROGRAM_USERNAME}
-      password: ${PROGRAM_PASSWORD}
-      pool-name: conv-program-cp
     student:
       username: ${STUDENT_USERNAME}
       password: ${STUDENT_PASSWORD}
@@ -148,12 +140,41 @@ endpoint:
   pen-student-api:
     by-pen:
       url: ${PEN_STUDENT_API}api/v1/student?pen=%s
+  grad-course-api:
+    course-restriction:
+      url: ${GRAD_COURSE_API}api/v1/course/course-restriction
+    save-course-restriction:
+      url: ${GRAD_COURSE_API}api/v1/course/save-course-restriction
+    course-requirement:
+      url: ${GRAD_COURSE_API}api/v1/course/course-requirement
+    save-course-requirement:
+      url: ${GRAD_COURSE_API}api/v1/course/save-course-requirement
+    student-courses-by-pen:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/pen
+    check-french-immersion-course:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course
+    check-french-immersion-course-for-en:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course-for-en
+    check-blank-language-course:
+      url: ${GRAD_COURSE_API}api/v1/course/check-blank-language-course
+    check-french-language-course:
+      url: ${GRAD_COURSE_API}api/v1/course/check-french-language-course
   grad-program-api:
     special-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+    optional-program-by-id:
+      url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms/id
+    career-program:
+      url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
+  grad-assessment-api:
+    assessment-requirement:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement
+    student-assessments-by-pen:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen
+
 
 #Conversion option
 data-conversion:

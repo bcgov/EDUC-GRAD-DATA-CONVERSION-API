@@ -55,7 +55,7 @@ public class DataConversionServiceTest {
     public void testLoadInitialRawGradStudentData() {
         Object[] obj = new Object[] {
                "123456789", "12345678", "12345678", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", Character.valueOf('Y'),
-                BigDecimal.ZERO, null, null, null, null, null, null, null, 'Y'
+                BigDecimal.ZERO, null, null, null, null, null, null, null, null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
@@ -82,7 +82,7 @@ public class DataConversionServiceTest {
         var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
-        GradCourseRestriction responseCourseRestriction = result.get(0);
+        CourseRestriction responseCourseRestriction = result.get(0);
         assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
     }
 

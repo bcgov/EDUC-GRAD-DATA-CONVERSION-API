@@ -43,3 +43,15 @@ where 1 = 1
   and trim(tsc.crse_code) = cr.course_code
   and trim(tsc.crse_level) = cr.course_level
   and cr.course_requirement_code = 202
+
+-- Language Course with blank validation by courseCode & courseLevel
+select count(*) from TAB_CRSE cr
+where cr.crse_code =  'SMA'
+and cr.crse_level = '12'
+and cr.language = ' '
+
+-- Language Course with french validation by courseCode & courseLevel
+select count(*) from TAB_CRSE cr
+where cr.crse_code =  'SMA'
+  and cr.crse_level = '12'
+  and cr.language = 'F'
