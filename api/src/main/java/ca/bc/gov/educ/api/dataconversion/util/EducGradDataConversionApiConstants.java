@@ -93,8 +93,8 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-course-api.save-course-restriction.url}")
     private String saveCourseRestrictionApiUrl;
 
-    @Value("${endpoint.grad-course-api.course-requirement.url}")
-    private String gradCourseRequirementApiUrl;
+    @Value("${endpoint.grad-course-api.check-course-requirement.url}")
+    private String checkCourseRequirementApiUrl;
 
     @Value("${endpoint.grad-course-api.save-course-requirement.url}")
     private String saveCourseRequirementApiUrl;

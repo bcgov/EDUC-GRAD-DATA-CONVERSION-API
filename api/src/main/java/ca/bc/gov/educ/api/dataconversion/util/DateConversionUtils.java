@@ -13,6 +13,8 @@ public class DateConversionUtils {
       try {
         if (dateStr.trim().length() == 6) {
           formatter = new SimpleDateFormat("yyyyMM");
+        } else if (dateStr.trim().length() == 7) {
+          formatter = new SimpleDateFormat("yyyy/MM");
         } else if (dateStr.trim().length() == 8) {
           formatter = new SimpleDateFormat("yyyyMMdd");
         }

@@ -55,7 +55,7 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
         	summaryDTO.setReadCount(courseRequirementList.size());
         }
 
-        if (indexForCourseRequirement % 300 == 0) {
+        if (indexForCourseRequirement % 50 == 0) {
             fetchAccessToken();
         }
 

@@ -142,11 +142,11 @@ endpoint:
       url: ${PEN_STUDENT_API}api/v1/student?pen=%s
   grad-course-api:
     course-restriction:
-      url: ${GRAD_COURSE_API}api/v1/course/course-restriction
+      url: ${GRAD_COURSE_API}api/v1/course/get-course-restriction
     save-course-restriction:
       url: ${GRAD_COURSE_API}api/v1/course/save-course-restriction
-    course-requirement:
-      url: ${GRAD_COURSE_API}api/v1/course/course-requirement
+    check-course-requirement:
+      url: ${GRAD_COURSE_API}api/v1/course/check-course-requirement
     save-course-requirement:
       url: ${GRAD_COURSE_API}api/v1/course/save-course-requirement
     student-courses-by-pen:
