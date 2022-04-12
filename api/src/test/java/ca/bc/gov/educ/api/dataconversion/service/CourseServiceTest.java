@@ -905,7 +905,7 @@ public class CourseServiceTest {
         courseRequirements.setCourseRequirementList(Arrays.asList(entity));
 
 //        when(this.courseRequirementCodeRepository.findById(ruleCode)).thenReturn(Optional.of(ruleCodeEntity));
-        when(this.restUtils.getCourseRequirements(courseCode, courseLevel, "123")).thenReturn(isUpdateMode? courseRequirements : null);
+        when(this.restUtils.checkCourseRequirementExists(courseCode, courseLevel, ruleCode,"123")).thenReturn(isUpdateMode? true : false);
         when(this.restUtils.saveCourseRequirement(entity, "123")).thenReturn(entity);
 
         if (lang != null) {

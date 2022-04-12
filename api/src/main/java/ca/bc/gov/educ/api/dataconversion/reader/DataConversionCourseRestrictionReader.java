@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
@@ -24,7 +24,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
 
     private int indexForCourseRestriction;
     private List<CourseRestriction> courseRestrictionList;
-    private ConversionBaseSummaryDTO summaryDTO;
+    private ConversionCourseSummaryDTO summaryDTO;
 
     public DataConversionCourseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
         this.dataConversionService = dataConversionService;
@@ -37,7 +37,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
     public void initializeSummaryDto(StepExecution stepExecution) {
         JobExecution jobExecution = stepExecution.getJobExecution();
         ExecutionContext jobContext = jobExecution.getExecutionContext();
-        summaryDTO = new ConversionBaseSummaryDTO();
+        summaryDTO = new ConversionCourseSummaryDTO();
         summaryDTO.setTableName("COURSE_RESTRICTION");
         jobContext.put("courseRestrictionSummaryDTO", summaryDTO);
 
@@ -55,7 +55,7 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
         	summaryDTO.setReadCount(courseRestrictionList.size());
         }
 
-        if (indexForCourseRestriction % 300 == 0) {
+        if (indexForCourseRestriction % 100 == 0) {
             fetchAccessToken();
         }
 

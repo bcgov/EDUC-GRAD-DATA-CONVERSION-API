@@ -3,6 +3,8 @@ package ca.bc.gov.educ.api.dataconversion.service.course;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -20,6 +22,9 @@ public class CourseService {
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
     private static final String COURSE_API_NAME = "GRAD Course API";
+    private static final String COURSE_RESTRICTION_ID = "courseRestrictionId";
+    private static final String CREATE_USER = "createUser";
+    private static final String CREATE_DATE = "createDate";
 
     private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>() {{
         add(Pair.of("CLEA", "CLEB"));
@@ -65,18 +70,21 @@ public class CourseService {
                     courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
             error.setReason("GRAD Course API is failed to retrieve!");
             summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
             return null;
         }
         if (currentCourseRestriction == null) {
             currentCourseRestriction = new CourseRestriction();
-            BeanUtils.copyProperties(courseRestriction, currentCourseRestriction);
+            BeanUtils.copyProperties(courseRestriction, currentCourseRestriction, COURSE_RESTRICTION_ID, CREATE_USER, CREATE_DATE);
         } else {
             isUpdate = true;  // update
         }
 
+        convertCourseRestrictionData(currentCourseRestriction);
+
         CourseRestriction result;
         try {
-            result = restUtils.saveCourseRestriction(courseRestriction, summary.getAccessToken());
+            result = restUtils.saveCourseRestriction(currentCourseRestriction, summary.getAccessToken());
             if (isUpdate) {
                 summary.setUpdatedCountForCourseRestriction(summary.getUpdatedCountForCourseRestriction() + 1L);
             } else {
@@ -90,6 +98,7 @@ public class CourseService {
                     courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
             error.setReason("GRAD Course API is failed to save Course Restriction!");
             summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
             return null;
         }
     }
@@ -99,28 +108,21 @@ public class CourseService {
         return IGNORE_LIST.contains(pair);
     }
 
-//    private void convertCourseRestrictionData(CourseRestriction courseRestriction, CourseRestrictionEntity courseRestrictionEntity) {
-//        if (courseRestrictionEntity.getCourseRestrictionId() == null) {
-//            courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-//        }
-//        courseRestrictionEntity.setMainCourse(courseRestriction.getMainCourse());
-//        courseRestrictionEntity.setMainCourseLevel(courseRestriction.getMainCourseLevel() == null? " " :  courseRestriction.getMainCourseLevel());
-//        courseRestrictionEntity.setRestrictedCourse(courseRestriction.getRestrictedCourse());
-//        courseRestrictionEntity.setRestrictedCourseLevel(courseRestriction.getRestrictedCourseLevel() == null? " " : courseRestriction.getRestrictedCourseLevel());
-//        // data conversion
-//        if (StringUtils.isNotBlank(courseRestriction.getRestrictionStartDate())) {
-//            Date start = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionStartDate());
-//            if (start != null) {
-//                courseRestrictionEntity.setRestrictionStartDate(start);
-//            }
-//        }
-//        if (StringUtils.isNotBlank(courseRestriction.getRestrictionEndDate())) {
-//            Date end = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionEndDate());
-//            if (end != null) {
-//                courseRestrictionEntity.setRestrictionEndDate(end);
-//            }
-//        }
-//    }
+    private void convertCourseRestrictionData(CourseRestriction courseRestriction) {
+        // data conversion
+        if (StringUtils.isNotBlank(courseRestriction.getRestrictionStartDate())) {
+            Date start = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionStartDate());
+            if (start != null) {
+                courseRestriction.setRestrictionStartDate(EducGradDataConversionApiUtils.formatDate(start));
+            }
+        }
+        if (StringUtils.isNotBlank(courseRestriction.getRestrictionEndDate())) {
+            Date end = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionEndDate());
+            if (end != null) {
+                courseRestriction.setRestrictionEndDate(EducGradDataConversionApiUtils.formatDate(end));
+            }
+        }
+    }
 
     public GraduationCourseEntity convertCourseRequirement(GraduationCourseEntity courseRequirement, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
@@ -512,14 +514,31 @@ public class CourseService {
     }
 
     private CourseRequirement createCourseRequirement(CourseRequirement courseRequirement, ConversionCourseSummaryDTO summary) {
-        boolean isUpdate = false;
-        CourseRequirements crs = restUtils.getCourseRequirements(courseRequirement.getCourseCode(), courseRequirement.getCourseLevel(), summary.getAccessToken());
-        if (crs != null && crs.getCourseRequirementList() != null && !crs.getCourseRequirementList().isEmpty()) {
-            isUpdate = true;
-        }
         logger.info(" Create CourseRequirement: course [{} / {}], rule [{}]",
                 courseRequirement.getCourseCode(), courseRequirement.getCourseLevel(),
                 courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "");
+
+        boolean isUpdate;
+        try {
+            if (StringUtils.isBlank(courseRequirement.getCourseLevel())) {
+                logger.info("course level [{}] is found for {}", courseRequirement.getCourseLevel(), courseRequirement.getCourseCode());
+                courseRequirement.setCourseLevel(" ");
+            }
+            isUpdate = restUtils.checkCourseRequirementExists(
+                    courseRequirement.getCourseCode(),
+                    courseRequirement.getCourseLevel(),
+                    courseRequirement.getRuleCode().getCourseRequirementCode(),
+                    summary.getAccessToken());
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
+            error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
+            error.setReason("GRAD Course API is failed to check Course Requirement exits!");
+            summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
+            return null;
+        }
+
         try {
             CourseRequirement result = restUtils.saveCourseRequirement(courseRequirement, summary.getAccessToken());
             if (isUpdate) {
@@ -534,6 +553,7 @@ public class CourseService {
             error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
             error.setReason("GRAD Course API is failed to save Course Requirement!");
             summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
             return null;
         }
     }
@@ -550,19 +570,25 @@ public class CourseService {
     }
 
     public boolean hasFrenchLanguageCourse(GraduationCourseKey key, String accessToken) {
-        return this.restUtils.checkFrenchLanguageCourse(key.getCourseCode(), key.getCourseLevel(), accessToken);
+        String courseCode = key.getCourseCode().trim();
+        String courseLevel = StringUtils.isBlank(key.getCourseLevel())? " " : key.getCourseLevel().trim();
+        return this.restUtils.checkFrenchLanguageCourse(courseCode, courseLevel, accessToken);
     }
 
     public boolean hasBlankLanguageCourse(GraduationCourseKey key, String accessToken) {
-        return this.restUtils.checkBlankLanguageCourse(key.getCourseCode(), key.getCourseLevel(), accessToken);
+        String courseCode = key.getCourseCode().trim();
+        String courseLevel = StringUtils.isBlank(key.getCourseLevel())? " " : key.getCourseLevel().trim();
+        return this.restUtils.checkBlankLanguageCourse(courseCode, courseLevel, accessToken);
     }
 
     public boolean isFrenchImmersionCourse(String pen, String courseLevel, String accessToken) {
-        return this.restUtils.checkFrenchImmersionCourse(pen, courseLevel, accessToken);
+        String courseLevelParam = StringUtils.isBlank(courseLevel)? " " : courseLevel.trim();
+        return this.restUtils.checkFrenchImmersionCourse(pen, courseLevelParam, accessToken);
     }
 
     public boolean isFrenchImmersionCourseForEN(String pen, String courseLevel, String accessToken) {
-        return this.restUtils.checkFrenchImmersionCourseForEN(pen, courseLevel, accessToken);
+        String courseLevelParam = StringUtils.isBlank(courseLevel)? " " : courseLevel.trim();
+        return this.restUtils.checkFrenchImmersionCourseForEN(pen, courseLevelParam, accessToken);
     }
 
     public List<StudentCourse> getStudentCourses(String pen, String accessToken) {

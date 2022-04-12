@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class RestUtils {
 
@@ -100,7 +102,7 @@ public class RestUtils {
         final ParameterizedTypeReference<List<StudentCourse>> responseType = new ParameterizedTypeReference<>() {
         };
         return this.webClient.get()
-                .uri(constants.getStudentAssessmentsByPenApiUrl(), uri -> uri.path("/{pen}").build(pen))
+                .uri(constants.getStudentCoursesByPenApiUrl(), uri -> uri.path("/{pen}").build(pen))
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
@@ -109,10 +111,14 @@ public class RestUtils {
             String courseCode, String courseLevel,
             String restrictedCourseCode, String restrictedCourseLevel,
             String accessToken) {
+        log.info("get request to retrieve Course Restriction: {} / {}, {} / {}", courseCode, courseLevel, restrictedCourseCode, restrictedCourseLevel);
         return this.webClient.get()
-                .uri(constants.getGradCareerProgramUrl(),
-                    uri -> uri.path("/{courseCode}/{courseLevel}/{restrictedCourseCode}/{restrictedCourseLevel}")
-                        .build(courseCode, courseLevel, restrictedCourseCode, restrictedCourseLevel))
+                .uri(constants.getGradCourseRestrictionApiUrl(),
+                    uri -> uri.queryParam("courseCode", courseCode)
+                            .queryParam("courseLevel", courseLevel)
+                            .queryParam("restrictedCourseCode", restrictedCourseCode)
+                            .queryParam("restrictedCourseLevel", restrictedCourseLevel)
+                            .build())
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
@@ -125,18 +131,6 @@ public class RestUtils {
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
 
-    public CourseRequirements getCourseRequirements(
-            String courseCode, String courseLevel,
-            String accessToken) {
-        return this.webClient.get()
-                .uri(constants.getGradCourseRequirementApiUrl(),
-                    uri -> uri.queryParam("courseCode").queryParam("courseLevel")
-//                            path("/{courseCode}/{courseLevel}")
-                        .build(courseCode, courseLevel))
-                .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(CourseRequirements.class).block();
-    }
-
     public CourseRequirement saveCourseRequirement(CourseRequirement courseRequirement, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveCourseRequirementApiUrl())
@@ -145,13 +139,28 @@ public class RestUtils {
                 .retrieve().bodyToMono(CourseRequirement.class).block();
     }
 
+    public Boolean checkCourseRequirementExists (
+            String courseCode, String courseLevel, String ruleCode,
+            String accessToken) {
+        log.info("get request to check Course Requirement exists: {} / {} [{}]", courseCode, courseLevel, ruleCode);
+        return this.webClient.get()
+                .uri(constants.getCheckCourseRequirementApiUrl(),
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .queryParam("ruleCode", ruleCode)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
     public Boolean checkFrenchImmersionCourse(
             String pen, String courseLevel,
             String accessToken) {
         return this.webClient.get()
                 .uri(constants.getCheckFrenchImmersionCourse(),
-                        uri -> uri.path("/{pen}/{courseLevel}")
-                                .build(pen, courseLevel))
+                        uri -> uri.queryParam("pen", pen)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
@@ -161,8 +170,9 @@ public class RestUtils {
             String accessToken) {
         return this.webClient.get()
                 .uri(constants.getCheckFrenchImmersionCourseForEN(),
-                        uri -> uri.path("/{pen}/{courseLevel}")
-                                .build(pen, courseLevel))
+                        uri -> uri.queryParam("pen", pen)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
@@ -172,8 +182,9 @@ public class RestUtils {
             String accessToken) {
         return this.webClient.get()
                 .uri(constants.getCheckBlankLanguageCourse(),
-                        uri -> uri.path("/{courseCode}/{courseLevel}")
-                                .build(courseCode, courseLevel))
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
@@ -183,8 +194,9 @@ public class RestUtils {
             String accessToken) {
         return this.webClient.get()
                 .uri(constants.getCheckFrenchLanguageCourse(),
-                        uri -> uri.path("/{courseCode}/{courseLevel}")
-                                .build(courseCode, courseLevel))
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
