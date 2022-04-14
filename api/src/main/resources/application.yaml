@@ -21,10 +21,6 @@ spring:
       username: ${BATCH_USERNAME}
       password: ${BATCH_PASSWORD}
       pool-name: conv-batch-cp
-    course:
-      username: ${COURSE_USERNAME}
-      password: ${COURSE_PASSWORD}
-      pool-name: conv-course-cp
     conv:
       username: ${CONV_USERNAME}
       password: ${CONV_PASSWORD}
