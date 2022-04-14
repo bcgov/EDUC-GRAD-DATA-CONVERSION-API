@@ -111,7 +111,7 @@ public class RestUtils {
             String courseCode, String courseLevel,
             String restrictedCourseCode, String restrictedCourseLevel,
             String accessToken) {
-        log.info("get request to retrieve Course Restriction: {} / {}, {} / {}", courseCode, courseLevel, restrictedCourseCode, restrictedCourseLevel);
+        log.debug("get request to retrieve Course Restriction: {} / {}, {} / {}", courseCode, courseLevel, restrictedCourseCode, restrictedCourseLevel);
         return this.webClient.get()
                 .uri(constants.getGradCourseRestrictionApiUrl(),
                     uri -> uri.queryParam("courseCode", courseCode)
@@ -142,7 +142,7 @@ public class RestUtils {
     public Boolean checkCourseRequirementExists (
             String courseCode, String courseLevel, String ruleCode,
             String accessToken) {
-        log.info("get request to check Course Requirement exists: {} / {} [{}]", courseCode, courseLevel, ruleCode);
+        log.debug("get request to check Course Requirement exists: {} / {} [{}]", courseCode, courseLevel, ruleCode);
         return this.webClient.get()
                 .uri(constants.getCheckCourseRequirementApiUrl(),
                         uri -> uri.queryParam("courseCode", courseCode)
