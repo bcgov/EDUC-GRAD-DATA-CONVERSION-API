@@ -182,7 +182,12 @@ grad:
   update:
     enabled: ${ENABLE_GRAD_UPDATE}
 
-#Page Size
+#Page Size for Parallel Processing
 batch:
   partitions:
     number: ${NUMBER_OF_PARTITIONS}
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: ${ENABLE_SPLUNK_LOG_HELPER}

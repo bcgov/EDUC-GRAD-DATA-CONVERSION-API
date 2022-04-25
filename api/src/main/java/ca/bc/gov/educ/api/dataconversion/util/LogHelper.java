@@ -23,7 +23,8 @@ public final class LogHelper {
 
   }
 
-  public static void logServerHttpReqResponseDetails(@NonNull final HttpServletRequest request, final HttpServletResponse response) {
+  public static void logServerHttpReqResponseDetails(@NonNull final HttpServletRequest request, final HttpServletResponse response, final boolean logging) {
+    if (!logging) return;
     try {
       final int status = response.getStatus();
       val totalTime = Instant.now().toEpochMilli() - (Long) request.getAttribute("startTime");
@@ -47,7 +48,8 @@ public final class LogHelper {
     }
   }
 
-  public static void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID) {
+  public static void logClientHttpReqResponseDetails(@NonNull final HttpMethod method, final String url, final int responseCode, final List<String> correlationID, final boolean logging) {
+    if (!logging) return;
     try {
       final Map<String, Object> httpMap = new HashMap<>();
       httpMap.put("client_http_response_code", responseCode);
@@ -70,7 +72,8 @@ public final class LogHelper {
    *
    * @param event the json string
    */
-  public static void logMessagingEventDetails(final String event) {
+  public static void logMessagingEventDetails(final String event, final boolean logging) {
+    if (!logging) return;
     try {
       MDC.putCloseable("messageEvent", event);
       log.debug("");
