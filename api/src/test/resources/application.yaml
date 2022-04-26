@@ -133,7 +133,12 @@ grad:
   update:
     enabled: true
 
-#Page Size
+#Page Size for Parallel Processing
 batch:
   partitions:
     number: 1
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: false

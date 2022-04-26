@@ -13,7 +13,7 @@ public class EducGradDataConversionApiConstants {
     public static final String API_NAME = "GRAD-DATA-CONVERSION-API";
     public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
-	public static final String API_ROOT_MAPPING = "";
+	  public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
@@ -121,4 +121,8 @@ public class EducGradDataConversionApiConstants {
     // Number of Partitions
     @Value("${batch.partitions.number}")
     private int numberOfPartitions;
+
+    // Splunk LogHelper Enabled
+    @Value("${splunk.log-helper.enabled}")
+    private boolean splunkLogHelperEnabled;
 }

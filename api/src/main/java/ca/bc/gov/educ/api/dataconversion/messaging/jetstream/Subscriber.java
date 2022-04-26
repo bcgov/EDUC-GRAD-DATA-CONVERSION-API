@@ -42,6 +42,7 @@ public class Subscriber {
   private final EventHandlerDelegatorService eventHandlerDelegatorService;
   private final Map<String, List<String>> streamTopicsMap = new HashMap<>(); // one stream can have multiple topics.
   private final Connection natsConnection;
+  private final EducGradDataConversionApiConstants constants;
 
   /**
    * Instantiates a new Subscriber.
@@ -50,9 +51,10 @@ public class Subscriber {
    * @param eventHandlerDelegatorService the event handler delegator service
    */
   @Autowired
-  public Subscriber(final Connection natsConnection, final EventHandlerDelegatorService eventHandlerDelegatorService) {
+  public Subscriber(final Connection natsConnection, final EventHandlerDelegatorService eventHandlerDelegatorService, final EducGradDataConversionApiConstants constants) {
     this.eventHandlerDelegatorService = eventHandlerDelegatorService;
     this.natsConnection = natsConnection;
+    this.constants = constants;
     this.initializeStreamTopicMap();
   }
 
@@ -92,7 +94,7 @@ public class Subscriber {
       log.info("Received message Subject:: {} , SID :: {} , sequence :: {}, pending :: {} ", message.getSubject(), message.getSID(), message.metaData().consumerSequence(), message.metaData().pendingCount());
       try {
         val eventString = new String(message.getData());
-        LogHelper.logMessagingEventDetails(eventString);
+        LogHelper.logMessagingEventDetails(eventString, constants.isSplunkLogHelperEnabled());
         final ChoreographedEvent event = JsonUtil.getJsonObjectFromString(ChoreographedEvent.class, eventString);
         if (event.getEventPayload() == null) {
           message.ack();
