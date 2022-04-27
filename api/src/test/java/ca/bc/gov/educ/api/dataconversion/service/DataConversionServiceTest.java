@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -35,6 +37,9 @@ public class DataConversionServiceTest {
     TraxStudentsLoadRepository traxStudentsLoadRepository;
 
     @MockBean
+    EventRepository eventRepository;
+
+    @MockBean
     RestUtils restUtils;
 
     @Before
@@ -50,14 +55,14 @@ public class DataConversionServiceTest {
     public void testLoadInitialRawGradStudentData() {
         Object[] obj = new Object[] {
                "123456789", "12345678", "12345678", "12", Character.valueOf('A'),Character.valueOf('A'), "2020", Character.valueOf('Y'),
-                BigDecimal.ZERO, null, null, null, null, null, null, null
+                BigDecimal.ZERO, null, null, null, null, null, null, null, null
         };
         List<Object[]> results = new ArrayList<>();
         results.add(obj);
 
-        when(this.traxStudentsLoadRepository.loadInitialStudentRawData()).thenReturn(results);
+        when(this.traxStudentsLoadRepository.loadAllTraxStudents()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradStudentData();
+        var result = dataConversionService.loadGradStudentsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
@@ -74,28 +79,11 @@ public class DataConversionServiceTest {
 
         when(this.traxStudentsLoadRepository.loadInitialCourseRestrictionRawData()).thenReturn(results);
 
-        var result = dataConversionService.loadInitialRawGradCourseRestrictionsData();
+        var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax();
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
-        GradCourseRestriction responseCourseRestriction = result.get(0);
+        CourseRestriction responseCourseRestriction = result.get(0);
         assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
-    }
-
-    @Test
-    public void testLoadAllTraxStudentData() {
-        Object[] obj = new Object[] {
-                "123456789"
-        };
-        List<Object[]> results = new ArrayList<>();
-        results.add(obj);
-
-        when(this.traxStudentsLoadRepository.loadAlTraxStudents()).thenReturn(results);
-
-        var result = dataConversionService.loadAllTraxStudentData();
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
-        ConvGradStudent responseStudent = result.get(0);
-        assertThat(responseStudent.getPen()).isEqualTo(obj[0]);
     }
 
     @Test
@@ -125,13 +113,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -147,7 +130,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -161,13 +144,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -184,7 +162,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -198,13 +176,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -234,13 +207,8 @@ public class DataConversionServiceTest {
         penStudent.setPen(pen);
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("A");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
@@ -257,7 +225,7 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 
     @Test
@@ -267,13 +235,8 @@ public class DataConversionServiceTest {
         String pen = "123456789";
 
         // Trax Student Input
-        ConvGradStudent convGradStudent = new ConvGradStudent();
-        convGradStudent.setPen(pen);
-        convGradStudent.setSchoolOfRecord("12345678");
-        convGradStudent.setSchoolAtGrad("12345678");
-        convGradStudent.setArchiveFlag("A");
-        convGradStudent.setStudentStatus("M");
-        convGradStudent.setGraduationRequestYear("2018");
+        TraxStudentEntity convGradStudent = new TraxStudentEntity();
+        convGradStudent.setStudNo(pen);
 
         Object[] obj = new Object[] {
                 pen, "Test", "QA", "", Character.valueOf('M'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), "987654321", "            "
@@ -289,6 +252,6 @@ public class DataConversionServiceTest {
 
         var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
-        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getStudNo()).isEqualTo(pen);
     }
 }

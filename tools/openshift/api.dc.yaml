@@ -62,6 +62,8 @@ objects:
                     name: educ-grad-api-config-map
                 - configMapRef:
                     name: educ-grad-data-conversion-api-config-map
+                - configMapRef:
+                    name: educ-grad-nats-messaging-config-map
                 - secretRef:
                     name: api-grad-conv-db-secret
                 - secretRef:

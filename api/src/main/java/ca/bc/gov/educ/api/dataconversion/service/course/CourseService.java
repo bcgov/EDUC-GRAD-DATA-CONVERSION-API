@@ -2,24 +2,17 @@ package ca.bc.gov.educ.api.dataconversion.service.course;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementCodeEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRequirementEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.course.CourseRestrictionEntity;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.model.GradCourseRestriction;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementCodeRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRequirementRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.course.CourseRestrictionRepository;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -27,6 +20,11 @@ import java.util.*;
 public class CourseService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+
+    private static final String COURSE_API_NAME = "GRAD Course API";
+    private static final String COURSE_RESTRICTION_ID = "courseRestrictionId";
+    private static final String CREATE_USER = "createUser";
+    private static final String CREATE_DATE = "createDate";
 
     private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>() {{
         add(Pair.of("CLEA", "CLEB"));
@@ -39,21 +37,14 @@ public class CourseService {
         add(Pair.of("CLEBF", "CLEAF"));
     }};
 
-    private final CourseRestrictionRepository courseRestrictionRepository;
-    private final CourseRequirementRepository courseRequirementRepository;
-    private final CourseRequirementCodeRepository courseRequirementCodeRepository;
+    private final RestUtils restUtils;
 
     @Autowired
-    public CourseService(CourseRestrictionRepository courseRestrictionRepository,
-                         CourseRequirementRepository courseRequirementRepository,
-                         CourseRequirementCodeRepository courseRequirementCodeRepository) {
-        this.courseRestrictionRepository = courseRestrictionRepository;
-        this.courseRequirementRepository = courseRequirementRepository;
-        this.courseRequirementCodeRepository = courseRequirementCodeRepository;
+    public CourseService(RestUtils restUtils) {
+        this.restUtils = restUtils;
     }
 
-    @Transactional(transactionManager = "courseTransactionManager")
-    public GradCourseRestriction convertCourseRestriction(GradCourseRestriction courseRestriction, ConversionBaseSummaryDTO summary) {
+    public CourseRestriction convertCourseRestriction(CourseRestriction courseRestriction, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         if (isInvalidData(courseRestriction.getMainCourse(), courseRestriction.getRestrictedCourse())) {
             ConversionAlert error = new ConversionAlert();
@@ -63,18 +54,53 @@ public class CourseService {
             summary.getErrors().add(error);
             return null;
         }
-        Optional<CourseRestrictionEntity> optional =  courseRestrictionRepository.findByMainCourseAndMainCourseLevelAndRestrictedCourseAndRestrictedCourseLevel(
-                courseRestriction.getMainCourse(), courseRestriction.getMainCourseLevel(), courseRestriction.getRestrictedCourse(), courseRestriction.getRestrictedCourseLevel());
-
-        CourseRestrictionEntity entity = optional.orElseGet(CourseRestrictionEntity::new);
-        convertCourseRestrictionData(courseRestriction, entity);
-        courseRestrictionRepository.save(entity);
-        if (optional.isPresent()) {
-            summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
-        } else {
-            summary.setAddedCount(summary.getAddedCount() + 1L);
+        boolean isUpdate = false;
+        CourseRestriction currentCourseRestriction;
+        try {
+            currentCourseRestriction = restUtils.getCourseRestriction(
+                    courseRestriction.getMainCourse(),
+                    courseRestriction.getMainCourseLevel(),
+                    courseRestriction.getRestrictedCourse(),
+                    courseRestriction.getRestrictedCourseLevel(),
+                    summary.getAccessToken());
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
+            error.setItem(courseRestriction.getMainCourse() + "/" + courseRestriction.getMainCourseLevel() + ", " +
+                    courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
+            error.setReason("GRAD Course API is failed to retrieve!");
+            summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
+            return null;
         }
-        return courseRestriction;
+        if (currentCourseRestriction == null) {
+            currentCourseRestriction = new CourseRestriction();
+            BeanUtils.copyProperties(courseRestriction, currentCourseRestriction, COURSE_RESTRICTION_ID, CREATE_USER, CREATE_DATE);
+        } else {
+            isUpdate = true;  // update
+        }
+
+        convertCourseRestrictionData(currentCourseRestriction);
+
+        CourseRestriction result;
+        try {
+            result = restUtils.saveCourseRestriction(currentCourseRestriction, summary.getAccessToken());
+            if (isUpdate) {
+                summary.setUpdatedCountForCourseRestriction(summary.getUpdatedCountForCourseRestriction() + 1L);
+            } else {
+                summary.setAddedCountForCourseRestriction(summary.getAddedCountForCourseRestriction() + 1L);
+            }
+            return result;
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
+            error.setItem(courseRestriction.getMainCourse() + "/" + courseRestriction.getMainCourseLevel() + ", " +
+                    courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
+            error.setReason("GRAD Course API is failed to save Course Restriction!");
+            summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
+            return null;
+        }
     }
 
     private boolean isInvalidData(String mainCourseCode, String restrictedCourseCode) {
@@ -82,44 +108,36 @@ public class CourseService {
         return IGNORE_LIST.contains(pair);
     }
 
-    private void convertCourseRestrictionData(GradCourseRestriction courseRestriction, CourseRestrictionEntity courseRestrictionEntity) {
-        if (courseRestrictionEntity.getCourseRestrictionId() == null) {
-            courseRestrictionEntity.setCourseRestrictionId(UUID.randomUUID());
-        }
-        courseRestrictionEntity.setMainCourse(courseRestriction.getMainCourse());
-        courseRestrictionEntity.setMainCourseLevel(courseRestriction.getMainCourseLevel() == null? " " :  courseRestriction.getMainCourseLevel());
-        courseRestrictionEntity.setRestrictedCourse(courseRestriction.getRestrictedCourse());
-        courseRestrictionEntity.setRestrictedCourseLevel(courseRestriction.getRestrictedCourseLevel() == null? " " : courseRestriction.getRestrictedCourseLevel());
+    private void convertCourseRestrictionData(CourseRestriction courseRestriction) {
         // data conversion
         if (StringUtils.isNotBlank(courseRestriction.getRestrictionStartDate())) {
             Date start = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionStartDate());
             if (start != null) {
-                courseRestrictionEntity.setRestrictionStartDate(start);
+                courseRestriction.setRestrictionStartDate(EducGradDataConversionApiUtils.formatDate(start));
             }
         }
         if (StringUtils.isNotBlank(courseRestriction.getRestrictionEndDate())) {
             Date end = DateConversionUtils.convertStringToDate(courseRestriction.getRestrictionEndDate());
             if (end != null) {
-                courseRestrictionEntity.setRestrictionEndDate(end);
+                courseRestriction.setRestrictionEndDate(EducGradDataConversionApiUtils.formatDate(end));
             }
         }
     }
 
-    @Transactional(transactionManager = "courseTransactionManager")
-    public GraduationCourseEntity convertCourseRequirement(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
+    public GraduationCourseEntity convertCourseRequirement(GraduationCourseEntity courseRequirement, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
-        processEnglish(graduationCourseEntity, summary);
-        processSocials(graduationCourseEntity, summary);
-        processMath(graduationCourseEntity, summary);
-        processScience(graduationCourseEntity, summary);
-        processCareerPersonal(graduationCourseEntity, summary);
-        processPhysEd(graduationCourseEntity, summary);
-        processAppliedSkills(graduationCourseEntity, summary);
-        processPortFolio(graduationCourseEntity, summary);
-        processConsEd(graduationCourseEntity, summary);
-        processFineArts(graduationCourseEntity, summary);
-        processCareerLifeConnections(graduationCourseEntity, summary);
-        return graduationCourseEntity;
+        processEnglish(courseRequirement, summary);
+        processSocials(courseRequirement, summary);
+        processMath(courseRequirement, summary);
+        processScience(courseRequirement, summary);
+        processCareerPersonal(courseRequirement, summary);
+        processPhysEd(courseRequirement, summary);
+        processAppliedSkills(courseRequirement, summary);
+        processPortFolio(courseRequirement, summary);
+        processConsEd(courseRequirement, summary);
+        processFineArts(courseRequirement, summary);
+        processCareerLifeConnections(courseRequirement, summary);
+        return courseRequirement;
     }
 
     private void processEnglish(GraduationCourseEntity graduationCourseEntity, ConversionCourseSummaryDTO summary) {
@@ -130,14 +148,14 @@ public class CourseService {
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "701"), summary);
             }
-            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "302"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "815"), summary);
                 }
             }
-            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "400"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
@@ -156,7 +174,7 @@ public class CourseService {
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "740"), summary);
             }
-            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "301"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
@@ -165,7 +183,7 @@ public class CourseService {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "818"), summary);
                 }
             }
-            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "401"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
@@ -186,7 +204,7 @@ public class CourseService {
             } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "1986")) {
                 createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "741"), summary);
             }
-            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasFrenchLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "300"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
@@ -195,7 +213,7 @@ public class CourseService {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "819"), summary);
                 }
             }
-            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey())) {
+            if (hasBlankLanguageCourse(graduationCourseEntity.getGraduationCourseKey(), summary.getAccessToken())) {
                 if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(graduationCourseEntity.getGraduationCourseKey(), "402"), summary);
                 } else if (StringUtils.equals(graduationCourseEntity.getGraduationCourseKey().getGradReqtYear(), "2004")) {
@@ -367,7 +385,6 @@ public class CourseService {
         }
     }
 
-    @Transactional(transactionManager = "courseTransactionManager")
     public void createCourseRequirementsForFrenchImmersion(ConversionCourseSummaryDTO summary) {
         // FRAL 12
         createCourseRequirement(populate("FRAL", "12", "200"), summary);
@@ -480,39 +497,64 @@ public class CourseService {
         createCourseRequirement(populate("WRK", "11B", "600"), summary);
     }
 
-    private CourseRequirementEntity populate(GraduationCourseKey key, String courseRequirementCode) {
+    private CourseRequirement populate(GraduationCourseKey key, String courseRequirementCode) {
         return populate(key.getCourseCode(), key.getCourseLevel(), courseRequirementCode);
     }
 
-    private CourseRequirementEntity populate(String courseCode, String courseLevel, String courseRequirementCode) {
-        CourseRequirementEntity courseRequirement = new CourseRequirementEntity();
+    private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
+        CourseRequirement courseRequirement = new CourseRequirement();
         courseRequirement.setCourseCode(courseCode.trim());
         courseRequirement.setCourseLevel(StringUtils.isBlank(courseLevel)? " " :  courseLevel.trim());
 
-        Optional<CourseRequirementCodeEntity> courseRequirementCodeOptional = courseRequirementCodeRepository.findById(courseRequirementCode);
-        if (courseRequirementCodeOptional.isPresent()) {
-            courseRequirement.setRuleCode(courseRequirementCodeOptional.get());
-        }
-        courseRequirement.setCourseRequirementId(UUID.randomUUID());
+        CourseRequirementCodeDTO ruleCode = new CourseRequirementCodeDTO();
+        ruleCode.setCourseRequirementCode(courseRequirementCode);
+
+        courseRequirement.setRuleCode(ruleCode);
         return courseRequirement;
     }
 
-    private void createCourseRequirement(CourseRequirementEntity courseRequirementEntity, ConversionCourseSummaryDTO summary) {
-        CourseRequirementEntity currentEntity = courseRequirementRepository.findByCourseCodeAndCourseLevelAndRuleCode(
-                courseRequirementEntity.getCourseCode(), courseRequirementEntity.getCourseLevel(), courseRequirementEntity.getRuleCode());
+    private CourseRequirement createCourseRequirement(CourseRequirement courseRequirement, ConversionCourseSummaryDTO summary) {
         logger.info(" Create CourseRequirement: course [{} / {}], rule [{}]",
-                courseRequirementEntity.getCourseCode(), courseRequirementEntity.getCourseLevel(),
-                courseRequirementEntity.getRuleCode() != null? courseRequirementEntity.getRuleCode().getCourseRequirementCode() : "");
-        if (currentEntity != null) {
-            // Update
-            currentEntity.setUpdateDate(null);
-            currentEntity.setUpdateUser(null);
-            courseRequirementRepository.save(currentEntity);
-            summary.setUpdatedCountForCourseRequirement(summary.getUpdatedCountForCourseRequirement() + 1L);
-        } else {
-            // Add
-            courseRequirementRepository.save(courseRequirementEntity);
-            summary.setAddedCountForCourseRequirement(summary.getAddedCountForCourseRequirement() + 1L);
+                courseRequirement.getCourseCode(), courseRequirement.getCourseLevel(),
+                courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "");
+
+        boolean isUpdate;
+        try {
+            if (StringUtils.isBlank(courseRequirement.getCourseLevel())) {
+                logger.info("course level [{}] is found for {}", courseRequirement.getCourseLevel(), courseRequirement.getCourseCode());
+                courseRequirement.setCourseLevel(" ");
+            }
+            isUpdate = restUtils.checkCourseRequirementExists(
+                    courseRequirement.getCourseCode(),
+                    courseRequirement.getCourseLevel(),
+                    courseRequirement.getRuleCode().getCourseRequirementCode(),
+                    summary.getAccessToken());
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
+            error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
+            error.setReason("GRAD Course API is failed to check Course Requirement exits!");
+            summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
+            return null;
+        }
+
+        try {
+            CourseRequirement result = restUtils.saveCourseRequirement(courseRequirement, summary.getAccessToken());
+            if (isUpdate) {
+                summary.setUpdatedCountForCourseRequirement(summary.getUpdatedCountForCourseRequirement() + 1L);
+            } else {
+                summary.setAddedCountForCourseRequirement(summary.getAddedCountForCourseRequirement() + 1L);
+            }
+            return result;
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
+            error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
+            error.setReason("GRAD Course API is failed to save Course Requirement!");
+            summary.getErrors().add(error);
+            logger.error("For {} : {}", error.getItem(), error.getReason());
+            return null;
         }
     }
 
@@ -527,35 +569,30 @@ public class CourseService {
         return true;
     }
 
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public boolean hasFrenchLanguageCourse(GraduationCourseKey key) {
-        if (this.courseRequirementRepository.countTabCourses(key.getCourseCode(), key.getCourseLevel(), "F") > 0L) {
-            return true;
-        }
-        return false;
+    public boolean hasFrenchLanguageCourse(GraduationCourseKey key, String accessToken) {
+        String courseCode = key.getCourseCode().trim();
+        String courseLevel = StringUtils.isBlank(key.getCourseLevel())? " " : key.getCourseLevel().trim();
+        return this.restUtils.checkFrenchLanguageCourse(courseCode, courseLevel, accessToken);
     }
 
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public boolean hasBlankLanguageCourse(GraduationCourseKey key) {
-        if (this.courseRequirementRepository.countTabCourses(key.getCourseCode(), key.getCourseLevel(), " ") > 0L) {
-            return true;
-        }
-        return false;
+    public boolean hasBlankLanguageCourse(GraduationCourseKey key, String accessToken) {
+        String courseCode = key.getCourseCode().trim();
+        String courseLevel = StringUtils.isBlank(key.getCourseLevel())? " " : key.getCourseLevel().trim();
+        return this.restUtils.checkBlankLanguageCourse(courseCode, courseLevel, accessToken);
     }
 
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public boolean isFrenchImmersionCourse(String pen, String courseLevel) {
-        if (this.courseRequirementRepository.countFrenchImmersionCourses(pen, courseLevel) > 0L) {
-            return true;
-        }
-        return false;
+    public boolean isFrenchImmersionCourse(String pen, String courseLevel, String accessToken) {
+        String courseLevelParam = StringUtils.isBlank(courseLevel)? " " : courseLevel.trim();
+        return this.restUtils.checkFrenchImmersionCourse(pen, courseLevelParam, accessToken);
     }
-    @Transactional(readOnly = true, transactionManager = "courseTransactionManager")
-    public boolean isFrenchImmersionCourseForEN(String pen, String courseLevel) {
-        if (this.courseRequirementRepository.countFrenchImmersionCourse(pen, courseLevel) > 0L) {
-            return true;
-        }
-        return false;
+
+    public boolean isFrenchImmersionCourseForEN(String pen, String courseLevel, String accessToken) {
+        String courseLevelParam = StringUtils.isBlank(courseLevel)? " " : courseLevel.trim();
+        return this.restUtils.checkFrenchImmersionCourseForEN(pen, courseLevelParam, accessToken);
+    }
+
+    public List<StudentCourse> getStudentCourses(String pen, String accessToken) {
+        return this.restUtils.getStudentCoursesByPen(pen, accessToken);
     }
 
 }

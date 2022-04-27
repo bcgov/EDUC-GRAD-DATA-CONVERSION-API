@@ -18,7 +18,7 @@ public class StudentDataConversionJobCompletionNotificationListener extends JobE
     
     @Override
     public void afterJob(JobExecution jobExecution) {
-    	if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
+    	if (jobExecution.getStatus() == BatchStatus.COMPLETED || jobExecution.getStatus() == BatchStatus.FAILED) {
 	    	long elapsedTimeMillis = new Date().getTime() - jobExecution.getStartTime().getTime();
 			LOGGER.info("=======================================================================================");
 	    	LOGGER.info("Data Conversion - Student Load Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());

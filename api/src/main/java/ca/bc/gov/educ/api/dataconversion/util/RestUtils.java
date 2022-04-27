@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.model.GradSpecialProgram;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
-import ca.bc.gov.educ.api.dataconversion.model.Student;
+import ca.bc.gov.educ.api.dataconversion.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +13,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.UUID;
 
+@Slf4j
 @Component
 public class RestUtils {
 
@@ -33,7 +34,6 @@ public class RestUtils {
                 constants.getUserName(), constants.getPassword());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
         map.add("grant_type", "client_credentials");
-        System.out.println("url = " + constants.getTokenUrl());
         return this.webClient.post().uri(constants.getTokenUrl())
                 .headers(h -> h.addAll(httpHeadersKC))
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -45,18 +45,32 @@ public class RestUtils {
     public List<Student> getStudentsByPen(String pen, String accessToken) {
         final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
         };
-        System.out.println("url = " + constants.getPenStudentApiByPenUrl());
         return this.webClient.get()
                 .uri(String.format(constants.getPenStudentApiByPenUrl(), pen))
                 .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
-    public GradSpecialProgram getGradSpecialProgram(String programCode, String specialProgramCode, String accessToken) {
+    public OptionalProgram getOptionalProgram(String programCode, String specialProgramCode, String accessToken) {
         return this.webClient.get()
-                .uri(constants.getGradProgramManagementUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
+                .uri(constants.getGradOptionalProgramUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
                 .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(GradSpecialProgram.class).block();
+                .retrieve().bodyToMono(OptionalProgram.class).block();
+    }
+
+    public OptionalProgram getOptionalProgramByID(UUID optionalProgramID, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getGradOptionalProgramByIDUrl(), uri -> uri.path("/{optionalProgramID}").build(optionalProgramID))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(OptionalProgram.class).block();
+    }
+
+
+    public CareerProgram getCareerProgram(String careerProgramCode, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getGradCareerProgramUrl(), uri -> uri.path("/{careerProgramCode}").build(careerProgramCode))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(CareerProgram.class).block();
     }
 
     public Student addNewPen(Student student, String accessToken) {
@@ -67,4 +81,123 @@ public class RestUtils {
                 .retrieve().bodyToMono(Student.class).block();
     }
 
+    public AssessmentRequirement addAssessmentRequirement(AssessmentRequirement assessmentRequirement, String accessToken) {
+        return webClient.post()
+                .uri(constants.getAddAssessmentRequirementApiUrl())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(assessmentRequirement))
+                .retrieve().bodyToMono(AssessmentRequirement.class).block();
+    }
+
+    public List<StudentAssessment> getStudentAssessmentsByPen(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(String.format(constants.getStudentAssessmentsByPenApiUrl(), pen))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<StudentCourse> getStudentCoursesByPen(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<StudentCourse>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getStudentCoursesByPenApiUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public CourseRestriction getCourseRestriction(
+            String courseCode, String courseLevel,
+            String restrictedCourseCode, String restrictedCourseLevel,
+            String accessToken) {
+        log.debug("get request to retrieve Course Restriction: {} / {}, {} / {}", courseCode, courseLevel, restrictedCourseCode, restrictedCourseLevel);
+        return this.webClient.get()
+                .uri(constants.getGradCourseRestrictionApiUrl(),
+                    uri -> uri.queryParam("courseCode", courseCode)
+                            .queryParam("courseLevel", courseLevel)
+                            .queryParam("restrictedCourseCode", restrictedCourseCode)
+                            .queryParam("restrictedCourseLevel", restrictedCourseLevel)
+                            .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(CourseRestriction.class).block();
+    }
+
+    public CourseRestriction saveCourseRestriction(CourseRestriction courseRestriction, String accessToken) {
+        return webClient.post()
+                .uri(constants.getSaveCourseRestrictionApiUrl())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(courseRestriction))
+                .retrieve().bodyToMono(CourseRestriction.class).block();
+    }
+
+    public CourseRequirement saveCourseRequirement(CourseRequirement courseRequirement, String accessToken) {
+        return webClient.post()
+                .uri(constants.getSaveCourseRequirementApiUrl())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(courseRequirement))
+                .retrieve().bodyToMono(CourseRequirement.class).block();
+    }
+
+    public Boolean checkCourseRequirementExists (
+            String courseCode, String courseLevel, String ruleCode,
+            String accessToken) {
+        log.debug("get request to check Course Requirement exists: {} / {} [{}]", courseCode, courseLevel, ruleCode);
+        return this.webClient.get()
+                .uri(constants.getCheckCourseRequirementApiUrl(),
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .queryParam("ruleCode", ruleCode)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public Boolean checkFrenchImmersionCourse(
+            String pen, String courseLevel,
+            String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getCheckFrenchImmersionCourse(),
+                        uri -> uri.queryParam("pen", pen)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public Boolean checkFrenchImmersionCourseForEN(
+            String pen, String courseLevel,
+            String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getCheckFrenchImmersionCourseForEN(),
+                        uri -> uri.queryParam("pen", pen)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public Boolean checkBlankLanguageCourse(
+            String courseCode, String courseLevel,
+            String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getCheckBlankLanguageCourse(),
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public Boolean checkFrenchLanguageCourse(
+            String courseCode, String courseLevel,
+            String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getCheckFrenchLanguageCourse(),
+                        uri -> uri.queryParam("courseCode", courseCode)
+                                .queryParam("courseLevel", courseLevel)
+                                .build())
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
 }

@@ -1,35 +1,28 @@
 package ca.bc.gov.educ.api.dataconversion.service.assessment;
 
-import ca.bc.gov.educ.api.dataconversion.entity.assessment.AssessmentRequirementCodeEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.assessment.AssessmentRequirementEntity;
+import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirement;
+import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirementCode;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementCodeRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.assessment.AssessmentRequirementRepository;
+import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 @Service
 public class AssessmentService {
 
     private static final Logger logger = LoggerFactory.getLogger(AssessmentService.class);
-
-    private final AssessmentRequirementCodeRepository assessmentRequirementCodeRepository;
-    private final AssessmentRequirementRepository assessmentRequirementRepository;
+    private final RestUtils restUtils;
 
     @Autowired
-    public AssessmentService(AssessmentRequirementCodeRepository assessmentRequirementCodeRepository,
-                             AssessmentRequirementRepository assessmentRequirementRepository) {
-        this.assessmentRequirementCodeRepository = assessmentRequirementCodeRepository;
-        this.assessmentRequirementRepository = assessmentRequirementRepository;
+    public AssessmentService(RestUtils restUtils) {
+        this.restUtils = restUtils;
     }
 
-    @Transactional(transactionManager = "assessmentTransactionManager")
     public void createAssessmentRequirements(ConversionCourseSummaryDTO summary) {
         createAssessmentRequirement("NME", "116", summary);
         createAssessmentRequirement("NME10", "116", summary);
@@ -52,34 +45,26 @@ public class AssessmentService {
     }
 
     private void createAssessmentRequirement(String assessmentCode, String assessmentRequirementCode, ConversionCourseSummaryDTO summary) {
-        AssessmentRequirementEntity assessmentRequirementEntity = populate(assessmentCode, assessmentRequirementCode);
-
-        AssessmentRequirementEntity currentEntity = assessmentRequirementRepository.findByAssessmentCodeAndRuleCode(
-                assessmentRequirementEntity.getAssessmentCode(), assessmentRequirementEntity.getRuleCode());
-        logger.info(" Create AssessmentRequirement: assessment [{}], rule [{}]", assessmentCode, assessmentRequirementCode);
-        if (currentEntity != null) {
-            // Update
-            currentEntity.setUpdateDate(null);
-            currentEntity.setUpdateUser(null);
-            assessmentRequirementRepository.save(currentEntity);
-            summary.setUpdatedCountForAssessmentRequirement(summary.getUpdatedCountForAssessmentRequirement() + 1L);
-
-        } else {
-            // Add
-            assessmentRequirementRepository.save(assessmentRequirementEntity);
+        logger.info("GRAD ASSESSMENT API - Create AssessmentRequirement: assessment [{}], rule [{}]", assessmentCode, assessmentRequirementCode);
+        AssessmentRequirement requestAssessmentRequirement = populate(assessmentCode, assessmentRequirementCode);
+        AssessmentRequirement responseAssessmentRequirement = restUtils.addAssessmentRequirement(requestAssessmentRequirement, summary.getAccessToken());
+        if (responseAssessmentRequirement != null) {
             summary.setAddedCountForAssessmentRequirement(summary.getAddedCountForAssessmentRequirement() + 1L);
         }
     }
 
-    private AssessmentRequirementEntity populate(String assessmentCode, String assessmentRequirementCode) {
-        AssessmentRequirementEntity assessmentRequirement = new AssessmentRequirementEntity();
+    private AssessmentRequirement populate(String assessmentCode, String assessmentRequirementCode) {
+        AssessmentRequirement assessmentRequirement = new AssessmentRequirement();
         assessmentRequirement.setAssessmentCode(assessmentCode);
 
-        Optional<AssessmentRequirementCodeEntity> assessmentCodeRequirementCodeOptional = assessmentRequirementCodeRepository.findById(assessmentRequirementCode);
-        if (assessmentCodeRequirementCodeOptional.isPresent()) {
-            assessmentRequirement.setRuleCode(assessmentCodeRequirementCodeOptional.get());
-        }
-        assessmentRequirement.setAssessmentRequirementId(UUID.randomUUID());
+        AssessmentRequirementCode ruleCode = new AssessmentRequirementCode();
+        ruleCode.setAssmtRequirementCode(assessmentRequirementCode);
+
+        assessmentRequirement.setRuleCode(ruleCode);
         return assessmentRequirement;
+    }
+
+    public List<StudentAssessment> getStudentAssessments(String pen, String accessToken) {
+       return restUtils.getStudentAssessmentsByPen(pen, accessToken);
     }
 }

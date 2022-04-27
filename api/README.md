@@ -1,4 +1,4 @@
-# GRAD BATCH GRADUATION API
+# GRAD DATA CONVERSION API
 ## Build Setup
 
 - #### Download ojdbc8.jar oracle driver file

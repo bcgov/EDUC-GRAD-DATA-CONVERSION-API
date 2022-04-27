@@ -28,14 +28,17 @@ import java.util.HashMap;
 @EnableTransactionManagement
 public class BatchDbConfig {
     // Hikari Pool
-    @Value("${spring.db-connection.hikari.maximum-pool-size}")
-    private int maxPoolSize;
+    @Value("${batch.partitions.number}")
+    private int numberOfPartitions;
 
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
     @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
+
+    @Value("${spring.db-connection.hikari.keepalive-time}")
+    private int keepAliveTime;
 
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
@@ -64,9 +67,13 @@ public class BatchDbConfig {
         config.setPoolName(batchPoolName);
 
         config.setMinimumIdle(2);
-        config.setMaximumPoolSize(maxPoolSize);
+        config.setMaximumPoolSize(numberOfPartitions);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
+        config.setKeepaliveTime(keepAliveTime);
+        config.addDataSourceProperty("socketTimeout", maxLifetime);
+
+        System.out.println("==> BATCH DB : POOL SIZE = " + numberOfPartitions);
 
         return new HikariDataSource(config);
     }

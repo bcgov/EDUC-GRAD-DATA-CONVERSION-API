@@ -16,22 +16,15 @@ spring:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-    assessment:
-      username: ${ASSESSMENT_USERNAME}
-      password: ${ASSESSMENT_PASSWORD}
-      pool-name: conv-assessment-cp
+      keepalive-time: ${KEEP_ALIVE_TIME}
     batch:
       username: ${BATCH_USERNAME}
       password: ${BATCH_PASSWORD}
       pool-name: conv-batch-cp
-    course:
-      username: ${COURSE_USERNAME}
-      password: ${COURSE_PASSWORD}
-      pool-name: conv-course-cp
-    program:
-      username: ${PROGRAM_USERNAME}
-      password: ${PROGRAM_PASSWORD}
-      pool-name: conv-program-cp
+    conv:
+      username: ${CONV_USERNAME}
+      password: ${CONV_PASSWORD}
+      pool-name: conv-primary-cp
     student:
       username: ${STUDENT_USERNAME}
       password: ${STUDENT_PASSWORD}
@@ -58,6 +51,15 @@ spring:
     initialize-schema: NEVER
     job:
       enabled: false
+  flyway:
+    enabled: ${ENABLE_FLYWAY}
+    baseline-on-migrate: ${BASELINE_ON_MIGRATE}
+    table: FLYWAY_SCHEMA_HISTORY
+    url: ${CONNECTION_STRING}
+    schema: ${CONV_USERNAME}
+    user: ${CONV_USERNAME}
+    password: ${CONV_PASSWORD}
+    location: classpath:db/migration
 
 #Logging properties
 logging:
@@ -87,9 +89,9 @@ logging:
         boot:
           autoconfigure:
             logging: ${SPRING_BOOT_AUTOCONFIG_LOG_LEVEL}
-    com:
-      zaxxer:
-        hikari: ERROR
+#    com:
+#      zaxxer:
+#        hikari: ERROR
 
 #Local properties
 server:
@@ -111,6 +113,22 @@ authorization:
   user: ${GRAD_CLIENT_NAME}
   password: ${GRAD_CLIENT_SECRET}
 
+#NATS
+nats:
+  url: ${NATS}
+  maxReconnect: ${NATS_MAX_RECONNECT}
+  connectionName: GRAD-DATA-CONVERSION-API
+
+#Scheduler
+cron:
+  scheduled:
+    process:
+      events:
+        stan:
+          run: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN}
+          lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
+          lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
+
 #Endpoints
 endpoint:
   keycloak:
@@ -118,14 +136,58 @@ endpoint:
   pen-student-api:
     by-pen:
       url: ${PEN_STUDENT_API}api/v1/student?pen=%s
+  grad-course-api:
+    course-restriction:
+      url: ${GRAD_COURSE_API}api/v1/course/get-course-restriction
+    save-course-restriction:
+      url: ${GRAD_COURSE_API}api/v1/course/save-course-restriction
+    check-course-requirement:
+      url: ${GRAD_COURSE_API}api/v1/course/check-course-requirement
+    save-course-requirement:
+      url: ${GRAD_COURSE_API}api/v1/course/save-course-requirement
+    student-courses-by-pen:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/pen
+    check-french-immersion-course:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course
+    check-french-immersion-course-for-en:
+      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course-for-en
+    check-blank-language-course:
+      url: ${GRAD_COURSE_API}api/v1/course/check-blank-language-course
+    check-french-language-course:
+      url: ${GRAD_COURSE_API}api/v1/course/check-french-language-course
   grad-program-api:
     special-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
+    optional-program-by-id:
+      url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms/id
+    career-program:
+      url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
+  grad-assessment-api:
+    assessment-requirement:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement
+    student-assessments-by-pen:
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen
+
 
 #Conversion option
 data-conversion:
   student-guid-pen-xref:
     enabled:  ${ENABLE_STUDENT_ID_PEN_XREF}
+
+#Incremental Grad Update
+grad:
+  update:
+    enabled: ${ENABLE_GRAD_UPDATE}
+
+#Page Size for Parallel Processing
+batch:
+  partitions:
+    number: ${NUMBER_OF_PARTITIONS}
+
+#Splunk LogHelper
+splunk:
+  log-helper:
+    enabled: ${ENABLE_SPLUNK_LOG_HELPER}

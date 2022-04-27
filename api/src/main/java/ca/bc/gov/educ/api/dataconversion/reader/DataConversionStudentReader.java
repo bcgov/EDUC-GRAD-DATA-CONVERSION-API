@@ -40,6 +40,10 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
         summaryDTO = new ConversionStudentSummaryDTO();
         summaryDTO.setTableName("GRAD_STUDENT");
         jobContext.put("studentSummaryDTO", summaryDTO);
+
+        // initialize
+        studentList = null;
+        indexForStudent = 0;
     }
 
     @Override
@@ -75,7 +79,7 @@ public class DataConversionStudentReader implements ItemReader<ConvGradStudent> 
 
     private List<ConvGradStudent> loadRawStudentData() {
         LOGGER.info("Fetching Student List that need Data Conversion Processing");
-        return dataConversionService.loadInitialRawGradStudentData();
+        return dataConversionService.loadGradStudentsDataFromTrax();
     }
 
     private void fetchAccessToken() {

@@ -5,6 +5,8 @@ import org.springframework.http.MediaType;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class EducGradDataConversionApiUtils {
@@ -40,6 +42,19 @@ public class EducGradDataConversionApiUtils {
         }
 
         return date;
+    }
+
+    public static String formatDate (Date date) {
+        if (date == null)
+            return null;
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
+        return simpleDateFormat.format(date);
+    }
+
+    public static String formatDate (Date date, String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        return simpleDateFormat.format(date);
     }
 	
 }

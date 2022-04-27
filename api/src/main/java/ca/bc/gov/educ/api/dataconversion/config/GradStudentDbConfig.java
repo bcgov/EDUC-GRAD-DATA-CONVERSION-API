@@ -68,6 +68,8 @@ public class GradStudentDbConfig {
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
 
+        System.out.println("==> STUDENT DB : POOL SIZE = " + maxPoolSize);
+
         return new HikariDataSource(config);
     }
 

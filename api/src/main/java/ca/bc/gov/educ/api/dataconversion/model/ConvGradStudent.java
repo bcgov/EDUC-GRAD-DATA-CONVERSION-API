@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,19 +16,20 @@ import java.util.List;
 @NoArgsConstructor
 public class ConvGradStudent {
   private String pen;
-  private String program;
+  private String program; // inc
   private Date programCompletionDate;
-  private String slpDate;
+  private String slpDate; // inc
   private String gpa;
   private String honoursStanding;
   private String recalculateGradStatus;
   private String studentGradData;
-  private String schoolOfRecord;
-  private String schoolAtGrad;
-  private String studentGrade;
-  private String studentStatus;
+  private String schoolOfRecord; // inc
+  private String schoolAtGrad; // inc
+  private String studentGrade; // inc
+  private String studentStatus; // inc
   private String archiveFlag;
   private String frenchCert;
+  private String consumerEducationRequirementMet; // inc
 
   // extra
   private String graduationRequestYear;
@@ -37,4 +39,7 @@ public class ConvGradStudent {
 
   // grad or non-grad
   private boolean graduated;
+
+  // data conversion status after being processed.
+  private ConversionResultType result;
 }

@@ -73,7 +73,7 @@ pipeline{
             steps {
                 script {
                     openshift.withCluster() {
-                        openshift.withProject(TOOLS_NAMESPACE) {
+                        openshift.withProject(DEV_NAMESPACE) {
                             openshift.apply(
                                         openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml",
                                         "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${DEV_HOST_ROUTE}")
