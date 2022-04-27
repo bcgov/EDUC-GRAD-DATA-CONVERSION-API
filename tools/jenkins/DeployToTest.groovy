@@ -3,7 +3,7 @@ pipeline{
         label 'maven'
     }
     environment{
-        OCP_PROJECT = '77c02f-dev'
+        OCP_PROJECT = '77c02f-test'
         IMAGE_PROJECT = '77c02f-tools'
         IMAGE_TAG = 'latest'
         APP_SUBDOMAIN_SUFFIX = '77c02f-test'
@@ -19,7 +19,7 @@ pipeline{
         buildDiscarder(logRotator(daysToKeepStr: '', numToKeepStr: '5'))
     }
     parameters {
-        choice( name: 'IMAGE_TAG', choices: ['latest', 'main', 'release-1.0.0', 'dev' ] )
+        choice( name: 'IMAGE_TAG', choices: ['latest', 'main', 'dev', 'test' ] )
     }
     stages{
         stage('Deploy to TEST') {
