@@ -4,7 +4,6 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import lombok.val;
-import org.codehaus.jackson.JsonProcessingException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -110,7 +109,7 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testGetSpecialProgram_givenValues_returnsGradSpecialProgram_with_APICallSuccess() throws JsonProcessingException {
+    public void testGetSpecialProgram_givenValues_returnsGradSpecialProgram_with_APICallSuccess() {
         final UUID specialProgramID = UUID.randomUUID();
         final OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(specialProgramID);
@@ -130,7 +129,7 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testGetStudentAssessments_givenValues_returnsStudentAssessments_withAPICallSuccess() throws JsonProcessingException {
+    public void testGetStudentAssessments_givenValues_returnsStudentAssessments_withAPICallSuccess() {
         final String pen = "123456789";
         final String assmtCode = "assmtCode";
 

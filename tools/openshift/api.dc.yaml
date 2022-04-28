@@ -67,8 +67,6 @@ objects:
                 - secretRef:
                     name: api-grad-conv-db-secret
                 - secretRef:
-                    name: grad-keycloak-pk-secret
-                - secretRef:
                     name: grad-client-secret
               resources: {}
             - image: docker-remote.artifacts.developer.gov.bc.ca/fluent/fluent-bit:1.5.7
