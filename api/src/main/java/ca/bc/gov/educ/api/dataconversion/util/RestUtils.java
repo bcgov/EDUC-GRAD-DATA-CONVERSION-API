@@ -47,21 +47,30 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getPenStudentApiByPenUrl(), pen))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(responseType).block();
     }
 
     public OptionalProgram getOptionalProgram(String programCode, String specialProgramCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradOptionalProgramUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(OptionalProgram.class).block();
     }
 
     public OptionalProgram getOptionalProgramByID(UUID optionalProgramID, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradOptionalProgramByIDUrl(), uri -> uri.path("/{optionalProgramID}").build(optionalProgramID))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(OptionalProgram.class).block();
     }
 
@@ -69,14 +78,20 @@ public class RestUtils {
     public CareerProgram getCareerProgram(String careerProgramCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradCareerProgramUrl(), uri -> uri.path("/{careerProgramCode}").build(careerProgramCode))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(CareerProgram.class).block();
     }
 
     public Student addNewPen(Student student, String accessToken) {
         return webClient.post()
                 .uri(constants.getAddNewPenFromGradStudentApiUrl())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .body(BodyInserters.fromValue(student))
                 .retrieve().bodyToMono(Student.class).block();
     }
@@ -84,7 +99,10 @@ public class RestUtils {
     public AssessmentRequirement addAssessmentRequirement(AssessmentRequirement assessmentRequirement, String accessToken) {
         return webClient.post()
                 .uri(constants.getAddAssessmentRequirementApiUrl())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .body(BodyInserters.fromValue(assessmentRequirement))
                 .retrieve().bodyToMono(AssessmentRequirement.class).block();
     }
@@ -94,7 +112,10 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getStudentAssessmentsByPenApiUrl(), pen))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -103,7 +124,10 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getStudentCoursesByPenApiUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -119,14 +143,20 @@ public class RestUtils {
                             .queryParam("restrictedCourseCode", restrictedCourseCode)
                             .queryParam("restrictedCourseLevel", restrictedCourseLevel)
                             .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
 
     public CourseRestriction saveCourseRestriction(CourseRestriction courseRestriction, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveCourseRestrictionApiUrl())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .body(BodyInserters.fromValue(courseRestriction))
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
@@ -134,7 +164,10 @@ public class RestUtils {
     public CourseRequirement saveCourseRequirement(CourseRequirement courseRequirement, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveCourseRequirementApiUrl())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .body(BodyInserters.fromValue(courseRequirement))
                 .retrieve().bodyToMono(CourseRequirement.class).block();
     }
@@ -149,7 +182,10 @@ public class RestUtils {
                                 .queryParam("courseLevel", courseLevel)
                                 .queryParam("ruleCode", ruleCode)
                                 .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -161,7 +197,10 @@ public class RestUtils {
                         uri -> uri.queryParam("pen", pen)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -173,7 +212,10 @@ public class RestUtils {
                         uri -> uri.queryParam("pen", pen)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -185,7 +227,10 @@ public class RestUtils {
                         uri -> uri.queryParam("courseCode", courseCode)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -197,7 +242,10 @@ public class RestUtils {
                         uri -> uri.queryParam("courseCode", courseCode)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> h.setBearerAuth(accessToken))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 }

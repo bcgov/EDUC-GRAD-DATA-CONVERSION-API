@@ -2,18 +2,19 @@ package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.LogHelper;
+import ca.bc.gov.educ.api.dataconversion.util.ThreadLocalStateUtil;
 import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import org.springframework.web.servlet.AsyncHandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.Instant;
 
 @Component
-public class RequestInterceptor extends HandlerInterceptorAdapter {
+public class RequestInterceptor implements AsyncHandlerInterceptor {
 
 	@Autowired
 	EducGradDataConversionApiConstants constants;
@@ -24,6 +25,10 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
 		if (request.getAttribute("startTime") == null) {
 			final long startTime = Instant.now().toEpochMilli();
 			request.setAttribute("startTime", startTime);
+		}
+		val correlationID = request.getHeader(EducGradDataConversionApiConstants.CORRELATION_ID);
+		if (correlationID != null) {
+			ThreadLocalStateUtil.setCorrelationID(correlationID);
 		}
 		return true;
 	}
@@ -42,6 +47,7 @@ public class RequestInterceptor extends HandlerInterceptorAdapter {
 		val correlationID = request.getHeader(EducGradDataConversionApiConstants.CORRELATION_ID);
 		if (correlationID != null) {
 			response.setHeader(EducGradDataConversionApiConstants.CORRELATION_ID, request.getHeader(EducGradDataConversionApiConstants.CORRELATION_ID));
+			ThreadLocalStateUtil.setCorrelationID(null);
 		}
 	}
 }
