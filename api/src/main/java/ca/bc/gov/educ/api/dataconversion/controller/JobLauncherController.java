@@ -17,7 +17,6 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.web.bind.annotation.*;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -25,7 +24,6 @@ import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants
 @RestController
 @RequestMapping(EducGradDataConversionApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
 @CrossOrigin
-@EnableResourceServer
 @OpenAPIDefinition(info = @Info(title = "API for Data Conversion & Ongoing Updates.",
         description = "This API is for Reading TRAX data and Persisting GRAD data.", version = "1"))
 public class JobLauncherController {

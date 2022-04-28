@@ -21,10 +21,16 @@ spring:
   jackson:
     deserialization:
       fail-on-unknown-properties: false
+  #Keycloak/OAuth properties
   security:
     user:
       name: ${API_USERNAME}
       password: ${API_PASSWORD}
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master
+          jwk-set-uri: https://soam-dev.apps.silver.devops.gov.bc.ca/auth/realms/master/protocol/openid-connect/certs
   batch:
     initialize-schema: NEVER
     job:
