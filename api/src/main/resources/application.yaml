@@ -67,7 +67,7 @@ logging:
   logback:
     rollingpolicy:
       max-history: 1
-      max-file-size: 5MB
+      max-file-size: 20MB
       clean-history-on-start: true
   pattern:
     #  file: "%d | [${HOSTNAME}] | %clr(%5p) | [%t]   | %logger{36}:%L | %msg%n"
