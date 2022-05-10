@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import lombok.val;
@@ -54,6 +56,12 @@ public class RestUtilsTest {
     private WebClient.RequestBodyUriSpec requestBodyUriMock;
     @Mock
     private WebClient.ResponseSpec responseMock;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Before
     public void setUp() {

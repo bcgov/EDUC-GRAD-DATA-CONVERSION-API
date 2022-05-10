@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
@@ -41,6 +43,12 @@ public class DataConversionServiceTest {
 
     @MockBean
     RestUtils restUtils;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Before
     public void setUp() {

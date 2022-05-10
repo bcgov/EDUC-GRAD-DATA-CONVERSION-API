@@ -2,6 +2,8 @@ package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.Student;
@@ -56,6 +58,12 @@ public class StudentServiceTest {
 
     @Autowired
     GradConversionTestUtils gradConversionTestUtils;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Before
     public void setUp() {
