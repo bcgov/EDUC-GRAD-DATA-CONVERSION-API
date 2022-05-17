@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
-import ca.bc.gov.educ.api.dataconversion.service.trax.TraxService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -41,7 +40,6 @@ public class StudentService extends StudentBaseService {
     private final RestUtils restUtils;
     private final AssessmentService assessmentService;
     private final CourseService courseService;
-    private final TraxService traxService;
 
     @Autowired
     public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
@@ -52,8 +50,7 @@ public class StudentService extends StudentBaseService {
                           EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
                           AssessmentService assessmentService,
-                          CourseService courseService,
-                          TraxService traxService) {
+                          CourseService courseService) {
         this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
@@ -63,15 +60,28 @@ public class StudentService extends StudentBaseService {
         this.restUtils = restUtils;
         this.assessmentService = assessmentService;
         this.courseService = courseService;
-        this.traxService = traxService;
     }
 
     @Transactional(transactionManager = "studentTransactionManager")
     public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
+            String accessToken = summary.getAccessToken();
+
             // School validation
-            if (!traxService.existsSchool(convGradStudent.getSchoolOfRecord())) {
+            Boolean schoolExists;
+            try {
+                schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
+            } catch (Exception e) {
+                ConversionAlert error = new ConversionAlert();
+                error.setItem(convGradStudent.getPen());
+                error.setReason("Grad Trax API is failed: " + e.getLocalizedMessage());
+                summary.getErrors().add(error);
+                convGradStudent.setResult(ConversionResultType.FAILURE);
+                return convGradStudent;
+            }
+
+            if (!schoolExists) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convGradStudent.getPen());
                 error.setReason("Invalid school of record " + convGradStudent.getSchoolOfRecord());
@@ -80,7 +90,7 @@ public class StudentService extends StudentBaseService {
                 return convGradStudent;
             }
 
-            String accessToken = summary.getAccessToken();
+            // PEN Student
             List<Student> students;
             try {
                 // Call PEN Student API
