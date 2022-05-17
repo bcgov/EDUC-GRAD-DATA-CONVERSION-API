@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.JwtUtil;
 import ca.bc.gov.educ.api.dataconversion.util.LogHelper;
 import ca.bc.gov.educ.api.dataconversion.util.ThreadLocalStateUtil;
 import lombok.val;
@@ -38,7 +39,7 @@ public class RequestInterceptor implements AsyncHandlerInterceptor {
 		// username
 		JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
 		Jwt jwt = (Jwt) authenticationToken.getCredentials();
-		String username = (String) jwt.getClaims().get("preferred_username");
+		String username = JwtUtil.getName(jwt);
 		if (username != null) {
 			ThreadLocalStateUtil.setCurrentUser(username);
 		}
