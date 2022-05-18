@@ -1,0 +1,68 @@
+name: Deploy to TEST
+
+env:
+  # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
+  # See https://github.com/redhat-actions/oc-login#readme for how to retrieve these values.
+  # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
+  OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+
+  SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api-dc
+
+  REPO_NAME: "educ-grad-trax-api"
+  NAMESPACE: ${{ secrets.GRAD_NAMESPACE_NO_ENV }}
+
+on:
+  # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+  workflow_dispatch:
+
+jobs:
+  deploy-prod:
+    name: Deploy to OpenShift PROD
+    # ubuntu-20.04 can also be used.
+    runs-on: ubuntu-18.04
+    environment: prod
+
+    outputs:
+      ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
+      SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Get latest tag
+      uses: actions-ecosystem/action-get-latest-tag@v1
+      id: get-latest-tag
+
+    - name: Install oc
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: 4
+
+      # https://github.com/redhat-actions/oc-login#readme
+    - uses: actions/checkout@v2
+    - name: Deploy
+      run: |
+        set -eux
+        # Login to OpenShift and select project
+        oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
+        oc project ${{ env.OPENSHIFT_NAMESPACE }}
+        # Cancel any rollouts in progress
+        oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+        || true && echo "No rollout in progress"
+        
+        oc tag ${{ env.NAMESPACE }}-dev/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }} ${{ env.NAMESPACE }}-test/${{ env.REPO_NAME }}:${{ steps.get-latest-tag.outputs.tag }}
+        
+        # Process and apply deployment template
+        oc process -f tools/openshift/api.dc.yaml -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ steps.get-latest-tag.outputs.tag }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE}}.${{ env.APP_DOMAIN }} \
+        | oc apply -f -
+        
+
+        # Start rollout (if necessary) and follow it
+        oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+        || true && echo "Rollout in progress"
+        oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+        # Get status, returns 0 if rollout is successful
+        oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}

@@ -1,0 +1,117 @@
+name: Build & Deploy to DEV from Release Branch
+
+env:
+  # 🖊️ EDIT your repository secrets to log into your OpenShift cluster and set up the context.
+  # See https://github.com/redhat-actions/oc-login#readme for how to retrieve these values.
+  # To get a permanent token, refer to https://github.com/redhat-actions/oc-login/wiki/Using-a-Service-Account-for-GitHub-Actions
+  OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
+  OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
+  OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+
+  # 🖊️ EDIT to change the image registry settings.
+  # Registries such as GHCR, Quay.io, and Docker Hub are supported.
+  IMAGE_REGISTRY: ghcr.io/${{ github.repository_owner }}
+  IMAGE_REGISTRY_USER: ${{ github.actor }}
+  IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
+
+  SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api-dc
+  DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
+
+  REPO_NAME: "educ-grad-trax-api"
+  APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
+  TAG: "latest"
+
+on:
+  # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
+  workflow_dispatch:
+
+jobs:
+  openshift-ci-cd:
+    name: Build and deploy to OpenShift DEV
+    # ubuntu-20.04 can also be used.
+    runs-on: ubuntu-18.04
+    environment: dev
+
+    outputs:
+      ROUTE: ${{ steps.deploy-and-expose.outputs.route }}
+      SELECTOR: ${{ steps.deploy-and-expose.outputs.selector }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          ref: grad-release
+
+      - name: Determine image tags
+        if: env.TAG == ''
+        run: |
+          echo "TAG=latest ${GITHUB_SHA::12}" | tee -a $GITHUB_ENV
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.DOCKER_ARTIFACTORY_REPO }}
+          username: ${{ secrets.DOCKER_ARTIFACTORY_USERNAME }}
+          password: ${{ secrets.DOCKER_ARTIFACTORY_ACCESS_TOKEN }}
+
+      # https://github.com/redhat-actions/buildah-build#readme
+      - name: Build from Dockerfile
+        id: build-image
+        uses: redhat-actions/buildah-build@v2
+        with:
+          image: ${{ env.REPO_NAME }}
+          tags: ${{ env.TAG }}
+
+          # If you don't have a Dockerfile/Containerfile, refer to https://github.com/redhat-actions/buildah-build#scratch-build-inputs
+          # Or, perform a source-to-image build using https://github.com/redhat-actions/s2i-build
+          # Otherwise, point this to your Dockerfile/Containerfile relative to the repository root.
+          dockerfiles: |
+            ./Dockerfile
+
+      # https://github.com/redhat-actions/push-to-registry#readme
+      - name: Push to registry
+        id: push-image
+        uses: redhat-actions/push-to-registry@v2
+        with:
+          image: ${{ steps.build-image.outputs.image }}
+          tags: ${{ steps.build-image.outputs.tags }}
+          registry: ${{ env.IMAGE_REGISTRY }}
+          username: ${{ env.IMAGE_REGISTRY_USER }}
+          password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
+
+      # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
+
+      - name: Install oc
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: 4
+
+        # https://github.com/redhat-actions/oc-login#readme
+      - uses: actions/checkout@v2
+      - name: Deploy
+        run: |
+          set -eux
+          # Login to OpenShift and select project
+          oc login --token=${{ env.OPENSHIFT_TOKEN }} --server=${{ env.OPENSHIFT_SERVER }}
+          oc project ${{ env.OPENSHIFT_NAMESPACE }}
+          # Cancel any rollouts in progress
+          oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+          || true && echo "No rollout in progress"
+
+          oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
+
+          # Process and apply deployment template
+          oc process -f tools/openshift/api.dc.yaml -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
+          | oc apply -f -
+
+          # Start rollout (if necessary) and follow it
+          oc rollout latest dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
+          || true && echo "Rollout in progress"
+          oc logs -f dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+          # Get status, returns 0 if rollout is successful
+          oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
+
+#      - name: ZAP Scan
+#        uses: zaproxy/action-api-scan@v0.1.0
+#        with:
+#         target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
