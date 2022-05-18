@@ -70,7 +70,7 @@ public class StudentService extends StudentBaseService {
             String accessToken = summary.getAccessToken();
 
             // School validation
-            Boolean schoolExists = validateSchool(convGradStudent, summary);
+            boolean schoolExists = validateSchool(convGradStudent, summary);
             if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // Grad Trax API is failed
                 return convGradStudent;
             } else if (!schoolExists) {
@@ -261,12 +261,14 @@ public class StudentService extends StudentBaseService {
             if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) {
                 frenchImmersion = true;
             }
-        } else if (program.equals("1986-EN")) {
-            if (StringUtils.equalsIgnoreCase("F", frenchCert) || courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) {
-                frenchImmersion = true;
-            }
+        } else if (program.equals("1986-EN") && isFrenchCertificate(frenchCert, pen, accessToken)) {
+            frenchImmersion = true;
         }
         return frenchImmersion;
+    }
+
+    private boolean isFrenchCertificate(String frenchCert, String pen, String accessToken) {
+        return StringUtils.equalsIgnoreCase("F", frenchCert) || courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken);
     }
 
     private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -454,9 +456,9 @@ public class StudentService extends StudentBaseService {
 
     private List<String> getCareerProgramCodes(List<StudentCareerProgramEntity> studentCareerProgramEntities) {
         List<String> codes = new ArrayList<>();
-        studentCareerProgramEntities.forEach(e -> {
-            codes.add(e.getCareerProgramCode());
-        });
+        studentCareerProgramEntities.forEach(
+            e -> codes.add(e.getCareerProgramCode())
+        );
         return codes;
     }
 
@@ -559,10 +561,7 @@ public class StudentService extends StudentBaseService {
     @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
     public boolean existsCareerProgram(UUID studentID) {
         List<StudentCareerProgramEntity> list = studentCareerProgramRepository.findByStudentID(studentID);
-        if (list != null && !list.isEmpty()) {
-            return true;
-        }
-        return false;
+        return list != null && !list.isEmpty();
     }
 
     @Transactional(transactionManager = "studentTransactionManager")

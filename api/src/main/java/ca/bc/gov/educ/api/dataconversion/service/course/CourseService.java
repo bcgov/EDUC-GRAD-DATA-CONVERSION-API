@@ -28,18 +28,25 @@ public class CourseService {
     private static final String CLEA_STR = "CLEA";
     private static final String CLEB_STR = "CLEB";
 
+    private static final String FRAL_STR = "FRAL";
+    private static final String FRALP_STR = "FRALP";
+    private static final String QFRAL_STR = "QFRAL";
+    private static final String ZFRAL_STR = "ZFRAL";
+    private static final String IBFAS_STR = "IBFAS";
+
     private static final String ERR_MSG_FORMAT = "For {} : {}";
 
-    private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>() {{
-        add(Pair.of(CLEA_STR, CLEB_STR));
-        add(Pair.of(CLEA_STR, CLEBF_STR));
-        add(Pair.of(CLEAF_STR, CLEB_STR));
-        add(Pair.of(CLEAF_STR, CLEBF_STR));
-        add(Pair.of(CLEB_STR, CLEA_STR));
-        add(Pair.of(CLEB_STR, CLEAF_STR));
-        add(Pair.of(CLEBF_STR, CLEA_STR));
-        add(Pair.of(CLEBF_STR, CLEAF_STR));
-    }};
+    private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>();
+    static {
+        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEB_STR));
+        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEBF_STR));
+        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEB_STR));
+        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEBF_STR));
+        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEA_STR));
+        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
+        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
+        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+    }
 
     private final RestUtils restUtils;
 
@@ -163,25 +170,33 @@ public class CourseService {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                         gradCourse.getCourseLevel(), "701"), summary);
             }
-            if (hasFrenchLanguageCourse(gradCourse.getCourseCode(),
-                    gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "302"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "815"), summary);
-                }
+            handleFrenchLanguageCourseForEnglish10(gradCourse, summary);
+            handleBlankLanguageCourseForEnglish10(gradCourse, summary);
+        }
+    }
+
+    private void handleFrenchLanguageCourseForEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasFrenchLanguageCourse(gradCourse.getCourseCode(),
+                gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "302"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "815"), summary);
             }
-            if (hasBlankLanguageCourse(gradCourse.getCourseCode(),
-                    gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "400"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "850"), summary);
-                }
+        }
+    }
+
+    private void handleBlankLanguageCourseForEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasBlankLanguageCourse(gradCourse.getCourseCode(),
+                gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "400"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "850"), summary);
             }
         }
     }
@@ -201,26 +216,35 @@ public class CourseService {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                         gradCourse.getCourseLevel(), "740"), summary);
             }
-            if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "301"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "816"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "818"), summary);
-                }
+            handleFrenchLanguageCourseForEnglish11(gradCourse, summary);
+            handleBlankLanguageCourseForEnglish11(gradCourse, summary);
+        }
+    }
+
+    private void handleFrenchLanguageCourseForEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "301"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "816"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "818"), summary);
             }
-            if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "401"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "851"), summary);
-                }
+        }
+
+    }
+
+    private void handleBlankLanguageCourseForEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "401"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "851"), summary);
             }
         }
     }
@@ -243,26 +267,34 @@ public class CourseService {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                         gradCourse.getCourseLevel(), "741"), summary);
             }
-            if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "300"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "817"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "819"), summary);
-                }
+            handleFrenchLanguageCourseForEnglish12(gradCourse, summary);
+            handleBlankLanguageCourseForEnglish12(gradCourse, summary);
+        }
+    }
+
+    private void handleFrenchLanguageCourseForEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "300"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "817"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "819"), summary);
             }
-            if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-                if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "402"), summary);
-                } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                            gradCourse.getCourseLevel(), "852"), summary);
-                }
+        }
+    }
+
+    private void handleBlankLanguageCourseForEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
+        if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
+            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "402"), summary);
+            } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+                createCourseRequirement(populate(gradCourse.getCourseCode(),
+                        gradCourse.getCourseLevel(), "852"), summary);
             }
         }
     }
@@ -362,7 +394,7 @@ public class CourseService {
 
     private void processCareerPersonal(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // careerPersonal10
-        if (StringUtils.isNotBlank(gradCourse.getCareerPersonal10()) && StringUtils.equals(gradCourse.getCareerPersonal10(), "Y")) {
+        if (isCareerPersonal10(gradCourse)) {
             if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                         gradCourse.getCourseLevel(), "112"), summary);
@@ -372,19 +404,27 @@ public class CourseService {
             }
         }
         // careerPersonal11
-        if (StringUtils.isNotBlank(gradCourse.getCareerPersonal11()) && StringUtils.equals(gradCourse.getCareerPersonal11(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
-                createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "728"), summary);
-            }
+        if (isCareerPersonal11(gradCourse) && StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                    gradCourse.getCourseLevel(), "728"), summary);
         }
         // careerPersonal12
-        if (StringUtils.isNotBlank(gradCourse.getCareerPersonal12()) && StringUtils.equals(gradCourse.getCareerPersonal12(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
-                createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "729"), summary);
-            }
+        if (isCareerPersonal12(gradCourse) && StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                    gradCourse.getCourseLevel(), "729"), summary);
         }
+    }
+
+    private boolean isCareerPersonal10(GradCourse gradCourse) {
+        return StringUtils.isNotBlank(gradCourse.getCareerPersonal10()) && StringUtils.equals(gradCourse.getCareerPersonal10(), "Y");
+    }
+
+    private boolean isCareerPersonal11(GradCourse gradCourse) {
+        return StringUtils.isNotBlank(gradCourse.getCareerPersonal11()) && StringUtils.equals(gradCourse.getCareerPersonal11(), "Y");
+    }
+
+    private boolean isCareerPersonal12(GradCourse gradCourse) {
+        return StringUtils.isNotBlank(gradCourse.getCareerPersonal12()) && StringUtils.equals(gradCourse.getCareerPersonal12(), "Y");
     }
 
     private void processPhysEd(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
@@ -423,108 +463,113 @@ public class CourseService {
 
     private void processPortFolio(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // portfolio
-        if (StringUtils.isNotBlank(gradCourse.getPortfolio()) && StringUtils.equals(gradCourse.getPortfolio(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
-                createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "713"), summary);
-            }
+        if (StringUtils.isNotBlank(gradCourse.getPortfolio()) && StringUtils.equals(gradCourse.getPortfolio(), "Y")
+            && StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                    gradCourse.getCourseLevel(), "713"), summary);
         }
     }
 
     private void processConsEd(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // consEd
-        if (StringUtils.isNotBlank(gradCourse.getConsEd()) && StringUtils.equals(gradCourse.getConsEd(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "1986")) {
-                createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "745"), summary);
-            }
+        if (StringUtils.isNotBlank(gradCourse.getConsEd()) && StringUtils.equals(gradCourse.getConsEd(), "Y")
+            && StringUtils.equals(gradCourse.getGradReqtYear(), "1986")) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                    gradCourse.getCourseLevel(), "745"), summary);
         }
     }
 
     private void processFineArts(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // fineArts
-        if (StringUtils.isNotBlank(gradCourse.getFineArts()) && StringUtils.equals(gradCourse.getFineArts(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
-                if (StringUtils.isBlank(gradCourse.getAppliedSkills()) || !StringUtils.equals(gradCourse.getAppliedSkills(), "Y")) {
-                    createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "726"), summary);
-                }
-            }
+        if (isFineArts(gradCourse)
+            && StringUtils.equals(gradCourse.getGradReqtYear(), "1996") && isAppliedSkills(gradCourse)) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                gradCourse.getCourseLevel(), "726"), summary);
         }
+    }
+
+    private boolean isFineArts(GradCourse gradCourse) {
+        return StringUtils.isNotBlank(gradCourse.getFineArts()) && StringUtils.equals(gradCourse.getFineArts(), "Y");
+    }
+
+    private boolean isAppliedSkills(GradCourse gradCourse) {
+        return StringUtils.isBlank(gradCourse.getAppliedSkills()) || !StringUtils.equals(gradCourse.getAppliedSkills(), "Y");
     }
 
     private void processCareerLifeConnections(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // careerLifeConnections
-        if (StringUtils.isNotBlank(gradCourse.getCareerLifeConnections()) && StringUtils.equals(gradCourse.getCareerLifeConnections(), "Y")) {
-            if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
-                createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "113"), summary);
-            }
+        if (isCareerLifeConnections(gradCourse) && StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
+            createCourseRequirement(populate(gradCourse.getCourseCode(),
+                    gradCourse.getCourseLevel(), "113"), summary);
         }
+    }
+
+    private boolean isCareerLifeConnections(GradCourse gradCourse) {
+        return StringUtils.isNotBlank(gradCourse.getCareerLifeConnections()) && StringUtils.equals(gradCourse.getCareerLifeConnections(), "Y");
     }
 
     public void createCourseRequirementsForFrenchImmersion(ConversionCourseSummaryDTO summary) {
         // FRAL 12
-        createCourseRequirement(populate("FRAL", "12", "200"), summary);
-        createCourseRequirement(populate("FRAL", "12", "900"), summary);
-        createCourseRequirement(populate("FRAL", "12", "819"), summary);
-        createCourseRequirement(populate("FRAL", "12", "910"), summary);
-        createCourseRequirement(populate("FRAL", "12", "915"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "200"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "900"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "819"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "910"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "915"), summary);
 
         // FRALP 12
-        createCourseRequirement(populate("FRALP", "12", "910"), summary);
-        createCourseRequirement(populate("FRALP", "12", "915"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "910"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "915"), summary);
 
         // QFRAL 12
-        createCourseRequirement(populate("QFRAL", "12", "200"), summary);
-        createCourseRequirement(populate("QFRAL", "12", "900"), summary);
-        createCourseRequirement(populate("QFRAL", "12", "819"), summary);
-        createCourseRequirement(populate("QFRAL", "12", "910"), summary);
-        createCourseRequirement(populate("QFRAL", "12", "915"), summary);
+        createCourseRequirement(populate(QFRAL_STR, "12", "200"), summary);
+        createCourseRequirement(populate(QFRAL_STR, "12", "900"), summary);
+        createCourseRequirement(populate(QFRAL_STR, "12", "819"), summary);
+        createCourseRequirement(populate(QFRAL_STR, "12", "910"), summary);
+        createCourseRequirement(populate(QFRAL_STR, "12", "915"), summary);
 
         // QFRALP 12
         createCourseRequirement(populate("QFRALP", "12", "910"), summary);
         createCourseRequirement(populate("QFRALP", "12", "915"), summary);
 
         // ZFRAL 12
-        createCourseRequirement(populate("ZFRAL", "12", "819"), summary);
-        createCourseRequirement(populate("ZFRAL", "12", "910"), summary);
-        createCourseRequirement(populate("ZFRAL", "12", "915"), summary);
+        createCourseRequirement(populate(ZFRAL_STR, "12", "819"), summary);
+        createCourseRequirement(populate(ZFRAL_STR, "12", "910"), summary);
+        createCourseRequirement(populate(ZFRAL_STR, "12", "915"), summary);
 
         // IBFAS 12
-        createCourseRequirement(populate("IBFAS", "12", "200"), summary);
-        createCourseRequirement(populate("IBFAS", "12", "900"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "12", "200"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "12", "900"), summary);
 
         // IBFAH 12
         createCourseRequirement(populate("IBFAH", "12", "200"), summary);
         createCourseRequirement(populate("IBFAH", "12", "900"), summary);
 
         // FRAL 11
-        createCourseRequirement(populate("FRAL", "11", "201"), summary);
-        createCourseRequirement(populate("FRAL", "11", "901"), summary);
-        createCourseRequirement(populate("FRAL", "11", "818"), summary);
-        createCourseRequirement(populate("FRAL", "11", "911"), summary);
-        createCourseRequirement(populate("FRAL", "11", "916"), summary);
+        createCourseRequirement(populate(FRAL_STR, "11", "201"), summary);
+        createCourseRequirement(populate(FRAL_STR, "11", "901"), summary);
+        createCourseRequirement(populate(FRAL_STR, "11", "818"), summary);
+        createCourseRequirement(populate(FRAL_STR, "11", "911"), summary);
+        createCourseRequirement(populate(FRAL_STR, "11", "916"), summary);
 
         // IBFAS 11
-        createCourseRequirement(populate("IBFAS", "11", "201"), summary);
-        createCourseRequirement(populate("IBFAS", "11", "901"), summary);
-        createCourseRequirement(populate("IBFAS", "11", "911"), summary);
-        createCourseRequirement(populate("IBFAS", "11", "916"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "11", "201"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "11", "901"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "11", "911"), summary);
+        createCourseRequirement(populate(IBFAS_STR, "11", "916"), summary);
 
         // FRALP 11
-        createCourseRequirement(populate("FRALP", "11", "201"), summary);
-        createCourseRequirement(populate("FRALP", "11", "901"), summary);
-        createCourseRequirement(populate("FRALP", "11", "911"), summary);
-        createCourseRequirement(populate("FRALP", "11", "916"), summary);
+        createCourseRequirement(populate(FRALP_STR, "11", "201"), summary);
+        createCourseRequirement(populate(FRALP_STR, "11", "901"), summary);
+        createCourseRequirement(populate(FRALP_STR, "11", "911"), summary);
+        createCourseRequirement(populate(FRALP_STR, "11", "916"), summary);
 
         // FRAL 10
-        createCourseRequirement(populate("FRAL", "10", "202"), summary);
-        createCourseRequirement(populate("FRAL", "10", "902"), summary);
+        createCourseRequirement(populate(FRAL_STR, "10", "202"), summary);
+        createCourseRequirement(populate(FRAL_STR, "10", "902"), summary);
 
         // FRALP 10
-        createCourseRequirement(populate("FRALP", "10", "202"), summary);
-        createCourseRequirement(populate("FRALP", "10", "902"), summary);
+        createCourseRequirement(populate(FRALP_STR, "10", "202"), summary);
+        createCourseRequirement(populate(FRALP_STR, "10", "902"), summary);
 
         // IBFRS 12A
         createCourseRequirement(populate("IBFRS", "12A", "200"), summary);
@@ -633,15 +678,11 @@ public class CourseService {
     }
 
     private boolean isValidCourseForRule727(String courseCode, String courseLevel) {
-        if ( (StringUtils.equals(courseCode.trim(), "AC") && StringUtils.equals(courseLevel, "11 "))
+         return (StringUtils.equals(courseCode.trim(), "AC") && StringUtils.equals(courseLevel, "11 "))
             || (StringUtils.equals(courseCode.trim(), "ACC") && StringUtils.equals(courseLevel, "12 "))
             || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "11 "))
             || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "12 "))
-            || (StringUtils.equals(courseCode.trim(), "FA") && StringUtils.equals(courseLevel, "12 ")) ) {
-            return false;
-        } else {
-            return true;
-        }
+            || (StringUtils.equals(courseCode.trim(), "FA") && StringUtils.equals(courseLevel, "12 "));
     }
 
     public boolean hasFrenchLanguageCourse(String courseCode, String courseLevel, String accessToken) {
