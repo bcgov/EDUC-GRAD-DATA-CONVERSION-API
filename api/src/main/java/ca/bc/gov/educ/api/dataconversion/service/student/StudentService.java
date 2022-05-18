@@ -29,6 +29,7 @@ import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiCo
 public class StudentService extends StudentBaseService {
 
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
+    private static final String DATA_CONVERSION_HISTORY_ACTIVITY_CODE = "DATACONVERT";
 
     private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
@@ -69,19 +70,10 @@ public class StudentService extends StudentBaseService {
             String accessToken = summary.getAccessToken();
 
             // School validation
-            Boolean schoolExists;
-            try {
-                schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
-            } catch (Exception e) {
-                ConversionAlert error = new ConversionAlert();
-                error.setItem(convGradStudent.getPen());
-                error.setReason("Grad Trax API is failed: " + e.getLocalizedMessage());
-                summary.getErrors().add(error);
-                convGradStudent.setResult(ConversionResultType.FAILURE);
+            Boolean schoolExists = validateSchool(convGradStudent, summary);
+            if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // Grad Trax API is failed
                 return convGradStudent;
-            }
-
-            if (!schoolExists) {
+            } else if (!schoolExists) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convGradStudent.getPen());
                 error.setReason("Invalid school of record " + convGradStudent.getSchoolOfRecord());
@@ -91,19 +83,10 @@ public class StudentService extends StudentBaseService {
             }
 
             // PEN Student
-            List<Student> students;
-            try {
-                // Call PEN Student API
-                students = restUtils.getStudentsByPen(convGradStudent.getPen(), accessToken);
-            } catch (Exception e) {
-                ConversionAlert error = new ConversionAlert();
-                error.setItem(convGradStudent.getPen());
-                error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
-                summary.getErrors().add(error);
-                convGradStudent.setResult(ConversionResultType.FAILURE);
+            List<Student> students = getStudentsFromPEN(convGradStudent, summary);
+            if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // PEN Student API is failed
                 return convGradStudent;
-            }
-            if (students == null || students.isEmpty()) {
+            } else if (students == null || students.isEmpty()) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convGradStudent.getPen());
                 error.setReason("PEN does not exist: PEN Student API returns empty response.");
@@ -112,64 +95,113 @@ public class StudentService extends StudentBaseService {
                 return convGradStudent;
             }
 
-            students.forEach(st -> {
-                boolean isStudentPersisted = false;
-                ConversionResultType result = ConversionResultType.SUCCESS;
-                UUID studentID = UUID.fromString(st.getStudentID());
-                Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
-                GraduationStudentRecordEntity gradStudentEntity;
-                if (stuOptional.isPresent()) {
-                    gradStudentEntity = stuOptional.get();
-                    gradStudentEntity.setPen(st.getPen());
-                    convertStudentData(convGradStudent, gradStudentEntity, summary);
-                    gradStudentEntity.setUpdateDate(null);
-                    gradStudentEntity.setUpdateUser(null);
-                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-                    isStudentPersisted = true;
-                    summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
-                } else {
-                    gradStudentEntity = new GraduationStudentRecordEntity();
-                    gradStudentEntity.setPen(st.getPen());
-                    gradStudentEntity.setStudentID(studentID);
-                    convertStudentData(convGradStudent, gradStudentEntity, summary);
-                    // if year "1950" without "AD" or "AN", then program is null
-                    if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
-                        gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-                        summary.setAddedCount(summary.getAddedCount() + 1L);
-                        isStudentPersisted = true;
-                    }
-                }
+            // Student conversion process
+            processStudents(convGradStudent, students, summary, accessToken);
 
-                if (isStudentPersisted) {
-                    // graduation status history
-                    createGraduationStudentRecordHistory(gradStudentEntity, "DATACONVERT");
-
-                    // student guid - pen
-                    if (constants.isStudentGuidPenXrefEnabled()) {
-                        saveStudentGuidPenXref(studentID, convGradStudent.getPen());
-                    }
-
-                    // process dependencies
-                    gradStudentEntity.setPen(convGradStudent.getPen());
-                    result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
-                    if (result != ConversionResultType.FAILURE) {
-                        result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
-                    }
-                    if (result != ConversionResultType.FAILURE) {
-                        result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
-                    }
-                }
-                convGradStudent.setResult(result);
-            });
-            return convGradStudent;
         } catch (Exception e) {
             ConversionAlert error = new ConversionAlert();
             error.setItem(convGradStudent.getPen());
             error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
             summary.getErrors().add(error);
             convGradStudent.setResult(ConversionResultType.FAILURE);
-            return convGradStudent;
+
         }
+        return convGradStudent;
+    }
+
+    private Boolean validateSchool(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        // School validation
+        Boolean schoolExists = null;
+        try {
+            schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setItem(convGradStudent.getPen());
+            error.setReason("Grad Trax API is failed: " + e.getLocalizedMessage());
+            summary.getErrors().add(error);
+            convGradStudent.setResult(ConversionResultType.FAILURE);
+        }
+        return schoolExists;
+    }
+
+    private List<Student> getStudentsFromPEN(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        List<Student> students = null;
+        try {
+            // Call PEN Student API
+            students = restUtils.getStudentsByPen(convGradStudent.getPen(), summary.getAccessToken());
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setItem(convGradStudent.getPen());
+            error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
+            summary.getErrors().add(error);
+            convGradStudent.setResult(ConversionResultType.FAILURE);
+        }
+        return students;
+    }
+
+    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken) {
+        students.forEach(st -> {
+            boolean isStudentPersisted = false;
+            UUID studentID = UUID.fromString(st.getStudentID());
+            Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
+            GraduationStudentRecordEntity gradStudentEntity;
+            if (stuOptional.isPresent()) {
+                gradStudentEntity = stuOptional.get();
+                gradStudentEntity.setPen(st.getPen());
+                convertStudentData(convGradStudent, gradStudentEntity, summary);
+                gradStudentEntity.setUpdateDate(null);
+                gradStudentEntity.setUpdateUser(null);
+                gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                isStudentPersisted = true;
+                summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
+            } else {
+                gradStudentEntity = new GraduationStudentRecordEntity();
+                gradStudentEntity.setPen(st.getPen());
+                gradStudentEntity.setStudentID(studentID);
+                convertStudentData(convGradStudent, gradStudentEntity, summary);
+                // if year "1950" without "AD" or "AN", then program is null
+                if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
+                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                    summary.setAddedCount(summary.getAddedCount() + 1L);
+                    isStudentPersisted = true;
+                }
+            }
+
+            if (isStudentPersisted) {
+                processDedendencies(convGradStudent, gradStudentEntity, studentID, summary, accessToken);
+            }
+
+            if (convGradStudent.getResult() == null) {
+                convGradStudent.setResult(ConversionResultType.SUCCESS);
+            }
+        });
+    }
+
+    private void processDedendencies(ConvGradStudent convGradStudent,
+                                     GraduationStudentRecordEntity gradStudentEntity,
+                                     UUID studentID,
+                                     ConversionStudentSummaryDTO summary, String accessToken) {
+
+        ConversionResultType result;
+
+        // graduation status history
+        createGraduationStudentRecordHistory(gradStudentEntity, DATA_CONVERSION_HISTORY_ACTIVITY_CODE);
+
+        // student guid - pen
+        if (constants.isStudentGuidPenXrefEnabled()) {
+            saveStudentGuidPenXref(studentID, convGradStudent.getPen());
+        }
+
+        // process dependencies
+        gradStudentEntity.setPen(convGradStudent.getPen());
+        result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
+        if (result != ConversionResultType.FAILURE) {
+            result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+        }
+        if (result != ConversionResultType.FAILURE) {
+            result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+        }
+        convGradStudent.setResult(result);
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
@@ -230,9 +262,7 @@ public class StudentService extends StudentBaseService {
                 frenchImmersion = true;
             }
         } else if (program.equals("1986-EN")) {
-            if (StringUtils.equalsIgnoreCase("F", frenchCert)) {
-                frenchImmersion = true;
-            } else if (courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) {
+            if (StringUtils.equalsIgnoreCase("F", frenchCert) || courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) {
                 frenchImmersion = true;
             }
         }
@@ -296,11 +326,11 @@ public class StudentService extends StudentBaseService {
                 currentEntity.setUpdateDate(null);
                 currentEntity.setUpdateUser(null);
                 studentOptionalProgramRepository.save(currentEntity); // touch: update_user & update_date will be updated only.
-                createStudentOptionalProgramHistory(currentEntity, "DATACONVERT"); // student optional program history
+                createStudentOptionalProgramHistory(currentEntity, DATA_CONVERSION_HISTORY_ACTIVITY_CODE); // student optional program history
             } else {
                 entity.setId(UUID.randomUUID());
                 studentOptionalProgramRepository.save(entity);
-                createStudentOptionalProgramHistory(entity, "DATACONVERT"); // student optional program history
+                createStudentOptionalProgramHistory(entity, DATA_CONVERSION_HISTORY_ACTIVITY_CODE); // student optional program history
             }
             summary.incrementOptionalProgram(optionalProgramCode);
         }

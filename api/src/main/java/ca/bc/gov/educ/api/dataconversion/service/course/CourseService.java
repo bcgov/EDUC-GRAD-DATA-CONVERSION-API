@@ -19,20 +19,26 @@ public class CourseService {
 
     private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
 
-    private static final String COURSE_API_NAME = "GRAD Course API";
     private static final String COURSE_RESTRICTION_ID = "courseRestrictionId";
     private static final String CREATE_USER = "createUser";
     private static final String CREATE_DATE = "createDate";
 
+    private static final String CLEAF_STR = "CLEAF";
+    private static final String CLEBF_STR = "CLEBF";
+    private static final String CLEA_STR = "CLEA";
+    private static final String CLEB_STR = "CLEB";
+
+    private static final String ERR_MSG_FORMAT = "For {} : {}";
+
     private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>() {{
-        add(Pair.of("CLEA", "CLEB"));
-        add(Pair.of("CLEA", "CLEBF"));
-        add(Pair.of("CLEAF", "CLEB"));
-        add(Pair.of("CLEAF", "CLEBF"));
-        add(Pair.of("CLEB", "CLEA"));
-        add(Pair.of("CLEB", "CLEAF"));
-        add(Pair.of("CLEBF", "CLEA"));
-        add(Pair.of("CLEBF", "CLEAF"));
+        add(Pair.of(CLEA_STR, CLEB_STR));
+        add(Pair.of(CLEA_STR, CLEBF_STR));
+        add(Pair.of(CLEAF_STR, CLEB_STR));
+        add(Pair.of(CLEAF_STR, CLEBF_STR));
+        add(Pair.of(CLEB_STR, CLEA_STR));
+        add(Pair.of(CLEB_STR, CLEAF_STR));
+        add(Pair.of(CLEBF_STR, CLEA_STR));
+        add(Pair.of(CLEBF_STR, CLEAF_STR));
     }};
 
     private final RestUtils restUtils;
@@ -68,7 +74,7 @@ public class CourseService {
                     courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
             error.setReason("GRAD Course API is failed to retrieve!");
             summary.getErrors().add(error);
-            logger.error("For {} : {}", error.getItem(), error.getReason());
+            logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
         if (currentCourseRestriction == null) {
@@ -96,7 +102,7 @@ public class CourseService {
                     courseRestriction.getRestrictedCourse() + "/" + courseRestriction.getRestrictedCourseLevel());
             error.setReason("GRAD Course API is failed to save Course Restriction!");
             summary.getErrors().add(error);
-            logger.error("For {} : {}", error.getItem(), error.getReason());
+            logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
     }
@@ -140,6 +146,14 @@ public class CourseService {
 
     private void processEnglish(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // english10
+        processEnglish10(gradCourse, summary);
+        // english11
+        processEnglish11(gradCourse, summary);
+        // english12
+        processEnglish12(gradCourse, summary);
+    }
+
+    private void processEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish10()) && StringUtils.equals(gradCourse.getEnglish10(), "Y")) {
             if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
@@ -150,27 +164,29 @@ public class CourseService {
                         gradCourse.getCourseLevel(), "701"), summary);
             }
             if (hasFrenchLanguageCourse(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), summary.getAccessToken())) {
+                    gradCourse.getCourseLevel(), summary.getAccessToken())) {
                 if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "302"), summary);
+                            gradCourse.getCourseLevel(), "302"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "815"), summary);
+                            gradCourse.getCourseLevel(), "815"), summary);
                 }
             }
             if (hasBlankLanguageCourse(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), summary.getAccessToken())) {
+                    gradCourse.getCourseLevel(), summary.getAccessToken())) {
                 if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
                             gradCourse.getCourseLevel(), "400"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "850"), summary);
+                            gradCourse.getCourseLevel(), "850"), summary);
                 }
             }
         }
-        // english11
+    }
+
+    private void processEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish11()) && StringUtils.equals(gradCourse.getEnglish11(), "Y")) {
             if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
@@ -200,14 +216,16 @@ public class CourseService {
             if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
                 if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "401"), summary);
+                            gradCourse.getCourseLevel(), "401"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "851"), summary);
+                            gradCourse.getCourseLevel(), "851"), summary);
                 }
             }
         }
-        // english12
+    }
+
+    private void processEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish12()) && StringUtils.equals(gradCourse.getEnglish12(), "Y")) {
             if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
@@ -228,22 +246,22 @@ public class CourseService {
             if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
                 if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "300"), summary);
+                            gradCourse.getCourseLevel(), "300"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "817"), summary);
+                            gradCourse.getCourseLevel(), "817"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "1996")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "819"), summary);
+                            gradCourse.getCourseLevel(), "819"), summary);
                 }
             }
             if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
                 if (StringUtils.equals(gradCourse.getGradReqtYear(), "2018")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "402"), summary);
+                            gradCourse.getCourseLevel(), "402"), summary);
                 } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
                     createCourseRequirement(populate(gradCourse.getCourseCode(),
-                        gradCourse.getCourseLevel(), "852"), summary);
+                            gradCourse.getCourseLevel(), "852"), summary);
                 }
             }
         }
@@ -591,7 +609,7 @@ public class CourseService {
             error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
             error.setReason("GRAD Course API is failed to check Course Requirement exits!");
             summary.getErrors().add(error);
-            logger.error("For {} : {}", error.getItem(), error.getReason());
+            logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
 
@@ -609,7 +627,7 @@ public class CourseService {
             error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
             error.setReason("GRAD Course API is failed to save Course Requirement!");
             summary.getErrors().add(error);
-            logger.error("For {} : {}", error.getItem(), error.getReason());
+            logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
     }
@@ -621,8 +639,9 @@ public class CourseService {
             || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "12 "))
             || (StringUtils.equals(courseCode.trim(), "FA") && StringUtils.equals(courseLevel, "12 ")) ) {
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     public boolean hasFrenchLanguageCourse(String courseCode, String courseLevel, String accessToken) {
