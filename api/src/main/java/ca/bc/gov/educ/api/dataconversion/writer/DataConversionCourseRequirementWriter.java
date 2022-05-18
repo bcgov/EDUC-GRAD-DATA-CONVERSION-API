@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.writer;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -12,7 +12,7 @@ import org.springframework.batch.item.ItemWriter;
 
 import java.util.List;
 
-public class DataConversionCourseRequirementWriter implements ItemWriter<GraduationCourseEntity> {
+public class DataConversionCourseRequirementWriter implements ItemWriter<GradCourse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementWriter.class);
 
@@ -26,9 +26,9 @@ public class DataConversionCourseRequirementWriter implements ItemWriter<Graduat
     }
     
     @Override
-    public void write(List<? extends GraduationCourseEntity> list) {
+    public void write(List<? extends GradCourse> list) {
         if (!list.isEmpty()) {
-            GraduationCourseEntity graduationCourseEntity = list.get(0);
+            GradCourse graduationCourse = list.get(0);
             LOGGER.info("Processed course requirement: {} in total {}", summaryDTO.getProcessedCount(), summaryDTO.getReadCount());
             LOGGER.info("-------------------------------------------------------");
         }

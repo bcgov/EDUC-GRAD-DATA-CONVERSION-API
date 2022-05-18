@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
-import ca.bc.gov.educ.api.dataconversion.service.trax.TraxService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -58,9 +57,6 @@ public class StudentServiceWithMockRepositoryTest {
 
     @MockBean
     CourseService courseService;
-
-    @MockBean
-    TraxService traxService;
 
     @MockBean
     RestUtils restUtils;
@@ -125,7 +121,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
-        when(this.traxService.existsSchool("222333")).thenReturn(true);
+        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(careerProgramEntity)).thenReturn(careerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -199,7 +195,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-        when(this.traxService.existsSchool("222333")).thenReturn(true);
+        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
@@ -275,7 +271,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-        when(this.traxService.existsSchool("222333")).thenReturn(true);
+        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
@@ -351,7 +347,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-        when(this.traxService.existsSchool("222333")).thenReturn(true);
+        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
         when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);

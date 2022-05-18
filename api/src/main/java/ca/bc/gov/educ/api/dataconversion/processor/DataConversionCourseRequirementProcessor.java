@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DataConversionCourseRequirementProcessor implements ItemProcessor<GraduationCourseEntity, GraduationCourseEntity> {
+public class DataConversionCourseRequirementProcessor implements ItemProcessor<GradCourse, GradCourse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementProcessor.class);
 
@@ -29,7 +29,7 @@ public class DataConversionCourseRequirementProcessor implements ItemProcessor<G
 	}
 
 	@Override
-	public GraduationCourseEntity process(GraduationCourseEntity graduationCourseEntity) throws Exception {
-		return courseService.convertCourseRequirement(graduationCourseEntity, summaryDTO);
+	public GradCourse process(GradCourse graduationCourse) throws Exception {
+		return courseService.convertCourseRequirement(graduationCourse, summaryDTO);
 	}
 }

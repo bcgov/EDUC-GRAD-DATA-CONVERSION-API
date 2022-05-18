@@ -3,7 +3,6 @@ package ca.bc.gov.educ.api.dataconversion.reader;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,15 +18,13 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRestrictionReader.class);
 
-    private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
 
     private int indexForCourseRestriction;
     private List<CourseRestriction> courseRestrictionList;
     private ConversionCourseSummaryDTO summaryDTO;
 
-    public DataConversionCourseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        this.dataConversionService = dataConversionService;
+    public DataConversionCourseRestrictionReader(RestUtils restUtils) {
         this.restUtils = restUtils;
 
         indexForCourseRestriction = 0;
@@ -50,13 +47,13 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
     public CourseRestriction read() {
         LOGGER.info("Reading the information of the next course restriction");
 
-        if (courseRestrictionDataIsNotInitialized()) {
-            courseRestrictionList = loadRawCourseRestrictionData();
-        	summaryDTO.setReadCount(courseRestrictionList.size());
-        }
-
         if (indexForCourseRestriction % 100 == 0) {
             fetchAccessToken();
+        }
+
+        if (courseRestrictionDataIsNotInitialized()) {
+            courseRestrictionList = loadRawCourseRestrictionData(summaryDTO.getAccessToken());
+        	summaryDTO.setReadCount(courseRestrictionList.size());
         }
 
         CourseRestriction nextCourseRestriction = null;
@@ -77,9 +74,9 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
         return this.courseRestrictionList == null;
     }
 
-    private List<CourseRestriction> loadRawCourseRestrictionData() {
+    private List<CourseRestriction> loadRawCourseRestrictionData(String accessToken) {
         LOGGER.info("Fetching Course Restriction List that need Data Conversion Processing");
-        return dataConversionService.loadGradCourseRestrictionsDataFromTrax();
+        return restUtils.getTraxCourseRestrictions(accessToken);
     }
 
     private void fetchAccessToken() {

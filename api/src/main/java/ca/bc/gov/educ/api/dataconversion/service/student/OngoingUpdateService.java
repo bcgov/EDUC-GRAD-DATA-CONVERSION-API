@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +24,6 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     private final EventRepository eventRepository;
 
     private final StudentService studentService;
-    private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
@@ -33,12 +31,10 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     @Autowired
     public OngoingUpdateService(EventRepository eventRepository,
                                 StudentService studentService,
-                                DataConversionService dataConversionService,
                                 RestUtils restUtils,
                                 EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
         this.studentService = studentService;
-        this.dataConversionService = dataConversionService;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -47,8 +43,15 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
     public <T extends Object> void processEvent(T request, Event event) {
         TraxUpdateInGrad traxUpdateInGrad = (TraxUpdateInGrad) request;
 
+        // Get Access Token
+        ResponseObj res = restUtils.getTokenResponseObject();
+        String accessToken = null;
+        if (res != null) {
+            accessToken = res.getAccess_token();
+        }
+
         ConvGradStudent requestStudent = null;
-            List<ConvGradStudent> traxStudents = dataConversionService.loadGradStudentDataFromTrax(traxUpdateInGrad.getPen());
+            List<ConvGradStudent> traxStudents = restUtils.getTraxStudentMasterDataByPen(traxUpdateInGrad.getPen(), accessToken);
         if (!traxStudents.isEmpty()) {
             requestStudent = traxStudents.get(0);
             log.info("=== Ongoing update: request pen = {}, update type = {} ===> TRAX load is done.", traxUpdateInGrad.getPen(), traxUpdateInGrad.getUpdateType());
@@ -57,12 +60,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         }
 
         if (requestStudent != null && constants.isGradUpdateEnabled()) {
-            // Get Access Token
-            ResponseObj res = restUtils.getTokenResponseObject();
-            String accessToken = null;
-            if (res != null) {
-                accessToken = res.getAccess_token();
-            }
+
             if (StringUtils.equals(traxUpdateInGrad.getUpdateType(), "NEWSTUDENT")) {
                 ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
                 summary.setAccessToken(accessToken);

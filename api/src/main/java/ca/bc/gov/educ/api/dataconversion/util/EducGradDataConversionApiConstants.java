@@ -111,6 +111,30 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-course-api.check-french-language-course.url}")
     private String checkFrenchLanguageCourse;
 
+    @Value("${endpoint.grad-trax-api.school.check-school-by-mincode.url}")
+    private String checkSchoolByMincodeUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-no-list-by-page.url}")
+    private String traxStudentNoListByPageUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-total-number-of-student-no-list.url}")
+    private String totalNumberOfTraxStudentNoListUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-demog-data.url}")
+    private String traxStudentDemogDataByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-master-data.url}")
+    private String traxStudentMasterDataByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.course.get-course-restrictions.url}")
+    private String traxCourseRestrictionsUrl;
+
+    @Value("${endpoint.grad-trax-api.course.get-course-requirements.url}")
+    private String traxCourseRequirementsUrl;
+
+    @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
+    private String saveTraxStudentNoUrl;
+
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;
 

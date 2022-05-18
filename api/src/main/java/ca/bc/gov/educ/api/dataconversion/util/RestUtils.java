@@ -248,4 +248,98 @@ public class RestUtils {
                 })
                 .retrieve().bodyToMono(Boolean.class).block();
     }
+
+    public Boolean checkSchoolExists(String minCode, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getCheckSchoolByMincodeUrl(), uri -> uri.path("/{minCode}").build(minCode))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public List<ConvGradStudent> getTraxStudentMasterDataByPen(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<ConvGradStudent>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTraxStudentMasterDataByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<Student> getTraxStudentDemographicsDataByPen(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<Student>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTraxStudentDemogDataByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<TraxStudentNo> getTraxStudentNoListByPage(int pageNumber, int pageSize, String accessToken) {
+        final ParameterizedTypeReference<List<TraxStudentNo>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTraxStudentNoListByPageUrl(),
+                        uri -> uri.queryParam("pageNumber", pageNumber)
+                                .queryParam("pageSize", pageSize)
+                                .build())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public Integer getTotalNumberOfTraxStudentNoList(String accessToken) {
+        return webClient.get()
+                .uri(constants.getTotalNumberOfTraxStudentNoListUrl())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(Integer.class).block();
+    }
+
+    public List<CourseRestriction> getTraxCourseRestrictions(String accessToken) {
+        final ParameterizedTypeReference<List<CourseRestriction>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTraxCourseRestrictionsUrl())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<GradCourse> getTraxCourseRequirements(String accessToken) {
+        final ParameterizedTypeReference<List<GradCourse>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTraxCourseRequirementsUrl())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public TraxStudentNo saveTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
+        return webClient.post()
+                .uri(constants.getSaveTraxStudentNoUrl())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .body(BodyInserters.fromValue(traxStudentNo))
+                .retrieve().bodyToMono(TraxStudentNo.class).block();
+    }
 }
