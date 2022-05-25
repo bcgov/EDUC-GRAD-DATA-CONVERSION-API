@@ -527,15 +527,15 @@ public class CourseService {
         createCourseRequirement(populate(QFRAL_STR, "12", "910"), summary);
         createCourseRequirement(populate(QFRAL_STR, "12", "915"), summary);
 
-        // QFRALP 12
-        createCourseRequirement(populate("QFRALP", "12", "910"), summary);
-        createCourseRequirement(populate("QFRALP", "12", "915"), summary);
+        // QFRAP 12
+        createCourseRequirement(populate("QFRAP", "12", "910"), summary);
+        createCourseRequirement(populate("QFRAP", "12", "915"), summary);
 
         // ZFRAL 12
         createCourseRequirement(populate(ZFRAL_STR, "12", "819"), summary);
         createCourseRequirement(populate(ZFRAL_STR, "12", "910"), summary);
         createCourseRequirement(populate(ZFRAL_STR, "12", "915"), summary);
-
+ 
         // IBFAS 12
         createCourseRequirement(populate(IBFAS_STR, "12", "200"), summary);
         createCourseRequirement(populate(IBFAS_STR, "12", "900"), summary);
