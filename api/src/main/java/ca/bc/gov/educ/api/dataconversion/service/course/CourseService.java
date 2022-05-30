@@ -555,7 +555,6 @@ public class CourseService {
         createCourseRequirement(populate(IBFAS_STR, "11", "201"), summary);
         createCourseRequirement(populate(IBFAS_STR, "11", "901"), summary);
         createCourseRequirement(populate(IBFAS_STR, "11", "911"), summary);
-        createCourseRequirement(populate(IBFAS_STR, "11", "916"), summary);
 
         // FRALP 11
         createCourseRequirement(populate(FRALP_STR, "11", "201"), summary);
