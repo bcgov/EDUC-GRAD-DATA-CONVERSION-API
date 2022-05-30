@@ -272,21 +272,27 @@ public class StudentService extends StudentBaseService {
     }
 
     private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+        ConversionResultType resultType = ConversionResultType.SUCCESS;
+        boolean isCareerProgramCreated = false;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
                 if (isOptionalProgramCode(programCode)) {
-                    return createStudentOptionalProgram(programCode, student, accessToken, summary);
+                    resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
                 } else {
-                    ConversionResultType result = createStudentCareerProgram(programCode, student, summary);
-                    if (result == ConversionResultType.SUCCESS) {
-                        return createStudentOptionalProgram("CP", student, accessToken, summary);
-                    } else {
-                        return result;
+                    resultType = createStudentCareerProgram(programCode, student, summary);
+                    if (resultType == ConversionResultType.SUCCESS) {
+                        isCareerProgramCreated = true;
                     }
                 }
+                if (resultType == ConversionResultType.FAILURE) {
+                    break;
+                }
+            }
+            if (isCareerProgramCreated) {
+                resultType = createStudentOptionalProgram("CP", student, accessToken, summary);
             }
         }
-        return ConversionResultType.SUCCESS;
+        return resultType;
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
