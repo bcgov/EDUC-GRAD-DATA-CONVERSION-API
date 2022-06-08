@@ -8,6 +8,7 @@ env:
   OPENSHIFT_SERVER: ${{ secrets.OPENSHIFT_SERVER }}
   OPENSHIFT_TOKEN: ${{ secrets.OPENSHIFT_TOKEN }}
   OPENSHIFT_NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+  OPENSHIFT_TOOLS_NAMESPACE: ${{ secrets.OPENSHIFT_TOOLS_NAMESPACE }}
 
   # 🖊️ EDIT to change the image registry settings.
   # Registries such as GHCR, Quay.io, and Docker Hub are supported.
@@ -15,10 +16,10 @@ env:
   IMAGE_REGISTRY_USER: ${{ github.actor }}
   IMAGE_REGISTRY_PASSWORD: ${{ github.token }}
 
-  SPRING_BOOT_IMAGE_NAME: educ-grad-trax-api-dc
+  SPRING_BOOT_IMAGE_NAME: educ-grad-data-conversion-api-dc
   DOCKER_ARTIFACTORY_REPO: docker-remote.artifacts.developer.gov.bc.ca
 
-  REPO_NAME: "educ-grad-trax-api"
+  REPO_NAME: "educ-grad-data-conversion-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   TAG: "latest"
 
@@ -78,8 +79,19 @@ jobs:
           username: ${{ env.IMAGE_REGISTRY_USER }}
           password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
 
-      # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
+      # scan the image for vulnerabilities
+      # TODO: set exit-code to '1' to fail on vulnerabilities
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.push-image.outputs.registry-path }}'
+          format: 'json'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
+      # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1
         with:
@@ -96,8 +108,8 @@ jobs:
           # Cancel any rollouts in progress
           oc rollout cancel dc/${{ env.SPRING_BOOT_IMAGE_NAME }} 2> /dev/null \
           || true && echo "No rollout in progress"
-
-          oc tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
+          # tag in tools env
+          oc -n ${{ env.OPENSHIFT_TOOLS_NAMESPACE }} tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
 
           # Process and apply deployment template
           oc process -f tools/openshift/api.dc.yaml -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
@@ -110,7 +122,8 @@ jobs:
           # Get status, returns 0 if rollout is successful
           oc rollout status dc/${{ env.SPRING_BOOT_IMAGE_NAME }}
 
-#      - name: ZAP Scan
-#        uses: zaproxy/action-api-scan@v0.1.0
-#        with:
-#         target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
+      # now hit it with a zap scan
+      - name: ZAP Scan
+        uses: zaproxy/action-api-scan@v0.1.0
+        with:
+         target: 'https://${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}-dev.apps.silver.devops.gov.bc.ca/api/v1/api-docs'
