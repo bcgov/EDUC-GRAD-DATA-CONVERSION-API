@@ -1,205 +1,39 @@
 package ca.bc.gov.educ.api.dataconversion.service.conv;
 
-import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.trax.GraduationCourseRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.trax.TraxStudentsLoadRepository;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 @Service
 @Slf4j
 public class DataConversionService {
-    private final TraxStudentsLoadRepository traxStudentsLoadRepository;
-    private final TraxStudentRepository traxStudentRepository;
-    private final GraduationCourseRepository graduationCourseRepository;
     private final RestUtils restUtils;
 
     @Autowired
-    public DataConversionService(TraxStudentsLoadRepository traxStudentsLoadRepository,
-                                 TraxStudentRepository traxStudentRepository,
-                                 GraduationCourseRepository graduationCourseRepository,
-                                 RestUtils restUtils) {
-        this.traxStudentsLoadRepository = traxStudentsLoadRepository;
-        this.traxStudentRepository = traxStudentRepository;
-        this.graduationCourseRepository = graduationCourseRepository;
+    public DataConversionService(RestUtils restUtils) {
         this.restUtils = restUtils;
     }
 
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadGradStudentsDataFromTrax() {
-        List<Object[]> results = traxStudentsLoadRepository.loadAllTraxStudents();
-        return buildConversionGradStudents(results);
+    public List<ConvGradStudent> getStudentMasterDataFromTrax(String pen, String accessToken) {
+        return restUtils.getTraxStudentMasterDataByPen(pen, accessToken);
     }
 
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<ConvGradStudent> loadGradStudentDataFromTrax(String pen) {
-        List<Object[]> results = traxStudentsLoadRepository.loadTraxStudent(pen);
-        return buildConversionGradStudents(results);
+    public List<Student> getStudentDemographicsDataFromTrax(String pen, String accessToken) {
+        return restUtils.getTraxStudentDemographicsDataByPen(pen, accessToken);
     }
 
-    private List<ConvGradStudent> buildConversionGradStudents(List<Object[]> traxStudents) {
-        List<ConvGradStudent> students = new ArrayList<>();
-        traxStudents.forEach(result -> {
-            ConvGradStudent student = populateConvGradStudent(result);
-            if (student != null) {
-                students.add(student);
-            }
-        });
-        return students; // .subList(0,10);
-    }
-
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<TraxStudentEntity> loadTraxStudentEntitiesByPage(Pageable pageable) {
-        return traxStudentRepository.findAllByStatus(null, pageable).toList();
-    }
-
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public Integer getTotalNumberOfTraxStudentEntities() {
-        return traxStudentRepository.countAllByStatus(null);
-    }
-
-    private ConvGradStudent populateConvGradStudent(Object[] fields) {
-        String pen = (String) fields[0];
-        String schoolOfRecord = (String) fields[1];
-        String schoolAtGrad = (String) fields[2];
-        String studentGrade = (String) fields[3];
-        Character studentStatus = (Character) fields[4];
-        Character archiveFlag = (Character) fields[5];
-        String graduationRequestYear = (String) fields[6];
-
-        Character recalculateGradStatus = (Character) fields[7];
-        if (studentStatus != null && (studentStatus == 'M' || studentStatus == 'D')) {
-            recalculateGradStatus = null;
-        }
-        // grad or non-grad
-        BigDecimal gradDate = (BigDecimal) fields[8];
-        boolean isGraduated = gradDate != null && !gradDate.equals(BigDecimal.ZERO);
-
-        List<String> programCodes = new ArrayList<>();
-        // student optional programs
-        populateProgramCode((String) fields[9], programCodes);
-        populateProgramCode((String) fields[10], programCodes);
-        populateProgramCode((String) fields[11], programCodes);
-        populateProgramCode((String) fields[12], programCodes);
-        populateProgramCode((String) fields[13], programCodes);
-
-        // slp date
-        BigDecimal slpDate = (BigDecimal) fields[14];
-        String slpDateStr = slpDate != null && !slpDate.equals(BigDecimal.ZERO) ? slpDate.toString() : null;
-
-        // french cert
-        String frenchCert = (String) fields[15];
-
-        // consumer education requirement met
-        String consumerEducationRequirementMet = (String) fields[16];
-
-        ConvGradStudent student = null;
-        try {
-            student = ConvGradStudent.builder()
-                    .pen(pen)
-                    .slpDate(slpDateStr)
-                    .recalculateGradStatus(recalculateGradStatus != null ? recalculateGradStatus.toString() : null)
-                    .schoolOfRecord(schoolOfRecord)
-                    .schoolAtGrad(schoolAtGrad)
-                    .studentGrade(studentGrade)
-                    .studentStatus(studentStatus != null? studentStatus.toString() : null)
-                    .archiveFlag(archiveFlag != null? archiveFlag.toString() : null)
-                    .frenchCert(frenchCert)
-                    .graduationRequestYear(graduationRequestYear)
-                    .programCodes(programCodes)
-                    .graduated(isGraduated)
-                    .consumerEducationRequirementMet(StringUtils.equalsIgnoreCase(consumerEducationRequirementMet, "Y")? "Y" : null)
-                    .result(ConversionResultType.SUCCESS)
-                    .build();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return student;
-    }
-
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<Student> getStudentDemographicsDataFromTrax(String pen) {
-        List<Student> students = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadStudentDemographicsData(pen);
-        results.forEach(result -> {
-            String legalFirstName = (String) result[1];
-            legalFirstName = StringUtils.isNotBlank(legalFirstName)? legalFirstName.trim() : null;
-            String legalLastName = (String) result[2];
-            legalLastName = StringUtils.isNotBlank(legalLastName)? legalLastName.trim() : null;
-            String legalMiddleName = (String) result[3];
-            legalMiddleName = StringUtils.isNotBlank(legalMiddleName)? legalMiddleName.trim() : null;
-
-            Character studStatus = (Character) result[4];
-            String studentStatusCode = studStatus != null? studStatus.toString() : null;
-            if (StringUtils.equals(studentStatusCode, "T")) {
-                studentStatusCode = "A";
-            }
-            log.debug(" TRAX - PEN mapping : stud_status [{}] => status code [{}]", studStatus,  studentStatusCode);
-
-            String schoolOfRecord = (String) result[6];
-            String studGrade = (String) result[7];
-            String studentGrade;
-            if (!NumberUtils.isCreatable(studGrade)) {
-                studentGrade = "11";
-            } else {
-                studentGrade = studGrade;
-            }
-            log.debug(" TRAX - PEN mapping : stud_grade [{}] => grade code [{}]", studGrade,  studentGrade);
-            String postal = (String) result[8];
-            Character sexCode = (Character) result[9];
-            String birthDate = (String) result[10];
-            String formattedBirthDate = birthDate.substring(0, 4) + "-" + birthDate.substring(4, 6) + "-" + birthDate.substring(6, 8);
-
-            String truePen = (String) result[12];
-            truePen = StringUtils.isNotBlank(truePen)? truePen.trim() : null;
-
-            String localID = (String) result[13];
-
-            Student student = Student.builder()
-                    .pen(pen)
-                    .legalFirstName(legalFirstName)
-                    .legalLastName(legalLastName)
-                    .legalMiddleNames(legalMiddleName)
-                    .usualFirstName(legalFirstName)
-                    .usualLastName(legalLastName)
-                    .usualMiddleNames(legalMiddleName)
-                    .statusCode(studentStatusCode)
-                    .genderCode(sexCode.toString())
-                    .sexCode(sexCode.toString())
-                    .mincode(schoolOfRecord)
-                    .postalCode(postal)
-                    .dob(formattedBirthDate)
-                    .gradeCode(studentGrade)
-                    .emailVerified("Y")
-                    .truePen(truePen)
-                    .localID(localID)
-                    .build();
-            students.add(student);
-        });
-        return students;
-    }
-
-    @Transactional(transactionManager = "traxTransactionManager")
-    public TraxStudentEntity readTraxStudentAndAddNewPen(TraxStudentEntity traxStudentNo, ConversionStudentSummaryDTO summary) {
+    public TraxStudentNo readTraxStudentAndAddNewPen(TraxStudentNo traxStudentNo, ConversionStudentSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
             String accessToken = summary.getAccessToken();
             Student penStudent = getPenStudent(traxStudentNo.getStudNo(), accessToken, summary);
             if (penStudent == null) {
-                Student traxStudent = readTraxStudent(traxStudentNo.getStudNo());
+                Student traxStudent = readTraxStudent(traxStudentNo.getStudNo(), accessToken);
                 if (traxStudent != null) {
                     if (StringUtils.equals(traxStudent.getStatusCode(), "M") && StringUtils.isNotBlank(traxStudent.getTruePen())) {
                         log.debug("Merged student is skipped: pen# {}", traxStudent.getPen());
@@ -220,11 +54,11 @@ public class DataConversionService {
                     }
                     // MergedFromStudent
                     createNewPen(traxStudent, accessToken, summary);
-                    saveTraxStudent(traxStudentNo.getStudNo(), "C");
+                    saveTraxStudent(traxStudentNo.getStudNo(), "C", accessToken);
                 }
             } else {
                 log.info("Student already exists : pen# {} => studentID {}", traxStudentNo.getStudNo(), penStudent.getStudentID());
-                saveTraxStudent(traxStudentNo.getStudNo(), "Y");
+                saveTraxStudent(traxStudentNo.getStudNo(), "Y", accessToken);
             }
             return traxStudentNo;
         } catch (Exception e) {
@@ -236,8 +70,8 @@ public class DataConversionService {
         }
     }
 
-    private Student readTraxStudent(String pen) {
-        List<Student> students = getStudentDemographicsDataFromTrax(pen);
+    private Student readTraxStudent(String pen, String accessToken) {
+        List<Student> students = getStudentDemographicsDataFromTrax(pen, accessToken);
         if (students != null && !students.isEmpty()) {
             return students.get(0);
         }
@@ -276,52 +110,18 @@ public class DataConversionService {
         return newStudent;
     }
 
-    private void populateProgramCode(String code, List<String> optionalProgramCodes) {
-        if (StringUtils.isNotBlank(code)) {
-            if (code.length() > 2) {
-                optionalProgramCodes.add(StringUtils.substring(code,2));
-            } else {
-                optionalProgramCodes.add(code);
-            }
-        }
+    public void saveTraxStudent(String studNo, String status, String accessToken) {
+        TraxStudentNo traxStudentNo = new TraxStudentNo();
+        traxStudentNo.setStudNo(studNo);
+        traxStudentNo.setStatus(status);
+        restUtils.saveTraxStudentNo(traxStudentNo, accessToken);
     }
 
-    @Transactional(transactionManager = "traxTransactionManager")
-    public void saveTraxStudent(String studNo, String status) {
-        TraxStudentEntity traxStudentEntity = new TraxStudentEntity();
-        traxStudentEntity.setStudNo(studNo);
-        traxStudentEntity.setStatus(status);
-        traxStudentRepository.save(traxStudentEntity);
+    public List<CourseRestriction> loadGradCourseRestrictionsDataFromTrax(String accessToken) {
+        return restUtils.getTraxCourseRestrictions(accessToken);
     }
 
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<CourseRestriction> loadGradCourseRestrictionsDataFromTrax() {
-        List<CourseRestriction> courseRestrictions = new ArrayList<>();
-        List<Object[]> results = traxStudentsLoadRepository.loadInitialCourseRestrictionRawData();
-        results.forEach(result -> {
-            String mainCourse = (String) result[0];
-            String mainCourseLevel = (String) result[1];
-            String restrictedCourse = (String) result[2];
-            String restrictedCourseLevel = (String) result[3];
-            String startDate = (String) result[4];
-            String endDate = (String) result[5];
-
-            // check null value for course level and convert it to space
-            if (StringUtils.isBlank(mainCourseLevel)) {
-                mainCourseLevel = " ";
-            }
-            if (StringUtils.isBlank(restrictedCourseLevel)) {
-                restrictedCourseLevel = " ";
-            }
-            CourseRestriction courseRestriction = new CourseRestriction(
-                    null, mainCourse, mainCourseLevel, restrictedCourse, restrictedCourseLevel, startDate, endDate);
-            courseRestrictions.add(courseRestriction);
-        });
-        return courseRestrictions;
-    }
-
-    @Transactional(readOnly = true, transactionManager = "traxTransactionManager")
-    public List<GraduationCourseEntity> loadGradCourseRequirementsDataFromTrax() {
-        return graduationCourseRepository.findAll();  // .subList(0,1)
+    public List<GradCourse> loadGradCourseRequirementsDataFromTrax(String accessToken) {
+        return restUtils.getTraxCourseRequirements(accessToken);  // .subList(0,1)
     }
 }

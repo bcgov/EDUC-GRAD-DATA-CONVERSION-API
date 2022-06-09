@@ -128,6 +128,26 @@ endpoint:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
     student-assessments-by-pen:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen
+  grad-trax-api:
+    student:
+      get-student-no-list-by-page:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-no-list/paginated
+      get-total-number-of-student-no-list:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-no-list/total-count
+      get-student-demog-data:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-demog
+      get-student-master-data:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-master
+      save-trax-student-no:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/trax-student-no
+    course:
+      get-course-restrictions:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/course-restrictions
+      get-course-requirements:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/course-requirements
+    school:
+      check-school-by-mincode:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/school/check
 
 #Conversion option
 data-conversion:

@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirement;
 import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirementCode;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
@@ -42,6 +44,12 @@ public class AssessmentServiceTest {
 
     @Autowired
     GradConversionTestUtils gradConversionTestUtils;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Before
     public void setUp() {

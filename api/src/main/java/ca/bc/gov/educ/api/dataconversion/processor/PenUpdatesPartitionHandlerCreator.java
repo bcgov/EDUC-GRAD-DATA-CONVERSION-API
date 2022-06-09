@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.TraxStudentEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
+import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
 import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
                 summaryDTO.setAccessToken(fetchAccessToken());
             }
             LOGGER.info(" ==> pen = " + pen);
-            TraxStudentEntity st = new TraxStudentEntity();
+            TraxStudentNo st = new TraxStudentNo();
             st.setStudNo(pen);
             try {
                 dataConversionService.readTraxStudentAndAddNewPen(st, summaryDTO);

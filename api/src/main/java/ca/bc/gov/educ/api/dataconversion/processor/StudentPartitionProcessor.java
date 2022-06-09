@@ -1,10 +1,12 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -17,11 +19,11 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentPartitionProcessor.class);
 
-	@Autowired
-	DataConversionService dataConversionService;
-
     @Autowired
 	private StudentService studentService;
+
+	@Autowired
+	private RestUtils restUtils;
 
 	@Value("#{stepExecutionContext['summary']}")
 	private ConversionStudentSummaryDTO summaryDTO;
@@ -30,11 +32,18 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 	public ConvGradStudent process(String pen) throws Exception {
 		ConvGradStudent responseStudent = null;
 		try {
-			List<ConvGradStudent> students = dataConversionService.loadGradStudentDataFromTrax(pen);
+			List<ConvGradStudent> students = restUtils.getTraxStudentMasterDataByPen(pen, summaryDTO.getAccessToken());
 			if (students != null && !students.isEmpty()) {
 				responseStudent = students.get(0);
+
+				// convert
 				responseStudent = studentService.convertStudent(students.get(0), summaryDTO);
-				dataConversionService.saveTraxStudent(pen, responseStudent.getResult().toString());
+
+				// update status
+				TraxStudentNo traxStudentNo = new TraxStudentNo();
+				traxStudentNo.setStudNo(pen);
+				traxStudentNo.setStatus(ConversionResultType.SUCCESS.toString());
+				restUtils.saveTraxStudentNo(traxStudentNo, summaryDTO.getAccessToken());
 			}
 		} catch (Exception e) {
 			ConversionAlert error = new ConversionAlert();

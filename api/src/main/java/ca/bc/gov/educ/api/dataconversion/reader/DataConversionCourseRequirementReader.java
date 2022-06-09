@@ -1,9 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,19 +14,17 @@ import org.springframework.batch.item.ItemReader;
 
 import java.util.List;
 
-public class DataConversionCourseRequirementReader implements ItemReader<GraduationCourseEntity> {
+public class DataConversionCourseRequirementReader implements ItemReader<GradCourse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementReader.class);
 
-    private final DataConversionService dataConversionService;
     private final RestUtils restUtils;
 
     private int indexForCourseRequirement;
-    private List<GraduationCourseEntity> courseRequirementList;
+    private List<GradCourse> courseRequirementList;
     private ConversionCourseSummaryDTO summaryDTO;
 
-    public DataConversionCourseRequirementReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        this.dataConversionService = dataConversionService;
+    public DataConversionCourseRequirementReader(RestUtils restUtils) {
         this.restUtils = restUtils;
 
         indexForCourseRequirement = 0;
@@ -47,19 +44,19 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
     }
 
     @Override
-    public GraduationCourseEntity read() {
+    public GradCourse read() {
         LOGGER.info("Reading the information of the next course requirement");
-
-        if (courseRequirementDataIsNotInitialized()) {
-            courseRequirementList = loadCourseRequirementData();
-        	summaryDTO.setReadCount(courseRequirementList.size());
-        }
 
         if (indexForCourseRequirement % 50 == 0) {
             fetchAccessToken();
         }
 
-        GraduationCourseEntity nextCourseRequirement = null;
+        if (courseRequirementDataIsNotInitialized()) {
+            courseRequirementList = loadCourseRequirementData(summaryDTO.getAccessToken());
+        	summaryDTO.setReadCount(courseRequirementList.size());
+        }
+
+        GradCourse nextCourseRequirement = null;
         
         if (indexForCourseRequirement < courseRequirementList.size()) {
             nextCourseRequirement = courseRequirementList.get(indexForCourseRequirement);
@@ -77,9 +74,9 @@ public class DataConversionCourseRequirementReader implements ItemReader<Graduat
         return this.courseRequirementList == null;
     }
 
-    private List<GraduationCourseEntity> loadCourseRequirementData() {
+    private List<GradCourse> loadCourseRequirementData(String accessToken) {
         LOGGER.info("Fetching Course Requirement List that need Data Conversion Processing");
-        return dataConversionService.loadGradCourseRequirementsDataFromTrax();
+        return restUtils.getTraxCourseRequirements(accessToken);
     }
 
     private void fetchAccessToken() {

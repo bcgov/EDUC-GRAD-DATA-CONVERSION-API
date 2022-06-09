@@ -13,7 +13,7 @@ public class EducGradDataConversionApiConstants {
     public static final String API_NAME = "GRAD-DATA-CONVERSION-API";
     public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENTS";
     public static final String CORRELATION_ID = "correlationID";
-	  public static final String API_ROOT_MAPPING = "";
+    public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
@@ -110,6 +110,30 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-course-api.check-french-language-course.url}")
     private String checkFrenchLanguageCourse;
+
+    @Value("${endpoint.grad-trax-api.school.check-school-by-mincode.url}")
+    private String checkSchoolByMincodeUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-no-list-by-page.url}")
+    private String traxStudentNoListByPageUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-total-number-of-student-no-list.url}")
+    private String totalNumberOfTraxStudentNoListUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-demog-data.url}")
+    private String traxStudentDemogDataByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.student.get-student-master-data.url}")
+    private String traxStudentMasterDataByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.course.get-course-restrictions.url}")
+    private String traxCourseRestrictionsUrl;
+
+    @Value("${endpoint.grad-trax-api.course.get-course-requirements.url}")
+    private String traxCourseRequirementsUrl;
+
+    @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
+    private String saveTraxStudentNoUrl;
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

@@ -1,13 +1,14 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseKey;
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,6 +44,12 @@ public class CourseServiceTest {
 
     @Autowired
     GradConversionTestUtils gradConversionTestUtils;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Before
     public void setUp() {
@@ -118,10 +125,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "10", "101", null,true);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "10", "101", null,true);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -130,10 +140,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "10", "101", null, false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "10", "101", null, false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -142,10 +155,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "10", "701", null,false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "10", "701", null,false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -154,10 +170,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "10", "302", "F",false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "10", "302", "F",false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -166,10 +185,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "10", "815", "F",false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "10", "815", "F",false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -178,10 +200,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "10", "400", "F",false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "10", "400", "F",false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -190,10 +215,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "10", "850", "F",false);
-        traxCourseEntity.setEnglish10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "10", "850", "F",false);
+        traxCourse.setEnglish10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -203,10 +231,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "11", "102", null,true);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "11", "102", null,true);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -215,10 +246,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "11", "102", null, false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "11", "102", null, false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -227,10 +261,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "11", "702", null,false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "11", "702", null,false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -239,10 +276,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ENG", "11", "721", null,false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ENG", "11", "721", null,false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -251,10 +291,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "ENG", "11", "740", null,false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "ENG", "11", "740", null,false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -263,10 +306,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "11", "301", "F",false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "11", "301", "F",false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -275,10 +321,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "11", "816", "F",false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "11", "816", "F",false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -287,10 +336,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ENG", "11", "818", "F",false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ENG", "11", "818", "F",false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -299,10 +351,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "11", "401", "F",false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "11", "401", "F",false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -311,10 +366,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "11", "851", "F",false);
-        traxCourseEntity.setEnglish11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "11", "851", "F",false);
+        traxCourse.setEnglish11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -324,10 +382,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "12", "103", null,true);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "12", "103", null,true);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -336,10 +397,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "12", "103", null, false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "12", "103", null, false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -348,10 +412,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "12", "703", null,false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "12", "703", null,false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -360,10 +427,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1950", "ENG", "12", "500", null,false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1950", "ENG", "12", "500", null,false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -372,10 +442,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ENG", "12", "722", null,false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ENG", "12", "722", null,false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -384,10 +457,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "ENG", "12", "741", null,false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "ENG", "12", "741", null,false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -396,10 +472,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "12", "300", "F",false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "12", "300", "F",false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -408,10 +487,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "12", "817", "F",false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "12", "817", "F",false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -420,10 +502,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ENG", "12", "819", "F",false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ENG", "12", "819", "F",false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -432,10 +517,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ENG", "12", "402", "F",false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ENG", "12", "402", "F",false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -444,10 +532,13 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ENG", "12", "852", "F",false);
-        traxCourseEntity.setEnglish12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ENG", "12", "852", "F",false);
+        traxCourse.setEnglish12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(true);
+
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -457,10 +548,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "SOC", "10", "104", null,false);
-        traxCourseEntity.setSocials10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "SOC", "10", "104", null,false);
+        traxCourse.setSocials10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -469,10 +560,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "SOC", "10", "704", null,false);
-        traxCourseEntity.setSocials10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "SOC", "10", "704", null,false);
+        traxCourse.setSocials10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -481,10 +572,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "SOC", "11", "105", null,false);
-        traxCourseEntity.setSocials("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "SOC", "11", "105", null,false);
+        traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -493,10 +584,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "SOC", "11", "705", null,false);
-        traxCourseEntity.setSocials("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "SOC", "11", "705", null,false);
+        traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -505,10 +596,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1950", "SOC", "11", "502", null,false);
-        traxCourseEntity.setSocials("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1950", "SOC", "11", "502", null,false);
+        traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -517,10 +608,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "SOC", "11", "723", null,false);
-        traxCourseEntity.setSocials("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "SOC", "11", "723", null,false);
+        traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -529,10 +620,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "SOC", "11", "742", null,false);
-        traxCourseEntity.setSocials("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "SOC", "11", "742", null,false);
+        traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -542,10 +633,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "MAT", "10", "106", null,false);
-        traxCourseEntity.setMath10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "MAT", "10", "106", null,false);
+        traxCourse.setMath10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -554,10 +645,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "MAT", "10", "706", null,false);
-        traxCourseEntity.setMath10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "MAT", "10", "706", null,false);
+        traxCourse.setMath10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -566,10 +657,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "MAT", "11", "107", null,false);
-        traxCourseEntity.setMath("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "MAT", "11", "107", null,false);
+        traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -578,10 +669,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "MAT", "11", "707", null,false);
-        traxCourseEntity.setMath("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "MAT", "11", "707", null,false);
+        traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -590,10 +681,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1950", "MAT", "11", "501", null,false);
-        traxCourseEntity.setMath("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1950", "MAT", "11", "501", null,false);
+        traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -602,10 +693,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "MAT", "11", "724", null,false);
-        traxCourseEntity.setMath("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "MAT", "11", "724", null,false);
+        traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -614,10 +705,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "MAT", "11", "743", null,false);
-        traxCourseEntity.setMath("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "MAT", "11", "743", null,false);
+        traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -627,10 +718,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "PHY", "10", "108", null,false);
-        traxCourseEntity.setScience10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "PHY", "10", "108", null,false);
+        traxCourse.setScience10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -639,10 +730,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "PHY", "10", "708", null,false);
-        traxCourseEntity.setScience10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "PHY", "10", "708", null,false);
+        traxCourse.setScience10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -651,10 +742,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "PHY", "11", "109", null,false);
-        traxCourseEntity.setScience("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "PHY", "11", "109", null,false);
+        traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -663,10 +754,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "PHY", "11", "709", null,false);
-        traxCourseEntity.setScience("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "PHY", "11", "709", null,false);
+        traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -675,10 +766,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "PHY", "11", "725", null,false);
-        traxCourseEntity.setScience("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "PHY", "11", "725", null,false);
+        traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -687,10 +778,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "PHY", "11", "744", null,false);
-        traxCourseEntity.setScience("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "PHY", "11", "744", null,false);
+        traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -700,10 +791,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "CPP", "10", "112", null,false);
-        traxCourseEntity.setCareerPersonal10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "CPP", "10", "112", null,false);
+        traxCourse.setCareerPersonal10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -712,10 +803,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "CPP", "10", "710", null,false);
-        traxCourseEntity.setCareerPersonal10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "CPP", "10", "710", null,false);
+        traxCourse.setCareerPersonal10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -724,10 +815,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "CPP", "11", "728", null,false);
-        traxCourseEntity.setCareerPersonal11("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "CPP", "11", "728", null,false);
+        traxCourse.setCareerPersonal11("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -736,10 +827,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "CPP", "12", "729", null,false);
-        traxCourseEntity.setCareerPersonal12("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "CPP", "12", "729", null,false);
+        traxCourse.setCareerPersonal12("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -749,10 +840,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "PHE", "10", "110", null,false);
-        traxCourseEntity.setPhysEd10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "PHE", "10", "110", null,false);
+        traxCourse.setPhysEd10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -761,10 +852,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "PHE", "10", "711", null,false);
-        traxCourseEntity.setPhysEd10("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "PHE", "10", "711", null,false);
+        traxCourse.setPhysEd10("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -774,10 +865,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "ASK", "10", "111", null,false);
-        traxCourseEntity.setAppliedSkills("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "ASK", "10", "111", null,false);
+        traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -786,10 +877,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "ASK", "10", "712", null,false);
-        traxCourseEntity.setAppliedSkills("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "ASK", "10", "712", null,false);
+        traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -798,11 +889,11 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ASK", "10", "732", null,false);
-        traxCourseEntity.setAppliedSkills("Y");
-        traxCourseEntity.setFineArts("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ASK", "10", "732", null,false);
+        traxCourse.setAppliedSkills("Y");
+        traxCourse.setFineArts("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -811,10 +902,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ASK", "10", "727", null,false);
-        traxCourseEntity.setAppliedSkills("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ASK", "10", "727", null,false);
+        traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -824,10 +915,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2004", "PFL", "11", "713", null,false);
-        traxCourseEntity.setPortfolio("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2004", "PFL", "11", "713", null,false);
+        traxCourse.setPortfolio("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -837,10 +928,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1986", "CED", "11", "745", null,false);
-        traxCourseEntity.setConsEd("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1986", "CED", "11", "745", null,false);
+        traxCourse.setConsEd("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -850,10 +941,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("2018", "CLC", "11", "113", null,false);
-        traxCourseEntity.setCareerLifeConnections("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "CLC", "11", "113", null,false);
+        traxCourse.setCareerLifeConnections("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -863,10 +954,10 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        GraduationCourseEntity traxCourseEntity = prepareCourseRequirementData("1996", "ART", "11", "726", null,false);
-        traxCourseEntity.setFineArts("Y");
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ART", "11", "726", null,false);
+        traxCourse.setFineArts("Y");
 
-        courseService.convertCourseRequirement(traxCourseEntity, summary);
+        courseService.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -881,14 +972,11 @@ public class CourseServiceTest {
     }
 
 
-    private GraduationCourseEntity prepareCourseRequirementData(String reqtYear, String courseCode, String courseLevel, String ruleCode, String lang, boolean isUpdateMode) {
-        GraduationCourseKey courseKey = new GraduationCourseKey();
-        courseKey.setCourseCode(courseCode);
-        courseKey.setCourseLevel(courseLevel);
-        courseKey.setGradReqtYear(reqtYear);
-
-        GraduationCourseEntity traxCourseEntity = new GraduationCourseEntity();
-        traxCourseEntity.setGraduationCourseKey(courseKey);
+    private GradCourse prepareCourseRequirementData(String reqtYear, String courseCode, String courseLevel, String ruleCode, String lang, boolean isUpdateMode) {
+        GradCourse traxCourse = new GradCourse();
+        traxCourse.setCourseCode(courseCode);
+        traxCourse.setCourseLevel(courseLevel);
+        traxCourse.setGradReqtYear(reqtYear);
 
         CourseRequirementCodeDTO ruleCodeEntity = new CourseRequirementCodeDTO();
         ruleCodeEntity.setCourseRequirementCode(ruleCode);
@@ -917,7 +1005,7 @@ public class CourseServiceTest {
             }
         }
 
-        return traxCourseEntity;
+        return traxCourse;
     }
 
 }

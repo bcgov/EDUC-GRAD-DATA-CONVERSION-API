@@ -1,11 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
-import ca.bc.gov.educ.api.dataconversion.entity.trax.GraduationCourseEntity;
 import ca.bc.gov.educ.api.dataconversion.listener.*;
 import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
+import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
 import ca.bc.gov.educ.api.dataconversion.reader.*;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.writer.*;
@@ -33,18 +32,18 @@ public class BatchJobConfig {
     JobRegistry jobRegistry;
 
     @Bean
-    public ItemReader<ConvGradStudent> studentReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        return new DataConversionStudentReader(dataConversionService, restUtils);
+    public ItemReader<ConvGradStudent> studentReader(RestUtils restUtils) {
+        return new DataConversionStudentReader(restUtils);
     }
 
     @Bean
-    public ItemReader<CourseRestriction> courseRestrictionReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        return new DataConversionCourseRestrictionReader(dataConversionService, restUtils);
+    public ItemReader<CourseRestriction> courseRestrictionReader(RestUtils restUtils) {
+        return new DataConversionCourseRestrictionReader(restUtils);
     }
 
     @Bean
-    public ItemReader<GraduationCourseEntity> courseRequirementReader(DataConversionService dataConversionService, RestUtils restUtils) {
-        return new DataConversionCourseRequirementReader(dataConversionService, restUtils);
+    public ItemReader<GradCourse> courseRequirementReader(RestUtils restUtils) {
+        return new DataConversionCourseRequirementReader(restUtils);
     }
 
     @Bean
@@ -58,7 +57,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemWriter<GraduationCourseEntity> courseRequirementWriter() {
+    public ItemWriter<GradCourse> courseRequirementWriter() {
         return new DataConversionCourseRequirementWriter();
     }
 
@@ -73,7 +72,7 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemProcessor<GraduationCourseEntity,GraduationCourseEntity> courseRequirementProcessor() {
+    public ItemProcessor<GradCourse,GradCourse> courseRequirementProcessor() {
         return new DataConversionCourseRequirementProcessor();
     }
 
@@ -153,12 +152,12 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step courseRequirementDataConversionJobStep(ItemReader<GraduationCourseEntity> courseRequirementReader,
-                                                       ItemProcessor<? super GraduationCourseEntity, ? extends GraduationCourseEntity> courseRequirementProcessor,
-                                                       ItemWriter<GraduationCourseEntity> courseRequirementWriter,
+    public Step courseRequirementDataConversionJobStep(ItemReader<GradCourse> courseRequirementReader,
+                                                       ItemProcessor<? super GradCourse, ? extends GradCourse> courseRequirementProcessor,
+                                                       ItemWriter<GradCourse> courseRequirementWriter,
                                                        StepBuilderFactory stepBuilderFactory) {
         return stepBuilderFactory.get("courseRequirementDataConversionJobStep")
-                .<GraduationCourseEntity, GraduationCourseEntity>chunk(1)
+                .<GradCourse, GradCourse>chunk(1)
                 .reader(courseRequirementReader)
                 .processor(courseRequirementProcessor)
                 .writer(courseRequirementWriter)
@@ -206,9 +205,9 @@ public class BatchJobConfig {
 
     // Partitioning for pen updates ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForPenUpdates(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService, EducGradDataConversionApiConstants constants) {
+    public Step masterStepForPenUpdates(StepBuilderFactory stepBuilderFactory, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
         return stepBuilderFactory.get("masterStepForPenUpdates")
-                .partitioner(slaveStepForPenUpdates(stepBuilderFactory).getName(), partitioner(dataConversionService))
+                .partitioner(slaveStepForPenUpdates(stepBuilderFactory).getName(), partitioner(restUtils))
                 .step(slaveStepForPenUpdates(stepBuilderFactory))
                 .gridSize(constants.getNumberOfPartitions())
                 .taskExecutor(taskExecutor(constants))
@@ -216,9 +215,9 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public StudentLoadPartitioner partitioner(DataConversionService dataConversionService) {
+    public StudentLoadPartitioner partitioner(RestUtils restUtils) {
         // Reader to feed input data for each partition
-        return new StudentLoadPartitioner(dataConversionService);
+        return new StudentLoadPartitioner(restUtils);
     }
 
     @Bean
@@ -237,22 +236,22 @@ public class BatchJobConfig {
 
     @Bean
     public Job penUpdatesJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-                             DataConversionService dataConversionService,
+                             RestUtils restUtils,
                              EducGradDataConversionApiConstants constants,
                              PenUpdatesJobCompletionNotificationListener listener) {
         return jobBuilderFactory.get("penUpdatesJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForPenUpdates(stepBuilderFactory, dataConversionService, constants))
+                .flow(masterStepForPenUpdates(stepBuilderFactory, restUtils, constants))
                 .end()
                 .build();
     }
 
     // Partitioning for student load ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, DataConversionService dataConversionService, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
+    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
         return stepBuilderFactory.get("masterStepForStudent")
-                .partitioner(slaveStepForStudent(stepBuilderFactory, restUtils).getName(), partitioner(dataConversionService))
+                .partitioner(slaveStepForStudent(stepBuilderFactory, restUtils).getName(), partitioner(restUtils))
                 .step(slaveStepForStudent(stepBuilderFactory, restUtils))
                 .gridSize(constants.getNumberOfPartitions())
                 .taskExecutor(taskExecutor(constants))
@@ -289,13 +288,13 @@ public class BatchJobConfig {
 
     @Bean
     public Job studentLoadJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-                              DataConversionService dataConversionService, RestUtils restUtils,
+                              RestUtils restUtils,
                               EducGradDataConversionApiConstants constants,
                               StudentDataConversionJobCompletionNotificationListener listener) {
         return jobBuilderFactory.get("studentLoadJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForStudent(stepBuilderFactory, dataConversionService, restUtils,constants))
+                .flow(masterStepForStudent(stepBuilderFactory, restUtils,constants))
                 .end()
                 .build();
     }
