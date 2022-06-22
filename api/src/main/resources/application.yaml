@@ -137,7 +137,7 @@ endpoint:
     save-course-requirement:
       url: ${GRAD_COURSE_API}api/v1/course/save-course-requirement
     student-courses-by-pen:
-      url: ${GRAD_COURSE_API}api/v1/studentcourse/pen
+      url: ${GRAD_COURSE_API}api/v1/course/studentcourse/pen
     check-french-immersion-course:
       url: ${GRAD_COURSE_API}api/v1/course/studentcourse/check-french-immersion-course
     check-french-immersion-course-for-en:
@@ -164,7 +164,7 @@ endpoint:
   grad-trax-api:
     student:
       get-student-no-list-by-page:
-        url: ${GRAD_TRAX_API}api/v1/common/student-no-list/paginated
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student-no-list/paginated
       get-total-number-of-student-no-list:
         url: ${GRAD_TRAX_API}api/v1/trax/common/student-no-list/total-count
       get-student-demog-data:
