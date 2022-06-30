@@ -31,7 +31,7 @@ objects:
             deploymentConfig: "${REPO_NAME}-dc"
         spec:
           containers:
-            - image: image-registry.openshift-image-registry.svc:5000/77c02f-tools/${REPO_NAME}:${TAG_NAME}
+            - image: image-registry.openshift-image-registry.svc:5000/${IS_NAMESPACE}/${REPO_NAME}:${TAG_NAME}
               imagePullPolicy: Always
               volumeMounts:
               - name: log-storage
@@ -158,6 +158,9 @@ objects:
 parameters:
   - name: REPO_NAME
     description: Application repository name
+    required: true
+  - name: IS_NAMESPACE
+    description: The namespace where the imagestream lives
     required: true
   - name: TAG_NAME
     description: Imagestream tag name
