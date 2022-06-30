@@ -76,7 +76,7 @@ pipeline{
                         openshift.withProject(DEV_NAMESPACE) {
                             openshift.apply(
                                         openshift.process("-f", "${SOURCE_REPO_URL_RAW}/${BRANCH}/tools/openshift/api.dc.yaml",
-                                        "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${DEV_HOST_ROUTE}")
+                                        "IS_NAMESPACE=${TOOLS_NAMESPACE}", "REPO_NAME=${REPO_NAME}", "HOST_ROUTE=${DEV_HOST_ROUTE}")
                                     )
                             openshift.selector("dc", "${REPO_NAME}-dc").rollout().latest()
                             timeout (time: 10, unit: 'MINUTES') {
