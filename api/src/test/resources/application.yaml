@@ -104,11 +104,11 @@ endpoint:
     save-course-requirement:
       url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/course/save-course-requirement
     student-courses-by-pen:
-      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/studentcourse/pen
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/course/studentcourse/pen
     check-french-immersion-course:
-      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/studentcourse/check-french-immersion-course
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/course/studentcourse/check-french-immersion-course
     check-french-immersion-course-for-en:
-      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/studentcourse/check-french-immersion-course-for-en
+      url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/course/studentcourse/check-french-immersion-course-for-en
     check-blank-language-course:
       url: https://educ-grad-course-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/course/check-blank-language-course
     check-french-language-course:
@@ -131,23 +131,23 @@ endpoint:
   grad-trax-api:
     student:
       get-student-no-list-by-page:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-no-list/paginated
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student-no-list/paginated
       get-total-number-of-student-no-list:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-no-list/total-count
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student-no-list/total-count
       get-student-demog-data:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-demog
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student-demog
       get-student-master-data:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/student-master
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student-master
       save-trax-student-no:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/trax-student-no
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/trax-student-no
     course:
       get-course-restrictions:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/course-restrictions
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-restrictions
       get-course-requirements:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/common/course-requirements
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-requirements
     school:
       check-school-by-mincode:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/school/check
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/check
 
 #Conversion option
 data-conversion:

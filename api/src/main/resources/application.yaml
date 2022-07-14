@@ -137,11 +137,11 @@ endpoint:
     save-course-requirement:
       url: ${GRAD_COURSE_API}api/v1/course/save-course-requirement
     student-courses-by-pen:
-      url: ${GRAD_COURSE_API}api/v1/studentcourse/pen
+      url: ${GRAD_COURSE_API}api/v1/course/studentcourse/pen
     check-french-immersion-course:
-      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course
+      url: ${GRAD_COURSE_API}api/v1/course/studentcourse/check-french-immersion-course
     check-french-immersion-course-for-en:
-      url: ${GRAD_COURSE_API}api/v1/studentcourse/check-french-immersion-course-for-en
+      url: ${GRAD_COURSE_API}api/v1/course/studentcourse/check-french-immersion-course-for-en
     check-blank-language-course:
       url: ${GRAD_COURSE_API}api/v1/course/check-blank-language-course
     check-french-language-course:
@@ -164,23 +164,23 @@ endpoint:
   grad-trax-api:
     student:
       get-student-no-list-by-page:
-        url: ${GRAD_TRAX_API}api/v1/common/student-no-list/paginated
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student-no-list/paginated
       get-total-number-of-student-no-list:
-        url: ${GRAD_TRAX_API}api/v1/common/student-no-list/total-count
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student-no-list/total-count
       get-student-demog-data:
-        url: ${GRAD_TRAX_API}api/v1/common/student-demog
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student-demog
       get-student-master-data:
-        url: ${GRAD_TRAX_API}api/v1/common/student-master
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student-master
       save-trax-student-no:
-        url: ${GRAD_TRAX_API}api/v1/common/trax-student-no
+        url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no
     course:
       get-course-restrictions:
-        url: ${GRAD_TRAX_API}api/v1/common/course-restrictions
+        url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
       get-course-requirements:
-        url: ${GRAD_TRAX_API}api/v1/common/course-requirements
+        url: ${GRAD_TRAX_API}api/v1/trax/common/course-requirements
     school:
       check-school-by-mincode:
-        url: ${GRAD_TRAX_API}api/v1/school/check
+        url: ${GRAD_TRAX_API}api/v1/trax/school/check
 
 #Conversion option
 data-conversion:
