@@ -97,7 +97,6 @@ jobs:
           oc: 4
 
         # https://github.com/redhat-actions/oc-login#readme
-      - uses: actions/checkout@v2
       - name: Deploy
         run: |
           set -eux
