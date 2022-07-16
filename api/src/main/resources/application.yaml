@@ -153,6 +153,10 @@ endpoint:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms/id
     career-program:
       url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
+    programs:
+      url: ${GRAD_PROGRAM_API}api/v1/program/programs
+    program-rules-by-trax:
+      url: ${GRAD_PROGRAM_API}api/v1/program/programrules/by-trax
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
@@ -181,6 +185,13 @@ endpoint:
     school:
       check-school-by-mincode:
         url: ${GRAD_TRAX_API}api/v1/trax/school/check
+    tsw:
+      get-tran-demog-by-pen:
+        url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-demog
+      get-student-graduated-by-pen:
+        url: ${GRAD_TRAX_API}api/vi1/trax/tsw/student
+      get-tran-courses-by-pen:
+        url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-courses
 
 #Conversion option
 data-conversion:
