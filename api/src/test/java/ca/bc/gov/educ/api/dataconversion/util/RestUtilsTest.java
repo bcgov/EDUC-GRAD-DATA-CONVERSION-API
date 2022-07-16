@@ -376,7 +376,6 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
 
         val result = this.restUtils.getTranscriptStudentIsGraduated(transcriptStudentDemog.getStudNo(), "123");
-        assertThat(result).isNotNull();
         assertThat(result).isTrue();
     }
 

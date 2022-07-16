@@ -113,8 +113,6 @@ public class StudentBaseService {
             case "1950":
                 if (StringUtils.equalsIgnoreCase(studentGrade, "AD")) {
                     gradProgram = "1950";
-                } else if (StringUtils.equalsIgnoreCase(studentGrade, "AN")) {
-                    gradProgram = null;
                 }
                 break;
             case "SCCP":
