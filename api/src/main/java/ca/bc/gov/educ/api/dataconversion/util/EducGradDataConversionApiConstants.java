@@ -66,6 +66,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
+    @Value("${endpoint.grad-program-api.programs.url}")
+    private String gradProgramUrl;
+
     @Value("${endpoint.grad-program-api.special-program.url}")
     private String gradOptionalProgramUrl;
 
@@ -74,6 +77,9 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-program-api.career-program.url}")
     private String gradCareerProgramUrl;
+
+    @Value("${endpoint.grad-program-api.program-rules-by-trax.url}")
+    private String gradProgramRulesByTraxReqNumberUrl;
 
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
@@ -134,6 +140,15 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
     private String saveTraxStudentNoUrl;
+
+    @Value("${endpoint.grad-trax-api.tsw.get-tran-demog-by-pen.url}")
+    private String tswTranscriptStudentDemogByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.tsw.get-student-graduated-by-pen.url}")
+    private String tswStudentIsGraduatedByPenUrl;
+
+    @Value("${endpoint.grad-trax-api.tsw.get-tran-courses-by-pen.url}")
+    private String tswTranscriptStudentCoursesByPenUrl;
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

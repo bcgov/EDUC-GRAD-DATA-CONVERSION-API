@@ -3,15 +3,21 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
+import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +36,7 @@ public class StudentService extends StudentBaseService {
 
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
     private static final String DATA_CONVERSION_HISTORY_ACTIVITY_CODE = "DATACONVERT";
+    private static final String TRAX_API_ERROR_MSG = "Grad Trax API is failed for ";
 
     private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
@@ -117,7 +124,7 @@ public class StudentService extends StudentBaseService {
         } catch (Exception e) {
             ConversionAlert error = new ConversionAlert();
             error.setItem(convGradStudent.getPen());
-            error.setReason("Grad Trax API is failed: " + e.getLocalizedMessage());
+            error.setReason(TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
             summary.getErrors().add(error);
             convGradStudent.setResult(ConversionResultType.FAILURE);
         }
@@ -140,35 +147,15 @@ public class StudentService extends StudentBaseService {
     }
 
     private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken) {
+        if (convGradStudent.isGraduated()) {
+            log.debug("Process Graduated Students for pen# : " + convGradStudent.getPen());
+        } else {
+            log.debug("Process Non-Graduated Students for pen# : " + convGradStudent.getPen());
+        }
         students.forEach(st -> {
-            boolean isStudentPersisted = false;
-            UUID studentID = UUID.fromString(st.getStudentID());
-            Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
-            GraduationStudentRecordEntity gradStudentEntity;
-            if (stuOptional.isPresent()) {
-                gradStudentEntity = stuOptional.get();
-                gradStudentEntity.setPen(st.getPen());
-                convertStudentData(convGradStudent, gradStudentEntity, summary);
-                gradStudentEntity.setUpdateDate(null);
-                gradStudentEntity.setUpdateUser(null);
-                gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-                isStudentPersisted = true;
-                summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
-            } else {
-                gradStudentEntity = new GraduationStudentRecordEntity();
-                gradStudentEntity.setPen(st.getPen());
-                gradStudentEntity.setStudentID(studentID);
-                convertStudentData(convGradStudent, gradStudentEntity, summary);
-                // if year "1950" without "AD" or "AN", then program is null
-                if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
-                    gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-                    summary.setAddedCount(summary.getAddedCount() + 1L);
-                    isStudentPersisted = true;
-                }
-            }
-
-            if (isStudentPersisted) {
-                processDedendencies(convGradStudent, gradStudentEntity, studentID, summary, accessToken);
+            GraduationStudentRecordEntity gradStudentEntity = processStudent(convGradStudent, st, summary);
+            if (gradStudentEntity != null) {
+                processDedendencies(gradStudentEntity.getStudentID(), convGradStudent, gradStudentEntity, st, summary, accessToken);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -177,9 +164,51 @@ public class StudentService extends StudentBaseService {
         });
     }
 
-    private void processDedendencies(ConvGradStudent convGradStudent,
+    private GraduationStudentRecordEntity processStudent(ConvGradStudent convGradStudent, Student penStudent,  ConversionStudentSummaryDTO summary) {
+        boolean isStudentPersisted = false;
+        UUID studentID = UUID.fromString(penStudent.getStudentID());
+        Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
+        GraduationStudentRecordEntity gradStudentEntity;
+        if (stuOptional.isPresent()) {
+            gradStudentEntity = stuOptional.get();
+            gradStudentEntity.setPen(penStudent.getPen());
+            if (convGradStudent.isGraduated()) {
+                convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
+            } else {
+                convertStudentData(convGradStudent, gradStudentEntity, summary);
+            }
+            gradStudentEntity.setUpdateDate(null);
+            gradStudentEntity.setUpdateUser(null);
+            gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+            isStudentPersisted = true;
+            summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
+        } else {
+            gradStudentEntity = new GraduationStudentRecordEntity();
+            gradStudentEntity.setPen(penStudent.getPen());
+            gradStudentEntity.setStudentID(studentID);
+            if (convGradStudent.isGraduated()) {
+                convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
+            } else {
+                convertStudentData(convGradStudent, gradStudentEntity, summary);
+            }
+            // if year "1950" without "AD" or "AN", then program is null
+            if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
+                gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                summary.setAddedCount(summary.getAddedCount() + 1L);
+                isStudentPersisted = true;
+            }
+        }
+        if (isStudentPersisted) {
+            return gradStudentEntity;
+        } else {
+            return null;
+        }
+    }
+
+    private void processDedendencies(UUID studentID,
+                                     ConvGradStudent convGradStudent,
                                      GraduationStudentRecordEntity gradStudentEntity,
-                                     UUID studentID,
+                                     Student penStudent,
                                      ConversionStudentSummaryDTO summary, String accessToken) {
 
         ConversionResultType result;
@@ -194,12 +223,31 @@ public class StudentService extends StudentBaseService {
 
         // process dependencies
         gradStudentEntity.setPen(convGradStudent.getPen());
-        result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
+        if (convGradStudent.isGraduated()) {
+            result = processOptionalProgramsForGraduatedStudent(gradStudentEntity, accessToken, summary);
+        } else {
+            result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
+        }
+
         if (result != ConversionResultType.FAILURE) {
             result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
         }
         if (result != ConversionResultType.FAILURE) {
             result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+        }
+
+        if (convGradStudent.isGraduated()) {
+            // Building GraduationData CLOB data
+            GraduationData graduationData = buildGraduationData(convGradStudent, gradStudentEntity, penStudent, summary);
+            if (graduationData != null) {
+                try {
+                    gradStudentEntity.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
+                } catch (JsonProcessingException jpe) {
+                    log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
+                }
+            }
+
+            // TODO(sks) : report, transcript, certificate generation & saving
         }
         convGradStudent.setResult(result);
     }
@@ -232,6 +280,328 @@ public class StudentService extends StudentBaseService {
         studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
     }
 
+    private void convertGraduatedStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
+        if (determineProgram(student, summary)) {
+            studentEntity.setProgram(student.getProgram());
+        }
+
+        studentEntity.setGpa(student.getGpa());
+        studentEntity.setHonoursStanding(student.getHonoursStanding());
+        if (studentEntity.getProgram().equals("SCCP")) {
+            studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
+        } else {
+            studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
+        }
+        studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
+        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        studentEntity.setRecalculateGradStatus(null);
+        studentEntity.setRecalculateProjectedGrad(null);
+        studentEntity.setStudentGrade(student.getStudentGrade());
+        studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        // Mappings with Student_Master
+        studentEntity.setFrenchCert(student.getFrenchCert());
+        studentEntity.setEnglishCert(student.getEnglishCert());
+        studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
+    }
+
+    private GraduationData buildGraduationData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, Student penStudent, ConversionStudentSummaryDTO summary) {
+        GraduationData graduationData = new GraduationData();
+
+        TranscriptStudentDemog transcriptStudentDemog;
+        // TSW_TRAN_DEMOG
+        try {
+            transcriptStudentDemog = restUtils.getTranscriptStudentDemog(student.getPen(), summary.getAccessToken());
+        } catch (Exception e) {
+            log.error(TRAX_API_ERROR_MSG + "getting Transcript Student Demog data : " + e.getLocalizedMessage());
+            return null;
+        }
+
+        // gradStatus
+        GradAlgorithmGraduationStudentRecord gradStatus = new GradAlgorithmGraduationStudentRecord();
+        gradStatus.setStudentID(studentEntity.getStudentID());
+        gradStatus.setProgram(studentEntity.getProgram());
+        gradStatus.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(studentEntity.getProgramCompletionDate()));
+        gradStatus.setGpa(studentEntity.getGpa());
+        gradStatus.setSchoolOfRecord(studentEntity.getSchoolOfRecord());
+        gradStatus.setStudentGrade(studentEntity.getStudentGrade());
+        gradStatus.setStudentStatus(studentEntity.getStudentStatus());
+        gradStatus.setSchoolAtGrad(studentEntity.getSchoolAtGrad());
+        gradStatus.setHonoursStanding(studentEntity.getHonoursStanding());
+        gradStatus.setRecalculateGradStatus(studentEntity.getRecalculateGradStatus());
+        graduationData.setGradStatus(gradStatus);
+
+        // graduated Student
+        GradSearchStudent gradStudent = populateGraduateStudentInfo(studentEntity, penStudent, transcriptStudentDemog);
+        graduationData.setGradStudent(gradStudent);
+
+        // TSW_TRAN_CRSE
+        List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
+
+        // school
+        // TODO (sks) : replace this with getting School object from Trax API
+        School school = new School();
+        school.setMinCode(transcriptStudentDemog.getMincode());
+        school.setSchoolName(transcriptStudentDemog.getSchoolName());
+        school.setAddress1(transcriptStudentDemog.getAddress1());
+        school.setCity(transcriptStudentDemog.getCity());
+        school.setProvCode(transcriptStudentDemog.getProvCode());
+        school.setPostal(transcriptStudentDemog.getPostal());
+        graduationData.setSchool(school);
+
+        // studentCourses
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList = buildStudentCourses(transcriptStudentCourses);
+        StudentCourses studentCourses = new StudentCourses();
+        studentCourses.setStudentCourseList(studentCourseList);
+        graduationData.setStudentCourses(studentCourses);
+
+        // optionalGradStatus
+        List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = buildOptionalGradStatus(studentEntity, studentCourseList, summary);
+        graduationData.setOptionalGradStatus(optionalGradStatus);
+
+        // requirements met
+        List<GradRequirement> requirementsMet = buildRequirementsMet(studentEntity.getProgram(), transcriptStudentCourses, summary);
+        graduationData.setRequirementsMet(requirementsMet);
+
+        // gradMessage
+        graduationData.setGradMessage(transcriptStudentDemog.getGradTextMessage());
+
+        // dualDogwood
+        graduationData.setDualDogwood(studentEntity.isDualDogwood());
+
+        // gradProgram
+        graduationData.setGradProgram(retrieveGradProgram(studentEntity.getProgram(), summary.getAccessToken()));
+
+        // graduated
+        graduationData.setGraduated(true);
+
+        return graduationData;
+    }
+
+    private GradSearchStudent populateGraduateStudentInfo(GraduationStudentRecordEntity studentEntity, Student penStudent, TranscriptStudentDemog transcriptStudentDemog ) {
+        GradSearchStudent gradSearchStudent = GradSearchStudent.builder()
+                .studentID(penStudent.getStudentID())
+                .pen(penStudent.getPen())
+                .legalFirstName(penStudent.getLegalFirstName())
+                .legalMiddleNames(penStudent.getLegalMiddleNames())
+                .legalLastName(penStudent.getLegalLastName())
+                .dob(penStudent.getDob())
+                .sexCode(penStudent.getSexCode())
+                .genderCode(penStudent.getGenderCode())
+                .usualFirstName(penStudent.getUsualFirstName())
+                .usualMiddleNames(penStudent.getUsualMiddleNames())
+                .usualLastName(penStudent.getUsualLastName())
+                .email(penStudent.getEmail())
+                .emailVerified(penStudent.getEmailVerified())
+                .deceasedDate(penStudent.getDeceasedDate())
+                .postalCode(penStudent.getPostalCode())
+                .mincode(penStudent.getMincode())
+                .localID(penStudent.getLocalID())
+                .gradeCode(penStudent.getGradeCode())
+                .gradeYear(penStudent.getGradeYear())
+                .demogCode(penStudent.getDemogCode())
+                .statusCode(penStudent.getStatusCode())
+                .memo(penStudent.getMemo())
+                .trueStudentID(penStudent.getTrueStudentID())
+        .build();
+
+        gradSearchStudent.setProgram(studentEntity.getProgram());
+        gradSearchStudent.setStudentGrade(studentEntity.getStudentGrade());
+        gradSearchStudent.setStudentStatus(studentEntity.getStudentStatus());
+        // TODO (sks) : replace this with getting School object from Trax API
+        gradSearchStudent.setSchoolOfRecord(studentEntity.getSchoolOfRecord());
+        gradSearchStudent.setSchoolOfRecordName(transcriptStudentDemog.getSchoolName());
+        gradSearchStudent.setSchoolOfRecordindependentAffiliation(null);
+
+        return gradSearchStudent;
+    }
+
+    private List<TranscriptStudentCourse> retrieveTswStudentCourses(String pen, String accessToken) {
+        List<TranscriptStudentCourse> courses = new ArrayList<>();
+        try {
+            courses = restUtils.getTranscriptStudentCourses(pen, accessToken);
+        } catch (Exception e) {
+            log.error(TRAX_API_ERROR_MSG + "getting TSW_TRAN_CRSE records : " + e.getLocalizedMessage());
+        }
+        return courses;
+    }
+
+    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse) {
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourses = new ArrayList<>();
+        for (TranscriptStudentCourse tswCourse : tswStudentCourse) {
+            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse studentCourse = populateStudentCourse(tswCourse);
+            studentCourses.add(studentCourse);
+        }
+
+        return studentCourses;
+    }
+
+    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse populateStudentCourse(TranscriptStudentCourse tswCourse) {
+        return ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse.builder()
+                .pen(tswCourse.getStudNo())
+                .courseCode(tswCourse.getCourseCode())
+                .courseLevel(tswCourse.getCourseLevel())
+                .courseName(tswCourse.getCourseName())
+                .originalCredits(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
+                .credits(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
+                .creditsUsedForGrad(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
+                .sessionDate(tswCourse.getCourseSession())
+                .completedCoursePercentage(NumberUtils.isCreatable(tswCourse.getFinalPercentage())? Double.parseDouble(tswCourse.getFinalPercentage()) : Double.parseDouble("0.0"))
+                .completedCourseLetterGrade(tswCourse.getFinalLG())
+                .schoolPercent(NumberUtils.isCreatable(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage()) : null)
+                .bestSchoolPercent(NumberUtils.isCreatable(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage()) : null)
+                .examPercent(NumberUtils.isCreatable(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage()) : null)
+                .bestExamPercent(NumberUtils.isCreatable(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage()) : null)
+                .hasRelatedCourse("N")
+                .metLitNumRequirement(tswCourse.getMetLitNumReqt())
+                .gradReqMet("") // TODO
+                .gradReqMetDetail("") // TODO
+                .hasRelatedCourse("N") // TODO
+                .genericCourseType("") //
+                .specialCase("N")
+                .provExamCourse("N") // TODO
+                .isUsed(false) // TODO
+                .isProjected(false)
+                .isRestricted(false)
+                .isDuplicate(false)
+                .isFailed(false)
+                .isNotCompleted(false)
+                .isLessCreditCourse(false)
+                .isValidationCourse(false)
+                .isGrade10Course(false)
+                .isCareerPrep(false)
+                .isLocallyDeveloped(false)
+                .isNotEligibleForElective(false)
+                .isBoardAuthorityAuthorized(false)
+                .isIndependentDirectedStudies(false)
+                .isCutOffCourse(false)
+            .build();
+    }
+
+    private List<GradAlgorithmOptionalStudentProgram> buildOptionalGradStatus(GraduationStudentRecordEntity studentEntity,
+              List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList, ConversionStudentSummaryDTO summary) {
+        List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
+        List<StudentOptionalProgramEntity> list = studentOptionalProgramRepository.findByStudentID(studentEntity.getStudentID());
+        for (StudentOptionalProgramEntity ent : list) {
+            GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(ent, summary.getAccessToken());
+            if (result != null) {
+                StudentCourses studentCourses = new StudentCourses();
+                studentCourses.setStudentCourseList(studentCourseList);
+                result.setOptionalStudentCourses(studentCourses);
+
+                results.add(result);
+            }
+
+        }
+        return results;
+
+    }
+
+    private GradAlgorithmOptionalStudentProgram populateOptionStudentProgramStatus(StudentOptionalProgramEntity entity, String accessToken) {
+        GradAlgorithmOptionalStudentProgram result = new GradAlgorithmOptionalStudentProgram();
+        try {
+            OptionalProgram optionalProgram = restUtils.getOptionalProgramByID(entity.getOptionalProgramID(), accessToken);
+            if (optionalProgram != null) {
+                result.setOptionalProgramID(optionalProgram.getOptionalProgramID());
+                result.setOptionalProgramCode(optionalProgram.getOptProgramCode());
+                result.setOptionalProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(entity.getSpecialProgramCompletionDate()));
+                result.setOptionalRequirementsMet(new ArrayList<>());
+                result.setStudentID(entity.getStudentID());
+                result.setCpList(buildStudentCareerProgramList(entity, accessToken));
+                result.setOptionalGraduated(false); // TODO
+            }
+        } catch (Exception e) {
+            log.error("Program API is failed to get OptionalProgram! : " + e.getLocalizedMessage());
+            return null;
+        }
+        return result;
+    }
+
+    private List<StudentCareerProgram> buildStudentCareerProgramList(StudentOptionalProgramEntity entity, String accessToken) {
+        List<StudentCareerProgram> results = new ArrayList<>();
+
+        List<StudentCareerProgramEntity> list = studentCareerProgramRepository.findByStudentID(entity.getStudentID());
+        for (StudentCareerProgramEntity ent : list) {
+            StudentCareerProgram studentCareerProgram = populateStudentCareerProgram(ent, accessToken);
+            if (studentCareerProgram != null) {
+                results.add(studentCareerProgram);
+            }
+        }
+
+        return results;
+    }
+
+    private StudentCareerProgram populateStudentCareerProgram(StudentCareerProgramEntity entity, String accessToken) {
+        StudentCareerProgram obj = new StudentCareerProgram();
+
+        try {
+            CareerProgram careerProgram = restUtils.getCareerProgram(entity.getCareerProgramCode(), accessToken);
+            obj.setCareerProgramName(careerProgram.getDescription());
+        } catch (Exception e) {
+            log.error("Program API is failed to get CareerProgram! : " + e.getLocalizedMessage());
+            return null;
+        }
+        obj.setCareerProgramCode(entity.getCareerProgramCode());
+        obj.setStudentID(entity.getStudentID());
+        obj.setId(entity.getId());
+
+        return obj;
+    }
+
+    private List<GradRequirement> buildRequirementsMet(String programCode, List<TranscriptStudentCourse> tswStudentCourses, ConversionStudentSummaryDTO summary) {
+        List<GradRequirement> requirements = new ArrayList<>();
+        for (TranscriptStudentCourse tswCourse : tswStudentCourses) {
+            if (StringUtils.isNotBlank(tswCourse.getFoundationReq())) {
+                GradRequirement gradRequirement = populateRequirement(programCode, tswCourse.getFoundationReq(), summary);
+                if (gradRequirement != null) {
+                    requirements.add(gradRequirement);
+                }
+            }
+        }
+        return requirements;
+    }
+
+    private GradRequirement populateRequirement(String programCode, String traxReqNumber, ConversionStudentSummaryDTO summary) {
+        GradRuleDetails rule = null;
+        List<GradRuleDetails> rules = retrieveProgramRulesByTraxReqNumber(traxReqNumber, summary.getAccessToken());
+        for (GradRuleDetails ruleDetail : rules) {
+            if (StringUtils.equals(ruleDetail.getProgramCode(), programCode)) {
+                rule = ruleDetail;
+                break;
+            }
+        }
+        if (rule != null) {
+            GradRequirement result = new GradRequirement();
+            result.setRule(rule.getRuleCode());
+            result.setDescription(rule.getRequirementName());
+            result.setProjected(false);
+            return result;
+        } else {
+            return null;
+        }
+
+    }
+
+    private GraduationProgramCode retrieveGradProgram(String programCode, String accessToken) {
+        GraduationProgramCode program = null;
+        try {
+            program = restUtils.getGradProgram(programCode, accessToken);
+        } catch (Exception e) {
+            log.error("Program API is failed to get Grad Programs! : " + e.getLocalizedMessage());
+        }
+        return program;
+    }
+
+    private List<GradRuleDetails> retrieveProgramRulesByTraxReqNumber(String traxReqNumber, String accessToken) {
+        List<GradRuleDetails> rules = new ArrayList<>();
+        try {
+            rules = restUtils.getGradProgramRulesByTraxReqNumber(traxReqNumber, accessToken);
+        } catch (Exception e) {
+            log.error("Program API is failed to get Program Rules! : " + e.getLocalizedMessage());
+        }
+        return rules;
+    }
+
     private ConversionResultType processOptionalPrograms(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return ConversionResultType.SUCCESS;
@@ -244,6 +614,25 @@ public class StudentService extends StudentBaseService {
 
         // French Immersion for 2018-EN, 2004-EN
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert(), accessToken)) {
+            return createStudentOptionalProgram("FI", student, accessToken, summary);
+        }
+
+        return ConversionResultType.SUCCESS;
+    }
+
+    private ConversionResultType processOptionalProgramsForGraduatedStudent(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+        if (StringUtils.isBlank(student.getProgram())) {
+            return ConversionResultType.SUCCESS;
+        }
+
+        // Dual Dogwood for yyyy-PF
+        if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(student.getEnglishCert(), "E")) {
+            student.setDualDogwood(true);
+            return createStudentOptionalProgram("DD", student, accessToken, summary);
+        }
+
+        // French Immersion for mincode[1:3] <> '093' and french_cert = 'F'
+        if (!student.getSchoolOfRecord().startsWith("093") && StringUtils.equalsIgnoreCase(student.getFrenchCert(), "F")) {
             return createStudentOptionalProgram("FI", student, accessToken, summary);
         }
 

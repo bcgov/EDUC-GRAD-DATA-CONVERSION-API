@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.GraduationProgramCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -341,5 +342,59 @@ public class RestUtils {
                 })
                 .body(BodyInserters.fromValue(traxStudentNo))
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
+    }
+
+    public TranscriptStudentDemog getTranscriptStudentDemog(String pen, String accessToken) {
+        return webClient.get()
+                .uri(constants.getTswTranscriptStudentDemogByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(TranscriptStudentDemog.class).block();
+    }
+
+    public Boolean getTranscriptStudentIsGraduated(String pen, String accessToken) {
+        return webClient.get()
+                .uri(constants.getTswStudentIsGraduatedByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(Boolean.class).block();
+    }
+
+    public List<TranscriptStudentCourse> getTranscriptStudentCourses(String pen, String accessToken) {
+        final ParameterizedTypeReference<List<TranscriptStudentCourse>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getTswTranscriptStudentCoursesByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public GraduationProgramCode getGradProgram(String programCode, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getGradProgramUrl(), uri -> uri.path("/{programCode}").build(programCode))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(GraduationProgramCode.class).block();
+    }
+
+    public List<GradRuleDetails> getGradProgramRulesByTraxReqNumber(String traxReqNumber, String accessToken) {
+        final ParameterizedTypeReference<List<GradRuleDetails>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getGradProgramRulesByTraxReqNumberUrl(), uri -> uri.path("/{traxReqNumber}").build(traxReqNumber))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
     }
 }

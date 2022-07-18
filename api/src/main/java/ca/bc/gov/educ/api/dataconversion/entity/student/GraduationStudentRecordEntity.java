@@ -67,4 +67,8 @@ public class GraduationStudentRecordEntity extends BaseEntity {
     // Mappings for Student_Master
     @Transient
     private String frenchCert;
+    @Transient
+    private String englishCert;
+    @Transient
+    private boolean dualDogwood = false;
 }
