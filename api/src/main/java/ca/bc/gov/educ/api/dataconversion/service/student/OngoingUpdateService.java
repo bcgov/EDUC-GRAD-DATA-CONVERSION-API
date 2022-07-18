@@ -67,7 +67,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                 studentService.convertStudent(requestStudent, new ConversionStudentSummaryDTO());
             } else {
                 // get Grad Program & Student Status for trax student
-                requestStudent.setProgram(getGradProgram(requestStudent.getGraduationRequestYear(), requestStudent.getSchoolOfRecord(), requestStudent.getStudentGrade()));
+                requestStudent.setProgram(getGradProgram(requestStudent.getGraduationRequestYear(), requestStudent.getSchoolOfRecord()));
                 requestStudent.setStudentStatus(getGradStudentStatus(requestStudent.getStudentStatus(), requestStudent.getArchiveFlag()));
 
                 // Load grad student
@@ -75,6 +75,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                 log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
                 switch (traxUpdateInGrad.getUpdateType()) {
                     case "STUDENT":
+                    case "UPD_GRAD":
                         processStudent(requestStudent, currentStudent, accessToken);
                         break;
                     case "XPROGRAM":
@@ -90,6 +91,7 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                         break;
                     case "COURSE":
                     case "ASSESSMENT":
+                    case "UPD_DEMOG":
                         studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
                         break;
                     default:
