@@ -34,7 +34,6 @@ public class JobLauncherControllerTest {
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
-
         assertThat(exceptionIsThrown).isTrue();
     }
 
