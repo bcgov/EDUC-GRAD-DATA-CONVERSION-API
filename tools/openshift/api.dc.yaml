@@ -59,10 +59,10 @@ objects:
                   protocol: TCP
               resources:
                 requests:
-                  cpu: "250m"
+                  cpu: "50m"
                   memory: "1024Mi"
                 limits:
-                  cpu: "500m"
+                  cpu: "250m"
                   memory: "2048Mi"
               envFrom:
                 - configMapRef:
