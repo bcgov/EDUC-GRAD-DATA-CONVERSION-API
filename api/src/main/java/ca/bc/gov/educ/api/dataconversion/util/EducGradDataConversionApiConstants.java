@@ -30,7 +30,7 @@ public class EducGradDataConversionApiConstants {
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String TRAX_DATE_FORMAT = "yyyyMM";
     public static final String TRAX_SLP_DATE_FORMAT = "yyyyMMdd";
-
+    public static final String SECONDARY_DATE_FORMAT = "yyyy/MM/dd";
     public static final String DEFAULT_CREATED_BY = "DATA_CONV";
     public static final String DEFAULT_UPDATED_BY = "DATA_CONV";
 
@@ -149,6 +149,21 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-trax-api.tsw.get-tran-courses-by-pen.url}")
     private String tswTranscriptStudentCoursesByPenUrl;
+
+    //Sree
+    @Value("${endpoint.grad-graduation-report-api.get-transcript}")
+    private String transcript;
+    @Value("${endpoint.educ-school-api.url}")
+    private String schoolCategoryCode;
+    @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
+    private String specialCase;
+    @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
+    private String programNameEndpoint;
+    @Value("${endpoint.grad-graduation-report-api.update-grad-student-transcript.url}")
+    private String updateGradStudentTranscript;
+    @Value("${endpoint.report-api.transcript_report}")
+    private String transcriptReport;
+    //sree
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

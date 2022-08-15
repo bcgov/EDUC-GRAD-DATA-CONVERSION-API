@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
@@ -48,6 +49,7 @@ public class StudentService extends StudentBaseService {
     private final RestUtils restUtils;
     private final AssessmentService assessmentService;
     private final CourseService courseService;
+    private final ReportService reportService;
 
     @Autowired
     public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
@@ -58,7 +60,8 @@ public class StudentService extends StudentBaseService {
                           EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
                           AssessmentService assessmentService,
-                          CourseService courseService) {
+                          CourseService courseService,
+                          ReportService reportService) {
         this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
@@ -68,6 +71,7 @@ public class StudentService extends StudentBaseService {
         this.restUtils = restUtils;
         this.assessmentService = assessmentService;
         this.courseService = courseService;
+        this.reportService = reportService;
     }
 
     @Transactional(transactionManager = "studentTransactionManager")
@@ -246,10 +250,17 @@ public class StudentService extends StudentBaseService {
                     log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
                 }
             }
+            createAndStoreStudentTranscript(graduationData,graduationData.getGradStatus(),accessToken);
+
 
             // TODO(sks) : report, transcript, certificate generation & saving
         }
         convGradStudent.setResult(result);
+    }
+
+    private void createAndStoreStudentTranscript(GraduationData graduationData, GradAlgorithmGraduationStudentRecord gradStatus, String accessToken) {
+        ReportData data = reportService.prepareTranscriptData(graduationData, gradStatus,accessToken);
+        reportService.saveStudentTranscriptReportJasper(data, accessToken, gradStatus.getStudentID(), graduationData.isGraduated());
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
