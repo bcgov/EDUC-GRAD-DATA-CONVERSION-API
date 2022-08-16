@@ -13,6 +13,8 @@ import java.util.Date;
 
 public class EducGradDataConversionApiUtils {
 
+    private EducGradDataConversionApiUtils() {}
+
     private static final Logger logger = LoggerFactory.getLogger(EducGradDataConversionApiUtils.class);
     private static final String ERROR_MSG  = "Error {}";
 
@@ -75,6 +77,26 @@ public class EducGradDataConversionApiUtils {
         Date temp = EducGradDataConversionApiUtils.parseDate(actualDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT);
         sDates = EducGradDataConversionApiUtils.formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
         return sDates;
+    }
+
+    public static String parsingDateForCertificate(String sessionDate) {
+        String actualSessionDate = sessionDate + "/01";
+        String sDates = null;
+        Date temp = parseDate(actualSessionDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT);
+        sDates = formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
+        return sDates;
+    }
+
+    public static String formatDateForReportJasper(String updatedTimestamp) {
+        SimpleDateFormat fromUser = new SimpleDateFormat(EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
+        SimpleDateFormat myFormat = new SimpleDateFormat(EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
+        try {
+            return myFormat.format(fromUser.parse(updatedTimestamp));
+        } catch (ParseException e) {
+            logger.debug(ERROR_MSG,e.getLocalizedMessage());
+        }
+        return updatedTimestamp;
+
     }
 
     public static String formatDate (Date date) {

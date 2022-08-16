@@ -197,7 +197,12 @@ endpoint:
   grad-graduation-report-api:
     get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
-        url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
+    get-cert-list: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programcertificates
+    update-grad-student-certificate:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentcertificate
+    update-grad-student-report:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
   educ-school-api:
     url: ${EDUC_SCHOOL_API}api/v1/schools/%s
   grad-student-graduation-api:
@@ -205,7 +210,8 @@ endpoint:
       url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
   report-api:
     transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
-
+    certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
+    achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
 
 #Conversion option
 data-conversion:
