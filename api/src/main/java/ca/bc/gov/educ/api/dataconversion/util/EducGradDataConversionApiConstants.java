@@ -163,6 +163,16 @@ public class EducGradDataConversionApiConstants {
     private String updateGradStudentTranscript;
     @Value("${endpoint.report-api.transcript_report}")
     private String transcriptReport;
+    @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
+    private String certList;
+    @Value("${endpoint.report-api.certificate_report}")
+    private String certificateReport;
+    @Value("${endpoint.grad-graduation-report-api.update-grad-student-certificate.url}")
+    private String updateGradStudentCertificate;
+    @Value("${endpoint.grad-graduation-report-api.update-grad-student-report.url}")
+    private String updateGradStudentReport;
+    @Value("${endpoint.report-api.achievement_report}")
+    private String achievementReport;
     //sree
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")

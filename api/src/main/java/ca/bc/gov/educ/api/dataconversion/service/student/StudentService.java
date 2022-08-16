@@ -11,10 +11,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
-import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
-import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import ca.bc.gov.educ.api.dataconversion.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -250,17 +247,24 @@ public class StudentService extends StudentBaseService {
                     log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
                 }
             }
-            createAndStoreStudentTranscript(graduationData,graduationData.getGradStatus(),accessToken);
-
-
-            // TODO(sks) : report, transcript, certificate generation & saving
+            if(graduationData != null) {
+                createAndStoreStudentTranscript(graduationData, accessToken);
+                createAndStoreStudentCertificates(graduationData, accessToken);
+            }
         }
         convGradStudent.setResult(result);
     }
 
-    private void createAndStoreStudentTranscript(GraduationData graduationData, GradAlgorithmGraduationStudentRecord gradStatus, String accessToken) {
-        ReportData data = reportService.prepareTranscriptData(graduationData, gradStatus,accessToken);
-        reportService.saveStudentTranscriptReportJasper(data, accessToken, gradStatus.getStudentID(), graduationData.isGraduated());
+    private void createAndStoreStudentTranscript(GraduationData graduationData,String accessToken) {
+        ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(),accessToken);
+        reportService.saveStudentTranscriptReportJasper(data, accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+    }
+
+    private void createAndStoreStudentCertificates(GraduationData graduationData, String accessToken) {
+        List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,accessToken);
+        for (ProgramCertificateTranscript certType : certificateList) {
+            reportService.saveStudentCertificateReportJasper(graduationData,accessToken, certType);
+        }
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
@@ -340,6 +344,7 @@ public class StudentService extends StudentBaseService {
         gradStatus.setSchoolAtGrad(studentEntity.getSchoolAtGrad());
         gradStatus.setHonoursStanding(studentEntity.getHonoursStanding());
         gradStatus.setRecalculateGradStatus(studentEntity.getRecalculateGradStatus());
+        gradStatus.setLastUpdateDate(DateConversionUtils.convertStringToDate(transcriptStudentDemog.getUpdateDate().toString()));
         graduationData.setGradStatus(gradStatus);
 
         // graduated Student
@@ -519,6 +524,7 @@ public class StudentService extends StudentBaseService {
                 result.setOptionalRequirementsMet(new ArrayList<>());
                 result.setStudentID(entity.getStudentID());
                 result.setCpList(buildStudentCareerProgramList(entity, accessToken));
+                result.setOptionalProgramName(optionalProgram.getOptionalProgramName());
                 result.setOptionalGraduated(true);
             }
         } catch (Exception e) {
@@ -933,7 +939,7 @@ public class StudentService extends StudentBaseService {
     @Transactional(transactionManager = "studentTransactionManager")
     public void addStudentOptionalProgram(UUID optionalProgramID, StudentGradDTO gradStudent) {
         Optional<StudentOptionalProgramEntity> optional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(gradStudent.getStudentID(), optionalProgramID);
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
             entity.setId(UUID.randomUUID());
             entity.setStudentID(gradStudent.getStudentID());
@@ -955,7 +961,7 @@ public class StudentService extends StudentBaseService {
     @Transactional(transactionManager = "studentTransactionManager")
     public void addStudentCareerProgram(String careerProgramCode, StudentGradDTO gradStudent) {
         Optional<StudentCareerProgramEntity> optional = studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(gradStudent.getStudentID(), careerProgramCode);
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             StudentCareerProgramEntity entity = new StudentCareerProgramEntity();
             entity.setId(UUID.randomUUID());
             entity.setStudentID(gradStudent.getStudentID());

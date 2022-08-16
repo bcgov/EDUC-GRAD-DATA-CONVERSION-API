@@ -165,6 +165,11 @@ endpoint:
     get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
       url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studenttranscript?isGraduated=%s
+    get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
+    update-grad-student-certificate:
+      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
+    update-grad-student-report:
+      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
   educ-school-api:
     url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
   grad-student-graduation-api:
@@ -172,6 +177,8 @@ endpoint:
       url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase/%s
   report-api:
     transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
+    certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
+    achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
 
 #Conversion option
 data-conversion:
