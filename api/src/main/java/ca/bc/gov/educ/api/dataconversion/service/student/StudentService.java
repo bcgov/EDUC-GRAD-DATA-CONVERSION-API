@@ -519,7 +519,7 @@ public class StudentService extends StudentBaseService {
                 result.setOptionalRequirementsMet(new ArrayList<>());
                 result.setStudentID(entity.getStudentID());
                 result.setCpList(buildStudentCareerProgramList(entity, accessToken));
-                result.setOptionalGraduated(false); // TODO
+                result.setOptionalGraduated(true);
             }
         } catch (Exception e) {
             log.error("Program API is failed to get OptionalProgram! : " + e.getLocalizedMessage());
