@@ -75,7 +75,7 @@ objects:
                     name: api-grad-conv-db-secret
                 - secretRef:
                     name: grad-client-secret
-            - image: docker-remote.artifacts.developer.gov.bc.ca/fluent/fluent-bit:1.5.7
+            - image: artifacts.developer.gov.bc.ca/docker-remote/fluent/fluent-bit:1.5.7
               name: "${REPO_NAME}-fluent-bit-sidecar"
               imagePullPolicy: Always
               imagePullSecrets:
