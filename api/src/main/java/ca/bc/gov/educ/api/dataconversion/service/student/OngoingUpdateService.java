@@ -72,7 +72,9 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
 
                 // Load grad student
                 StudentGradDTO currentStudent = studentService.loadStudentData(requestStudent.getPen(), accessToken);
-                log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
+                if (currentStudent != null) {
+                    log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
+                }
                 switch (traxUpdateInGrad.getUpdateType()) {
                     case "STUDENT":
                     case "UPD_GRAD":

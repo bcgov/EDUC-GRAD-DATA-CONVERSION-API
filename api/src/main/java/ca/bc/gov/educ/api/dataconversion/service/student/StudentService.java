@@ -728,7 +728,7 @@ public class StudentService extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
-    protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
+    public boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
         boolean frenchImmersion = false;
         // French Immersion for 2018-EN, 2004-EN
         if (program.equals("2018-EN") || program.equals("2004-EN")) {
@@ -877,14 +877,29 @@ public class StudentService extends StudentBaseService {
 
     @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
-        byte[] rawGUID = graduationStudentRecordRepository.findStudentID(pen);
-        if (rawGUID == null) {
+
+//        byte[] rawGUID = graduationStudentRecordRepository.findStudentID(pen);
+//        if (rawGUID == null) {
+//            return null;
+//        }
+//        ByteBuffer bb = ByteBuffer.wrap(rawGUID);
+//        UUID studentID = new UUID(bb.getLong(), bb.getLong());
+
+        Student penStudent;
+        // PEN Student
+        try {
+            // Call PEN Student API
+            List<Student> students = restUtils.getStudentsByPen(pen, accessToken);
+            penStudent = students.stream().filter(s -> s.getPen().compareTo(pen) == 0).findAny().orElse(null);
+        } catch (Exception e) {
+            log.error("PEN Student API is failed for pen# [{}] : {} ", pen, e.getLocalizedMessage());
             return null;
         }
-        ByteBuffer bb = ByteBuffer.wrap(rawGUID);
-        UUID studentID = new UUID(bb.getLong(), bb.getLong());
+
+        UUID studentID = UUID.fromString(penStudent.getStudentID());
         StudentGradDTO studentData = new StudentGradDTO();
         studentData.setStudentID(studentID);
+
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
             GraduationStudentRecordEntity entity = gradStatusOptional.get();
@@ -894,6 +909,7 @@ public class StudentService extends StudentBaseService {
             studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
             studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
         } else {
+            log.error("GraduationStudentRecord is not found for pen# [{}], studentID [{}]", pen, studentID);
             return null;
         }
 

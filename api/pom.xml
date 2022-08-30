@@ -17,6 +17,7 @@
             src/main/resources/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/config/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/constant/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/controller/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/choreographer/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/exception/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/model/**,
@@ -28,6 +29,10 @@
             src/main/java/ca/bc/gov/educ/api/dataconversion/reader/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/writer/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/scheduler/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/EducGradDataConversionApplication,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/ChoreographedEventPersistenceService,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/EventHandlerDelegatorService,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/StudentBaseService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/util/**
         </sonar.exclusions>
         <java.version>11</java.version>
