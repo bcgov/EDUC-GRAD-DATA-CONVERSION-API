@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
+import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Code;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
@@ -55,6 +57,12 @@ public class ReportServiceTest {
 
     @MockBean
     WebClient webClient;
+
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
 
     @Autowired
     private EducGradDataConversionApiConstants constants;
