@@ -50,14 +50,10 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
+            return ResponseEntity.ok(handleSuccess(jobContext, "studentSummaryDTO"));
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
+            return ResponseEntity.status(500).body(handleException(e));
         }
     }
 
@@ -71,14 +67,10 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("courseRestrictionDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRestrictionSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
+            return ResponseEntity.ok(handleSuccess(jobContext, "courseRestrictionSummaryDTO"));
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
+            return ResponseEntity.status(500).body(handleException(e));
         }
     }
 
@@ -92,14 +84,10 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("courseRequirementDataConversionBatchJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
+            return ResponseEntity.ok(handleSuccess(jobContext, "courseRequirementSummaryDTO"));
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
+            return ResponseEntity.status(500).body(handleException(e));
         }
     }
 
@@ -113,14 +101,10 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentLoadJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("studentSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
+            return ResponseEntity.ok(handleSuccess(jobContext, "studentSummaryDTO"));
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
+            return ResponseEntity.status(500).body(handleException(e));
         }
     }
 
@@ -134,14 +118,21 @@ public class JobLauncherController {
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("penUpdatesJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();
-            ConversionBaseSummaryDTO summaryDTO = (ConversionBaseSummaryDTO)jobContext.get("penUpdatesSummaryDTO");
-            return ResponseEntity.ok(summaryDTO);
+            return ResponseEntity.ok(handleSuccess(jobContext, "penUpdatesSummaryDTO"));
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
-            e.printStackTrace();
-            ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
-            summaryDTO.setException(e.getLocalizedMessage());
-            return ResponseEntity.status(500).body(summaryDTO);
+            return ResponseEntity.status(500).body(handleException(e));
         }
+    }
+
+    private ConversionBaseSummaryDTO handleSuccess(ExecutionContext jobContext , String summaryDtoName) throws JobParametersInvalidException {
+        return (ConversionBaseSummaryDTO)jobContext.get(summaryDtoName);
+    }
+
+    private ConversionBaseSummaryDTO handleException(Exception e) {
+        e.printStackTrace();
+        ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
+        summaryDTO.setException(e.getLocalizedMessage());
+        return summaryDTO;
     }
 }

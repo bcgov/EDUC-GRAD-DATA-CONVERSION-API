@@ -8,14 +8,11 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.*;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
-import ca.bc.gov.educ.api.dataconversion.util.ThreadLocalStateUtil;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -28,33 +25,10 @@ public class ReportService {
 	private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
 
 	@Autowired
-	WebClient webClient;
+	RestUtils restUtils;
 
 	@Autowired
 	EducGradDataConversionApiConstants constants;
-
-	public ProgramCertificateTranscript getTranscript(GradAlgorithmGraduationStudentRecord gradResponse, GraduationData graduationDataStatus, String accessToken) {
-		ProgramCertificateReq req = new ProgramCertificateReq();
-		req.setProgramCode(gradResponse.getProgram());
-		req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
-		return webClient.post().uri(constants.getTranscript())
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
-	}
-
-	public String getSchoolCategoryCode(String accessToken, String mincode) {
-		CommonSchool commonSchoolObj = webClient.get().uri(String.format(constants.getSchoolCategoryCode(), mincode))
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).retrieve().bodyToMono(CommonSchool.class).block();
-		if (commonSchoolObj != null) {
-			return commonSchoolObj.getSchoolCategoryCode();
-		}
-		return null;
-	}
 
 	public ReportData prepareTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, String accessToken) {
 		ReportData data = new ReportData();
@@ -85,13 +59,14 @@ public class ReportService {
 	private Transcript getTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, String accessToken) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
-		ProgramCertificateTranscript pcObj = getTranscript(gradResponse, graduationDataStatus, accessToken);
+		ProgramCertificateTranscript pcObj = restUtils.getTranscript(gradResponse.getProgram(),
+				graduationDataStatus.getGradStatus().getSchoolOfRecord(), accessToken);
 		if (pcObj != null) {
 			Code code = new Code();
 			code.setCode(pcObj.getTranscriptTypeCode());
 			transcriptData.setTranscriptTypeCode(code);
 		}
-		transcriptData.setIssueDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getLastUpdateDate().toString()));
+		transcriptData.setIssueDate(graduationDataStatus.getGradStatus().getLastUpdateDate());
 		transcriptData.setResults(getTranscriptResults(graduationDataStatus, accessToken));
 		return transcriptData;
 	}
@@ -119,7 +94,8 @@ public class ReportService {
 		crse.setCode(sc.getCourseCode());
 		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(), sc.getCourseCode(), sc.getCredits(), sc.isRestricted()));
 		crse.setLevel(sc.getCourseLevel());
-		crse.setName(getCourseNameLogic(sc));
+//		crse.setName(getCourseNameLogic(sc));
+		crse.setName(sc.getCourseName());
 
 		crse.setRelatedCourse(sc.getRelatedCourse());
 		crse.setRelatedLevel(sc.getRelatedLevel());
@@ -293,11 +269,7 @@ public class ReportService {
 			finalPercent = "RM";
 		}
 		if (sA.getSpecialCase() != null && StringUtils.isNotBlank(sA.getSpecialCase().trim()) && !sA.getSpecialCase().equalsIgnoreCase("X") && !sA.getSpecialCase().equalsIgnoreCase("Q")) {
-			SpecialCase spC = webClient.get().uri(String.format(constants.getSpecialCase(), sA.getSpecialCase()))
-					.headers(h -> {
-						h.setBearerAuth(accessToken);
-						h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					}).retrieve().bodyToMono(SpecialCase.class).block();
+			SpecialCase spC = this.restUtils.getSpecialCase(sA.getSpecialCase(), accessToken);
 			finalPercent = spC != null ? spC.getLabel() : "";
 		}
 		return finalPercent;
@@ -330,7 +302,7 @@ public class ReportService {
 						data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
 					}
 				}
-				data.setHonorsFlag(graduationDataStatus.getGradStatus().getHonoursStanding().equals("Y"));
+				data.setHonorsFlag(StringUtils.equals(graduationDataStatus.getGradStatus().getHonoursStanding(), "Y"));
 			} else {
 				data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
 			}
@@ -343,11 +315,7 @@ public class ReportService {
 		ca.bc.gov.educ.api.dataconversion.model.tsw.report.GradProgram gPgm = new ca.bc.gov.educ.api.dataconversion.model.tsw.report.GradProgram();
 		Code code = new Code();
 		if (graduationDataStatus.getGradStatus().getProgram() != null) {
-			GradProgram gradProgram = webClient.get().uri(String.format(constants.getProgramNameEndpoint(), graduationDataStatus.getGradStatus().getProgram()))
-					.headers(h -> {
-						h.setBearerAuth(accessToken);
-						h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-					}).retrieve().bodyToMono(GradProgram.class).block();
+			GradProgram gradProgram = this.restUtils.getGradProgram(graduationDataStatus.getGradStatus().getProgram(), accessToken);
 			if (gradProgram != null) {
 				code.setDescription(gradProgram.getProgramName());
 				code.setName(gradProgram.getProgramName());
@@ -404,11 +372,7 @@ public class ReportService {
 		if (isGraduated)
 			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
-		webClient.post().uri(String.format(constants.getUpdateGradStudentTranscript(), isGraduated))
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentTranscripts.class).block();
+		this.restUtils.saveGradStudentTranscript(requestObj, isGraduated, accessToken);
 	}
 
 	private String generateStudentTranscriptReportJasper(ReportData sample,String accessToken) {
@@ -418,11 +382,7 @@ public class ReportService {
 		ReportRequest reportParams = new ReportRequest();
 		reportParams.setOptions(options);
 		reportParams.setData(sample);
-		byte[] bytesSAR = webClient.post().uri(constants.getTranscriptReport())
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+		byte[] bytesSAR = this.restUtils.getTranscriptReport(reportParams, accessToken);
 		byte[] encoded = org.apache.commons.codec.binary.Base64.encodeBase64(bytesSAR);
 		return new String(encoded, StandardCharsets.US_ASCII);
 	}
@@ -433,15 +393,11 @@ public class ReportService {
 		for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationDataStatus.getOptionalGradStatus()) {
 			if (optionalPrograms.getOptionalProgramCode().equals("FI") || optionalPrograms.getOptionalProgramCode().equals("DD") || optionalPrograms.getOptionalProgramCode().equals("FR")) {
 				req.setOptionalProgram(optionalPrograms.getOptionalProgramCode());
+				break;
 			}
 		}
-		req.setSchoolCategoryCode(getSchoolCategoryCode(accessToken, graduationDataStatus.getGradStatus().getSchoolOfRecord()));
-		return webClient.post().uri(constants.getCertList())
-			.headers(h -> {
-				h.setBearerAuth(accessToken);
-				h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-			}).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
-			}).block();
+		req.setSchoolCategoryCode(this.restUtils.getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord(), accessToken));
+		return this.restUtils.getProgramCertificateTranscriptList(req, accessToken);
 	}
 
 	public ReportData prepareCertificateData(GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
@@ -450,7 +406,7 @@ public class ReportService {
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
-		data.setUpdateDate(EducGradDataConversionApiUtils.formatDateForReportJasper(new Date().toString()));
+		data.setUpdateDate(EducGradDataConversionApiUtils.formatDate(new Date()));
 		data.setCertificate(getCertificateData(graduationDataStatus.getGradStatus(),certType));
 		if(certType.getCertificateTypeCode().equalsIgnoreCase("E") || certType.getCertificateTypeCode().equalsIgnoreCase("A") || certType.getCertificateTypeCode().equalsIgnoreCase("EI") || certType.getCertificateTypeCode().equalsIgnoreCase("AI")) {
 			data.getStudent().setEnglishCert(certType.getCertificateTypeCode());
@@ -470,17 +426,12 @@ public class ReportService {
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
 		requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
-		webClient.post().uri(constants.getUpdateGradStudentCertificate())
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
-
+		this.restUtils.saveGradStudentCertificate(requestObj, accessToken);
 	}
 
 	private Certificate getCertificateData(GradAlgorithmGraduationStudentRecord gradResponse,ProgramCertificateTranscript certData) {
 		Certificate cert = new Certificate();
-		cert.setIssued(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingDateForCertificate(gradResponse.getProgramCompletionDate())));
+		cert.setIssued(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(gradResponse.getProgramCompletionDate()));
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();
@@ -502,11 +453,7 @@ public class ReportService {
 		ReportRequest reportParams = new ReportRequest();
 		reportParams.setOptions(options);
 		reportParams.setData(sample);
-		byte[] bytesSAR = webClient.post().uri(constants.getCertificateReport())
-				.headers(h -> {
-					h.setBearerAuth(accessToken);
-					h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-				}).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+		byte[] bytesSAR = this.restUtils.getCertificateReport(reportParams, accessToken);
 		byte[] encoded = Base64.encodeBase64(bytesSAR);
 		return new String(encoded,StandardCharsets.US_ASCII);
 	}

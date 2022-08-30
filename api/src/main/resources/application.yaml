@@ -155,6 +155,8 @@ endpoint:
       url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
     programs:
       url: ${GRAD_PROGRAM_API}api/v1/program/programs
+    program-rules:
+      url: ${GRAD_PROGRAM_API}api/v1/program/programrules
     program-rules-by-trax:
       url: ${GRAD_PROGRAM_API}api/v1/program/programrules/by-trax
     program_name_by_program_code:
@@ -187,6 +189,8 @@ endpoint:
     school:
       check-school-by-mincode:
         url: ${GRAD_TRAX_API}api/v1/trax/school/check
+      school-by-min-code:
+        url: ${GRAD_TRAX_API}api/v1/trax/school/%s
     tsw:
       get-tran-demog-by-pen:
         url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-demog
@@ -204,10 +208,10 @@ endpoint:
     update-grad-student-report:
       url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
   educ-school-api:
-    url: ${EDUC_SCHOOL_API}api/v1/schools/%s
+    url: ${EDUC_SCHOOL_API}api/v1/schools
   grad-student-graduation-api:
     get-special-cases:
-      url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase/%s
+      url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase
   report-api:
     transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
     certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate

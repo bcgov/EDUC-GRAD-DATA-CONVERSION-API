@@ -78,6 +78,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-program-api.career-program.url}")
     private String gradCareerProgramUrl;
 
+    @Value("${endpoint.grad-program-api.program-rules.url}")
+    private String gradProgramRulesUrl;
+
     @Value("${endpoint.grad-program-api.program-rules-by-trax.url}")
     private String gradProgramRulesByTraxReqNumberUrl;
 
@@ -174,6 +177,8 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.report-api.achievement_report}")
     private String achievementReport;
     //sree
+    @Value("${endpoint.grad-trax-api.school.school-by-min-code.url}")
+    private String schoolByMincode;
 
     @Value("${data-conversion.student-guid-pen-xref.enabled}")
     private boolean studentGuidPenXrefEnabled;

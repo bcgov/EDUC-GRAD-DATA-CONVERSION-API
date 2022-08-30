@@ -9,6 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.ZoneId;
 import java.util.Date;
 
 public class EducGradDataConversionApiUtils {
@@ -134,6 +135,18 @@ public class EducGradDataConversionApiUtils {
 
 
         return monthsYear + months;
+    }
+
+    private static String parseDateByFormat(final String sessionDate, final String dateFormat) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        try {
+            Date date = simpleDateFormat.parse(sessionDate);
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            return localDate.getYear() +"/"+ String.format("%02d", localDate.getMonthValue());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 	
 }

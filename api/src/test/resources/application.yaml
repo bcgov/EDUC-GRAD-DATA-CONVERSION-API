@@ -122,6 +122,8 @@ endpoint:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/careerprogram
     programs:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programs
+    program-rules:
+      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programrules
     program-rules-by-trax:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programrules/by-trax
     program_name_by_program_code:
@@ -154,6 +156,8 @@ endpoint:
     school:
       check-school-by-mincode:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/check
+      school-by-min-code:
+        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/%s
     tsw:
       get-tran-demog-by-pen:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/tsw/tran-demog
@@ -171,10 +175,10 @@ endpoint:
     update-grad-student-report:
       url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
   educ-school-api:
-    url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools/%s
+    url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
   grad-student-graduation-api:
     get-special-cases:
-      url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase/%s
+      url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase
   report-api:
     transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
     certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
