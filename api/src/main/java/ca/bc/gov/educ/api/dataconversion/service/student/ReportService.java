@@ -94,7 +94,6 @@ public class ReportService {
 		crse.setCode(sc.getCourseCode());
 		crse.setCredits(getCredits(graduationDataStatus.getGradStatus().getProgram(), sc.getCourseCode(), sc.getCredits(), sc.isRestricted()));
 		crse.setLevel(sc.getCourseLevel());
-//		crse.setName(getCourseNameLogic(sc));
 		crse.setName(sc.getCourseName());
 
 		crse.setRelatedCourse(sc.getRelatedCourse());
@@ -273,16 +272,6 @@ public class ReportService {
 			finalPercent = spC != null ? spC.getLabel() : "";
 		}
 		return finalPercent;
-	}
-
-	private String getCourseNameLogic(StudentCourse sc) {
-		if (sc.getGenericCourseType() != null && sc.getGenericCourseType().equalsIgnoreCase("I") && StringUtils.isNotBlank(sc.getRelatedCourse()) && StringUtils.isNotBlank(sc.getRelatedLevel()) && StringUtils.isNotBlank(sc.getRelatedCourseName())) {
-			return "IDS " + sc.getRelatedCourseName();
-		}
-		if (StringUtils.isNotBlank(sc.getCustomizedCourseName())) {
-			return sc.getCustomizedCourseName();
-		}
-		return sc.getCourseName();
 	}
 
 	private String getValue(Double value) {

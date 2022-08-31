@@ -74,30 +74,30 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
                 StudentGradDTO currentStudent = studentService.loadStudentData(requestStudent.getPen(), accessToken);
                 if (currentStudent != null) {
                     log.info(" Get graduation data : studentID = {}  ===> GRAD load is done.", currentStudent.getStudentID(), traxUpdateInGrad.getUpdateType());
-                }
-                switch (traxUpdateInGrad.getUpdateType()) {
-                    case "STUDENT":
-                    case "UPD_GRAD":
-                        processStudent(requestStudent, currentStudent, accessToken);
-                        break;
-                    case "XPROGRAM":
-                        processOptionalAndCareerPrograms(requestStudent, currentStudent, accessToken);
-                        break;
-                    case "FI10ADD":
-                    case "FI11ADD":
-                        processFrenchImmersion(requestStudent, currentStudent, accessToken, false);
-                        break;
-                    case "FI10DELETE":
-                    case "FI11DELETE":
-                        processFrenchImmersion(requestStudent, currentStudent, accessToken, true);
-                        break;
-                    case "COURSE":
-                    case "ASSESSMENT":
-                    case "UPD_DEMOG":
-                        studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
-                        break;
-                    default:
-                        break;
+                    switch (traxUpdateInGrad.getUpdateType()) {
+                        case "STUDENT":
+                        case "UPD_GRAD":
+                            processStudent(requestStudent, currentStudent, accessToken);
+                            break;
+                        case "XPROGRAM":
+                            processOptionalAndCareerPrograms(requestStudent, currentStudent, accessToken);
+                            break;
+                        case "FI10ADD":
+                        case "FI11ADD":
+                            processFrenchImmersion(requestStudent, currentStudent, accessToken, false);
+                            break;
+                        case "FI10DELETE":
+                        case "FI11DELETE":
+                            processFrenchImmersion(requestStudent, currentStudent, accessToken, true);
+                            break;
+                        case "COURSE":
+                        case "ASSESSMENT":
+                        case "UPD_DEMOG":
+                            studentService.triggerGraduationBatchRun(currentStudent.getStudentID());
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -232,10 +232,8 @@ public class OngoingUpdateService extends StudentBaseService implements EventSer
         });
         // Removed Program?
         curProgramCodes.forEach(p -> {
-            if (!StringUtils.equals(p, "DD") && !StringUtils.equals(p, "FI") && !StringUtils.equals(p,"CP")) {
-                if (!reqProgramCodes.contains(p)) {
-                    currentStudent.getRemovedProgramCodes().add(p);
-                }
+            if (!StringUtils.equals(p, "DD") && !StringUtils.equals(p, "FI") && !StringUtils.equals(p,"CP") && !reqProgramCodes.contains(p)) {
+                currentStudent.getRemovedProgramCodes().add(p);
             }
         });
     }

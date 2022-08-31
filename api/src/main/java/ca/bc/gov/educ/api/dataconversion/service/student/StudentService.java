@@ -482,7 +482,7 @@ public class StudentService extends StudentBaseService {
                 .hasRelatedCourse(StringUtils.isNotBlank(tswCourse.getRelatedCourse())? "Y" : "N")
                 //.genericCourseType("") // tsw course name is used
                 //.relatedCourseName("")// tsw course name is used
-                .provExamCourse(StringUtils.equals(tswCourse.getReportType(), "1")? "Y" : "N") // TODO : confirm how to determine this with Mike or Kim
+                .provExamCourse(StringUtils.equals(tswCourse.getReportType(), "1")? "Y" : "N")
                 .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())? true : false)
                 .isProjected(false)
                 .isRestricted(false)
@@ -502,19 +502,11 @@ public class StudentService extends StudentBaseService {
 
         ProgramRequirement rule = getProgramRequirement(graduationProgramCode, tswCourse.getFoundationReq(), accessToken);
         if (rule != null) {
-            // TODO (jsung) : old trax code is used
-//            result.setGradReqMet(rule.getProgramRequirementCode().getProReqCode());
+            // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
             result.setGradReqMet(tswCourse.getFoundationReq());
             result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
         }
 
-//        if (StringUtils.isNotBlank(tswCourse.getSpecialCase())) {
-//            // SpecialCase
-//            SpecialCase sc = lookupSpecialCase(tswCourse.getSpecialCase().trim(), accessToken);
-//            if (sc != null) {
-//                result.setSpecialCase(sc.getSpCase());
-//            }
-//        }
         return result;
     }
 
@@ -534,7 +526,7 @@ public class StudentService extends StudentBaseService {
 
         ProgramRequirement rule = getProgramRequirement(graduationProgramCode, tswCourse.getFoundationReq(), accessToken);
         if (rule != null) {
-//            result.setGradReqMet(rule.getProgramRequirementCode().getProReqCode());
+            // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
             result.setGradReqMet(tswCourse.getFoundationReq());
             result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
         }
@@ -877,14 +869,6 @@ public class StudentService extends StudentBaseService {
 
     @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
-
-//        byte[] rawGUID = graduationStudentRecordRepository.findStudentID(pen);
-//        if (rawGUID == null) {
-//            return null;
-//        }
-//        ByteBuffer bb = ByteBuffer.wrap(rawGUID);
-//        UUID studentID = new UUID(bb.getLong(), bb.getLong());
-
         Student penStudent;
         // PEN Student
         try {
@@ -892,7 +876,12 @@ public class StudentService extends StudentBaseService {
             List<Student> students = restUtils.getStudentsByPen(pen, accessToken);
             penStudent = students.stream().filter(s -> s.getPen().compareTo(pen) == 0).findAny().orElse(null);
         } catch (Exception e) {
-            log.error("PEN Student API is failed for pen# [{}] : {} ", pen, e.getLocalizedMessage());
+            log.error("PEN Student API is failed: {} ", pen, e.getLocalizedMessage());
+            return null;
+        }
+
+        if (penStudent == null) {
+            log.error("Pen# [{}] is not found in PEN StudentAPI.", pen);
             return null;
         }
 
