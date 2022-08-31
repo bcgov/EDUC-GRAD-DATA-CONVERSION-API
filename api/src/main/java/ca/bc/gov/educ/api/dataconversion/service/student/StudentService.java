@@ -483,7 +483,7 @@ public class StudentService extends StudentBaseService {
                 //.genericCourseType("") // tsw course name is used
                 //.relatedCourseName("")// tsw course name is used
                 .provExamCourse(StringUtils.equals(tswCourse.getReportType(), "1")? "Y" : "N")
-                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())? true : false)
+                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad()))
                 .isProjected(false)
                 .isRestricted(false)
                 .isDuplicate(false)
@@ -517,7 +517,7 @@ public class StudentService extends StudentBaseService {
                 .assessmentName(tswCourse.getCourseName())
                 .sessionDate(tswCourse.getCourseSession())
                 .proficiencyScore(NumberUtils.isCreatable(tswCourse.getFinalPercentage().trim())? Double.parseDouble(tswCourse.getFinalPercentage().trim()) : Double.parseDouble("0.0"))
-                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())? true : false) // usedForGrad has some credits or not
+                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())) // usedForGrad has some credits or not
                 .isProjected(false)
                 .isDuplicate(false)
                 .isFailed(false)
@@ -743,19 +743,19 @@ public class StudentService extends StudentBaseService {
 
     private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType = ConversionResultType.SUCCESS;
-        boolean isCareerProgramCreated = false;
+        Boolean isCareerProgramCreated = Boolean.FALSE;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
                 Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, accessToken, summary);
-                if (res.getRight()) {
-                    isCareerProgramCreated = true;
+                if (Boolean.TRUE.equals(res.getRight())) {
+                    isCareerProgramCreated = Boolean.TRUE;
                 }
                 resultType = res.getLeft();
                 if (resultType == ConversionResultType.FAILURE) {
                     break;
                 }
             }
-            if (isCareerProgramCreated) {
+            if (Boolean.TRUE.equals(isCareerProgramCreated)) {
                 resultType = createStudentOptionalProgram("CP", student, accessToken, summary);
             }
         }
@@ -1073,12 +1073,10 @@ public class StudentService extends StudentBaseService {
         programRuleMap.computeIfAbsent(graduationProgramCode, k -> restUtils.getGradProgramRules(graduationProgramCode, accessToken));
 
         List<ProgramRequirement> rules = programRuleMap.get(graduationProgramCode);
-        ProgramRequirement result = rules.stream()
+        return rules.stream()
                 .filter(pr -> pr.getProgramRequirementCode().getTraxReqNumber().compareTo(foundationReq) == 0)
                 .findAny()
                 .orElse(null);
-
-        return result;
     }
 
     public SpecialCase lookupSpecialCase(String specialCaseLabel, String accessToken) {

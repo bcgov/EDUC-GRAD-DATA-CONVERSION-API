@@ -1108,12 +1108,12 @@ public class StudentServiceWithMockRepositoryTest {
         var result = studentService.loadStudentData(pen, "123");
         assertThat(result).isNotNull();
         assertThat(result.getStudentID()).isEqualTo(studentID);
-        assertThat(result.getProgramCodes().isEmpty()).isFalse();
-        assertThat(result.getProgramCodes().size()).isEqualTo(2);
-        assertThat(result.getCourses().isEmpty()).isFalse();
-        assertThat(result.getCourses().size()).isEqualTo(1);
-        assertThat(result.getAssessments().isEmpty()).isFalse();
-        assertThat(result.getAssessments().size()).isEqualTo(1);
+        assertThat(result.getProgramCodes()).isNotEmpty();
+        assertThat(result.getProgramCodes()).hasSize(2);
+        assertThat(result.getCourses()).isNotEmpty();
+        assertThat(result.getCourses()).hasSize(1);
+        assertThat(result.getAssessments()).isNotEmpty();
+        assertThat(result.getAssessments()).hasSize(1);
     }
 
 
