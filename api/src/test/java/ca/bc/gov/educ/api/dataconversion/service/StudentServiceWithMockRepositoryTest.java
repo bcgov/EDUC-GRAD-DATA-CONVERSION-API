@@ -32,6 +32,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -846,6 +847,156 @@ public class StudentServiceWithMockRepositoryTest {
         assertThat(result.getRecalculateGradStatus()).isNull();
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
+    }
+
+    @Test
+    public void testAddStudentCareerProgram() {
+        UUID studentID = UUID.randomUUID();
+        String careerProgramCode = "XC";
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+
+        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.empty());
+
+        boolean exceptionIsThrown = false;
+        try {
+            this.studentService.addStudentCareerProgram(careerProgramCode, requestStudent);
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
+    public void testRemoveStudentCareerProgram() {
+        UUID studentID = UUID.randomUUID();
+        String careerProgramCode = "XC";
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+
+        StudentCareerProgramEntity studentCareerProgram = new StudentCareerProgramEntity();
+        studentCareerProgram.setCareerProgramCode(careerProgramCode);
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setId(UUID.randomUUID());
+
+        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.of(studentCareerProgram));
+
+        boolean exceptionIsThrown = false;
+        try {
+            this.studentService.removeStudentCareerProgram(careerProgramCode, requestStudent);
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
+    public void testExistCareerProgram() {
+        UUID studentID = UUID.randomUUID();
+        String careerProgramCode = "XC";
+
+        StudentCareerProgramEntity studentCareerProgram = new StudentCareerProgramEntity();
+        studentCareerProgram.setCareerProgramCode(careerProgramCode);
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setId(UUID.randomUUID());
+
+        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgram));
+
+        var result = this.studentService.existsCareerProgram(studentID);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void testAddStudentOptionalProgram() {
+        String program = "2018-EN";
+
+        UUID studentID = UUID.randomUUID();
+        String optionalProgramCode = "FI";
+
+        OptionalProgram optionalProgram = new OptionalProgram();
+        optionalProgram.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram.setOptProgramCode(optionalProgramCode);
+        optionalProgram.setOptionalProgramName("French Immersion");
+        optionalProgram.setGraduationProgramCode(program);
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+        requestStudent.setProgram(program);
+
+        when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
+        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.empty());
+
+        boolean exceptionIsThrown = false;
+        try {
+            this.studentService.addStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
+    public void testRemoveStudentOptionalProgram() {
+        String program = "2018-EN";
+
+        UUID studentID = UUID.randomUUID();
+        String optionalProgramCode = "FI";
+
+        OptionalProgram optionalProgram = new OptionalProgram();
+        optionalProgram.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram.setOptProgramCode(optionalProgramCode);
+        optionalProgram.setOptionalProgramName("French Immersion");
+        optionalProgram.setGraduationProgramCode(program);
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+        requestStudent.setProgram(program);
+
+        StudentOptionalProgramEntity studentOptionalProgramEntity = new StudentOptionalProgramEntity();
+        studentOptionalProgramEntity.setOptionalProgramID(optionalProgram.getOptionalProgramID());
+        studentOptionalProgramEntity.setStudentID(studentID);
+        studentOptionalProgramEntity.setId(UUID.randomUUID());
+
+        when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
+        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.of(studentOptionalProgramEntity));
+
+        boolean exceptionIsThrown = false;
+        try {
+            this.studentService.removeStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
+    public void testSaveGraduationStudent() {
+        String program = "2018-EN";
+
+        UUID studentID = UUID.randomUUID();
+
+        GraduationStudentRecordEntity graduationStudentRecordEntity = new GraduationStudentRecordEntity();
+        graduationStudentRecordEntity.setStudentID(studentID);
+        graduationStudentRecordEntity.setProgram(program);
+        graduationStudentRecordEntity.setStudentGrade("12");
+        graduationStudentRecordEntity.setStudentStatus("A");
+        graduationStudentRecordEntity.setSchoolOfRecord("222336");
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(graduationStudentRecordEntity));
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+        requestStudent.setProgram(program);
+
+        boolean exceptionIsThrown = false;
+        try {
+            this.studentService.saveGraduationStudent(requestStudent, "accessToken");
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
     }
 
 }
