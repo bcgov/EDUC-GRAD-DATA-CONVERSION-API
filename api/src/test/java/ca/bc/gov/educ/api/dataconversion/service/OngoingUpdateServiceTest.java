@@ -19,10 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -898,5 +895,4 @@ public class OngoingUpdateServiceTest {
         assertThat(event).isNotNull();
         assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
     }
-
 }

@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.SpecialCase;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
+import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.student.ReportService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
@@ -32,7 +33,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -64,6 +64,9 @@ public class StudentServiceWithMockRepositoryTest {
 
     @MockBean
     CourseService courseService;
+
+    @MockBean
+    AssessmentService assessmentService;
 
     @MockBean
     ReportService reportService;
@@ -592,20 +595,7 @@ public class StudentServiceWithMockRepositoryTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-//        // Graduation Data
-//        GraduationData graduationData = studentService.buildGraduationData(student, gradStudentEntity, penStudent, summary);
-//        // Report Data
-//        ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData gradDataForReport = new ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData();
-//        BeanUtils.copyProperties(graduationData, gradDataForReport);
-//
-//        ReportData reportData = new ReportData();
-//        reportData.setGraduationData(gradDataForReport);
-//        // Transcript
-//        Transcript transcript = new Transcript();
-//        reportData.setTranscript(transcript);
-
         when(this.reportService.prepareTranscriptData(any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
-//        doNothing().when(this.reportService).saveStudentTranscriptReportJasper(any(), eq(summary.getAccessToken()), studentID, true);
 
         var result = studentService.convertStudent(student, summary);
 
@@ -825,20 +815,7 @@ public class StudentServiceWithMockRepositoryTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-//        // Graduation Data
-//        GraduationData graduationData = studentService.buildGraduationData(student, gradStudentEntity, penStudent, summary);
-//        // Report Data
-//        ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData gradDataForReport = new ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData();
-//        BeanUtils.copyProperties(graduationData, gradDataForReport);
-//
-//        ReportData reportData = new ReportData();
-//        reportData.setGraduationData(gradDataForReport);
-//        // Transcript
-//        Transcript transcript = new Transcript();
-//        reportData.setTranscript(transcript);
-
         when(this.reportService.prepareTranscriptData(any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
-//        doNothing().when(this.reportService).saveStudentTranscriptReportJasper(any(), eq(summary.getAccessToken()), studentID, true);
 
         var result = studentService.convertStudent(student, summary);
 
@@ -861,7 +838,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         boolean exceptionIsThrown = false;
         try {
-            this.studentService.addStudentCareerProgram(careerProgramCode, requestStudent);
+            studentService.addStudentCareerProgram(careerProgramCode, requestStudent);
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -885,7 +862,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         boolean exceptionIsThrown = false;
         try {
-            this.studentService.removeStudentCareerProgram(careerProgramCode, requestStudent);
+            studentService.removeStudentCareerProgram(careerProgramCode, requestStudent);
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -904,7 +881,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgram));
 
-        var result = this.studentService.existsCareerProgram(studentID);
+        var result = studentService.existsCareerProgram(studentID);
         assertThat(result).isTrue();
     }
 
@@ -930,7 +907,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         boolean exceptionIsThrown = false;
         try {
-            this.studentService.addStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+            studentService.addStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -964,7 +941,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         boolean exceptionIsThrown = false;
         try {
-            this.studentService.removeStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+            studentService.removeStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -972,7 +949,7 @@ public class StudentServiceWithMockRepositoryTest {
     }
 
     @Test
-    public void testSaveGraduationStudent() {
+    public void testSaveGraduationStudent_whenENisChangedToPF_then_returnAPICallSuccess() {
         String program = "2018-EN";
 
         UUID studentID = UUID.randomUUID();
@@ -980,7 +957,7 @@ public class StudentServiceWithMockRepositoryTest {
         GraduationStudentRecordEntity graduationStudentRecordEntity = new GraduationStudentRecordEntity();
         graduationStudentRecordEntity.setStudentID(studentID);
         graduationStudentRecordEntity.setProgram(program);
-        graduationStudentRecordEntity.setStudentGrade("12");
+        graduationStudentRecordEntity.setStudentGrade("11");
         graduationStudentRecordEntity.setStudentStatus("A");
         graduationStudentRecordEntity.setSchoolOfRecord("222336");
 
@@ -989,14 +966,155 @@ public class StudentServiceWithMockRepositoryTest {
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
         requestStudent.setProgram(program);
+        requestStudent.setNewProgram("2018-PF");
+        requestStudent.setNewStudentGrade("12");
+        requestStudent.setNewSchoolOfRecord("333456");
+        requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setAddDualDogwood(true);
 
         boolean exceptionIsThrown = false;
         try {
-            this.studentService.saveGraduationStudent(requestStudent, "accessToken");
+            studentService.saveGraduationStudent(requestStudent, "accessToken");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
         assertThat(exceptionIsThrown).isFalse();
     }
+
+    @Test
+    public void testSaveGraduationStudent_whenPFisChangedToEN_then_returnAPICallSuccess() {
+        String program = "2018-PF";
+
+        UUID studentID = UUID.randomUUID();
+
+        GraduationStudentRecordEntity graduationStudentRecordEntity = new GraduationStudentRecordEntity();
+        graduationStudentRecordEntity.setStudentID(studentID);
+        graduationStudentRecordEntity.setProgram(program);
+        graduationStudentRecordEntity.setStudentGrade("11");
+        graduationStudentRecordEntity.setStudentStatus("A");
+        graduationStudentRecordEntity.setSchoolOfRecord("222336");
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(graduationStudentRecordEntity));
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+        requestStudent.setProgram(program);
+        requestStudent.setNewProgram("2018-EN");
+        requestStudent.setNewStudentGrade("12");
+        requestStudent.setNewSchoolOfRecord("333456");
+        requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setDeleteDualDogwood(true);
+
+        boolean exceptionIsThrown = false;
+        try {
+            studentService.saveGraduationStudent(requestStudent, "accessToken");
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
+    public void testLoadStudentData_whenPENStudentAPIisDown_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenThrow(IllegalArgumentException.class);
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenPENStudentIsNotFound_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_withGivenData_returnsStudentGradDTO_withAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("2018-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
+        gradStudentEntity.setHonoursStanding("Y");
+        gradStudentEntity.setSchoolAtGrad(mincode);
+        gradStudentEntity.setSchoolOfRecord(mincode);
+        gradStudentEntity.setEnglishCert("E");
+        gradStudentEntity.setFrenchCert("F");
+        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+
+        StudentOptionalProgramEntity studentOptionalProgramEntity = new StudentOptionalProgramEntity();
+        studentOptionalProgramEntity.setStudentID(studentID);
+        studentOptionalProgramEntity.setPen(pen);
+        studentOptionalProgramEntity.setOptionalProgramID(UUID.randomUUID());
+        studentOptionalProgramEntity.setStudentID(UUID.randomUUID());
+
+        OptionalProgram optionalProgram = new OptionalProgram();
+        optionalProgram.setOptionalProgramID(studentOptionalProgramEntity.getOptionalProgramID());
+        optionalProgram.setOptProgramCode("FI");
+        optionalProgram.setOptionalProgramName("French Immersion");
+
+        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        studentCareerProgramEntity.setStudentID(studentID);
+        studentCareerProgramEntity.setCareerProgramCode("XC");
+        studentCareerProgramEntity.setId(UUID.randomUUID());
+
+        StudentCourse studentCourse = new StudentCourse();
+        studentCourse.setPen(pen);
+        studentCourse.setCourseCode("TestCourse");
+        studentCourse.setCourseLevel("12");
+        studentCourse.setCredits(Integer.valueOf("4"));
+
+        StudentAssessment studentAssessment = new StudentAssessment();
+        studentAssessment.setPen(pen);
+        studentAssessment.setAssessmentCode("TestAssmt");
+        studentAssessment.setAssessmentName("Test Assessment");
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        when(this.restUtils.getOptionalProgramByID(optionalProgram.getOptionalProgramID(), "123")).thenReturn(optionalProgram);
+        when(this.studentOptionalProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentOptionalProgramEntity));
+        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.courseService.getStudentCourses(pen, "123")).thenReturn(Arrays.asList(studentCourse));
+        when(this.assessmentService.getStudentAssessments(pen, "123")).thenReturn(Arrays.asList(studentAssessment));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNotNull();
+        assertThat(result.getStudentID()).isEqualTo(studentID);
+        assertThat(result.getProgramCodes().isEmpty()).isFalse();
+        assertThat(result.getProgramCodes().size()).isEqualTo(2);
+        assertThat(result.getCourses().isEmpty()).isFalse();
+        assertThat(result.getCourses().size()).isEqualTo(1);
+        assertThat(result.getAssessments().isEmpty()).isFalse();
+        assertThat(result.getAssessments().size()).isEqualTo(1);
+    }
+
 
 }

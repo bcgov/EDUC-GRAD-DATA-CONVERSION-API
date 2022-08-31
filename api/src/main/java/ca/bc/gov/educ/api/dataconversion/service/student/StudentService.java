@@ -875,7 +875,7 @@ public class StudentService extends StudentBaseService {
             List<Student> students = restUtils.getStudentsByPen(pen, accessToken);
             penStudent = students.stream().filter(s -> s.getPen().compareTo(pen) == 0).findAny().orElse(null);
         } catch (Exception e) {
-            log.error("PEN Student API is failed: {} ", pen, e.getLocalizedMessage());
+            log.error("PEN Student API is failed for pen[{}] : {} ", pen, e.getLocalizedMessage());
             return null;
         }
 
