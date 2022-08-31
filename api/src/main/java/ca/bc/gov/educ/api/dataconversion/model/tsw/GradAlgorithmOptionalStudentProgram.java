@@ -22,4 +22,5 @@ public class GradAlgorithmOptionalStudentProgram {
     private List<GradRequirement> optionalRequirementsMet;
     private UUID studentID;
     private List<StudentCareerProgram> cpList;
+    private String optionalProgramName;
 }

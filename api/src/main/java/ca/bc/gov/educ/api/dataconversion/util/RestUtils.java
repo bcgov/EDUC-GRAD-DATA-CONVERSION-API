@@ -1,7 +1,13 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.GraduationProgramCode;
+import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
+import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -376,7 +382,7 @@ public class RestUtils {
                 .retrieve().bodyToMono(responseType).block();
     }
 
-    public GraduationProgramCode getGradProgram(String programCode, String accessToken) {
+    public GraduationProgramCode getGradProgramCode(String programCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradProgramUrl(), uri -> uri.path("/{programCode}").build(programCode))
                 .headers(h -> {
@@ -396,5 +402,124 @@ public class RestUtils {
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 })
                 .retrieve().bodyToMono(responseType).block();
+    }
+
+    public School getSchoolGrad(String minCode, String accessToken) {
+        return webClient.get()
+                .uri(String.format(constants.getSchoolByMincode(), minCode))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve()
+                .bodyToMono(School.class).block();
+    }
+
+    public List<ProgramRequirement> getGradProgramRules(String gradProgramCode, String accessToken) {
+        final ParameterizedTypeReference<List<ProgramRequirement>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getGradProgramRulesUrl(),
+                        uri -> uri.queryParam("programCode", gradProgramCode)
+                                .build())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<SpecialCase> getAllSpecialCases(String accessToken) {
+        final ParameterizedTypeReference<List<SpecialCase>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(constants.getSpecialCase())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public SpecialCase getSpecialCase(String specialCode, String accessToken) {
+        return this.webClient.get()
+                .uri(constants.getSpecialCase(), uri -> uri.path("/{specialCode}").build(specialCode))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(SpecialCase.class).block();
+    }
+
+    public ProgramCertificateTranscript getTranscript(String gradProgram, String mincode, String accessToken) {
+        ProgramCertificateReq req = new ProgramCertificateReq();
+        req.setProgramCode(gradProgram);
+        req.setSchoolCategoryCode(getSchoolCategoryCode(mincode, accessToken));
+        return webClient.post().uri(constants.getTranscript())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
+    }
+
+    public String getSchoolCategoryCode(String mincode, String accessToken) {
+        CommonSchool commonSchoolObj = webClient.get()
+                .uri(constants.getSchoolCategoryCode(), uri -> uri.path("/{mincode}").build(mincode))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(CommonSchool.class).block();
+        if (commonSchoolObj != null) {
+            return commonSchoolObj.getSchoolCategoryCode();
+        }
+        return null;
+    }
+
+    public GradProgram getGradProgram(String gradProgram, String accessToken) {
+        return webClient.get().uri(String.format(constants.getProgramNameEndpoint(), gradProgram))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(GradProgram.class).block();
+    }
+
+    public void saveGradStudentTranscript(GradStudentTranscripts requestObj, boolean isGraduated, String accessToken) {
+        webClient.post().uri(String.format(constants.getUpdateGradStudentTranscript(), isGraduated))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentTranscripts.class).block();
+    }
+
+    public byte[] getTranscriptReport(ReportRequest reportParams, String accessToken) {
+        return webClient.post().uri(constants.getTranscriptReport())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    public List<ProgramCertificateTranscript> getProgramCertificateTranscriptList(ProgramCertificateReq req, String accessToken) {
+        return webClient.post().uri(constants.getCertList())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
+                }).block();
+    }
+
+    public void saveGradStudentCertificate(GradStudentCertificates requestObj, String accessToken) {
+        webClient.post().uri(constants.getUpdateGradStudentCertificate())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
+    }
+
+    public byte[] getCertificateReport(ReportRequest reportParams, String accessToken) {
+        return webClient.post().uri(constants.getCertificateReport())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
     }
 }

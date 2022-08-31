@@ -17,15 +17,22 @@
             src/main/resources/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/config/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/constant/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/controller/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/choreographer/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/exception/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/model/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/entity/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/mappers/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/listener/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/messaging/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/processor/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/reader/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/writer/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/scheduler/**,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/EducGradDataConversionApplication,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/ChoreographedEventPersistenceService,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/EventHandlerDelegatorService,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/StudentBaseService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/util/**
         </sonar.exclusions>
         <java.version>11</java.version>
@@ -196,6 +203,11 @@
             <groupId>io.nats</groupId>
             <artifactId>jnats</artifactId>
             <version>${nats.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.15</version>
         </dependency>
         <dependency>
             <groupId>org.junit.vintage</groupId>

@@ -19,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.UUID;
 
@@ -44,6 +45,9 @@ public class AssessmentServiceTest {
 
     @Autowired
     GradConversionTestUtils gradConversionTestUtils;
+
+    @MockBean
+    WebClient webClient;
 
     // NATS
     @MockBean

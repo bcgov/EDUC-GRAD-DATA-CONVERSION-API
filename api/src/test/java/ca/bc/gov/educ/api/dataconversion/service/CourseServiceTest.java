@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.*;
 
@@ -38,6 +38,9 @@ public class CourseServiceTest {
 
     @MockBean
     RestUtils restUtils;
+
+    @MockBean
+    WebClient webClient;
 
     @Autowired
     private EducGradDataConversionApiConstants constants;

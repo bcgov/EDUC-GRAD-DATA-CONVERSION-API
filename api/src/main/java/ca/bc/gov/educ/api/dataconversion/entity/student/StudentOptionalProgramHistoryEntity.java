@@ -33,8 +33,9 @@ public class StudentOptionalProgramHistoryEntity extends BaseEntity {
     @Column(name = "OPTIONAL_PROGRAM_ID", nullable = false)
     private UUID optionalProgramID;
     
-    @Lob
-    @Column(name = "PROGRAM_NOTE", columnDefinition="CLOB")
+//    @Lob
+//    @Column(name = "PROGRAM_NOTE", columnDefinition="CLOB")
+    @Transient
     private String studentSpecialProgramData;
 
     @Column(name = "COMPLETION_DATE", nullable = true)

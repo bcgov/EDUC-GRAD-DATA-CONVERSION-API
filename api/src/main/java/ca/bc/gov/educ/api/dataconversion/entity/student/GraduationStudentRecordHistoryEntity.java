@@ -26,8 +26,9 @@ public class GraduationStudentRecordHistoryEntity extends BaseEntity {
 	@Column(name = "HISTORY_ACTIVITY_CODE", nullable = true)
     private String activityCode;
 	
-    @Lob
-    @Column(name = "STUDENT_GRAD_DATA", columnDefinition="CLOB")
+//    @Lob
+//    @Column(name = "STUDENT_GRAD_DATA", columnDefinition="CLOB")
+    @Transient
     private String studentGradData;
 
     @Column(name = "GRADUATION_PROGRAM_CODE", nullable = true)
