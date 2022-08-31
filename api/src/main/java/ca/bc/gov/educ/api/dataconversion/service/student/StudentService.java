@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -516,7 +517,7 @@ public class StudentService extends StudentBaseService {
                 .assessmentName(tswCourse.getCourseName())
                 .sessionDate(tswCourse.getCourseSession())
                 .proficiencyScore(NumberUtils.isCreatable(tswCourse.getFinalPercentage().trim())? Double.parseDouble(tswCourse.getFinalPercentage().trim()) : Double.parseDouble("0.0"))
-                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())? true : false) // TODO : usedForGrad has some credits or not
+                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())? true : false) // usedForGrad has some credits or not
                 .isProjected(false)
                 .isDuplicate(false)
                 .isFailed(false)
@@ -745,14 +746,11 @@ public class StudentService extends StudentBaseService {
         boolean isCareerProgramCreated = false;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
-                if (isOptionalProgramCode(programCode)) {
-                    resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
-                } else {
-                    resultType = createStudentCareerProgram(programCode, student, summary);
-                    if (resultType == ConversionResultType.SUCCESS) {
-                        isCareerProgramCreated = true;
-                    }
+                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, accessToken, summary);
+                if (res.getRight()) {
+                    isCareerProgramCreated = true;
                 }
+                resultType = res.getLeft();
                 if (resultType == ConversionResultType.FAILURE) {
                     break;
                 }
@@ -762,6 +760,20 @@ public class StudentService extends StudentBaseService {
             }
         }
         return resultType;
+    }
+
+    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+        ConversionResultType resultType;
+        boolean isCareerProgramCreated = false;
+        if (isOptionalProgramCode(programCode)) {
+            resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
+        } else {
+            resultType = createStudentCareerProgram(programCode, student, summary);
+            if (resultType == ConversionResultType.SUCCESS) {
+                isCareerProgramCreated = true;
+            }
+        }
+        return Pair.of(resultType, isCareerProgramCreated);
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -1058,19 +1070,15 @@ public class StudentService extends StudentBaseService {
     }
 
     public ProgramRequirement lookupProgramRule(String graduationProgramCode, String foundationReq, String accessToken) {
-        ProgramRequirement result = null;
-        if (!programRuleMap.containsKey(graduationProgramCode)) {
-            List<ProgramRequirement> results = restUtils.getGradProgramRules(graduationProgramCode, accessToken);
-            programRuleMap.put(graduationProgramCode, results);
-        }
+        programRuleMap.computeIfAbsent(graduationProgramCode, k -> restUtils.getGradProgramRules(graduationProgramCode, accessToken));
 
         List<ProgramRequirement> rules = programRuleMap.get(graduationProgramCode);
-        ProgramRequirement tempProgramRule = rules.stream()
+        ProgramRequirement result = rules.stream()
                 .filter(pr -> pr.getProgramRequirementCode().getTraxReqNumber().compareTo(foundationReq) == 0)
                 .findAny()
                 .orElse(null);
 
-        return tempProgramRule;
+        return result;
     }
 
     public SpecialCase lookupSpecialCase(String specialCaseLabel, String accessToken) {

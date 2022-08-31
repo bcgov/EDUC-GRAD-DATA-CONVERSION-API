@@ -34,8 +34,8 @@ import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.openMocks;
-import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -525,11 +525,6 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testGetTranscript_givenValue_returnProgramCertificateTranscript_withAPICallSuccess() {
-
-    }
-
-    @Test
     public void testGetSchoolCategoryCode_givenValue_returnString_withAPICallSuccess() {
         CommonSchool commSch = new CommonSchool();
         commSch.setSchlNo("1231123");
@@ -593,6 +588,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(GradStudentTranscripts.class)).thenReturn(Mono.just(rep));
 
         restUtils.saveGradStudentTranscript(rep, isGraduated, accessToken);
+        verify(this.webClient, times(1)).post();
     }
 
     @Test
