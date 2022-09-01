@@ -5,9 +5,6 @@ import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
-import ca.bc.gov.educ.api.dataconversion.util.ThreadLocalStateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -362,7 +359,7 @@ public class RestUtils {
 
     public Boolean getTranscriptStudentIsGraduated(String pen, String accessToken) {
         return webClient.get()
-                .uri(constants.getTswStudentIsGraduatedByPenUrl(), uri -> uri.path("/{pen}").build(pen))
+                .uri(constants.getTraxStudentIsGraduatedByPenUrl(), uri -> uri.path("/{pen}").build(pen))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());

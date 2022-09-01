@@ -76,7 +76,7 @@ public class StudentServiceTest {
         assertThat(entities).isNotNull();
         assertThat(entities.size()).isGreaterThan(0);
 
-        UUID studentID = UUID.randomUUID();
+        final UUID studentID = UUID.randomUUID();
         System.out.println("Generated StudentID: " + studentID);
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -95,14 +95,13 @@ public class StudentServiceTest {
         assertThat(findAllEntities).isNotNull();
         assertThat(findAllEntities.size()).isGreaterThan(0);
 
-        studentID = findAllEntities.get(0).getStudentID();
+        GraduationStudentRecordEntity result = findAllEntities.stream().filter(st -> st.getStudentID().equals(studentID)).findAny().orElse(null);
+        assertThat(result).isNotNull();
         System.out.println("Found studentID: " + studentID);
 
-        Optional<GraduationStudentRecordEntity> result = graduationStudentRecordRepository.findById(studentID);
         assertThat(result).isNotNull();
-        assertThat(result.isPresent()).isTrue();
-        assertThat(result.get().getStudentID()).isEqualTo(studentID);
-        assertThat(result.get().getRecalculateGradStatus()).isEqualTo("N");
+        assertThat(result.getStudentID()).isEqualTo(studentID);
+        assertThat(result.getRecalculateGradStatus()).isEqualTo("Y");
     }
 
     @Test

@@ -375,7 +375,7 @@ public class RestUtilsTest {
         transcriptStudentDemog.setSchoolName("Test school");
 
         when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getTswStudentIsGraduatedByPenUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersUriMock.uri(eq(this.constants.getTraxStudentIsGraduatedByPenUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
         when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
 

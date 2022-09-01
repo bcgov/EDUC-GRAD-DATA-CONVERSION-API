@@ -69,6 +69,8 @@ public class ConvDbConfig {
         config.setMaximumPoolSize(numberOfPartitions);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
+        config.addDataSourceProperty("socketTimeout", maxLifetime);
+        config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
         System.out.println("==> CONV DB : POOL SIZE = " + numberOfPartitions);
 
