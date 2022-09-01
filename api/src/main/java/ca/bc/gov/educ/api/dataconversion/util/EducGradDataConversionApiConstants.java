@@ -135,6 +135,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-trax-api.student.get-student-master-data.url}")
     private String traxStudentMasterDataByPenUrl;
 
+    @Value("${endpoint.grad-trax-api.student.get-student-graduated-by-pen.url}")
+    private String traxStudentIsGraduatedByPenUrl;
+
     @Value("${endpoint.grad-trax-api.course.get-course-restrictions.url}")
     private String traxCourseRestrictionsUrl;
 
@@ -146,9 +149,6 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-trax-api.tsw.get-tran-demog-by-pen.url}")
     private String tswTranscriptStudentDemogByPenUrl;
-
-    @Value("${endpoint.grad-trax-api.tsw.get-student-graduated-by-pen.url}")
-    private String tswStudentIsGraduatedByPenUrl;
 
     @Value("${endpoint.grad-trax-api.tsw.get-tran-courses-by-pen.url}")
     private String tswTranscriptStudentCoursesByPenUrl;
