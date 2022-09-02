@@ -293,7 +293,7 @@ public class ReportService {
 				}
 				data.setHonorsFlag(StringUtils.equals(graduationDataStatus.getGradStatus().getHonoursStanding(), "Y"));
 			} else {
-				data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
+				data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
 			}
 		}
 
