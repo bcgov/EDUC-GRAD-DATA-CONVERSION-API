@@ -1,5 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -148,5 +150,19 @@ public class EducGradDataConversionApiUtils {
             return null;
         }
     }
-	
+
+    public static Integer getNumberOfCredits(final String credits) {
+        String digits = StringUtils.getDigits(credits);
+        if (StringUtils.isNotBlank(digits) && NumberUtils.isCreatable(digits)) {
+            return Integer.valueOf(digits.trim());
+        }
+        return null;
+    }
+
+    public static Double getPercentage(final String percentage) {
+        if (StringUtils.isNotBlank(percentage) && NumberUtils.isCreatable(percentage)) {
+            return Double.valueOf(percentage.trim());
+        }
+        return null;
+    }
 }

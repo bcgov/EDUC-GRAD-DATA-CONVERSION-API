@@ -465,16 +465,16 @@ public class StudentService extends StudentBaseService {
                 .courseCode(tswCourse.getCourseCode())
                 .courseLevel(tswCourse.getCourseLevel())
                 .courseName(tswCourse.getCourseName())
-                .originalCredits(StringUtils.isNotBlank(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits().trim()) : null)
-                .credits(StringUtils.isNotBlank(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits().trim()) : null)
-                .creditsUsedForGrad(StringUtils.isNotBlank(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits().trim()) : null)
+                .originalCredits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
+                .credits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
+                .creditsUsedForGrad(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
                 .sessionDate(tswCourse.getCourseSession())
-                .completedCoursePercentage(StringUtils.isNotBlank(tswCourse.getFinalPercentage())? Double.parseDouble(tswCourse.getFinalPercentage().trim()) : Double.parseDouble("0.0"))
+                .completedCoursePercentage(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
                 .completedCourseLetterGrade(tswCourse.getFinalLG() != null? tswCourse.getFinalLG().trim() : null)
-                .schoolPercent(StringUtils.isNotBlank(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage().trim()) : null)
-                .bestSchoolPercent(StringUtils.isNotBlank(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage().trim()) : null)
-                .examPercent(StringUtils.isNotBlank(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage().trim()) : null)
-                .bestExamPercent(StringUtils.isNotBlank(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage().trim()) : null)
+                .schoolPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getSchoolPercentage()))
+                .bestSchoolPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getSchoolPercentage()))
+                .examPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getExamPercentage()))
+                .bestExamPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getExamPercentage()))
                 .hasRelatedCourse("N")
                 .metLitNumRequirement(tswCourse.getMetLitNumReqt())
                 .relatedCourse(StringUtils.isNotBlank(tswCourse.getRelatedCourse())? tswCourse.getRelatedCourse().trim() : null)
@@ -507,6 +507,11 @@ public class StudentService extends StudentBaseService {
             result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
         }
 
+        // Final Percentage
+        SpecialCase sc = handleSpecialCase(tswCourse.getFinalPercentage(), accessToken);
+        if (sc != null) {
+            result.setSpecialCase(sc.getSpCase());
+        }
         return result;
     }
 
@@ -516,7 +521,7 @@ public class StudentService extends StudentBaseService {
                 .assessmentCode(tswCourse.getCourseCode())
                 .assessmentName(tswCourse.getCourseName())
                 .sessionDate(tswCourse.getCourseSession())
-                .proficiencyScore(NumberUtils.isCreatable(tswCourse.getFinalPercentage().trim())? Double.parseDouble(tswCourse.getFinalPercentage().trim()) : Double.parseDouble("0.0"))
+                .proficiencyScore(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
                 .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())) // usedForGrad has some credits or not
                 .isProjected(false)
                 .isDuplicate(false)
@@ -539,15 +544,22 @@ public class StudentService extends StudentBaseService {
             }
         }
 
-        if (StringUtils.isNotBlank(tswCourse.getFinalPercentage()) && !NumberUtils.isCreatable(tswCourse.getFinalPercentage().trim())) {
-            // SpecialCase
-            SpecialCase sc = lookupSpecialCase(tswCourse.getFinalPercentage().trim(), accessToken);
-            if (sc != null) {
-                result.setSpecialCase(sc.getSpCase());
-            }
+        // Final Percentage
+        SpecialCase sc = handleSpecialCase(tswCourse.getFinalPercentage(), accessToken);
+        if (sc != null) {
+            result.setSpecialCase(sc.getSpCase());
         }
-
         return result;
+    }
+
+    // SpecialCase
+    private SpecialCase handleSpecialCase(String percentage, String accessToken) {
+        if (StringUtils.isNotBlank(percentage)
+                && !NumberUtils.isCreatable(percentage.trim())
+                && !StringUtils.equals(percentage.trim(), "---")) {
+            return lookupSpecialCase(percentage.trim(), accessToken);
+        }
+        return null;
     }
 
 
@@ -1074,7 +1086,7 @@ public class StudentService extends StudentBaseService {
 
         List<ProgramRequirement> rules = programRuleMap.get(graduationProgramCode);
         return rules.stream()
-                .filter(pr -> pr.getProgramRequirementCode().getTraxReqNumber().compareTo(foundationReq) == 0)
+                .filter(pr -> StringUtils.equals(pr.getProgramRequirementCode().getTraxReqNumber(), foundationReq))
                 .findAny()
                 .orElse(null);
     }

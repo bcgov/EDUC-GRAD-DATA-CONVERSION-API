@@ -111,6 +111,7 @@ public class StudentBaseService {
                 }
                 break;
             case "1996":
+            case "1995":
                 if (schoolOfRecord.startsWith("093") &&
                     (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {
                     gradProgram = "1996-PF";
