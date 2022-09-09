@@ -4,7 +4,7 @@ spring:
     enabled: false
   db-connection:
     url: ${CONNECTION_STRING}
-    driver-class: oracle.jdbc.OracleDriver
+    driver-class: oracle.jdbc.driver.OracleDriver
     hikari:
       maximum-pool-size: ${MAXIMUM_POOL_SIZE}
       connection-timeout: ${CONNECTION_TIMEOUT}
@@ -155,8 +155,12 @@ endpoint:
       url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
     programs:
       url: ${GRAD_PROGRAM_API}api/v1/program/programs
+    program-rules:
+      url: ${GRAD_PROGRAM_API}api/v1/program/programrules
     program-rules-by-trax:
       url: ${GRAD_PROGRAM_API}api/v1/program/programrules/by-trax
+    program_name_by_program_code:
+      url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
@@ -177,6 +181,8 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/student-master
       save-trax-student-no:
         url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no
+      get-student-graduated-by-pen:
+        url: ${GRAD_TRAX_API}api/v1/trax/common/student/graduated
     course:
       get-course-restrictions:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
@@ -185,13 +191,31 @@ endpoint:
     school:
       check-school-by-mincode:
         url: ${GRAD_TRAX_API}api/v1/trax/school/check
+      school-by-min-code:
+        url: ${GRAD_TRAX_API}api/v1/trax/school/%s
     tsw:
       get-tran-demog-by-pen:
         url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-demog
-      get-student-graduated-by-pen:
-        url: ${GRAD_TRAX_API}api/vi1/trax/tsw/student
       get-tran-courses-by-pen:
         url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-courses
+  grad-graduation-report-api:
+    get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
+    update-grad-student-transcript:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
+    get-cert-list: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programcertificates
+    update-grad-student-certificate:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentcertificate
+    update-grad-student-report:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
+  educ-school-api:
+    url: ${EDUC_SCHOOL_API}api/v1/schools
+  grad-student-graduation-api:
+    get-special-cases:
+      url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase
+  report-api:
+    transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
+    certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
+    achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
 
 #Conversion option
 data-conversion:

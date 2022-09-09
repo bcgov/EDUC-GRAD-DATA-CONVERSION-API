@@ -1,11 +1,22 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import org.apache.commons.lang3.StringUtils;
 
 public class StudentBaseService {
+
+    protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
+        ConversionAlert error = new ConversionAlert();
+        error.setItem(pen);
+        error.setReason(reason);
+        summary.getErrors().add(error);
+        if (convGradStudent != null) {
+            convGradStudent.setResult(type);
+        }
+    }
 
     protected String getGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
         if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "A")) {
@@ -100,6 +111,7 @@ public class StudentBaseService {
                 }
                 break;
             case "1996":
+            case "1995":
                 if (schoolOfRecord.startsWith("093") &&
                     (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {
                     gradProgram = "1996-PF";

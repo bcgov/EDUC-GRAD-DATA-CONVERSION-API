@@ -59,7 +59,7 @@ public class StudentPartitionReader implements ItemReader<String> {
     public String read() {
         LOGGER.debug("Reading the information of the next student");
 
-        if (indexForStudent % 100 == 0) {
+        if (indexForStudent % 20 == 0) {
             fetchAccessToken();
         }
 

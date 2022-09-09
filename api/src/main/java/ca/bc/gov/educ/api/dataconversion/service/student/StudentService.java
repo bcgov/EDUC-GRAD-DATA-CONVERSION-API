@@ -6,26 +6,27 @@ import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
-import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import ca.bc.gov.educ.api.dataconversion.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
@@ -48,6 +49,17 @@ public class StudentService extends StudentBaseService {
     private final RestUtils restUtils;
     private final AssessmentService assessmentService;
     private final CourseService courseService;
+    private final ReportService reportService;
+
+    /**
+     * The Program Rules map.
+     */
+    private final Map<String, List<ProgramRequirement>> programRuleMap = new ConcurrentHashMap<>();
+
+    /**
+     * The Special Case map.
+     */
+    private final Map<String, SpecialCase> specialCaseMap = new ConcurrentHashMap<>();
 
     @Autowired
     public StudentService(GraduationStudentRecordRepository graduationStudentRecordRepository,
@@ -58,7 +70,8 @@ public class StudentService extends StudentBaseService {
                           EducGradDataConversionApiConstants constants,
                           RestUtils restUtils,
                           AssessmentService assessmentService,
-                          CourseService courseService) {
+                          CourseService courseService,
+                          ReportService reportService) {
         this.graduationStudentRecordRepository = graduationStudentRecordRepository;
         this.studentOptionalProgramRepository = studentOptionalProgramRepository;
         this.studentCareerProgramRepository = studentCareerProgramRepository;
@@ -68,6 +81,12 @@ public class StudentService extends StudentBaseService {
         this.restUtils = restUtils;
         this.assessmentService = assessmentService;
         this.courseService = courseService;
+        this.reportService = reportService;
+    }
+
+    public void clearMaps() {
+        programRuleMap.clear();
+        specialCaseMap.clear();
     }
 
     @Transactional(transactionManager = "studentTransactionManager")
@@ -81,11 +100,7 @@ public class StudentService extends StudentBaseService {
             if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // Grad Trax API is failed
                 return convGradStudent;
             } else if (!schoolExists) {
-                ConversionAlert error = new ConversionAlert();
-                error.setItem(convGradStudent.getPen());
-                error.setReason("Invalid school of record " + convGradStudent.getSchoolOfRecord());
-                summary.getErrors().add(error);
-                convGradStudent.setResult(ConversionResultType.FAILURE);
+                handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Invalid school of record " + convGradStudent.getSchoolOfRecord());
                 return convGradStudent;
             }
 
@@ -94,11 +109,7 @@ public class StudentService extends StudentBaseService {
             if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // PEN Student API is failed
                 return convGradStudent;
             } else if (students == null || students.isEmpty()) {
-                ConversionAlert error = new ConversionAlert();
-                error.setItem(convGradStudent.getPen());
-                error.setReason("PEN does not exist: PEN Student API returns empty response.");
-                summary.getErrors().add(error);
-                convGradStudent.setResult(ConversionResultType.FAILURE);
+                handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN does not exist: PEN Student API returns empty response.");
                 return convGradStudent;
             }
 
@@ -106,12 +117,7 @@ public class StudentService extends StudentBaseService {
             processStudents(convGradStudent, students, summary, accessToken);
 
         } catch (Exception e) {
-            ConversionAlert error = new ConversionAlert();
-            error.setItem(convGradStudent.getPen());
-            error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
-            summary.getErrors().add(error);
-            convGradStudent.setResult(ConversionResultType.FAILURE);
-
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Unexpected Exception is occurred: " + e.getLocalizedMessage());
         }
         return convGradStudent;
     }
@@ -122,11 +128,7 @@ public class StudentService extends StudentBaseService {
         try {
             schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
         } catch (Exception e) {
-            ConversionAlert error = new ConversionAlert();
-            error.setItem(convGradStudent.getPen());
-            error.setReason(TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
-            summary.getErrors().add(error);
-            convGradStudent.setResult(ConversionResultType.FAILURE);
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
         }
         return schoolExists;
     }
@@ -137,11 +139,7 @@ public class StudentService extends StudentBaseService {
             // Call PEN Student API
             students = restUtils.getStudentsByPen(convGradStudent.getPen(), summary.getAccessToken());
         } catch (Exception e) {
-            ConversionAlert error = new ConversionAlert();
-            error.setItem(convGradStudent.getPen());
-            error.setReason("PEN Student API is failed: " + e.getLocalizedMessage());
-            summary.getErrors().add(error);
-            convGradStudent.setResult(ConversionResultType.FAILURE);
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN Student API is failed: " + e.getLocalizedMessage());
         }
         return students;
     }
@@ -246,10 +244,24 @@ public class StudentService extends StudentBaseService {
                     log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
                 }
             }
-
-            // TODO(sks) : report, transcript, certificate generation & saving
+            if(graduationData != null) {
+                createAndStoreStudentTranscript(graduationData, accessToken);
+                createAndStoreStudentCertificates(graduationData, accessToken);
+            }
         }
         convGradStudent.setResult(result);
+    }
+
+    private void createAndStoreStudentTranscript(GraduationData graduationData,String accessToken) {
+        ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(),accessToken);
+        reportService.saveStudentTranscriptReportJasper(data, accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+    }
+
+    private void createAndStoreStudentCertificates(GraduationData graduationData, String accessToken) {
+        List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,accessToken);
+        for (ProgramCertificateTranscript certType : certificateList) {
+            reportService.saveStudentCertificateReportJasper(graduationData,accessToken, certType);
+        }
     }
 
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
@@ -329,31 +341,31 @@ public class StudentService extends StudentBaseService {
         gradStatus.setSchoolAtGrad(studentEntity.getSchoolAtGrad());
         gradStatus.setHonoursStanding(studentEntity.getHonoursStanding());
         gradStatus.setRecalculateGradStatus(studentEntity.getRecalculateGradStatus());
+        gradStatus.setLastUpdateDate(DateConversionUtils.convertStringToDate(transcriptStudentDemog.getUpdateDate().toString()));
         graduationData.setGradStatus(gradStatus);
 
+        // school
+        School school = restUtils.getSchoolGrad(transcriptStudentDemog.getMincode(), summary.getAccessToken());
+        graduationData.setSchool(school);
+
         // graduated Student
-        GradSearchStudent gradStudent = populateGraduateStudentInfo(studentEntity, penStudent, transcriptStudentDemog);
+        GradSearchStudent gradStudent = populateGraduateStudentInfo(studentEntity, penStudent, school);
         graduationData.setGradStudent(gradStudent);
 
         // TSW_TRAN_CRSE
         List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
 
-        // school
-        // TODO (sks) : replace this with getting School object from Trax API
-        School school = new School();
-        school.setMinCode(transcriptStudentDemog.getMincode());
-        school.setSchoolName(transcriptStudentDemog.getSchoolName());
-        school.setAddress1(transcriptStudentDemog.getAddress1());
-        school.setCity(transcriptStudentDemog.getCity());
-        school.setProvCode(transcriptStudentDemog.getProvCode());
-        school.setPostal(transcriptStudentDemog.getPostal());
-        graduationData.setSchool(school);
-
         // studentCourses
-        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList = buildStudentCourses(transcriptStudentCourses);
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList = buildStudentCourses(transcriptStudentCourses.stream().filter(c -> !c.getReportType().equals("3")).collect(Collectors.toList()), studentEntity.getProgram(), summary.getAccessToken());
         StudentCourses studentCourses = new StudentCourses();
         studentCourses.setStudentCourseList(studentCourseList);
         graduationData.setStudentCourses(studentCourses);
+
+        // studentAssessments
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessmentList = buildStudentAssessments(transcriptStudentCourses.stream().filter(c -> c.getReportType().equals("3")).collect(Collectors.toList()), studentEntity.getProgram(), summary.getAccessToken());
+        StudentAssessments studentAssessments = new StudentAssessments();
+        studentAssessments.setStudentAssessmentList(studentAssessmentList);
+        graduationData.setStudentAssessments(studentAssessments);
 
         // optionalGradStatus
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = buildOptionalGradStatus(studentEntity, studentCourseList, summary);
@@ -378,7 +390,9 @@ public class StudentService extends StudentBaseService {
         return graduationData;
     }
 
-    private GradSearchStudent populateGraduateStudentInfo(GraduationStudentRecordEntity studentEntity, Student penStudent, TranscriptStudentDemog transcriptStudentDemog ) {
+    private GradSearchStudent populateGraduateStudentInfo(GraduationStudentRecordEntity studentEntity,
+                                                          Student penStudent,
+                                                          School school) {
         GradSearchStudent gradSearchStudent = GradSearchStudent.builder()
                 .studentID(penStudent.getStudentID())
                 .pen(penStudent.getPen())
@@ -408,10 +422,9 @@ public class StudentService extends StudentBaseService {
         gradSearchStudent.setProgram(studentEntity.getProgram());
         gradSearchStudent.setStudentGrade(studentEntity.getStudentGrade());
         gradSearchStudent.setStudentStatus(studentEntity.getStudentStatus());
-        // TODO (sks) : replace this with getting School object from Trax API
-        gradSearchStudent.setSchoolOfRecord(studentEntity.getSchoolOfRecord());
-        gradSearchStudent.setSchoolOfRecordName(transcriptStudentDemog.getSchoolName());
-        gradSearchStudent.setSchoolOfRecordindependentAffiliation(null);
+        gradSearchStudent.setSchoolOfRecord(school.getMinCode());
+        gradSearchStudent.setSchoolOfRecordName(school.getSchoolName());
+        gradSearchStudent.setSchoolOfRecordindependentAffiliation(school.getIndependentAffiliation());
 
         return gradSearchStudent;
     }
@@ -426,41 +439,51 @@ public class StudentService extends StudentBaseService {
         return courses;
     }
 
-    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse) {
+    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse, String graduationProgramCode, String accessToken) {
         List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourses = new ArrayList<>();
         for (TranscriptStudentCourse tswCourse : tswStudentCourse) {
-            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse studentCourse = populateStudentCourse(tswCourse);
+            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse studentCourse = populateStudentCourse(tswCourse, graduationProgramCode, accessToken);
             studentCourses.add(studentCourse);
         }
 
         return studentCourses;
     }
 
-    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse populateStudentCourse(TranscriptStudentCourse tswCourse) {
-        return ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse.builder()
+    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> buildStudentAssessments(List<TranscriptStudentCourse> tswStudentCourse, String graduationProgramCode, String accessToken) {
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessments = new ArrayList<>();
+        for (TranscriptStudentCourse tswCourse : tswStudentCourse) {
+            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment studentAssessment = populateStudentAssessment(tswCourse, graduationProgramCode, accessToken);
+            studentAssessments.add(studentAssessment);
+        }
+
+        return studentAssessments;
+    }
+
+    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse populateStudentCourse(TranscriptStudentCourse tswCourse, String graduationProgramCode, String accessToken) {
+        ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse result = ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse.builder()
                 .pen(tswCourse.getStudNo())
                 .courseCode(tswCourse.getCourseCode())
                 .courseLevel(tswCourse.getCourseLevel())
                 .courseName(tswCourse.getCourseName())
-                .originalCredits(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
-                .credits(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
-                .creditsUsedForGrad(NumberUtils.isCreatable(tswCourse.getNumberOfCredits())? Integer.parseInt(tswCourse.getNumberOfCredits()) : null)
+                .originalCredits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
+                .credits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
+                .creditsUsedForGrad(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
                 .sessionDate(tswCourse.getCourseSession())
-                .completedCoursePercentage(NumberUtils.isCreatable(tswCourse.getFinalPercentage())? Double.parseDouble(tswCourse.getFinalPercentage()) : Double.parseDouble("0.0"))
-                .completedCourseLetterGrade(tswCourse.getFinalLG())
-                .schoolPercent(NumberUtils.isCreatable(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage()) : null)
-                .bestSchoolPercent(NumberUtils.isCreatable(tswCourse.getSchoolPercentage())? Double.parseDouble(tswCourse.getSchoolPercentage()) : null)
-                .examPercent(NumberUtils.isCreatable(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage()) : null)
-                .bestExamPercent(NumberUtils.isCreatable(tswCourse.getExamPercentage())? Double.parseDouble(tswCourse.getExamPercentage()) : null)
+                .completedCoursePercentage(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
+                .completedCourseLetterGrade(tswCourse.getFinalLG() != null? tswCourse.getFinalLG().trim() : null)
+                .schoolPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getSchoolPercentage()))
+                .bestSchoolPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getSchoolPercentage()))
+                .examPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getExamPercentage()))
+                .bestExamPercent(EducGradDataConversionApiUtils.getPercentage(tswCourse.getExamPercentage()))
                 .hasRelatedCourse("N")
                 .metLitNumRequirement(tswCourse.getMetLitNumReqt())
-                .gradReqMet("") // TODO
-                .gradReqMetDetail("") // TODO
-                .hasRelatedCourse("N") // TODO
-                .genericCourseType("") //
-                .specialCase("N")
-                .provExamCourse("N") // TODO
-                .isUsed(false) // TODO
+                .relatedCourse(StringUtils.isNotBlank(tswCourse.getRelatedCourse())? tswCourse.getRelatedCourse().trim() : null)
+                .relatedLevel(StringUtils.isNotBlank(tswCourse.getRelatedCourseLevel())? tswCourse.getRelatedCourseLevel().trim() : null)
+                .hasRelatedCourse(StringUtils.isNotBlank(tswCourse.getRelatedCourse())? "Y" : "N")
+                //.genericCourseType("") // tsw course name is used
+                //.relatedCourseName("")// tsw course name is used
+                .provExamCourse(StringUtils.equals(tswCourse.getReportType(), "1")? "Y" : "N")
+                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad()))
                 .isProjected(false)
                 .isRestricted(false)
                 .isDuplicate(false)
@@ -476,6 +499,75 @@ public class StudentService extends StudentBaseService {
                 .isIndependentDirectedStudies(false)
                 .isCutOffCourse(false)
             .build();
+
+        ProgramRequirement rule = getProgramRequirement(graduationProgramCode, tswCourse.getFoundationReq(), accessToken);
+        if (rule != null) {
+            // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
+            result.setGradReqMet(tswCourse.getFoundationReq());
+            result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
+        }
+
+        // Final Percentage
+        SpecialCase sc = handleSpecialCase(tswCourse.getFinalPercentage(), accessToken);
+        if (sc != null) {
+            result.setSpecialCase(sc.getSpCase());
+        }
+        return result;
+    }
+
+    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment populateStudentAssessment(TranscriptStudentCourse tswCourse, String graduationProgramCode, String accessToken) {
+        ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment result = ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment.builder()
+                .pen(tswCourse.getStudNo())
+                .assessmentCode(tswCourse.getCourseCode())
+                .assessmentName(tswCourse.getCourseName())
+                .sessionDate(tswCourse.getCourseSession())
+                .proficiencyScore(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
+                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())) // usedForGrad has some credits or not
+                .isProjected(false)
+                .isDuplicate(false)
+                .isFailed(false)
+                .isNotCompleted(false)
+            .build();
+
+        ProgramRequirement rule = getProgramRequirement(graduationProgramCode, tswCourse.getFoundationReq(), accessToken);
+        if (rule != null) {
+            // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
+            result.setGradReqMet(tswCourse.getFoundationReq());
+            result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
+        }
+
+        if (StringUtils.isNotBlank(tswCourse.getSpecialCase())) {
+            // SpecialCase
+            SpecialCase sc = lookupSpecialCase(tswCourse.getSpecialCase().trim(), accessToken);
+            if (sc != null) {
+                result.setSpecialCase(sc.getSpCase());
+            }
+        }
+
+        // Final Percentage
+        SpecialCase sc = handleSpecialCase(tswCourse.getFinalPercentage(), accessToken);
+        if (sc != null) {
+            result.setSpecialCase(sc.getSpCase());
+        }
+        return result;
+    }
+
+    // SpecialCase
+    private SpecialCase handleSpecialCase(String percentage, String accessToken) {
+        if (StringUtils.isNotBlank(percentage)
+                && !NumberUtils.isCreatable(percentage.trim())
+                && !StringUtils.equals(percentage.trim(), "---")) {
+            return lookupSpecialCase(percentage.trim(), accessToken);
+        }
+        return null;
+    }
+
+
+    private ProgramRequirement getProgramRequirement(String graduationProgramCode, String foundationReq, String accessToken) {
+        if (StringUtils.isBlank(graduationProgramCode) || StringUtils.isBlank(foundationReq)) {
+            return null;
+        }
+        return lookupProgramRule(graduationProgramCode, foundationReq, accessToken);
     }
 
     private List<GradAlgorithmOptionalStudentProgram> buildOptionalGradStatus(GraduationStudentRecordEntity studentEntity,
@@ -508,7 +600,8 @@ public class StudentService extends StudentBaseService {
                 result.setOptionalRequirementsMet(new ArrayList<>());
                 result.setStudentID(entity.getStudentID());
                 result.setCpList(buildStudentCareerProgramList(entity, accessToken));
-                result.setOptionalGraduated(false); // TODO
+                result.setOptionalProgramName(optionalProgram.getOptionalProgramName());
+                result.setOptionalGraduated(true);
             }
         } catch (Exception e) {
             log.error("Program API is failed to get OptionalProgram! : " + e.getLocalizedMessage());
@@ -585,7 +678,7 @@ public class StudentService extends StudentBaseService {
     private GraduationProgramCode retrieveGradProgram(String programCode, String accessToken) {
         GraduationProgramCode program = null;
         try {
-            program = restUtils.getGradProgram(programCode, accessToken);
+            program = restUtils.getGradProgramCode(programCode, accessToken);
         } catch (Exception e) {
             log.error("Program API is failed to get Grad Programs! : " + e.getLocalizedMessage());
         }
@@ -639,7 +732,7 @@ public class StudentService extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
-    protected boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
+    public boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
         boolean frenchImmersion = false;
         // French Immersion for 2018-EN, 2004-EN
         if (program.equals("2018-EN") || program.equals("2004-EN")) {
@@ -662,26 +755,37 @@ public class StudentService extends StudentBaseService {
 
     private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType = ConversionResultType.SUCCESS;
-        boolean isCareerProgramCreated = false;
+        Boolean isCareerProgramCreated = Boolean.FALSE;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
-                if (isOptionalProgramCode(programCode)) {
-                    resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
-                } else {
-                    resultType = createStudentCareerProgram(programCode, student, summary);
-                    if (resultType == ConversionResultType.SUCCESS) {
-                        isCareerProgramCreated = true;
-                    }
+                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, accessToken, summary);
+                if (Boolean.TRUE.equals(res.getRight())) {
+                    isCareerProgramCreated = Boolean.TRUE;
                 }
+                resultType = res.getLeft();
                 if (resultType == ConversionResultType.FAILURE) {
                     break;
                 }
             }
-            if (isCareerProgramCreated) {
+            if (Boolean.TRUE.equals(isCareerProgramCreated)) {
                 resultType = createStudentOptionalProgram("CP", student, accessToken, summary);
             }
         }
         return resultType;
+    }
+
+    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+        ConversionResultType resultType;
+        boolean isCareerProgramCreated = false;
+        if (isOptionalProgramCode(programCode)) {
+            resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
+        } else {
+            resultType = createStudentCareerProgram(programCode, student, summary);
+            if (resultType == ConversionResultType.SUCCESS) {
+                isCareerProgramCreated = true;
+            }
+        }
+        return Pair.of(resultType, isCareerProgramCreated);
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -708,11 +812,7 @@ public class StudentService extends StudentBaseService {
         try {
             optionalProgram = restUtils.getOptionalProgram(student.getProgram(), optionalProgramCode, accessToken);
         } catch (Exception e) {
-            ConversionAlert error = new ConversionAlert();
-            error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
-            error.setItem(student.getPen());
-            error.setReason("Grad Program API is failed to retrieve Optional Program [" + optionalProgramCode + "] - " + e.getLocalizedMessage());
-            summary.getErrors().add(error);
+            handleException(null, summary, student.getPen(), ConversionResultType.WARNING, "Grad Program API is failed to retrieve Optional Program [" + optionalProgramCode + "] - " + e.getLocalizedMessage());
             return ConversionResultType.WARNING;
         }
         if (optionalProgram != null && optionalProgram.getOptionalProgramID() != null) {
@@ -743,11 +843,7 @@ public class StudentService extends StudentBaseService {
         try {
             careerProgram = restUtils.getCareerProgram(careerProgramCode, summary.getAccessToken());
         } catch (Exception e) {
-            ConversionAlert error = new ConversionAlert();
-            error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
-            error.setItem(student.getPen());
-            error.setReason("Grad Program API is failed to retrieve Career Program [" + careerProgramCode + "] - " + e.getLocalizedMessage());
-            summary.getErrors().add(error);
+            handleException(null, summary, student.getPen(), ConversionResultType.WARNING, "Grad Program API is failed to retrieve Career Program [" + careerProgramCode + "] - " + e.getLocalizedMessage());
             return ConversionResultType.WARNING;
         }
         if (careerProgram != null) {
@@ -765,11 +861,7 @@ public class StudentService extends StudentBaseService {
             summary.incrementCareerProgram(careerProgramCode);
             return ConversionResultType.SUCCESS;
         } else {
-            ConversionAlert error = new ConversionAlert();
-            error.setLevel(ConversionAlert.AlertLevelEnum.WARNING);
-            error.setItem(student.getPen());
-            error.setReason("Career Program Code does not exist: " + careerProgramCode);
-            summary.getErrors().add(error);
+            handleException(null, summary, student.getPen(), ConversionResultType.WARNING, "Career Program Code does not exist: " + careerProgramCode);
             return ConversionResultType.WARNING;
         }
     }
@@ -800,14 +892,26 @@ public class StudentService extends StudentBaseService {
 
     @Transactional(transactionManager = "studentTransactionManager", readOnly = true)
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
-        byte[] rawGUID = graduationStudentRecordRepository.findStudentID(pen);
-        if (rawGUID == null) {
+        Student penStudent;
+        // PEN Student
+        try {
+            // Call PEN Student API
+            List<Student> students = restUtils.getStudentsByPen(pen, accessToken);
+            penStudent = students.stream().filter(s -> s.getPen().compareTo(pen) == 0).findAny().orElse(null);
+        } catch (Exception e) {
+            log.error("PEN Student API is failed for pen[{}] : {} ", pen, e.getLocalizedMessage());
             return null;
         }
-        ByteBuffer bb = ByteBuffer.wrap(rawGUID);
-        UUID studentID = new UUID(bb.getLong(), bb.getLong());
+
+        if (penStudent == null) {
+            log.error("Pen# [{}] is not found in PEN StudentAPI.", pen);
+            return null;
+        }
+
+        UUID studentID = UUID.fromString(penStudent.getStudentID());
         StudentGradDTO studentData = new StudentGradDTO();
         studentData.setStudentID(studentID);
+
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
             GraduationStudentRecordEntity entity = gradStatusOptional.get();
@@ -817,6 +921,7 @@ public class StudentService extends StudentBaseService {
             studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
             studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
         } else {
+            log.error("GraduationStudentRecord is not found for pen# [{}], studentID [{}]", pen, studentID);
             return null;
         }
 
@@ -922,7 +1027,7 @@ public class StudentService extends StudentBaseService {
     @Transactional(transactionManager = "studentTransactionManager")
     public void addStudentOptionalProgram(UUID optionalProgramID, StudentGradDTO gradStudent) {
         Optional<StudentOptionalProgramEntity> optional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(gradStudent.getStudentID(), optionalProgramID);
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
             entity.setId(UUID.randomUUID());
             entity.setStudentID(gradStudent.getStudentID());
@@ -944,7 +1049,7 @@ public class StudentService extends StudentBaseService {
     @Transactional(transactionManager = "studentTransactionManager")
     public void addStudentCareerProgram(String careerProgramCode, StudentGradDTO gradStudent) {
         Optional<StudentCareerProgramEntity> optional = studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(gradStudent.getStudentID(), careerProgramCode);
-        if (!optional.isPresent()) {
+        if (optional.isEmpty()) {
             StudentCareerProgramEntity entity = new StudentCareerProgramEntity();
             entity.setId(UUID.randomUUID());
             entity.setStudentID(gradStudent.getStudentID());
@@ -976,4 +1081,22 @@ public class StudentService extends StudentBaseService {
         }
     }
 
+    public ProgramRequirement lookupProgramRule(String graduationProgramCode, String foundationReq, String accessToken) {
+        programRuleMap.computeIfAbsent(graduationProgramCode, k -> restUtils.getGradProgramRules(graduationProgramCode, accessToken));
+
+        List<ProgramRequirement> rules = programRuleMap.get(graduationProgramCode);
+        return rules.stream()
+                .filter(pr -> StringUtils.equals(pr.getProgramRequirementCode().getTraxReqNumber(), foundationReq))
+                .findAny()
+                .orElse(null);
+    }
+
+    public SpecialCase lookupSpecialCase(String specialCaseLabel, String accessToken) {
+        if (!specialCaseMap.containsKey(specialCaseLabel)) {
+            List<SpecialCase> results = restUtils.getAllSpecialCases(accessToken);
+            results.forEach(r -> specialCaseMap.put(r.getLabel(), r));
+        }
+
+        return specialCaseMap.get(specialCaseLabel);
+    }
 }

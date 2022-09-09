@@ -67,6 +67,8 @@ public class GradStudentDbConfig {
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
+        config.addDataSourceProperty("socketTimeout", maxLifetime);
+        config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
         System.out.println("==> STUDENT DB : POOL SIZE = " + maxPoolSize);
 
