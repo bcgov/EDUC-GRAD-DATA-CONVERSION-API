@@ -40,23 +40,6 @@ public class JobLauncherController {
         this.jobRegistry = jobRegistry;
     }
 
-    @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB)
-    @Operation(summary = "Initial Load of Students", description = "Loading students from TRAX into GRAD using the list of TRAX_STUDENTS_LOAD", tags = { "Students" })
-    public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionJob( ) {
-        logger.info("Inside Launch Student Data Conversion Job");
-        JobParametersBuilder builder = new JobParametersBuilder();
-        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
-        builder.addString(JOB_PARAM, "studentDataConversionBatchJob");
-        try {
-            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentDataConversionBatchJob"), builder.toJobParameters());
-            ExecutionContext jobContext = jobExecution.getExecutionContext();
-            return ResponseEntity.ok(handleSuccess(jobContext, "studentSummaryDTO"));
-        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
-                | JobParametersInvalidException | NoSuchJobException e) {
-            return ResponseEntity.status(500).body(handleException(e));
-        }
-    }
-
     @GetMapping(EducGradDataConversionApiConstants.GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB)
     @Operation(summary = "Initial Load of Course Restrictions", description = "Loading Course Restrictions from TRAX into GRAD", tags = { "Courses" })
     public ResponseEntity<ConversionBaseSummaryDTO> launchCourseRestrictionDataConversionJob( ) {

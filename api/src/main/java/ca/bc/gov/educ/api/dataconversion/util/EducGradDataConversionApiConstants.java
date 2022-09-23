@@ -18,7 +18,6 @@ public class EducGradDataConversionApiConstants {
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
     // Data Conversion
-    public static final String GRAD_STUDENT_DATA_CONVERSION_BATCH_JOB = "/gradStudent";
     public static final String GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB = "/student/parallel";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
@@ -190,6 +189,10 @@ public class EducGradDataConversionApiConstants {
     // Number of Partitions
     @Value("${batch.partitions.number}")
     private int numberOfPartitions;
+
+    // Token expiry offset (seconds)
+    @Value("${batch.token-expiry.offset}")
+    private int tokenExpiryOffset;
 
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")

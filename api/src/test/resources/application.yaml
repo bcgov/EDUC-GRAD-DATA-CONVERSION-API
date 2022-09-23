@@ -198,6 +198,8 @@ grad:
 batch:
   partitions:
     number: 1
+  token-expiry:
+    offset: 10
 
 #Splunk LogHelper
 splunk:
