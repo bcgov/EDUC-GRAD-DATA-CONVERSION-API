@@ -59,10 +59,7 @@ public class StudentPartitionReader implements ItemReader<String> {
     public String read() {
         LOGGER.debug("Reading the information of the next student");
 
-        if (indexForStudent % 20 == 0) {
-            fetchAccessToken();
-        }
-
+        fetchAccessToken();
         String nextStudent = null;
         
         if (indexForStudent < studentList.size()) {
@@ -76,7 +73,6 @@ public class StudentPartitionReader implements ItemReader<String> {
     }
 
     private void fetchAccessToken() {
-        LOGGER.info("Fetching the access token from KeyCloak API");
         ResponseObj res = restUtils.getTokenResponseObject();
         if (res != null) {
             summaryDTO.setAccessToken(res.getAccess_token());

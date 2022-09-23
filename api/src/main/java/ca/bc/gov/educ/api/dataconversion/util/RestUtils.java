@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,15 +26,27 @@ public class RestUtils {
 
     private final EducGradDataConversionApiConstants constants;
 
+    private ResponseObjCache responseObjCache;
+
     private final WebClient webClient;
 
     @Autowired
-    public RestUtils(final EducGradDataConversionApiConstants constants, final WebClient webClient) {
+    public RestUtils(final EducGradDataConversionApiConstants constants, final WebClient webClient, ResponseObjCache objCache) {
         this.constants = constants;
         this.webClient = webClient;
+        this.responseObjCache = objCache;
     }
 
     public ResponseObj getTokenResponseObject() {
+        if(responseObjCache.isExpired()){
+            responseObjCache.setResponseObj(getTokenResponseObj());
+        }
+        return responseObjCache.getResponseObj();
+    }
+
+    @Retry(name = "rt-getToken", fallbackMethod = "rtGetTokenFallback")
+    private ResponseObj getTokenResponseObj() {
+        log.info("Fetching the access token from KeyCloak API");
         HttpHeaders httpHeadersKC = EducGradDataConversionApiUtils.getHeaders(
                 constants.getUserName(), constants.getPassword());
         MultiValueMap<String, String> map= new LinkedMultiValueMap<>();

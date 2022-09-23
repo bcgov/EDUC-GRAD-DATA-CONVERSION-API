@@ -100,6 +100,17 @@ springdoc:
     path: /api/v1/api-docs-ui.html
     operationsSorter: alpha
 
+#Resilience
+resilience4j.retry:
+  instances:
+    rt-getToken:
+      maxAttempts: 35
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+
 authorization:
   user: ${GRAD_CLIENT_NAME}
   password: ${GRAD_CLIENT_SECRET}
@@ -231,6 +242,8 @@ grad:
 batch:
   partitions:
     number: ${NUMBER_OF_PARTITIONS}
+  token-expiry:
+    offset: ${TOKEN_EXPIRY_OFFSET}
 
 #Splunk LogHelper
 splunk:

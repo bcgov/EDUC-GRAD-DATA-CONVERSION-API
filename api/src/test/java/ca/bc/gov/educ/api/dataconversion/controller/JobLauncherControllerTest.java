@@ -27,17 +27,6 @@ public class JobLauncherControllerTest {
     private JobLauncherController jobLauncherController;
 
     @Test
-    public void testLaunchGradStudent_DataConversionJob_thenReturnError() {
-        boolean exceptionIsThrown = false;
-        try {
-            jobLauncherController.launchStudentDataConversionJob();
-        } catch (Exception e) {
-            exceptionIsThrown = true;
-        }
-        assertThat(exceptionIsThrown).isTrue();
-    }
-
-    @Test
     public void testLaunchGradStudentWithPartitions_DataConversionJob_thenReturnError() {
         boolean exceptionIsThrown = false;
         try {
