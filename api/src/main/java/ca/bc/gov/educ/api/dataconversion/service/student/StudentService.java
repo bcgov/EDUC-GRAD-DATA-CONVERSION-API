@@ -153,7 +153,7 @@ public class StudentService extends StudentBaseService {
         students.forEach(st -> {
             GraduationStudentRecordEntity gradStudentEntity = processStudent(convGradStudent, st, summary);
             if (gradStudentEntity != null) {
-                processDedendencies(gradStudentEntity.getStudentID(), convGradStudent, gradStudentEntity, st, summary, accessToken);
+                processDependencies(gradStudentEntity.getStudentID(), convGradStudent, gradStudentEntity, st, summary, accessToken);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -203,7 +203,7 @@ public class StudentService extends StudentBaseService {
         }
     }
 
-    private void processDedendencies(UUID studentID,
+    private void processDependencies(UUID studentID,
                                      ConvGradStudent convGradStudent,
                                      GraduationStudentRecordEntity gradStudentEntity,
                                      Student penStudent,

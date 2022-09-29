@@ -32,11 +32,6 @@ public class BatchJobConfig {
     JobRegistry jobRegistry;
 
     @Bean
-    public ItemReader<ConvGradStudent> studentReader(RestUtils restUtils) {
-        return new DataConversionStudentReader(restUtils);
-    }
-
-    @Bean
     public ItemReader<CourseRestriction> courseRestrictionReader(RestUtils restUtils) {
         return new DataConversionCourseRestrictionReader(restUtils);
     }
@@ -47,11 +42,6 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public ItemWriter<ConvGradStudent> studentWriter() {
-        return new DataConversionStudentWriter();
-    }
-
-    @Bean
     public ItemWriter<CourseRestriction> courseRestrictionWriter() {
         return new DataConversionCourseRestrictionWriter();
     }
@@ -59,11 +49,6 @@ public class BatchJobConfig {
     @Bean
     public ItemWriter<GradCourse> courseRequirementWriter() {
         return new DataConversionCourseRequirementWriter();
-    }
-
-    @Bean
-    public ItemProcessor<ConvGradStudent,ConvGradStudent> studentProcessor() {
-        return new DataConversionStudentProcessor();
     }
 
     @Bean
@@ -84,37 +69,6 @@ public class BatchJobConfig {
     @Bean
     public CourseRequirementCreator courseRequirementCreator() {
         return new CourseRequirementCreator();
-    }
-
-    /**
-    * Creates a bean that represents the only steps of our batch job.
-    */
-    @Bean
-    public Step studentDataConversionJobStep(ItemReader<ConvGradStudent> studentReader,
-                                        ItemProcessor<? super ConvGradStudent, ? extends ConvGradStudent> studentProcessor,
-                                        ItemWriter<ConvGradStudent> studentWriter,
-                                        StepBuilderFactory stepBuilderFactory) {
-    return stepBuilderFactory.get("studentDataConversionJobStep")
-            .<ConvGradStudent, ConvGradStudent>chunk(1)
-            .reader(studentReader)
-            .processor(studentProcessor)
-            .writer(studentWriter)
-            .build();
-    }
-
-    /**
-    * Creates a bean that represents our batch job.
-    */
-    @Bean
-    public Job studentDataConversionBatchJob(Step studentDataConversionJobStep,
-                                        StudentDataConversionJobCompletionNotificationListener listener,
-                                        JobBuilderFactory jobBuilderFactory) {
-    return jobBuilderFactory.get("studentDataConversionBatchJob")
-            .incrementer(new RunIdIncrementer())
-            .listener(listener)
-            .flow(studentDataConversionJobStep)
-            .end()
-            .build();
     }
 
     /**

@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
 	<artifactId>educ-grad-data-conversion-api</artifactId>
-	<version>1.6.0</version>
+	<version>1.7.0</version>
 	<name>educ-grad-data-conversion-api</name>
 	<description>Ministry of Education GRAD DATA CONVERSION API</description>
 
@@ -47,6 +47,7 @@
         <shedlock.version>4.20.0</shedlock.version>
         <junit>4.12</junit>
         <log4j.version>2.18.0</log4j.version>
+        <resilience4j.version>1.7.1</resilience4j.version>
     </properties>
 
     <parent>
@@ -137,6 +138,11 @@
             <version>2.3.6</version>
         </dependency>
         <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot2</artifactId>
+            <version>${resilience4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
@@ -185,6 +191,11 @@
         <dependency>
             <groupId>org.springframework.retry</groupId>
             <artifactId>spring-retry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20220320</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/net.javacrumbs.shedlock/shedlock-spring -->
         <dependency>
