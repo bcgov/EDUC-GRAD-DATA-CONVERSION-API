@@ -59,10 +59,10 @@ objects:
                   protocol: TCP
               resources:
                 requests:
-                  cpu: "50m"
+                  cpu: "30m"
                   memory: "1024Mi"
                 limits:
-                  cpu: "250m"
+                  cpu: "120m"
                   memory: "2048Mi"
               envFrom:
                 - configMapRef:
@@ -108,10 +108,10 @@ objects:
                   name: metrics
               resources:
                 requests:
-                  cpu: "25m"
+                  cpu: "15m"
                   memory: "50Mi"
                 limits:
-                  cpu: "50m"
+                  cpu: "30m"
                   memory: "100Mi"
           volumes:
             - name: log-storage
