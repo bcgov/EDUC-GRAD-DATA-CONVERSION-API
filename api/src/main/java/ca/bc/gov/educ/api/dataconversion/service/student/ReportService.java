@@ -160,19 +160,6 @@ public class ReportService {
 
 	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
 		for (StudentAssessment sc : studentAssessmentList) {
-			String finalPercent = getValue(sc.getProficiencyScore());
-			String cutoffDate = EducGradDataConversionApiUtils.formatDate(graduationDataStatus.getGradProgram().getAssessmentReleaseDate(), EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
-			if (sc.getSessionDate() != null) {
-				String sessionDate = sc.getSessionDate() + "/01";
-				Date temp = EducGradDataConversionApiUtils.parseDate(sessionDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT);
-				sessionDate = EducGradDataConversionApiUtils.formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
-
-				int diff = EducGradDataConversionApiUtils.getDifferenceInMonths(sessionDate, cutoffDate);
-
-				if (diff < 0 && !finalPercent.equals("") && !finalPercent.equals("0")) {
-					continue;
-				}
-			}
 			TranscriptResult result = new TranscriptResult();
 			TranscriptCourse crse = new TranscriptCourse();
 			crse.setCode(sc.getAssessmentCode());
