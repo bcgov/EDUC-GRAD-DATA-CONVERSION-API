@@ -519,7 +519,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new java.util.Date(System.currentTimeMillis() - 100000L));
 
         GraduationData graduationDataStatus = new GraduationData();
         graduationDataStatus.setDualDogwood(false);
@@ -603,7 +602,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new Date(System.currentTimeMillis()));
 
         graduationDataStatus.setGradProgram(gpCode);
 
@@ -683,7 +681,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new Date(System.currentTimeMillis()));
 
         graduationDataStatus.setGradProgram(gpCode);
 
@@ -778,7 +775,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new Date(System.currentTimeMillis()));
 
         graduationDataStatus.setGradProgram(gpCode);
 
@@ -874,7 +870,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new Date(System.currentTimeMillis()));
 
         graduationDataStatus.setGradProgram(gpCode);
 
@@ -1144,7 +1139,6 @@ public class ReportServiceTest {
         GraduationProgramCode gpCode = new GraduationProgramCode();
         gpCode.setProgramCode("2018-EN");
         gpCode.setProgramName("2018 Graduation Program");
-        gpCode.setAssessmentReleaseDate(new Date(System.currentTimeMillis()));
 
         graduationDataStatus.setGradProgram(gpCode);
 
