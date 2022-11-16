@@ -19,7 +19,7 @@ spring:
       password: ${STUDENT_PASSWORD}
       pool-name: conv-student-cp
   jpa:
-    show-sql: true
+    show-sql: ${SHOW_SQL_LOGS}
     database-platform: org.hibernate.dialect.Oracle12cDialect
     hibernate:
       ddl-auto: none
