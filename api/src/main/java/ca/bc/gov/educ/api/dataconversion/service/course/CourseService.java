@@ -508,7 +508,7 @@ public class CourseService {
         return StringUtils.isNotBlank(gradCourse.getCareerLifeConnections()) && StringUtils.equals(gradCourse.getCareerLifeConnections(), "Y");
     }
 
-    public void createCourseRequirementsForFrenchImmersion(ConversionCourseSummaryDTO summary) {
+    public void createCourseRequirements(ConversionCourseSummaryDTO summary) {
         // FRAL 12
         createCourseRequirement(populate(FRAL_STR, "12", "200"), summary);
         createCourseRequirement(populate(FRAL_STR, "12", "900"), summary);
@@ -617,6 +617,47 @@ public class CourseService {
         createCourseRequirement(populate("WRK", "12B", "600"), summary);
         createCourseRequirement(populate("WRK", "11A", "600"), summary);
         createCourseRequirement(populate("WRK", "11B", "600"), summary);
+
+        // Provincial Exams and Assessment Equivalencies
+        createCourseRequirement(populate("AMA", "10", "116"), summary);
+        createCourseRequirement(populate("EMA", "10", "116"), summary);
+        createCourseRequirement(populate("FMP", "10", "116"), summary);
+        createCourseRequirement(populate("MA", "10", "116"), summary);
+        createCourseRequirement(populate("AWM", "10", "116"), summary);
+        createCourseRequirement(populate("AMAF", "10", "116"), summary);
+        createCourseRequirement(populate("EMAF", "10", "116"), summary);
+        createCourseRequirement(populate("FMPF", "10", "116"), summary);
+        createCourseRequirement(populate("MTH", "10", "116"), summary);
+        createCourseRequirement(populate("AWMF", "10", "116"), summary);
+        createCourseRequirement(populate("EN", "10", "115"), summary);
+        createCourseRequirement(populate("EN", "10", "403"), summary);
+        createCourseRequirement(populate("FRALP", "10", "115"), summary);
+        createCourseRequirement(populate("FRALP", "10", "303"), summary);
+        createCourseRequirement(populate("EFP", "10", "115"), summary);
+        createCourseRequirement(populate("EFP", "10", "403"), summary);
+        createCourseRequirement(populate("COM", "12", "115"), summary);
+        createCourseRequirement(populate("COM", "12", "118"), summary);
+        createCourseRequirement(populate("TPC", "12", "115"), summary);
+        createCourseRequirement(populate("TPC", "12", "118"), summary);
+        createCourseRequirement(populate("TPC", "12", "403"), summary);
+        createCourseRequirement(populate("TPC", "12", "404"), summary);
+        createCourseRequirement(populate("EN", "12", "115"), summary);
+        createCourseRequirement(populate("EN", "12", "118"), summary);
+        createCourseRequirement(populate("EN", "12", "403"), summary);
+        createCourseRequirement(populate("EN", "12", "404"), summary);
+        createCourseRequirement(populate("EFP", "12", "115"), summary);
+        createCourseRequirement(populate("EFP", "12", "118"), summary);
+        createCourseRequirement(populate("EFP", "12", "403"), summary);
+        createCourseRequirement(populate("EFP", "12", "404"), summary);
+        createCourseRequirement(populate("FRALP", "12", "115"), summary);
+        createCourseRequirement(populate("FRALP", "12", "118"), summary);
+        createCourseRequirement(populate("FRALP", "12", "303"), summary);
+        createCourseRequirement(populate("FRALP", "12", "304"), summary);
+        createCourseRequirement(populate("TPCF", "12", "115"), summary);
+        createCourseRequirement(populate("TPCF", "12", "118"), summary);
+        createCourseRequirement(populate("TPCF", "12", "303"), summary);
+        createCourseRequirement(populate("TPCF", "12", "304"), summary);
+        createCourseRequirement(populate("FRAL", "12", "203"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
