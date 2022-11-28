@@ -631,8 +631,8 @@ public class CourseService {
         createCourseRequirement(populate("AWMF", "10", "116"), summary);
         createCourseRequirement(populate("EN", "10", "115"), summary);
         createCourseRequirement(populate("EN", "10", "403"), summary);
-        createCourseRequirement(populate("FRALP", "10", "115"), summary);
-        createCourseRequirement(populate("FRALP", "10", "303"), summary);
+        createCourseRequirement(populate(FRALP_STR, "10", "115"), summary);
+        createCourseRequirement(populate(FRALP_STR, "10", "303"), summary);
         createCourseRequirement(populate("EFP", "10", "115"), summary);
         createCourseRequirement(populate("EFP", "10", "403"), summary);
         createCourseRequirement(populate("COM", "12", "115"), summary);
@@ -649,15 +649,15 @@ public class CourseService {
         createCourseRequirement(populate("EFP", "12", "118"), summary);
         createCourseRequirement(populate("EFP", "12", "403"), summary);
         createCourseRequirement(populate("EFP", "12", "404"), summary);
-        createCourseRequirement(populate("FRALP", "12", "115"), summary);
-        createCourseRequirement(populate("FRALP", "12", "118"), summary);
-        createCourseRequirement(populate("FRALP", "12", "303"), summary);
-        createCourseRequirement(populate("FRALP", "12", "304"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "115"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "118"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "303"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "304"), summary);
         createCourseRequirement(populate("TPCF", "12", "115"), summary);
         createCourseRequirement(populate("TPCF", "12", "118"), summary);
         createCourseRequirement(populate("TPCF", "12", "303"), summary);
         createCourseRequirement(populate("TPCF", "12", "304"), summary);
-        createCourseRequirement(populate("FRAL", "12", "203"), summary);
+        createCourseRequirement(populate(FRAL_STR, "12", "203"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
