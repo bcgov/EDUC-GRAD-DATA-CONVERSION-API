@@ -970,7 +970,7 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        courseService.createCourseRequirementsForFrenchImmersion(summary);
+        courseService.createCourseRequirements(summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isGreaterThan(0L);
     }
 

@@ -259,7 +259,7 @@ public class BatchJobConfig {
 
         executor.setCorePoolSize(constants.getNumberOfPartitions());
         executor.setMaxPoolSize(constants.getNumberOfPartitions());
-        executor.setThreadNamePrefix("task_thread-");
+        executor.setThreadNamePrefix("partition-");
         executor.initialize();
 
         return executor;

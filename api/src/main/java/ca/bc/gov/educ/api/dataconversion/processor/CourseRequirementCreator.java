@@ -18,7 +18,7 @@ public class CourseRequirementCreator implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         summaryDTO =  (ConversionCourseSummaryDTO)stepContribution.getStepExecution().getJobExecution().getExecutionContext().get("courseRequirementSummaryDTO");
-        courseService.createCourseRequirementsForFrenchImmersion(summaryDTO);
+        courseService.createCourseRequirements(summaryDTO);
         return RepeatStatus.FINISHED;
     }
 }
