@@ -23,11 +23,17 @@ public class CourseService {
     private static final String CREATE_USER = "createUser";
     private static final String CREATE_DATE = "createDate";
 
-    private static final String CLEAF_STR = "CLEAF";
-    private static final String CLEBF_STR = "CLEBF";
+    // Ignore List for Course Restriction
     private static final String CLEA_STR = "CLEA";
     private static final String CLEB_STR = "CLEB";
+    private static final String CLEAF_STR = "CLEAF";
+    private static final String CLEBF_STR = "CLEBF";
+    private static final String CLCA_STR = "CLCA";
+    private static final String CLCB_STR = "CLCB";
+    private static final String CLCAF_STR = "CLCAF";
+    private static final String CLCBF_STR = "CLCBF";
 
+    // Hard coded Insert into Course Requirement
     private static final String FRAL_STR = "FRAL";
     private static final String FRALP_STR = "FRALP";
     private static final String QFRAL_STR = "QFRAL";
@@ -46,6 +52,15 @@ public class CourseService {
         IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
         IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
         IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+
+        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCB_STR));
+        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCBF_STR));
+        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCB_STR));
+        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCBF_STR));
+        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCA_STR));
+        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCAF_STR));
+        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCA_STR));
+        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCAF_STR));
     }
 
     private final RestUtils restUtils;
