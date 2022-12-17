@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
-import static ca.bc.gov.educ.api.dataconversion.constant.Topics.TRAX_UPDATE_EVENTS_TOPIC;
-
 @Service
 @Slf4j
 public class EventHandlerDelegatorService {
