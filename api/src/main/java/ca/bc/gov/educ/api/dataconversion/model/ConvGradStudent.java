@@ -17,20 +17,21 @@ import java.util.List;
 public class ConvGradStudent {
   private String pen;
   private String program; // inc
-  private Date programCompletionDate;
+  private Date programCompletionDate; // inc
   private String slpDate; // inc
   private String gpa;
-  private String honoursStanding;
+  private String honoursStanding; // inc
   private String recalculateGradStatus;
   private String studentGradData;
   private String schoolOfRecord; // inc
   private String schoolAtGrad; // inc
   private String studentGrade; // inc
   private String studentStatus; // inc
-  private String archiveFlag;
+  private String archiveFlag; // inc
   private String frenchCert;
   private String englishCert;
-  private String consumerEducationRequirementMet; // inc
+  private String consumerEducationRequirementMet;
+  private String studentCitizenship;
 
   // extra
   private String graduationRequestYear;

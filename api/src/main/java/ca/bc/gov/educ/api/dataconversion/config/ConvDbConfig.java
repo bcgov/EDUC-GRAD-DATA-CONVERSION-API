@@ -72,8 +72,6 @@ public class ConvDbConfig {
         config.addDataSourceProperty("socketTimeout", maxLifetime);
         config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
-        System.out.println("==> CONV DB : POOL SIZE = " + numberOfPartitions);
-
         return new HikariDataSource(config);
     }
 

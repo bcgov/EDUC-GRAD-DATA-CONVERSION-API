@@ -290,6 +290,7 @@ public class StudentService extends StudentBaseService {
         // Mappings with Student_Master
         studentEntity.setFrenchCert(student.getFrenchCert());
         studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
+        studentEntity.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
     }
 
     private void convertGraduatedStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
@@ -315,6 +316,7 @@ public class StudentService extends StudentBaseService {
         studentEntity.setFrenchCert(student.getFrenchCert());
         studentEntity.setEnglishCert(student.getEnglishCert());
         studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
+        studentEntity.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
     }
 
     private GraduationData buildGraduationData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, Student penStudent, ConversionStudentSummaryDTO summary) {
