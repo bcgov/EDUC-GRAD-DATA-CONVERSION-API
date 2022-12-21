@@ -1192,5 +1192,74 @@ public class StudentServiceWithMockRepositoryTest {
         assertThat(result.getAssessments()).hasSize(1);
     }
 
+    @Test
+    public void testTriggerGraduationBatchRun_withMergedStatus_returnsNoBatchRun() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("2018-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("MER");
+        gradStudentEntity.setHonoursStanding("Y");
+        gradStudentEntity.setSchoolAtGrad(mincode);
+        gradStudentEntity.setSchoolOfRecord(mincode);
+        gradStudentEntity.setEnglishCert("E");
+        gradStudentEntity.setFrenchCert("F");
+        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        boolean isExceptionThrown = false;
+        try {
+            studentService.triggerGraduationBatchRun(studentID);
+        } catch (Exception e) {
+            isExceptionThrown = true;
+        }
+        assertThat(isExceptionThrown).isFalse();
+    }
+
+    @Test
+    public void testTriggerGraduationBatchRun_withCurrentStatus_returnsNoBatchRun() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("2018-EN");
+        gradStudentEntity.setStudentGrade("12");
+        gradStudentEntity.setStudentStatus("CUR");
+        gradStudentEntity.setHonoursStanding("Y");
+        gradStudentEntity.setSchoolAtGrad(mincode);
+        gradStudentEntity.setSchoolOfRecord(mincode);
+        gradStudentEntity.setEnglishCert("E");
+        gradStudentEntity.setFrenchCert("F");
+        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+
+        boolean isExceptionThrown = false;
+        try {
+            studentService.triggerGraduationBatchRun(studentID);
+        } catch (Exception e) {
+            isExceptionThrown = true;
+        }
+        assertThat(isExceptionThrown).isFalse();
+    }
+
 
 }
