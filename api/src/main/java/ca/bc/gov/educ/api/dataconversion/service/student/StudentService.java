@@ -234,7 +234,7 @@ public class StudentService extends StudentBaseService {
             result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
         }
 
-        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), "MER")) {
+        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             // Building GraduationData CLOB data
             GraduationData graduationData = buildGraduationData(convGradStudent, gradStudentEntity, penStudent, summary);
             if (graduationData != null) {
@@ -286,7 +286,7 @@ public class StudentService extends StudentBaseService {
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
         // flags
-        if (StringUtils.equalsIgnoreCase(studentEntity.getStudentStatus(), "MER")) {
+        if (StringUtils.equalsIgnoreCase(studentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             studentEntity.setRecalculateGradStatus(null);
             studentEntity.setRecalculateProjectedGrad(null);
         } else {
@@ -1080,7 +1080,7 @@ public class StudentService extends StudentBaseService {
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
             GraduationStudentRecordEntity graduationStudentRecordEntity = gradStatusOptional.get();
-            if (StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "MER")) {
+            if (StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
                 graduationStudentRecordEntity.setRecalculateGradStatus(null);
                 graduationStudentRecordEntity.setRecalculateProjectedGrad(null);
             } else {
