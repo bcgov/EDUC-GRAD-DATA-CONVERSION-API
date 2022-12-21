@@ -286,7 +286,7 @@ public class StudentService extends StudentBaseService {
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
         // flags
-        if (StringUtils.equalsIgnoreCase(student.getStudentStatus(), "MER")) {
+        if (StringUtils.equalsIgnoreCase(studentEntity.getStudentStatus(), "MER")) {
             studentEntity.setRecalculateGradStatus(null);
             studentEntity.setRecalculateProjectedGrad(null);
         } else {
@@ -1080,8 +1080,7 @@ public class StudentService extends StudentBaseService {
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
             GraduationStudentRecordEntity graduationStudentRecordEntity = gradStatusOptional.get();
-            if (StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "MER")
-                || StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "DEC")) {
+            if (StringUtils.equals(graduationStudentRecordEntity.getStudentStatus(), "MER")) {
                 graduationStudentRecordEntity.setRecalculateGradStatus(null);
                 graduationStudentRecordEntity.setRecalculateProjectedGrad(null);
             } else {
