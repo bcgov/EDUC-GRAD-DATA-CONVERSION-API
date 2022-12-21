@@ -2,7 +2,6 @@
   {
     "pen": "123456789",
     "program": "2018-EN",
-    "recalculateGradStatus": "N",
     "schoolOfRecord": "1234567",
     "studentGrade": "12",
     "studentStatus": "CUR"
@@ -10,7 +9,6 @@
   {
     "pen": "987654321",
     "program": "2018-EN",
-    "recalculateGradStatus": "N",
     "schoolOfRecord": "76543421",
     "studentGrade": "11",
     "studentStatus": "CUR"

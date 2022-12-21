@@ -19,9 +19,9 @@ public class ConvGradStudent {
   private String program; // inc
   private Date programCompletionDate; // inc
   private String slpDate; // inc
+  private String sccDate;
   private String gpa;
   private String honoursStanding; // inc
-  private String recalculateGradStatus;
   private String studentGradData;
   private String schoolOfRecord; // inc
   private String schoolAtGrad; // inc
