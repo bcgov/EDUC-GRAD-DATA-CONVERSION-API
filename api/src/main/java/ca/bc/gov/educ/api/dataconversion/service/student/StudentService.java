@@ -234,7 +234,7 @@ public class StudentService extends StudentBaseService {
             result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
         }
 
-        if (convGradStudent.isGraduated()) {
+        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), "MER")) {
             // Building GraduationData CLOB data
             GraduationData graduationData = buildGraduationData(convGradStudent, gradStudentEntity, penStudent, summary);
             if (graduationData != null) {
@@ -282,10 +282,17 @@ public class StudentService extends StudentBaseService {
         studentEntity.setSchoolAtGrad(null);
 
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
-        studentEntity.setRecalculateGradStatus(student.getRecalculateGradStatus());
-        studentEntity.setRecalculateProjectedGrad(student.getRecalculateGradStatus());
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        // flags
+        if (StringUtils.equalsIgnoreCase(student.getStudentStatus(), "MER")) {
+            studentEntity.setRecalculateGradStatus(null);
+            studentEntity.setRecalculateProjectedGrad(null);
+        } else {
+            studentEntity.setRecalculateGradStatus("Y");
+            studentEntity.setRecalculateProjectedGrad("Y");
+        }
 
         // Mappings with Student_Master
         studentEntity.setFrenchCert(student.getFrenchCert());
@@ -307,10 +314,12 @@ public class StudentService extends StudentBaseService {
         }
         studentEntity.setSchoolAtGrad(StringUtils.isNotBlank(student.getSchoolAtGrad())? student.getSchoolAtGrad() : null);
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
-        studentEntity.setRecalculateGradStatus(null);
-        studentEntity.setRecalculateProjectedGrad(null);
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        // flags
+        studentEntity.setRecalculateGradStatus(null);
+        studentEntity.setRecalculateProjectedGrad(null);
 
         // Mappings with Student_Master
         studentEntity.setFrenchCert(student.getFrenchCert());

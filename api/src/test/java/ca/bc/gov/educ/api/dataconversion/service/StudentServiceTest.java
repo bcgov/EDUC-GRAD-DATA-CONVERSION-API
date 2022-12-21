@@ -84,7 +84,7 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").archiveFlag("A")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -117,7 +117,7 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenThrow(new RuntimeException("PEN Student API is failed!"));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -143,7 +143,7 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("333222111", "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
                 .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
