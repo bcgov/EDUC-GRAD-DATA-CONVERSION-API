@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.choreographer;
 
 import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
-import ca.bc.gov.educ.api.dataconversion.model.TraxUpdateInGrad;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
-import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPDATE_TRAX_STUDENT_MASTER;
+import static ca.bc.gov.educ.api.dataconversion.constant.EventType.*;
 
 /**
  * This class is responsible to handle different choreographed events related student by calling different services.
@@ -41,10 +41,45 @@ public class ChoreographEventHandler {
     this.singleTaskExecutor.execute(() -> {
       try {
         switch (event.getEventType()) {
-          case "UPDATE_TRAX_STUDENT_MASTER":
-            log.debug("Processing CREATE_GRAD_STATUS event record :: {} ", event);
-            final TraxUpdateInGrad traxUpdateInGrad = JsonUtil.getJsonObjectFromString(TraxUpdateInGrad.class, event.getEventPayload());
-            this.eventServiceMap.get(UPDATE_TRAX_STUDENT_MASTER.toString()).processEvent(traxUpdateInGrad, event);
+          case "NEWSTUDENT":
+            log.debug("Processing NEWSTUDENT event record :: {} ", event);
+            final ConvGradStudent newStudent = JsonUtil.getJsonObjectFromString(ConvGradStudent.class, event.getEventPayload());
+            this.eventServiceMap.get(NEWSTUDENT.toString()).processEvent(newStudent, event);
+            break;
+          case "UPD_DEMOG":
+            log.debug("Processing UPD_DEMOG event record :: {} ", event);
+            final TraxDemographicsUpdateDTO updateDemog = JsonUtil.getJsonObjectFromString(TraxDemographicsUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(UPD_DEMOG.toString()).processEvent(updateDemog, event);
+            break;
+          case "UPD_GRAD":
+            log.debug("Processing UPD_GRAD event record :: {} ", event);
+            final TraxGraduationUpdateDTO updateGrad = JsonUtil.getJsonObjectFromString(TraxGraduationUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(UPD_GRAD.toString()).processEvent(updateGrad, event);
+            break;
+          case "UPD_STD_STATUS":
+            log.debug("Processing UPD_STD_STATUS event record :: {} ", event);
+            final TraxStudentStatusUpdateDTO updateStudentStatus = JsonUtil.getJsonObjectFromString(TraxStudentStatusUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(UPD_STD_STATUS.toString()).processEvent(updateStudentStatus, event);
+            break;
+          case "XPROGRAM":
+            log.debug("Processing XPROGRAM event record :: {} ", event);
+            final TraxXProgramDTO xprogram = JsonUtil.getJsonObjectFromString(TraxXProgramDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(XPROGRAM.toString()).processEvent(xprogram, event);
+            break;
+          case "ASSESSMENT":
+            log.debug("Processing ASSESSMENT event record :: {} ", event);
+            final TraxStudentUpdateDTO assessment = JsonUtil.getJsonObjectFromString(TraxStudentUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(ASSESSMENT.toString()).processEvent(assessment, event);
+            break;
+          case "COURSE":
+            log.debug("Processing COURSE event record :: {} ", event);
+            final TraxStudentUpdateDTO course = JsonUtil.getJsonObjectFromString(TraxStudentUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(COURSE.toString()).processEvent(course, event);
+            break;
+          case "FI10ADD":
+            log.debug("Processing FI10ADD event record :: {} ", event);
+            final TraxFrenchImmersionUpdateDTO frenchImmersion = JsonUtil.getJsonObjectFromString(TraxFrenchImmersionUpdateDTO.class, event.getEventPayload());
+            this.eventServiceMap.get(FI10ADD.toString()).processEvent(frenchImmersion, event);
             break;
           default:
             log.warn("Silently ignoring event: {}", event);

@@ -8,7 +8,14 @@ public enum EventType {
     Incremental updates from Trax to Grad
    =============================================================*/
   /**
-   * Update trax student master event type
+   * Trax update type
    */
-  UPDATE_TRAX_STUDENT_MASTER,
+  NEWSTUDENT,
+  UPD_DEMOG,
+  UPD_GRAD,
+  UPD_STD_STATUS,
+  XPROGRAM,
+  ASSESSMENT,
+  COURSE,
+  FI10ADD
 }
