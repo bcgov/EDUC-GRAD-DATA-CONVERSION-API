@@ -745,15 +745,25 @@ public class StudentService extends StudentBaseService {
 
     public boolean hasAnyFrenchImmersionCourse(String program, String pen, String accessToken) {
         boolean frenchImmersion = false;
-        if ((program.equals("2018-EN") || program.equals("2004-EN"))
-            && courseService.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
-            frenchImmersion = true;
-        } else if (program.equals("1996-EN")
-            && courseService.isFrenchImmersionCourse(pen, "11", accessToken)) {  // FRAL 11 or FRALP 11
-            frenchImmersion = true;
-        } else if (program.equals("1986-EN")
-            && courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
-            frenchImmersion = true;
+        switch(program) {
+            case "2018-EN":
+            case "2004-EN":
+                if (courseService.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
+                    frenchImmersion = true;
+                }
+                break;
+            case "1996-EN":
+                if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) { // FRAL 11 or FRALP 11
+                    frenchImmersion = true;
+                }
+                break;
+            case "1986-EN":
+                if (courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
+                    frenchImmersion = true;
+                }
+                break;
+            default:
+                break;
         }
         return frenchImmersion;
     }
