@@ -144,7 +144,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -152,7 +152,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("2018");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -220,7 +220,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -228,7 +228,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("2018");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -296,7 +296,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("M").schoolOfRecord("222333").graduationRequestYear("2018")
+                .studentStatus("M").schoolOfRecord("222333").graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -304,7 +304,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("2018");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -372,7 +372,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("1996")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("1996")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -380,7 +380,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("1996");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1996");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -449,7 +449,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("1986")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -457,7 +457,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("1986");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -666,7 +666,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .englishCert("E")
                 .frenchCert("F")
                 .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
-                .graduationRequestYear("1986")
+                .graduationRequirementYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -677,7 +677,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("1986");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -886,7 +886,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .englishCert("E")
                 .frenchCert("F")
                 .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
-                .graduationRequestYear("2018")
+                .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -897,7 +897,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequestYear()).isEqualTo("2018");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -1219,7 +1219,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
         boolean isExceptionThrown = false;
         try {
-            studentService.triggerGraduationBatchRun(studentID);
+            studentService.triggerGraduationBatchRun(studentID, "Y", "Y");
         } catch (Exception e) {
             isExceptionThrown = true;
         }
@@ -1254,7 +1254,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         boolean isExceptionThrown = false;
         try {
-            studentService.triggerGraduationBatchRun(studentID);
+            studentService.triggerGraduationBatchRun(studentID, "Y", "Y");
         } catch (Exception e) {
             isExceptionThrown = true;
         }

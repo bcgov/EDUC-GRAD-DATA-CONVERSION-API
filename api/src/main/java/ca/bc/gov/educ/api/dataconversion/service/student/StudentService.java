@@ -716,8 +716,8 @@ public class StudentService extends StudentBaseService {
             return createStudentOptionalProgram("DD", student, accessToken, summary);
         }
 
-        // French Immersion for 2018-EN, 2004-EN
-        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), student.getFrenchCert(), accessToken)) {
+        // French Immersion for 2018-EN, 2004-EN, 1996-EN, 1986-EN
+        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), accessToken)) {
             return createStudentOptionalProgram("FI", student, accessToken, summary);
         }
 
@@ -743,25 +743,29 @@ public class StudentService extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
-    public boolean hasAnyFrenchImmersionCourse(String program, String pen, String frenchCert, String accessToken) {
+    public boolean hasAnyFrenchImmersionCourse(String program, String pen, String accessToken) {
         boolean frenchImmersion = false;
-        // French Immersion for 2018-EN, 2004-EN
-        if (program.equals("2018-EN") || program.equals("2004-EN")) {
-            if (courseService.isFrenchImmersionCourse(pen, "10", accessToken)) {
-                frenchImmersion = true;
-            }
-        } else if (program.equals("1996-EN")) {
-            if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) {
-                frenchImmersion = true;
-            }
-        } else if (program.equals("1986-EN") && isFrenchCertificate(frenchCert, pen, accessToken)) {
-            frenchImmersion = true;
+        switch(program) {
+            case "2018-EN":
+            case "2004-EN":
+                if (courseService.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
+                    frenchImmersion = true;
+                }
+                break;
+            case "1996-EN":
+                if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) { // FRAL 11 or FRALP 11
+                    frenchImmersion = true;
+                }
+                break;
+            case "1986-EN":
+                if (courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
+                    frenchImmersion = true;
+                }
+                break;
+            default:
+                break;
         }
         return frenchImmersion;
-    }
-
-    private boolean isFrenchCertificate(String frenchCert, String pen, String accessToken) {
-        return StringUtils.equalsIgnoreCase("F", frenchCert) || courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken);
     }
 
     private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -922,6 +926,11 @@ public class StudentService extends StudentBaseService {
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         StudentGradDTO studentData = new StudentGradDTO();
         studentData.setStudentID(studentID);
+        // populate Demographic data
+        studentData.setLastName(penStudent.getLegalLastName());
+        studentData.setFirstName(penStudent.getLegalFirstName());
+        studentData.setMiddleName(penStudent.getLegalMiddleNames());
+        studentData.setBirthday(penStudent.getDob());
 
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
@@ -931,6 +940,7 @@ public class StudentService extends StudentBaseService {
             studentData.setStudentStatus(entity.getStudentStatus());
             studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
             studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
+            studentData.setCitizenship(entity.getStudentCitizenship());
         } else {
             log.error("GraduationStudentRecord is not found for pen# [{}], studentID [{}]", pen, studentID);
             return null;
@@ -992,6 +1002,12 @@ public class StudentService extends StudentBaseService {
             }
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolAtGrad())) {
                 entity.setSchoolAtGrad(gradStudent.getNewSchoolAtGrad());
+            }
+            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
+                entity.setRecalculateGradStatus(gradStudent.getNewRecalculateGradStatus());
+            }
+            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateProjectedGrad())) {
+                entity.setRecalculateProjectedGrad(gradStudent.getNewRecalculateProjectedGrad());
             }
 
             graduationStudentRecordRepository.save(entity);
@@ -1076,7 +1092,7 @@ public class StudentService extends StudentBaseService {
     }
 
     @Transactional(transactionManager = "studentTransactionManager")
-    public void triggerGraduationBatchRun(UUID studentID) {
+    public void triggerGraduationBatchRun(UUID studentID, String recalculateGradStatus, String recalcualteProjectedGrad) {
         Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(studentID);
         if (gradStatusOptional.isPresent()) {
             GraduationStudentRecordEntity graduationStudentRecordEntity = gradStatusOptional.get();
