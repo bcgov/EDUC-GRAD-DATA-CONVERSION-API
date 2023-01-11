@@ -8,6 +8,12 @@ import org.apache.commons.lang3.StringUtils;
 
 public class StudentBaseService {
 
+    public static final String STUDENT_STATUS_CURRENT = "CUR";
+    public static final String STUDENT_STATUS_ARCHIVED = "ARC";
+    public static final String STUDENT_STATUS_DECEASED = "DEC";
+    public static final String STUDENT_STATUS_MERGED = "MER";
+    public static final String STUDENT_STATUS_TERMINATED = "TER";
+
     protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
         ConversionAlert error = new ConversionAlert();
         error.setItem(pen);
@@ -20,24 +26,24 @@ public class StudentBaseService {
 
     protected String getGradStudentStatus(String traxStudentStatus, String traxArchiveFlag) {
         if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "A")) {
-            return "CUR";
+            return STUDENT_STATUS_CURRENT;
         } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "A") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) {
-            return "ARC";
+            return STUDENT_STATUS_ARCHIVED;
         } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "D")) {
-            return "DEC";
+            return STUDENT_STATUS_DECEASED;
         } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "M")) {
-            return "MER";
+            return STUDENT_STATUS_MERGED;
         } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") &&
                 (StringUtils.equalsIgnoreCase(traxArchiveFlag, "A") || StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) ) {
-            return "TER";
+            return STUDENT_STATUS_TERMINATED;
         }
         return null;
     }
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
         String gradProgram = student.isGraduated() ?
-            getGradProgramForGraduatedStudent(student.getGraduationRequestYear(), student.getSchoolOfRecord(), student.getFrenchCert(), student.getStudentGrade())
-            : getGradProgram(student.getGraduationRequestYear(), student.getSchoolOfRecord());
+            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchCert(), student.getStudentGrade())
+            : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
             updateProgramCountsInSummary(summary, gradProgram, student.isGraduated());
@@ -46,15 +52,15 @@ public class StudentBaseService {
             // error
             ConversionAlert error = new ConversionAlert();
             error.setItem(student.getPen());
-            error.setReason("Program is not found for year " + student.getGraduationRequestYear() + " / grade " + student.getStudentGrade());
+            error.setReason("Program is not found for year " + student.getGraduationRequirementYear() + " / grade " + student.getStudentGrade());
             summary.getErrors().add(error);
             return false;
         }
     }
 
-    protected String getGradProgram(String graduationRequestYear, String schoolOfRecord) {
+    protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord) {
         String gradProgram = null;
-        switch(graduationRequestYear) {
+        switch(graduationRequirementYear) {
             case "2018":
                 if (schoolOfRecord.startsWith("093")) {
                     gradProgram = "2018-PF";
@@ -91,9 +97,9 @@ public class StudentBaseService {
         return gradProgram;
     }
 
-    protected String getGradProgramForGraduatedStudent(String graduationRequestYear, String schoolOfRecord, String frenchCert, String studentGrade) {
+    protected String getGradProgramForGraduatedStudent(String graduationRequirementYear, String schoolOfRecord, String frenchCert, String studentGrade) {
         String gradProgram = null;
-        switch(graduationRequestYear) {
+        switch(graduationRequirementYear) {
             case "2018":
                 if (schoolOfRecord.startsWith("093") &&
                     (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {

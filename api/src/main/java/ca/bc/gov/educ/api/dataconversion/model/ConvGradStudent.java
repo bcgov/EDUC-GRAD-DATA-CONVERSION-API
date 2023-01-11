@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -17,23 +16,24 @@ import java.util.List;
 public class ConvGradStudent {
   private String pen;
   private String program; // inc
-  private Date programCompletionDate;
+  private Date programCompletionDate; // inc
   private String slpDate; // inc
+  private String sccDate;
   private String gpa;
-  private String honoursStanding;
-  private String recalculateGradStatus;
+  private String honoursStanding; // inc
   private String studentGradData;
   private String schoolOfRecord; // inc
   private String schoolAtGrad; // inc
   private String studentGrade; // inc
   private String studentStatus; // inc
-  private String archiveFlag;
+  private String archiveFlag; // inc
   private String frenchCert;
   private String englishCert;
-  private String consumerEducationRequirementMet; // inc
+  private String consumerEducationRequirementMet;
+  private String studentCitizenship;
 
   // extra
-  private String graduationRequestYear;
+  private String graduationRequirementYear;
 
   // program codes for optional / career program
   private List<String> programCodes;

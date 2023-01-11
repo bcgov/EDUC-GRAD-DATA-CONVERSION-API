@@ -25,7 +25,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -84,8 +83,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018").archiveFlag("A")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("2018").archiveFlag("A")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -117,8 +116,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("111222333", "123")).thenThrow(new RuntimeException("PEN Student API is failed!"));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -143,8 +142,8 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentsByPen("333222111", "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF").recalculateGradStatus("Y")
-                .studentStatus("A").schoolOfRecord("222333").graduationRequestYear("2018")
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
+                .studentStatus("A").schoolOfRecord("222333").graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");

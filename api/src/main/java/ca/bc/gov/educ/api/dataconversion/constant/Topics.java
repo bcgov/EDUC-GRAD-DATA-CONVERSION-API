@@ -7,6 +7,6 @@ public enum Topics {
   /**
    * TraxUpdate events topic topics.
    */
-  TRAX_UPDATE_EVENTS_TOPIC,
+  TRAX_UPDATE_EVENT_TOPIC,
 
 }

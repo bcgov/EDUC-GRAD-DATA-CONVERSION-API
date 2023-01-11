@@ -66,8 +66,7 @@ public class DataConversionServiceTest {
                 .studentGrade("12")
                 .studentStatus("A")
                 .archiveFlag("A")
-                .graduationRequestYear("2020")
-                .recalculateGradStatus("Y")
+                .graduationRequirementYear("2020")
                 .graduated(false)
             .build();
         List<ConvGradStudent> results = new ArrayList<>();

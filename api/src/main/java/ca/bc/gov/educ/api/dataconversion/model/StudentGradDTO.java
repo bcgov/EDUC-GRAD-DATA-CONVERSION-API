@@ -19,7 +19,11 @@ public class StudentGradDTO extends  StudentCommonDTO {
     private String newSchoolOfRecord;
     private String newSchoolAtGrad;
     private String newStudentGrade;
-    private String newStudentStatus;
+    private String newStudentStatus;;
+
+    // new flags
+    private String newRecalculateGradStatus;
+    private String newRecalculateProjectedGrad;
 
     private List<String> addedProgramCodes = new ArrayList<>();
     private List<String> removedProgramCodes = new ArrayList<>();
