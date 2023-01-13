@@ -78,18 +78,6 @@ jobs:
           username: ${{ env.IMAGE_REGISTRY_USER }}
           password: ${{ env.IMAGE_REGISTRY_PASSWORD }}
 
-      # scan the image for vulnerabilities
-      # TODO: set exit-code to '1' to fail on vulnerabilities
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: '${{ steps.push-image.outputs.registry-path }}'
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
       # The path the image was pushed to is now stored in ${{ steps.push-image.outputs.registry-path }}
       - name: Install oc
         uses: redhat-actions/openshift-tools-installer@v1
