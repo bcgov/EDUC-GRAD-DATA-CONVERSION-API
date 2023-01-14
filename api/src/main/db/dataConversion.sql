@@ -6,23 +6,25 @@ select trim(m.stud_no) as PEN, m.mincode as SCHOOL_OF_RECORD, m.mincode_grad as 
        m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG,
        m.grad_reqt_year as GRAD_REQT_YEAR, 'Y' as RECALCULATE_GRAD_STATUS, m.grad_date as GRAD_DATE,
        trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,
-       m.slp_date as SLP_DATE, trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG
+       m.slp_date as SLP_DATE, trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG,
+       m.stud_citiz as CITIZENSHIP, m.french_dogwood as FRENCH_DOGWOOD
 from student_master m
 where 1 = 1
   and m.grad_date = 0
---and m.stud_no = ''
+  and m.stud_no = ''
 
 -- GRAD the graduated STUDENT
 select trim(gs.stud_no) as PEN, gs.mincode as SCHOOL_OF_RECORD, m.mincode_grad as SCHOOL_AT_GRADUATION, gs.stud_grade as STUDENT_GRADE,
        m.stud_status as STUDENT_STATUS_CODE, m.archive_flag as ARCHIVE_FLAG,
        gs.grad_reqt_year as GRAD_REQT_YEAR, null as RECALCULATE_GRAD_STATUS, gs.grad_date as GRAD_DATE,
        trim(m.prgm_code) as PRGM_CODE1, trim(m.prgm_code2) as PRGM_CODE2, trim(m.prgm_code3) as PRGM_CODE3, trim(m.prgm_code4) as PRGM_CODE4, trim(m.prgm_code5) as PRGM_CODE5,
-       m.slp_date as SLP_DATE, trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG
+       m.slp_date as SLP_DATE, trim(m.french_cert) as FRENCH_CERT, trim(m.stud_consed_flag) as STUD_CONSED_FLAG, trim(m.english_cert) as ENGLISH_CERT, m.honour_flag as HONOUR_FLAG,
+       m.stud_citiz as CITIZENSHIP, m.french_dogwood as FRENCH_DOGWOOD
 from student_master m, tsw_tran_demog gs
 where 1 = 1
   and m.stud_no = gs.stud_no
   and gs.grad_date <> 0
---and m.stud_no = ''
+  and m.stud_no = ''
 
 -- GRAD_COURSE_RESTRICTIONS
 select trim(c1.crse_code) as CRSE_MAIN, trim(c1.crse_level) as CRSE_MAIN_LVL,

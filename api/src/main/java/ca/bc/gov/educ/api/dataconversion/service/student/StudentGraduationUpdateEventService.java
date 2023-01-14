@@ -66,7 +66,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
         // Grad Program
-        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord());
+        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord(), null);
         if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
             handleProgramChange(gradProgram, currentStudent);
             if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
