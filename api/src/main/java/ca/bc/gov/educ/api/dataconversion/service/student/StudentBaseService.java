@@ -43,7 +43,7 @@ public class StudentBaseService {
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
         String gradProgram = student.isGraduated() ?
             getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchCert(), student.getStudentGrade())
-            : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord());
+            : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
             updateProgramCountsInSummary(summary, gradProgram, student.isGraduated());
@@ -58,7 +58,7 @@ public class StudentBaseService {
         }
     }
 
-    protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord) {
+    protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord, String frenchDogwood) {
         String gradProgram = null;
         switch(graduationRequirementYear) {
             case "2018":
@@ -83,7 +83,11 @@ public class StudentBaseService {
                 }
                 break;
             case "1986":
-                gradProgram = "1986-EN";
+                if ("Y".equalsIgnoreCase(frenchDogwood)) {
+                    gradProgram = "1986-PF";
+                } else {
+                    gradProgram = "1986-EN";
+                }
                 break;
             case "1950":
                 gradProgram = "1950";
