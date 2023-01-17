@@ -389,10 +389,11 @@ public class StudentService extends StudentBaseService {
 
         // gradMessage
         String gradMessage = transcriptStudentDemog.getGradMessage();
-        if ("1950".equalsIgnoreCase(studentEntity.getProgram()) && "AD".equalsIgnoreCase(studentEntity.getStudentGrade())) {
-            if (StringUtils.isNotBlank(gradMessage) && StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG)) {
-                gradMessage = StringUtils.remove(gradMessage, TSW_PF_GRAD_MSG).trim();
-            }
+        if ("1950".equalsIgnoreCase(studentEntity.getProgram())
+            && "AD".equalsIgnoreCase(studentEntity.getStudentGrade())
+            && StringUtils.isNotBlank(gradMessage)
+            && StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG)) {
+            gradMessage = StringUtils.remove(gradMessage, TSW_PF_GRAD_MSG).trim();
         }
         graduationData.setGradMessage(gradMessage);
 
