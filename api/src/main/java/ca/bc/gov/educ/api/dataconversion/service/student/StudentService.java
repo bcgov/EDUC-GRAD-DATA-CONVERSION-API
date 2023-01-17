@@ -38,6 +38,7 @@ public class StudentService extends StudentBaseService {
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
     private static final String DATA_CONVERSION_HISTORY_ACTIVITY_CODE = "DATACONVERT";
     private static final String TRAX_API_ERROR_MSG = "Grad Trax API is failed for ";
+    private static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
 
     private final GraduationStudentRecordRepository graduationStudentRecordRepository;
     private final StudentOptionalProgramRepository studentOptionalProgramRepository;
@@ -387,7 +388,13 @@ public class StudentService extends StudentBaseService {
         graduationData.setRequirementsMet(requirementsMet);
 
         // gradMessage
-        graduationData.setGradMessage(transcriptStudentDemog.getGradTextMessage());
+        String gradMessage = transcriptStudentDemog.getGradMessage();
+        if ("1950".equalsIgnoreCase(studentEntity.getProgram()) && "AD".equalsIgnoreCase(studentEntity.getStudentGrade())) {
+            if (StringUtils.isNotBlank(gradMessage) && StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG)) {
+                gradMessage = StringUtils.remove(gradMessage, TSW_PF_GRAD_MSG).trim();
+            }
+        }
+        graduationData.setGradMessage(gradMessage);
 
         // dualDogwood
         graduationData.setDualDogwood(studentEntity.isDualDogwood());

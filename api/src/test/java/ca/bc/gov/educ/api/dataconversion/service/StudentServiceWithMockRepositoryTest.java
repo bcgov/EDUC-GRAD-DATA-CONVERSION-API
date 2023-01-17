@@ -903,6 +903,185 @@ public class StudentServiceWithMockRepositoryTest {
     }
 
     @Test
+    public void convertGraduatedStudent_forAdult1950_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        gradStudentEntity.setStudentID(studentID);
+        gradStudentEntity.setPen(pen);
+        gradStudentEntity.setProgram("1950");
+        gradStudentEntity.setStudentGrade("AD");
+        gradStudentEntity.setStudentStatus("CUR");
+
+        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setSchoolName("Test School");
+        tranStudentDemog.setStudentGrade("AD");
+        tranStudentDemog.setGradReqtYear("1950");
+        tranStudentDemog.setGradMessage("Test Message. Student has successfully completed the Programme Francophone.");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        // TSW
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        // Rule 10
+        ProgramRequirement pr10 = new ProgramRequirement();
+        pr10.setProgramRequirementID(UUID.randomUUID());
+        pr10.setGraduationProgramCode("2018-EN");
+        ProgramRequirementCode rule10 = new ProgramRequirementCode();
+        rule10.setTraxReqNumber("10");
+        rule10.setProReqCode("110");
+        rule10.setLabel("Rule 10 Test Label");
+        rule10.setDescription("Rule 10 Test Description");
+
+        pr10.setProgramRequirementCode(rule10);
+
+        GradRuleDetails gradRule10Details = new GradRuleDetails();
+        gradRule10Details.setRuleCode("110");
+        gradRule10Details.setTraxReqNumber("10");
+        gradRule10Details.setProgramCode("2018-EN");
+        gradRule10Details.setRequirementName("Rule 10 Test Label");
+
+        // Rule 11
+        ProgramRequirement pr11 = new ProgramRequirement();
+        pr11.setProgramRequirementID(UUID.randomUUID());
+        pr11.setGraduationProgramCode("2018-EN");
+        ProgramRequirementCode rule11 = new ProgramRequirementCode();
+        rule11.setTraxReqNumber("11");
+        rule11.setProReqCode("111");
+        rule11.setLabel("Rule 11 Test Label");
+        rule11.setDescription("Rule 11 Test Description");
+
+        pr11.setProgramRequirementCode(rule11);
+
+        GradRuleDetails gradRule11Details = new GradRuleDetails();
+        gradRule11Details.setRuleCode("111");
+        gradRule11Details.setTraxReqNumber("11");
+        gradRule11Details.setProgramCode("2018-EN");
+        gradRule11Details.setRequirementName("Rule 11 Test Label");
+
+        // Rule 15
+        ProgramRequirement pr15 = new ProgramRequirement();
+        pr15.setProgramRequirementID(UUID.randomUUID());
+        pr15.setGraduationProgramCode("2018-EN");
+        ProgramRequirementCode rule15 = new ProgramRequirementCode();
+        rule15.setTraxReqNumber("15");
+        rule15.setProReqCode("115");
+        rule15.setLabel("Rule 15 Test Label");
+        rule15.setDescription("Rule 15 Test Description");
+
+        pr15.setProgramRequirementCode(rule15);
+
+        GradRuleDetails gradRule15Details = new GradRuleDetails();
+        gradRule15Details.setRuleCode("115");
+        gradRule15Details.setTraxReqNumber("15");
+        gradRule15Details.setProgramCode("2018-EN");
+        gradRule15Details.setRequirementName("Rule 15 Test Label");
+
+        // SpecialCase
+        SpecialCase sc = new SpecialCase();
+        sc.setSpCase("E");
+        sc.setLabel("XMT");
+        sc.setDescription("Exempt");
+        sc.setPassFlag("Y");
+
+        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
+        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
+        when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
+        when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule11Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule11Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule15Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule15Details));
+
+        ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("1950")
+                .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("I")
+                .slpDate("0")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentStatus("A")
+                .studentGrade("AD")
+                .schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("1950")
+                .programCodes(new ArrayList<>())
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1950");
+
+    }
+
+    @Test
     public void testAddStudentCareerProgram() {
         UUID studentID = UUID.randomUUID();
         String careerProgramCode = "XC";
@@ -1260,6 +1439,5 @@ public class StudentServiceWithMockRepositoryTest {
         }
         assertThat(isExceptionThrown).isFalse();
     }
-
 
 }
