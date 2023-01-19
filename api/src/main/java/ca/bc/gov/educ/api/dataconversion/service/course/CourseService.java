@@ -633,6 +633,331 @@ public class CourseService {
         createCourseRequirement(populate("WRK", "11A", "600"), summary);
         createCourseRequirement(populate("WRK", "11B", "600"), summary);
 
+        createCourseRequirement(populate("TRNA", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNA", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNB", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNB", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRND", "12A", "600"), summary);
+        createCourseRequirement(populate("TRND", "12B", "600"), summary);
+        createCourseRequirement(populate("TRND", "12C", "600"), summary);
+        createCourseRequirement(populate("TRND", "12D", "600"), summary);
+        createCourseRequirement(populate("TRND", "12E", "600"), summary);
+        createCourseRequirement(populate("TRND", "12F", "600"), summary);
+        createCourseRequirement(populate("TRND", "12G", "600"), summary);
+        createCourseRequirement(populate("TRND", "12H", "600"), summary);
+        createCourseRequirement(populate("TRND", "12I", "600"), summary);
+        createCourseRequirement(populate("TRND", "12J", "600"), summary);
+        createCourseRequirement(populate("TRND", "12K", "600"), summary);
+        createCourseRequirement(populate("TRND", "12L", "600"), summary);
+        createCourseRequirement(populate("TRND", "12M", "600"), summary);
+        createCourseRequirement(populate("TRND", "12N", "600"), summary);
+        createCourseRequirement(populate("TRND", "12O", "600"), summary);
+        createCourseRequirement(populate("TRND", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNE", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNE", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNJ", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNJ", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNL", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNL", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNM", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNM", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNN", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNN", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNO", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNO", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNP", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNP", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNQ", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNQ", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNS", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNS", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNV", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNV", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNW", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNW", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TRNZ", "12A", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12B", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12C", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12D", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12E", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12F", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12G", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12H", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12I", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12J", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12K", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12L", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12M", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12N", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12O", "600"), summary);
+        createCourseRequirement(populate("TRNZ", "12P", "600"), summary);
+
+        createCourseRequirement(populate("TSTA", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTA", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTA", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTB", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTB", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTB", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTD", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTD", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTD", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTE", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTE", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTE", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTJ", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTJ", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTJ", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTL", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTL", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTL", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTM", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTM", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTM", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTN", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTN", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTN", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTO", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTO", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTO", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTP", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTP", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTP", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTQ", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTQ", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTQ", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTS", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTS", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTS", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTV", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTV", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTV", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTW", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTW", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTW", "12C", "600"), summary);
+
+        createCourseRequirement(populate("TSTZ", "12A", "600"), summary);
+        createCourseRequirement(populate("TSTZ", "12B", "600"), summary);
+        createCourseRequirement(populate("TSTZ", "12C", "600"), summary);
+
+        createCourseRequirement(populate("WEXF", "12A", "600"), summary);
+        createCourseRequirement(populate("WEXF", "12B", "600"), summary);
+        createCourseRequirement(populate("WEXF", "12A", "506"), summary);
+        createCourseRequirement(populate("WEXF", "12B", "506"), summary);
+
+        createCourseRequirement(populate("WRKF", "12A", "600"), summary);
+        createCourseRequirement(populate("WRKF", "12B", "600"), summary);
+        createCourseRequirement(populate("WRKF", "11A", "600"), summary);
+        createCourseRequirement(populate("WRKF", "11B", "600"), summary);
+
         // Provincial Exams and Assessment Equivalencies
         createCourseRequirement(populate("AMA", "10", "116"), summary);
         createCourseRequirement(populate("EMA", "10", "116"), summary);

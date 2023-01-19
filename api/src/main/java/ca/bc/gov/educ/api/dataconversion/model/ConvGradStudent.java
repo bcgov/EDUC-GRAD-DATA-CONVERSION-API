@@ -29,6 +29,7 @@ public class ConvGradStudent {
   private String archiveFlag; // inc
   private String frenchCert;
   private String englishCert;
+  private String frenchDogwood;
   private String consumerEducationRequirementMet;
   private String studentCitizenship;
 
