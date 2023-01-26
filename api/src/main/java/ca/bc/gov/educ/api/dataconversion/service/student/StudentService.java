@@ -1138,9 +1138,6 @@ public class StudentService extends StudentBaseService {
     }
 
     private boolean isAdultOrSccp(String graduationProgram, String grade) {
-        if ("SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade))) {
-            return true;
-        }
-        return false;
+        return "SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade));
     }
 }
