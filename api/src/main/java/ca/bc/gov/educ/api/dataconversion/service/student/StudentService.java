@@ -229,10 +229,10 @@ public class StudentService extends StudentBaseService {
         }
 
         if (result != ConversionResultType.FAILURE) {
-            result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), accessToken, summary);
+            result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
         }
         if (result != ConversionResultType.FAILURE) {
-            result = processSccpFrenchCertificates(gradStudentEntity, accessToken, summary);
+            result = processSccpFrenchCertificates(gradStudentEntity, convGradStudent.isGraduated(), accessToken, summary);
         }
 
         if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -368,7 +368,9 @@ public class StudentService extends StudentBaseService {
         List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
 
         // studentCourses
-        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList = buildStudentCourses(transcriptStudentCourses.stream().filter(c -> !c.getReportType().equals("3")).collect(Collectors.toList()), studentEntity.getProgram(), summary.getAccessToken());
+        List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList =
+                buildStudentCourses(transcriptStudentCourses.stream().filter(c -> !c.getReportType().equals("3")).collect(Collectors.toList()),
+                studentEntity.getProgram(), student.getStudentGrade(), summary.getAccessToken());
         StudentCourses studentCourses = new StudentCourses();
         studentCourses.setStudentCourseList(studentCourseList);
         graduationData.setStudentCourses(studentCourses);
@@ -458,10 +460,10 @@ public class StudentService extends StudentBaseService {
         return courses;
     }
 
-    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse, String graduationProgramCode, String accessToken) {
+    private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse, String graduationProgramCode, String studentGrade, String accessToken) {
         List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourses = new ArrayList<>();
         for (TranscriptStudentCourse tswCourse : tswStudentCourse) {
-            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse studentCourse = populateStudentCourse(tswCourse, graduationProgramCode, accessToken);
+            ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse studentCourse = populateStudentCourse(tswCourse, graduationProgramCode, studentGrade, accessToken);
             studentCourses.add(studentCourse);
         }
 
@@ -478,15 +480,19 @@ public class StudentService extends StudentBaseService {
         return studentAssessments;
     }
 
-    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse populateStudentCourse(TranscriptStudentCourse tswCourse, String graduationProgramCode, String accessToken) {
+    private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse populateStudentCourse(TranscriptStudentCourse tswCourse, String graduationProgramCode, String studentGrade, String accessToken) {
+        Integer credits = EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits());
+        Integer creditsUsedForGrad = EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getUsedForGrad());
+        boolean isAdultOrSccp = isAdultOrSccp(graduationProgramCode, studentGrade);
+
         ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse result = ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse.builder()
                 .pen(tswCourse.getStudNo())
                 .courseCode(tswCourse.getCourseCode())
                 .courseLevel(tswCourse.getCourseLevel())
                 .courseName(tswCourse.getCourseName())
-                .originalCredits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
-                .credits(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
-                .creditsUsedForGrad(EducGradDataConversionApiUtils.getNumberOfCredits(tswCourse.getNumberOfCredits()))
+                .originalCredits(credits)
+                .credits(credits)
+                .creditsUsedForGrad(isAdultOrSccp? null : creditsUsedForGrad)
                 .sessionDate(tswCourse.getCourseSession())
                 .completedCoursePercentage(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
                 .completedCourseLetterGrade(tswCourse.getFinalLG() != null? tswCourse.getFinalLG().trim() : null)
@@ -501,8 +507,9 @@ public class StudentService extends StudentBaseService {
                 .hasRelatedCourse(StringUtils.isNotBlank(tswCourse.getRelatedCourse())? "Y" : "N")
                 //.genericCourseType("") // tsw course name is used
                 //.relatedCourseName("")// tsw course name is used
+                .specialCase(StringUtils.isNotBlank(tswCourse.getSpecialCase())? tswCourse.getSpecialCase().trim() : null)
                 .provExamCourse(StringUtils.equals(tswCourse.getReportType(), "1")? "Y" : "N")
-                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad()))
+                .isUsed(isAdultOrSccp? true : creditsUsedForGrad != null && creditsUsedForGrad.intValue() != 0)
                 .isProjected(false)
                 .isRestricted(false)
                 .isDuplicate(false)
@@ -523,7 +530,8 @@ public class StudentService extends StudentBaseService {
         if (rule != null) {
             // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
             result.setGradReqMet(tswCourse.getFoundationReq());
-            result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
+            result.setGradReqMetDetail(StringUtils.isNotBlank(tswCourse.getFoundationReq())?
+                    tswCourse.getFoundationReq().trim() + " - " + rule.getProgramRequirementCode().getLabel() : rule.getProgramRequirementCode().getLabel());
         }
 
         // Final Percentage
@@ -541,7 +549,8 @@ public class StudentService extends StudentBaseService {
                 .assessmentName(tswCourse.getCourseName())
                 .sessionDate(tswCourse.getCourseSession())
                 .proficiencyScore(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
-                .isUsed(StringUtils.isNotBlank(tswCourse.getUsedForGrad())) // usedForGrad has some credits or not
+                .specialCase(StringUtils.isNotBlank(tswCourse.getSpecialCase())? tswCourse.getSpecialCase().trim() : null)
+                .isUsed(StringUtils.isNotBlank(tswCourse.getFoundationReq()))
                 .isProjected(false)
                 .isDuplicate(false)
                 .isFailed(false)
@@ -552,15 +561,8 @@ public class StudentService extends StudentBaseService {
         if (rule != null) {
             // old trax requirement code is used instead of new requirement code, rule.getProgramRequirementCode().getProReqCode()
             result.setGradReqMet(tswCourse.getFoundationReq());
-            result.setGradReqMetDetail(rule.getProgramRequirementCode().getLabel());
-        }
-
-        if (StringUtils.isNotBlank(tswCourse.getSpecialCase())) {
-            // SpecialCase
-            SpecialCase sc = lookupSpecialCase(tswCourse.getSpecialCase().trim(), accessToken);
-            if (sc != null) {
-                result.setSpecialCase(sc.getSpCase());
-            }
+            result.setGradReqMetDetail(StringUtils.isNotBlank(tswCourse.getFoundationReq())?
+                tswCourse.getFoundationReq().trim() + " - " + rule.getProgramRequirementCode().getLabel() : rule.getProgramRequirementCode().getLabel());
         }
 
         // Final Percentage
@@ -580,7 +582,6 @@ public class StudentService extends StudentBaseService {
         }
         return null;
     }
-
 
     private ProgramRequirement getProgramRequirement(String graduationProgramCode, String foundationReq, String accessToken) {
         if (StringUtils.isBlank(graduationProgramCode) || StringUtils.isBlank(foundationReq)) {
@@ -615,7 +616,7 @@ public class StudentService extends StudentBaseService {
             if (optionalProgram != null) {
                 result.setOptionalProgramID(optionalProgram.getOptionalProgramID());
                 result.setOptionalProgramCode(optionalProgram.getOptProgramCode());
-                result.setOptionalProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(entity.getSpecialProgramCompletionDate()));
+                result.setOptionalProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(entity.getOptionalProgramCompletionDate()));
                 result.setOptionalRequirementsMet(new ArrayList<>());
                 result.setStudentID(entity.getStudentID());
                 result.setCpList(buildStudentCareerProgramList(entity, accessToken));
@@ -661,7 +662,7 @@ public class StudentService extends StudentBaseService {
     }
 
     private List<GradRequirement> buildRequirementsMet(String programCode, List<TranscriptStudentCourse> tswStudentCourses, ConversionStudentSummaryDTO summary) {
-        List<GradRequirement> requirements = new ArrayList<>();
+        Set<GradRequirement> requirements = new HashSet<>();
         for (TranscriptStudentCourse tswCourse : tswStudentCourses) {
             if (StringUtils.isNotBlank(tswCourse.getFoundationReq())) {
                 GradRequirement gradRequirement = populateRequirement(programCode, tswCourse.getFoundationReq(), summary);
@@ -670,7 +671,7 @@ public class StudentService extends StudentBaseService {
                 }
             }
         }
-        return requirements;
+        return new ArrayList<>(requirements);
     }
 
     private GradRequirement populateRequirement(String programCode, String traxReqNumber, ConversionStudentSummaryDTO summary) {
@@ -721,12 +722,12 @@ public class StudentService extends StudentBaseService {
 
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF")) {
-            return createStudentOptionalProgram("DD", student, accessToken, summary);
+            return createStudentOptionalProgram("DD", student, false, accessToken, summary);
         }
 
         // French Immersion for 2018-EN, 2004-EN, 1996-EN, 1986-EN
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), accessToken)) {
-            return createStudentOptionalProgram("FI", student, accessToken, summary);
+            return createStudentOptionalProgram("FI", student, false, accessToken, summary);
         }
 
         return ConversionResultType.SUCCESS;
@@ -740,12 +741,12 @@ public class StudentService extends StudentBaseService {
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(student.getEnglishCert(), "E")) {
             student.setDualDogwood(true);
-            return createStudentOptionalProgram("DD", student, accessToken, summary);
+            return createStudentOptionalProgram("DD", student, true, accessToken, summary);
         }
 
         // French Immersion for mincode[1:3] <> '093' and french_cert = 'F'
         if (!student.getSchoolOfRecord().startsWith("093") && StringUtils.equalsIgnoreCase(student.getFrenchCert(), "F")) {
-            return createStudentOptionalProgram("FI", student, accessToken, summary);
+            return createStudentOptionalProgram("FI", student, true, accessToken, summary);
         }
 
         return ConversionResultType.SUCCESS;
@@ -776,12 +777,12 @@ public class StudentService extends StudentBaseService {
         return frenchImmersion;
     }
 
-    private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processProgramCodes(GraduationStudentRecordEntity student, List<String> programCodes, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType = ConversionResultType.SUCCESS;
         Boolean isCareerProgramCreated = Boolean.FALSE;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
-                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, accessToken, summary);
+                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, isGraduated, accessToken, summary);
                 if (Boolean.TRUE.equals(res.getRight())) {
                     isCareerProgramCreated = Boolean.TRUE;
                 }
@@ -791,17 +792,17 @@ public class StudentService extends StudentBaseService {
                 }
             }
             if (Boolean.TRUE.equals(isCareerProgramCreated)) {
-                resultType = createStudentOptionalProgram("CP", student, accessToken, summary);
+                resultType = createStudentOptionalProgram("CP", student, isGraduated, accessToken, summary);
             }
         }
         return resultType;
     }
 
-    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecordEntity student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType;
         boolean isCareerProgramCreated = false;
         if (isOptionalProgramCode(programCode)) {
-            resultType = createStudentOptionalProgram(programCode, student, accessToken, summary);
+            resultType = createStudentOptionalProgram(programCode, student, isGraduated, accessToken, summary);
         } else {
             resultType = createStudentCareerProgram(programCode, student, summary);
             if (resultType == ConversionResultType.SUCCESS) {
@@ -811,12 +812,12 @@ public class StudentService extends StudentBaseService {
         return Pair.of(resultType, isCareerProgramCreated);
     }
 
-    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecordEntity student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.equals(student.getProgram(), "SCCP")
             && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
                  && student.getSchoolOfRecord().startsWith("093") )
         ) {
-            return createStudentOptionalProgram("FR", student, accessToken, summary);
+            return createStudentOptionalProgram("FR", student, isGraduated, accessToken, summary);
         }
         return ConversionResultType.SUCCESS;
     }
@@ -825,7 +826,7 @@ public class StudentService extends StudentBaseService {
        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
-    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecordEntity student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramEntity entity = new StudentOptionalProgramEntity();
         entity.setPen(student.getPen());
         entity.setStudentID(student.getStudentID());
@@ -843,12 +844,14 @@ public class StudentService extends StudentBaseService {
             Optional<StudentOptionalProgramEntity> stdSpecialProgramOptional = studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(student.getStudentID(), optionalProgram.getOptionalProgramID());
             if (stdSpecialProgramOptional.isPresent()) {
                 StudentOptionalProgramEntity currentEntity = stdSpecialProgramOptional.get();
+                currentEntity.setOptionalProgramCompletionDate(isGraduated? student.getProgramCompletionDate() : null);
                 currentEntity.setUpdateDate(null);
                 currentEntity.setUpdateUser(null);
                 studentOptionalProgramRepository.save(currentEntity); // touch: update_user & update_date will be updated only.
                 createStudentOptionalProgramHistory(currentEntity, DATA_CONVERSION_HISTORY_ACTIVITY_CODE); // student optional program history
             } else {
                 entity.setId(UUID.randomUUID());
+                entity.setOptionalProgramCompletionDate(isGraduated? student.getProgramCompletionDate() : null);
                 studentOptionalProgramRepository.save(entity);
                 createStudentOptionalProgramHistory(entity, DATA_CONVERSION_HISTORY_ACTIVITY_CODE); // student optional program history
             }
@@ -1132,5 +1135,9 @@ public class StudentService extends StudentBaseService {
         }
 
         return specialCaseMap.get(specialCaseLabel);
+    }
+
+    private boolean isAdultOrSccp(String graduationProgram, String grade) {
+        return "SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade));
     }
 }
