@@ -92,6 +92,7 @@ public class StudentService extends StudentBaseService {
 
     @Transactional(transactionManager = "studentTransactionManager")
     public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
             String accessToken = summary.getAccessToken();
@@ -120,6 +121,10 @@ public class StudentService extends StudentBaseService {
         } catch (Exception e) {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Unexpected Exception is occurred: " + e.getLocalizedMessage());
         }
+
+        long endTime = System.currentTimeMillis();
+        long diff = (endTime - startTime)/1000;
+        log.info("************* TIME Taken for pen [{}]  ************ {} secs",convGradStudent.getPen(), diff);
         return convGradStudent;
     }
 
@@ -176,11 +181,14 @@ public class StudentService extends StudentBaseService {
             } else {
                 convertStudentData(convGradStudent, gradStudentEntity, summary);
             }
-            gradStudentEntity.setUpdateDate(null);
-            gradStudentEntity.setUpdateUser(null);
-            gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-            isStudentPersisted = true;
-            summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
+            // if year "1950" without "AD" or "AN", then program is null
+            if (StringUtils.isNotBlank(convGradStudent.getProgram())) {
+                gradStudentEntity.setUpdateDate(null);
+                gradStudentEntity.setUpdateUser(null);
+                gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
+                isStudentPersisted = true;
+                summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
+            }
         } else {
             gradStudentEntity = new GraduationStudentRecordEntity();
             gradStudentEntity.setPen(penStudent.getPen());
@@ -191,7 +199,7 @@ public class StudentService extends StudentBaseService {
                 convertStudentData(convGradStudent, gradStudentEntity, summary);
             }
             // if year "1950" without "AD" or "AN", then program is null
-            if (StringUtils.isNotBlank(gradStudentEntity.getProgram())) {
+            if (StringUtils.isNotBlank(convGradStudent.getProgram())) {
                 gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                 summary.setAddedCount(summary.getAddedCount() + 1L);
                 isStudentPersisted = true;
@@ -268,13 +276,13 @@ public class StudentService extends StudentBaseService {
     private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
+        } else {
+            return;
         }
 
-        // for testing purpose
-        // always set to NULL, even for graduated students.  => GRAD grad algorithm will be run at some point
         studentEntity.setGpa(null);
         studentEntity.setHonoursStanding(null);
-        if (studentEntity.getProgram().equals("SCCP")) {
+        if ("SCCP".equalsIgnoreCase(studentEntity.getProgram())) {
             studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
         } else {
             studentEntity.setProgramCompletionDate(null);
@@ -304,11 +312,13 @@ public class StudentService extends StudentBaseService {
     private void convertGraduatedStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
+        } else {
+            return;
         }
 
         studentEntity.setGpa(student.getGpa());
         studentEntity.setHonoursStanding(student.getHonoursStanding());
-        if (studentEntity.getProgram().equals("SCCP")) {
+        if ("SCCP".equalsIgnoreCase(studentEntity.getProgram())) {
             studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
         } else {
             studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
@@ -332,14 +342,14 @@ public class StudentService extends StudentBaseService {
     private GraduationData buildGraduationData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, Student penStudent, ConversionStudentSummaryDTO summary) {
         GraduationData graduationData = new GraduationData();
 
-        TranscriptStudentDemog transcriptStudentDemog;
+        TranscriptStudentDemog transcriptStudentDemog = student.getTranscriptStudentDemog();
         // TSW_TRAN_DEMOG
-        try {
-            transcriptStudentDemog = restUtils.getTranscriptStudentDemog(student.getPen(), summary.getAccessToken());
-        } catch (Exception e) {
-            log.error(TRAX_API_ERROR_MSG + "getting Transcript Student Demog data : " + e.getLocalizedMessage());
-            return null;
-        }
+//        try {
+//            transcriptStudentDemog = restUtils.getTranscriptStudentDemog(student.getPen(), summary.getAccessToken());
+//        } catch (Exception e) {
+//            log.error(TRAX_API_ERROR_MSG + "getting Transcript Student Demog data : " + e.getLocalizedMessage());
+//            return null;
+//        }
 
         // gradStatus
         GradAlgorithmGraduationStudentRecord gradStatus = new GradAlgorithmGraduationStudentRecord();
@@ -365,7 +375,8 @@ public class StudentService extends StudentBaseService {
         graduationData.setGradStudent(gradStudent);
 
         // TSW_TRAN_CRSE
-        List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
+//        List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
+        List<TranscriptStudentCourse> transcriptStudentCourses = student.getTranscriptStudentCourses();
 
         // studentCourses
         List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList =
@@ -745,7 +756,7 @@ public class StudentService extends StudentBaseService {
         }
 
         // French Immersion for mincode[1:3] <> '093' and french_cert = 'F'
-        if (!student.getSchoolOfRecord().startsWith("093") && StringUtils.equalsIgnoreCase(student.getFrenchCert(), "F")) {
+        if (student.getProgram().endsWith("-EN") && !student.getSchoolOfRecord().startsWith("093") && StringUtils.equalsIgnoreCase(student.getFrenchCert(), "F")) {
             return createStudentOptionalProgram("FI", student, true, accessToken, summary);
         }
 

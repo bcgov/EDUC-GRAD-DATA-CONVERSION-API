@@ -41,6 +41,9 @@ public class ConvGradStudent {
 
   // grad or non-grad
   private boolean graduated;
+  // tsw
+  private TranscriptStudentDemog transcriptStudentDemog;
+  private List<TranscriptStudentCourse> transcriptStudentCourses;
 
   // data conversion status after being processed.
   private ConversionResultType result;
