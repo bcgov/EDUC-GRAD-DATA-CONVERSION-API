@@ -216,7 +216,6 @@ public class StudentService extends StudentBaseService {
                                      GraduationStudentRecordEntity gradStudentEntity,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary, String accessToken) {
-        long startTime = System.currentTimeMillis();
         ConversionResultType result;
 
         // graduation status history
