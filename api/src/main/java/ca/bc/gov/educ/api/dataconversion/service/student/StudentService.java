@@ -122,9 +122,8 @@ public class StudentService extends StudentBaseService {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Unexpected Exception is occurred: " + e.getLocalizedMessage());
         }
 
-        long endTime = System.currentTimeMillis();
-        long diff = (endTime - startTime)/1000;
-        log.info("************* TIME Taken for pen [{}]  ************ {} secs",convGradStudent.getPen(), diff);
+        long diff = (System.currentTimeMillis() - startTime) / 1000L;
+        log.info("************* TIME Taken for pen [{}]  ************ {} secs", convGradStudent.getPen(), diff);
         return convGradStudent;
     }
 
@@ -217,7 +216,7 @@ public class StudentService extends StudentBaseService {
                                      GraduationStudentRecordEntity gradStudentEntity,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary, String accessToken) {
-
+        long startTime = System.currentTimeMillis();
         ConversionResultType result;
 
         // graduation status history
@@ -343,13 +342,6 @@ public class StudentService extends StudentBaseService {
         GraduationData graduationData = new GraduationData();
 
         TranscriptStudentDemog transcriptStudentDemog = student.getTranscriptStudentDemog();
-        // TSW_TRAN_DEMOG
-//        try {
-//            transcriptStudentDemog = restUtils.getTranscriptStudentDemog(student.getPen(), summary.getAccessToken());
-//        } catch (Exception e) {
-//            log.error(TRAX_API_ERROR_MSG + "getting Transcript Student Demog data : " + e.getLocalizedMessage());
-//            return null;
-//        }
 
         // gradStatus
         GradAlgorithmGraduationStudentRecord gradStatus = new GradAlgorithmGraduationStudentRecord();
@@ -375,7 +367,6 @@ public class StudentService extends StudentBaseService {
         graduationData.setGradStudent(gradStudent);
 
         // TSW_TRAN_CRSE
-//        List<TranscriptStudentCourse> transcriptStudentCourses = retrieveTswStudentCourses(student.getPen(), summary.getAccessToken());
         List<TranscriptStudentCourse> transcriptStudentCourses = student.getTranscriptStudentCourses();
 
         // studentCourses
