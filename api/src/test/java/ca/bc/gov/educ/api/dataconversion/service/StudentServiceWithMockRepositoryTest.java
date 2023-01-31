@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
@@ -97,6 +98,49 @@ public class StudentServiceWithMockRepositoryTest {
     @After
     public void tearDown() {
         graduationStudentRecordRepository.deleteAll();
+    }
+
+    @Test
+    public void convertStudent_forSchoolValidation_whenTraxAPIisDown_thenReturnFailure() throws Exception {
+        String pen = "111222333";
+        String mincode = "222333";
+
+        when(this.restUtils.checkSchoolExists(mincode, "123")).thenThrow(IllegalArgumentException.class);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
+                .programCodes(new ArrayList<>()).build();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("SCCP");
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Grad Trax API is failed for");
+    }
+
+    @Test
+    public void convertStudent_forSchoolValidation_whenGivenSchool_doesNotExist_thenReturnFailure() throws Exception {
+        String pen = "111222333";
+        String mincode = "222333";
+
+        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(false);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
+                .programCodes(new ArrayList<>()).build();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("SCCP");
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Invalid school of record");
     }
 
     @Test
@@ -1578,7 +1622,7 @@ public class StudentServiceWithMockRepositoryTest {
         assertThat(result.getPen()).isEqualTo(pen);
         assertThat(result.getGraduationRequirementYear()).isEqualTo("SCCP");
         assertThat(summary.getErrors()).isNotEmpty();
-        assertThat(summary.getErrors().get(0).getReason().startsWith("Bad data : slp_date format")).isTrue();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Bad data : slp_date format");
     }
 
     @Test
