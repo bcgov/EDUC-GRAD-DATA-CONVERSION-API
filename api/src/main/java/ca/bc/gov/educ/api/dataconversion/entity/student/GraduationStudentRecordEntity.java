@@ -67,6 +67,9 @@ public class GraduationStudentRecordEntity extends BaseEntity {
     @Column(name = "STUDENT_CITIZENSHIP_CODE", nullable = true)
     private String studentCitizenship;
 
+    @Column(name = "ADULT_START_DATE", nullable = true)
+    private Date adultStartDate;
+
     // Mappings for Student_Master
     @Transient
     private String frenchCert;

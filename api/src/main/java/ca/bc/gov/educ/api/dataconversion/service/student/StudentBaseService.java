@@ -50,10 +50,7 @@ public class StudentBaseService {
             return true;
         } else {
             // error
-            ConversionAlert error = new ConversionAlert();
-            error.setItem(student.getPen());
-            error.setReason("Program is not found for year " + student.getGraduationRequirementYear() + " / grade " + student.getStudentGrade());
-            summary.getErrors().add(error);
+            handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, "Program is not found for grad_reqt_year " + student.getGraduationRequirementYear() + " / grade " + student.getStudentGrade());
             return false;
         }
     }

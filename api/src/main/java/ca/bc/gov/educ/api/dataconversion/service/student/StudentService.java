@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class StudentService extends StudentBaseService {
 
             // School validation
             boolean schoolExists = validateSchool(convGradStudent, summary);
-            if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // Grad Trax API is failed
+            if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // Grad Trax API is failed
                 return convGradStudent;
             } else if (!schoolExists) {
                 handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Invalid school of record " + convGradStudent.getSchoolOfRecord());
@@ -108,7 +109,7 @@ public class StudentService extends StudentBaseService {
 
             // PEN Student
             List<Student> students = getStudentsFromPEN(convGradStudent, summary);
-            if (convGradStudent.getResult() == ConversionResultType.FAILURE) { // PEN Student API is failed
+            if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // PEN Student API is failed
                 return convGradStudent;
             } else if (students == null || students.isEmpty()) {
                 handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN does not exist: PEN Student API returns empty response.");
@@ -168,7 +169,6 @@ public class StudentService extends StudentBaseService {
     }
 
     private GraduationStudentRecordEntity processStudent(ConvGradStudent convGradStudent, Student penStudent,  ConversionStudentSummaryDTO summary) {
-        boolean isStudentPersisted = false;
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         Optional<GraduationStudentRecordEntity> stuOptional = graduationStudentRecordRepository.findById(studentID);
         GraduationStudentRecordEntity gradStudentEntity;
@@ -178,14 +178,12 @@ public class StudentService extends StudentBaseService {
             if (convGradStudent.isGraduated()) {
                 convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
             } else {
-                convertStudentData(convGradStudent, gradStudentEntity, summary);
+                convertStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             }
-            // if year "1950" without "AD" or "AN", then program is null
-            if (StringUtils.isNotBlank(convGradStudent.getProgram())) {
+            if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 gradStudentEntity.setUpdateDate(null);
                 gradStudentEntity.setUpdateUser(null);
                 gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
-                isStudentPersisted = true;
                 summary.setUpdatedCount(summary.getUpdatedCount() + 1L);
             }
         } else {
@@ -195,16 +193,14 @@ public class StudentService extends StudentBaseService {
             if (convGradStudent.isGraduated()) {
                 convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
             } else {
-                convertStudentData(convGradStudent, gradStudentEntity, summary);
+                convertStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             }
-            // if year "1950" without "AD" or "AN", then program is null
-            if (StringUtils.isNotBlank(convGradStudent.getProgram())) {
+            if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 gradStudentEntity = graduationStudentRecordRepository.save(gradStudentEntity);
                 summary.setAddedCount(summary.getAddedCount() + 1L);
-                isStudentPersisted = true;
             }
         }
-        if (isStudentPersisted) {
+        if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
             return gradStudentEntity;
         } else {
             return null;
@@ -234,27 +230,23 @@ public class StudentService extends StudentBaseService {
             result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
         }
 
-        if (result != ConversionResultType.FAILURE) {
+        if (ConversionResultType.FAILURE != result) {
             result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
         }
-        if (result != ConversionResultType.FAILURE) {
+        if (ConversionResultType.FAILURE != result) {
             result = processSccpFrenchCertificates(gradStudentEntity, convGradStudent.isGraduated(), accessToken, summary);
         }
 
         if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             // Building GraduationData CLOB data
             GraduationData graduationData = buildGraduationData(convGradStudent, gradStudentEntity, penStudent, summary);
-            if (graduationData != null) {
-                try {
-                    gradStudentEntity.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
-                } catch (JsonProcessingException jpe) {
-                    log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
-                }
+            try {
+                gradStudentEntity.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
+            } catch (JsonProcessingException jpe) {
+                log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
             }
-            if(graduationData != null) {
-                createAndStoreStudentTranscript(graduationData, accessToken);
-                createAndStoreStudentCertificates(graduationData, accessToken);
-            }
+            createAndStoreStudentTranscript(graduationData, accessToken);
+            createAndStoreStudentCertificates(graduationData, accessToken);
         }
         convGradStudent.setResult(result);
     }
@@ -271,7 +263,7 @@ public class StudentService extends StudentBaseService {
         }
     }
 
-    private void convertStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
+    private void convertStudentData(ConvGradStudent student, Student penStudent, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
         } else {
@@ -281,7 +273,9 @@ public class StudentService extends StudentBaseService {
         studentEntity.setGpa(null);
         studentEntity.setHonoursStanding(null);
         if ("SCCP".equalsIgnoreCase(studentEntity.getProgram())) {
-            studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
+            if (!validateAndSetSlpDate(student, studentEntity, summary)) {
+                return;
+            }
         } else {
             studentEntity.setProgramCompletionDate(null);
         }
@@ -291,6 +285,8 @@ public class StudentService extends StudentBaseService {
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        handleAdult19Rule(student, penStudent, studentEntity);
 
         // flags
         if (StringUtils.equalsIgnoreCase(studentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -317,7 +313,9 @@ public class StudentService extends StudentBaseService {
         studentEntity.setGpa(student.getGpa());
         studentEntity.setHonoursStanding(student.getHonoursStanding());
         if ("SCCP".equalsIgnoreCase(studentEntity.getProgram())) {
-            studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
+            if (!validateAndSetSlpDate(student, studentEntity, summary)) {
+                return;
+            }
         } else {
             studentEntity.setProgramCompletionDate(student.getProgramCompletionDate());
         }
@@ -393,7 +391,6 @@ public class StudentService extends StudentBaseService {
         // gradMessage
         String gradMessage = transcriptStudentDemog.getGradMessage();
         if ("1950".equalsIgnoreCase(studentEntity.getProgram())
-            && "AD".equalsIgnoreCase(studentEntity.getStudentGrade())
             && StringUtils.isNotBlank(gradMessage)
             && StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG)) {
             gradMessage = StringUtils.remove(gradMessage, TSW_PF_GRAD_MSG).trim();
@@ -449,16 +446,6 @@ public class StudentService extends StudentBaseService {
         gradSearchStudent.setSchoolOfRecordindependentAffiliation(school.getIndependentAffiliation());
 
         return gradSearchStudent;
-    }
-
-    private List<TranscriptStudentCourse> retrieveTswStudentCourses(String pen, String accessToken) {
-        List<TranscriptStudentCourse> courses = new ArrayList<>();
-        try {
-            courses = restUtils.getTranscriptStudentCourses(pen, accessToken);
-        } catch (Exception e) {
-            log.error(TRAX_API_ERROR_MSG + "getting TSW_TRAN_CRSE records : " + e.getLocalizedMessage());
-        }
-        return courses;
     }
 
     private List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> buildStudentCourses(List<TranscriptStudentCourse> tswStudentCourse, String graduationProgramCode, String studentGrade, String accessToken) {
@@ -788,7 +775,7 @@ public class StudentService extends StudentBaseService {
                     isCareerProgramCreated = Boolean.TRUE;
                 }
                 resultType = res.getLeft();
-                if (resultType == ConversionResultType.FAILURE) {
+                if (ConversionResultType.FAILURE == resultType) {
                     break;
                 }
             }
@@ -806,7 +793,7 @@ public class StudentService extends StudentBaseService {
             resultType = createStudentOptionalProgram(programCode, student, isGraduated, accessToken, summary);
         } else {
             resultType = createStudentCareerProgram(programCode, student, summary);
-            if (resultType == ConversionResultType.SUCCESS) {
+            if (ConversionResultType.SUCCESS == resultType) {
                 isCareerProgramCreated = true;
             }
         }
@@ -1140,5 +1127,23 @@ public class StudentService extends StudentBaseService {
 
     private boolean isAdultOrSccp(String graduationProgram, String grade) {
         return "SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade));
+    }
+
+    private void handleAdult19Rule(ConvGradStudent student, Student penStudent, GraduationStudentRecordEntity studentEntity) {
+        if ("1950".equalsIgnoreCase(studentEntity.getProgram()) && "AD".equalsIgnoreCase(studentEntity.getStudentGrade())) {
+            Date dob = EducGradDataConversionApiUtils.parseDate(penStudent.getDob());
+            Date adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule()? 19 : 18);
+            studentEntity.setAdultStartDate(adultStartDate);
+        }
+    }
+
+    private boolean validateAndSetSlpDate(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
+        if (StringUtils.isNotBlank(student.getSlpDate()) && StringUtils.length(student.getSlpDate().trim()) != 8) {
+            handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, "Bad data : slp_date format is not yyyyMMdd");
+            return false;
+        } else {
+            studentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT));
+            return true;
+        }
     }
 }

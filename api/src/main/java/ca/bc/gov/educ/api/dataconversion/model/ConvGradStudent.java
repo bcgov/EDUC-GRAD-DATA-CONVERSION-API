@@ -44,6 +44,8 @@ public class ConvGradStudent {
   // tsw
   private TranscriptStudentDemog transcriptStudentDemog;
   private List<TranscriptStudentCourse> transcriptStudentCourses;
+  // 1950 "AD"
+  private boolean adult19Rule;
 
   // data conversion status after being processed.
   private ConversionResultType result;
