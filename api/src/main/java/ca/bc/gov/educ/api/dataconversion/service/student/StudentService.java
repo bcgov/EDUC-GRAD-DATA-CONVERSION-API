@@ -99,7 +99,7 @@ public class StudentService extends StudentBaseService {
             String accessToken = summary.getAccessToken();
 
             // School validation
-            boolean schoolExists = validateSchool(convGradStudent, summary);
+            Boolean schoolExists = validateSchool(convGradStudent, summary);
             if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // Grad Trax API is failed
                 return convGradStudent;
             } else if (!schoolExists) {
