@@ -148,8 +148,6 @@ endpoint:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student-master
       save-trax-student-no:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/trax-student-no
-      get-student-graduated-by-pen:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/student/graduated
     course:
       get-course-restrictions:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-restrictions
@@ -160,11 +158,6 @@ endpoint:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/check
       school-by-min-code:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/school/%s
-    tsw:
-      get-tran-demog-by-pen:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/tsw/tran-demog
-      get-tran-courses-by-pen:
-        url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/tsw/tran-courses
   grad-graduation-report-api:
     get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
