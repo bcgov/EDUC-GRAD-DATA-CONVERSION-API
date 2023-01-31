@@ -30,6 +30,7 @@ public class ConversionStudentSummaryDTO extends ConversionBaseSummaryDTO {
     put("1950", 0L);
     put("1950 Grad", 0L);
     put("SCCP", 0L);
+    put("SCCP Grad", 0L);
   }};
 
   // optional program stats
