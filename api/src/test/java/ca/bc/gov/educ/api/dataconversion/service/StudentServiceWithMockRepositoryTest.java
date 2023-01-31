@@ -737,9 +737,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-//        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-//        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
         when(this.restUtils.getGradProgramRules("1986-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -962,9 +960,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-//        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-//        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1188,9 +1184,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("2018-PF", "DD", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-//        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-//        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
         when(this.restUtils.getGradProgramRules("2018-PF", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1371,9 +1365,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-//        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-//        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1552,9 +1544,7 @@ public class StudentServiceWithMockRepositoryTest {
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-//        when(this.restUtils.getTranscriptStudentDemog(pen, "123")).thenReturn(tranStudentDemog);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-//        when(this.restUtils.getTranscriptStudentCourses(pen, "123")).thenReturn(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));

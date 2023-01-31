@@ -191,8 +191,6 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/student-master
       save-trax-student-no:
         url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no
-      get-student-graduated-by-pen:
-        url: ${GRAD_TRAX_API}api/v1/trax/common/student/graduated
     course:
       get-course-restrictions:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
@@ -203,11 +201,6 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/school/check
       school-by-min-code:
         url: ${GRAD_TRAX_API}api/v1/trax/school/%s
-    tsw:
-      get-tran-demog-by-pen:
-        url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-demog
-      get-tran-courses-by-pen:
-        url: ${GRAD_TRAX_API}api/v1/trax/tsw/tran-courses
   grad-graduation-report-api:
     get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
