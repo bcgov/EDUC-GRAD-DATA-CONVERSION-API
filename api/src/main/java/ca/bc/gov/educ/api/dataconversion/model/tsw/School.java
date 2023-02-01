@@ -3,99 +3,125 @@ package ca.bc.gov.educ.api.dataconversion.model.tsw;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Data
 @Component
-public class School {
+public class School implements Comparable<School> {
 
 	private String minCode;
-    private String schoolName;
-    private String districtName;
-    private String transcriptEligibility;    
-    private String certificateEligibility;
-    private String independentDesignation;    
-    private String mailerType;    
-    private String address1;    
-    private String address2;    
-    private String city;    
-    private String provCode; 
-    private String provinceName;
-    private String countryCode; 
-    private String countryName;
-    private String postal;
-    private String independentAffiliation;
-    private String openFlag;    
-    private String signatureDistrict;
-    private String newMinCode;    
-    private String schoolOrg;    
-    private String appendTrans;
-    private String ministryContact;
-    private String principalName;
-    private String schoolPhone;
-    private String schoolFax;
-    private String schoolEmail;
-    
+	private String schoolName;
+	private String districtName;
+	private String transcriptEligibility;
+	private String certificateEligibility;
+	private String independentDesignation;
+	private String mailerType;
+	private String address1;
+	private String address2;
+	private String city;
+	private String provCode;
+	private String provinceName;
+	private String countryCode;
+	private String countryName;
+	private String postal;
+	private String independentAffiliation;
+	private String openFlag;
+	private String signatureDistrict;
+	private String newMinCode;
+	private String schoolOrg;
+	private String appendTrans;
+	private String ministryContact;
+	private String principalName;
+	private String schoolPhone;
+	private String schoolFax;
+	private String schoolEmail;
+
+	private String schoolCategory;
+
 	public String getSchoolName() {
-		return  schoolName != null ? schoolName.trim(): null;
+		return  schoolName != null ? schoolName.trim(): "";
 	}
-	
+
 	public String getDistrictName() {
-		return districtName != null ? districtName.trim(): null;
+		return districtName != null ? districtName.trim(): "";
 	}
-	
+
 	public String getAddress1() {
-		return address1 != null ? address1.trim(): null;
+		return address1 != null ? address1.trim(): "";
 	}
 
 	public String getAddress2() {
-		return address2 != null ? address2.trim(): null;
+		return address2 != null ? address2.trim(): "";
 	}
 
 	public String getCity() {
-		return city != null ? city.trim(): null;
+		return city != null ? city.trim(): "";
 	}
 
 	public String getProvinceName() {
-		return provinceName != null ? provinceName.trim(): null;
+		return provinceName != null ? provinceName.trim(): "";
 	}
-	
+
 	public String getCountryName() {
-		return countryName != null ? countryName.trim(): null;
+		return countryName != null ? countryName.trim(): "";
 	}
-	
+
 	public String getPostal() {
-		return postal != null ? postal.trim(): null;
+		return postal != null ? postal.trim(): "";
 	}
-	
+
 	public String getIndependentDesignation() {
-		return independentDesignation != null ? independentDesignation.trim(): null;
+		return independentDesignation != null ? independentDesignation.trim(): "";
 	}
-	
+
 	public String getIndependentAffiliation() {
-		return independentAffiliation != null ? independentAffiliation.trim(): null;
+		return independentAffiliation != null ? independentAffiliation.trim(): "";
 	}
-	
+
 	public String getOpenFlag() {
-		return openFlag != null ? openFlag.trim(): null;
+		return openFlag != null ? openFlag.trim(): "";
 	}
-	
+
+	public String getReportingFlag() {
+		return getOpenFlag();
+	}
+
 	public String getSignatureDistrict() {
-		return signatureDistrict != null ? signatureDistrict.trim(): null;
+		return signatureDistrict != null ? signatureDistrict.trim(): "";
 	}
-	
+
 	public String getSchoolEmail() {
-		return  schoolEmail != null ? schoolEmail.trim(): null;
+		return  schoolEmail != null ? schoolEmail.trim(): "";
 	}
-	
+
 	public String getPrincipalName() {
-		return  principalName != null ? principalName.trim(): null;
+		return  principalName != null ? principalName.trim(): "";
 	}
-	
+
 	public String getAppendTrans() {
-		return  appendTrans != null ? appendTrans.trim(): null;
+		return  appendTrans != null ? appendTrans.trim(): "";
 	}
-	
+
 	public String getMinistryContact() {
-		return  ministryContact != null ? ministryContact.trim(): null;
+		return  ministryContact != null ? ministryContact.trim(): "";
+	}
+
+	public String getMinCode() {
+		return minCode != null ? minCode.trim(): "";
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		School school = (School) o;
+		return getMinCode().equals(school.getMinCode())
+				&& getSchoolName().equals(school.getSchoolName());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getMinCode(), getSchoolName());
 	}
 
 	@Override
@@ -110,5 +136,19 @@ public class School {
 				+ ", schoolOrg=" + schoolOrg + ", appendTrans=" + appendTrans + ", ministryContact=" + ministryContact
 				+ ", principalName=" + principalName + ", schoolPhone=" + schoolPhone + ", schoolFax=" + schoolFax
 				+ ", schoolEmail=" + schoolEmail + "]";
-	}	    
+	}
+
+	@Override
+	public int compareTo(School o) {
+		int result = 0;
+		{
+			if (result == 0) {
+				result = getMinCode().compareToIgnoreCase(o.getMinCode());
+			}
+			if (result == 0) {
+				result = getSchoolName().compareToIgnoreCase(o.getSchoolName());
+			}
+		}
+		return result;
+	}
 }

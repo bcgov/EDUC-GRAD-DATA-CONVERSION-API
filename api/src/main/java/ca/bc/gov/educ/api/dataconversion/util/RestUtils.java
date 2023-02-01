@@ -360,38 +360,6 @@ public class RestUtils {
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
-    public TranscriptStudentDemog getTranscriptStudentDemog(String pen, String accessToken) {
-        return webClient.get()
-                .uri(constants.getTswTranscriptStudentDemogByPenUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(TranscriptStudentDemog.class).block();
-    }
-
-    public Boolean getTranscriptStudentIsGraduated(String pen, String accessToken) {
-        return webClient.get()
-                .uri(constants.getTraxStudentIsGraduatedByPenUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(Boolean.class).block();
-    }
-
-    public List<TranscriptStudentCourse> getTranscriptStudentCourses(String pen, String accessToken) {
-        final ParameterizedTypeReference<List<TranscriptStudentCourse>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(constants.getTswTranscriptStudentCoursesByPenUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(responseType).block();
-    }
-
     public GraduationProgramCode getGradProgramCode(String programCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradProgramUrl(), uri -> uri.path("/{programCode}").build(programCode))

@@ -350,68 +350,6 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testGetTranscriptStudentDemog_returnsObject_withAPICallSuccess() {
-        final TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
-        transcriptStudentDemog.setStudNo("123456789");
-        transcriptStudentDemog.setMincode("12345678");
-        transcriptStudentDemog.setSchoolName("Test school");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getTswTranscriptStudentDemogByPenUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        when(this.responseMock.bodyToMono(TranscriptStudentDemog.class)).thenReturn(Mono.just(transcriptStudentDemog));
-
-        val result = this.restUtils.getTranscriptStudentDemog(transcriptStudentDemog.getStudNo(), "123");
-        assertThat(result).isNotNull();
-        assertThat(result.getStudNo()).isEqualTo(transcriptStudentDemog.getStudNo());
-    }
-
-    @Test
-    public void testGetTranscriptStudentIsGraduated_returnsObject_withAPICallSuccess() {
-        final TranscriptStudentDemog transcriptStudentDemog = new TranscriptStudentDemog();
-        transcriptStudentDemog.setStudNo("123456789");
-        transcriptStudentDemog.setMincode("12345678");
-        transcriptStudentDemog.setSchoolName("Test school");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getTraxStudentIsGraduatedByPenUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
-
-        val result = this.restUtils.getTranscriptStudentIsGraduated(transcriptStudentDemog.getStudNo(), "123");
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    public void testGetTranscriptStudentCourses_returnsObject_withAPICallSuccess() {
-        final TranscriptStudentCourse transcriptStudentCourse = new TranscriptStudentCourse();
-        transcriptStudentCourse.setStudNo("123456789");
-        transcriptStudentCourse.setCourseCode("Test");
-        transcriptStudentCourse.setCourseLevel("11");
-        transcriptStudentCourse.setCourseName("Test Course1");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getTswTranscriptStudentCoursesByPenUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        final ParameterizedTypeReference<List<TranscriptStudentCourse>> responseType = new ParameterizedTypeReference<>() {
-        };
-        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(transcriptStudentCourse)));
-
-        val results = this.restUtils.getTranscriptStudentCourses(transcriptStudentCourse.getStudNo(), "123");
-        assertThat(results).isNotNull();
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getStudNo()).isEqualTo(transcriptStudentCourse.getStudNo());
-        assertThat(results.get(0).getCourseCode()).isEqualTo(transcriptStudentCourse.getCourseCode());
-        assertThat(results.get(0).getCourseLevel()).isEqualTo(transcriptStudentCourse.getCourseLevel());
-    }
-
-    @Test
     public void testGetGradProgramRulesByTraxReqNumber_givenValues_returnsGradRuleDetails_withAPICallSuccess() {
         final String traxReqNumber = "5";
 
