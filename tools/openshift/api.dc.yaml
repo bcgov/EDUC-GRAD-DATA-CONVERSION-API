@@ -59,11 +59,11 @@ objects:
                   protocol: TCP
               resources:
                 requests:
-                  cpu: "30m"
-                  memory: "1024Mi"
-                limits:
-                  cpu: "120m"
+                  cpu: "50m"
                   memory: "2048Mi"
+                limits:
+                  cpu: "200m"
+                  memory: "4096Mi"
               envFrom:
                 - configMapRef:
                     name: educ-grad-api-config-map
