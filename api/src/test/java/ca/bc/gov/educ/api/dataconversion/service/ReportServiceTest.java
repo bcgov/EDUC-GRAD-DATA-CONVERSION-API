@@ -91,6 +91,7 @@ public class ReportServiceTest {
         transcript.setTranscriptTypeCode(code);
         data.setTranscript(transcript);
         ExceptionMessage exception = new ExceptionMessage();
+        Date distributionDate = new Date(System.currentTimeMillis());
 
         byte[] bytesSAR = RandomUtils.nextBytes(20);
 
@@ -101,7 +102,7 @@ public class ReportServiceTest {
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(commSch.getSchoolCategoryCode());
         when(this.restUtils.getTranscriptReport(any(), eq(accessToken))).thenReturn(bytesSAR);
 
-        reportService.saveStudentTranscriptReportJasper(data, accessToken, UUID.fromString(studentID),isGraduated);
+        reportService.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, UUID.fromString(studentID),isGraduated);
         assertThat(exception.getExceptionName()).isNull();
     }
 

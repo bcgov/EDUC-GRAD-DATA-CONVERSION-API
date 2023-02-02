@@ -336,7 +336,7 @@ public class ReportService {
 		return schObj;
 	}
 
-	public void saveStudentTranscriptReportJasper(ReportData sample, String accessToken, UUID studentID, boolean isGraduated) {
+	public void saveStudentTranscriptReportJasper(ReportData sample, Date distributionDate, String accessToken, UUID studentID, boolean isGraduated) {
 
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken);
 		GradStudentTranscripts requestObj = new GradStudentTranscripts();
@@ -344,6 +344,7 @@ public class ReportService {
 		requestObj.setStudentID(studentID);
 		requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
 		requestObj.setDocumentStatusCode("IP");
+		requestObj.setDistributionDate(distributionDate);
 		if (isGraduated)
 			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
@@ -391,8 +392,8 @@ public class ReportService {
 		return data;
 	}
 
-	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, String accessToken,
-												   ProgramCertificateTranscript certType) {
+	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, Date distributionDate,
+												   String accessToken, ProgramCertificateTranscript certType) {
 		ReportData certData = prepareCertificateData(graduationDataStatus, certType, accessToken);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
@@ -401,6 +402,7 @@ public class ReportService {
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
 		requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
+		requestObj.setDistributionDate(distributionDate);
 		this.restUtils.saveGradStudentCertificate(requestObj, accessToken);
 	}
 

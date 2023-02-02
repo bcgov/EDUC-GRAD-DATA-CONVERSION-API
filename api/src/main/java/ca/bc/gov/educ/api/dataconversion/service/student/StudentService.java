@@ -245,21 +245,21 @@ public class StudentService extends StudentBaseService {
             } catch (JsonProcessingException jpe) {
                 log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
             }
-            createAndStoreStudentTranscript(graduationData, accessToken);
-            createAndStoreStudentCertificates(graduationData, accessToken);
+            createAndStoreStudentTranscript(graduationData, convGradStudent.getDistributionDate(), accessToken);
+            createAndStoreStudentCertificates(graduationData, convGradStudent.getDistributionDate(), accessToken);
         }
         convGradStudent.setResult(result);
     }
 
-    private void createAndStoreStudentTranscript(GraduationData graduationData,String accessToken) {
+    private void createAndStoreStudentTranscript(GraduationData graduationData, Date distributionDate, String accessToken) {
         ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(),accessToken);
-        reportService.saveStudentTranscriptReportJasper(data, accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+        reportService.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
     }
 
-    private void createAndStoreStudentCertificates(GraduationData graduationData, String accessToken) {
+    private void createAndStoreStudentCertificates(GraduationData graduationData, Date distributionDate, String accessToken) {
         List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,accessToken);
         for (ProgramCertificateTranscript certType : certificateList) {
-            reportService.saveStudentCertificateReportJasper(graduationData,accessToken, certType);
+            reportService.saveStudentCertificateReportJasper(graduationData, distributionDate, accessToken, certType);
         }
     }
 
