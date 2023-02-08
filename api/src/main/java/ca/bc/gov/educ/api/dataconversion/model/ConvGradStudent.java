@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ConvGradStudent {
   private String pen;
   private String program; // inc
