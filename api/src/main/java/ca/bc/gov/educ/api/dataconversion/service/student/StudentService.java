@@ -24,7 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -176,7 +178,7 @@ public class StudentService extends StudentBaseService {
             gradStudentEntity = stuOptional.get();
             gradStudentEntity.setPen(penStudent.getPen());
             if (convGradStudent.isGraduated()) {
-                convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
+                convertGraduatedStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             } else {
                 convertStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             }
@@ -191,7 +193,7 @@ public class StudentService extends StudentBaseService {
             gradStudentEntity.setPen(penStudent.getPen());
             gradStudentEntity.setStudentID(studentID);
             if (convGradStudent.isGraduated()) {
-                convertGraduatedStudentData(convGradStudent, gradStudentEntity, summary);
+                convertGraduatedStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             } else {
                 convertStudentData(convGradStudent, penStudent, gradStudentEntity, summary);
             }
@@ -244,6 +246,10 @@ public class StudentService extends StudentBaseService {
                 gradStudentEntity.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
             } catch (JsonProcessingException jpe) {
                 log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
+            }
+            if (convGradStudent.getDistributionDate() == null) {
+                Date distributionDate =  DateConversionUtils.getLastDayOfMonth(convGradStudent.getProgramCompletionDate());
+                convGradStudent.setDistributionDate(distributionDate);
             }
             createAndStoreStudentTranscript(graduationData, convGradStudent.getDistributionDate(), accessToken);
             createAndStoreStudentCertificates(graduationData, convGradStudent.getDistributionDate(), accessToken);
@@ -303,7 +309,7 @@ public class StudentService extends StudentBaseService {
         studentEntity.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
     }
 
-    private void convertGraduatedStudentData(ConvGradStudent student, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
+    private void convertGraduatedStudentData(ConvGradStudent student, Student penStudent, GraduationStudentRecordEntity studentEntity, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
             studentEntity.setProgram(student.getProgram());
         } else {
@@ -323,6 +329,8 @@ public class StudentService extends StudentBaseService {
         studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
         studentEntity.setStudentGrade(student.getStudentGrade());
         studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+
+        handleAdult19Rule(student, penStudent, studentEntity);
 
         // flags
         studentEntity.setRecalculateGradStatus(null);
@@ -940,6 +948,7 @@ public class StudentService extends StudentBaseService {
             studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
             studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
             studentData.setCitizenship(entity.getStudentCitizenship());
+            studentData.setAdultStartDate(entity.getAdultStartDate());
         } else {
             log.error("GraduationStudentRecord is not found for pen# [{}], studentID [{}]", pen, studentID);
             return null;

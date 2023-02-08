@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.model;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -17,6 +18,9 @@ public class StudentCommonDTO extends StudentDemographicDTO {
 
     // citizenship
     private String citizenship;
+
+    // adultStartDate
+    private Date adultStartDate;
 
     // all program codes
     private List<String> programCodes = new ArrayList<>();
