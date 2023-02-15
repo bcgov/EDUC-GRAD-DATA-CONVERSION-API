@@ -78,7 +78,9 @@ public class ConvDbConfig {
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
-        config.addDataSourceProperty("socketTimeout", maxLifetime);
+        config.setKeepaliveTime(keepAliveTime);
+        config.setIdleTimeout(idleTimeout);
+        config.addDataSourceProperty("socketTimeout", 36000000);
         config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
         return new HikariDataSource(config);
