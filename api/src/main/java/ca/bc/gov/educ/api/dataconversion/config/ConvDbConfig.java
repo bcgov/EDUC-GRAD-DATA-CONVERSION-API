@@ -32,6 +32,9 @@ public class ConvDbConfig {
     @Value("${batch.partitions.number}")
     private int numberOfPartitions;
 
+    @Value("${spring.db-connection.hikari.maximum-pool-size}")
+    private int maxPoolSize;
+
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
@@ -65,8 +68,8 @@ public class ConvDbConfig {
         config.setPassword(convPassword);
         config.setPoolName(convPoolName);
 
-        config.setMinimumIdle(2);
-        config.setMaximumPoolSize(numberOfPartitions);
+        config.setMinimumIdle(numberOfPartitions);
+        config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
         config.addDataSourceProperty("socketTimeout", maxLifetime);

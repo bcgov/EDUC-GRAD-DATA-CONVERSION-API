@@ -20,7 +20,7 @@ public class StudentCommonDTO extends StudentDemographicDTO {
     private String citizenship;
 
     // adultStartDate
-    private Date adultStartDate;
+    private String adultStartDate;
 
     // all program codes
     private List<String> programCodes = new ArrayList<>();

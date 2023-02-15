@@ -86,6 +86,30 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
 
+    @Value("${endpoint.grad-student-api.read-grad-student-record}")
+    private String readGraduationStudentRecord;
+
+    @Value("${endpoint.grad-student-api.save-grad-student-record}")
+    private String saveGraduationStudentRecord;
+
+    @Value("${endpoint.grad-student-api.read-student-optional-programs}")
+    private String readStudentOptionalPrograms;
+
+    @Value("${endpoint.grad-student-api.save-student-optional-program}")
+    private String saveStudentOptionalProgram;
+
+    @Value("${endpoint.grad-student-api.remove-student-optional-program}")
+    private String removeStudentOptionalProgram;
+
+    @Value("${endpoint.grad-student-api.read-student-career-programs}")
+    private String readStudentCareerPrograms;
+
+    @Value("${endpoint.grad-student-api.save-student-career-program}")
+    private String saveStudentCareerProgram;
+
+    @Value("${endpoint.grad-student-api.remove-student-career-program}")
+    private String removeStudentCareerProgram;
+
     @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
     private String addAssessmentRequirementApiUrl;
 

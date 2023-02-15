@@ -51,7 +51,7 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(studentCourseUpdate.getPen(), accessToken);
-            processCourse(studentCourseUpdate, currentStudent);
+            processCourse(studentCourseUpdate, currentStudent, accessToken);
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
@@ -62,9 +62,9 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
         });
     }
 
-    public void processCourse(TraxStudentUpdateDTO studentCourseUpdate, StudentGradDTO currentStudent) {
+    public void processCourse(TraxStudentUpdateDTO studentCourseUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process Courses : studentID = {}, pen = {} ", currentStudent.getStudentID(), studentCourseUpdate.getPen());
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
     }
 
     @Override

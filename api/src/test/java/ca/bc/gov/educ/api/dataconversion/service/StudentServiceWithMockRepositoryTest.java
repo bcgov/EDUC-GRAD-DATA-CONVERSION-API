@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.entity.student.*;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -9,19 +8,18 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.School;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.SpecialCase;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.repository.student.*;
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.student.ReportService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -44,21 +42,6 @@ public class StudentServiceWithMockRepositoryTest {
 
     @Autowired
     StudentService studentService;
-
-    @MockBean
-    GraduationStudentRecordRepository graduationStudentRecordRepository;
-
-    @MockBean
-    StudentOptionalProgramRepository studentOptionalProgramRepository;
-
-    @MockBean
-    StudentCareerProgramRepository studentCareerProgramRepository;
-
-    @MockBean
-    GraduationStudentRecordHistoryRepository graduationStudentRecordHistoryRepository;
-
-    @MockBean
-    StudentOptionalProgramHistoryRepository studentOptionalProgramHistoryRepository;
 
     @MockBean
     EventRepository eventRepository;
@@ -87,9 +70,6 @@ public class StudentServiceWithMockRepositoryTest {
     @Autowired
     private EducGradDataConversionApiConstants constants;
 
-    @Autowired
-    GradConversionTestUtils gradConversionTestUtils;
-
     @Before
     public void setUp() {
         openMocks(this);
@@ -97,7 +77,7 @@ public class StudentServiceWithMockRepositoryTest {
 
     @After
     public void tearDown() {
-        graduationStudentRecordRepository.deleteAll();
+
     }
 
     @Test
@@ -153,15 +133,15 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("SCCP");
         gradStudentEntity.setStudentGrade("11");
         gradStudentEntity.setStudentStatus("CUR");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
-        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -190,15 +170,15 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setDob("2000-06-30");
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("1950");
         gradStudentEntity.setStudentGrade("AD");
         gradStudentEntity.setStudentStatus("CUR");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
-        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -227,7 +207,7 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("2018-EN");
@@ -240,24 +220,32 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentCareerProgramEntity careerProgramEntity = new StudentCareerProgramEntity();
-        careerProgramEntity.setId(UUID.randomUUID());
-        careerProgramEntity.setStudentID(studentID);
-        careerProgramEntity.setCareerProgramCode("XC");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudentEntity.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
-        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.save(specialProgramEntity)).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(careerProgramEntity)).thenReturn(careerProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
@@ -285,17 +273,12 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("2018-EN");
         gradStudentEntity.setStudentGrade("12");
         gradStudentEntity.setStudentStatus("CUR");
-
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -303,16 +286,19 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudentEntity.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -320,20 +306,18 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
@@ -361,17 +345,17 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("MER");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("MER");
 
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -379,16 +363,19 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -396,20 +383,18 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
@@ -437,17 +422,12 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("1996-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1996-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -455,16 +435,24 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+//        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+//        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
+//        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
+//        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -472,20 +460,18 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
@@ -513,17 +499,12 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("1986-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1986-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -531,16 +512,19 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -548,20 +532,18 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
@@ -591,23 +573,23 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("1986-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1986-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -615,16 +597,24 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+//        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
+//        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
+//        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
+//        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -632,7 +622,7 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
@@ -766,17 +756,15 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
@@ -829,23 +817,18 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
-
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -853,16 +836,19 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -870,7 +856,7 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
@@ -989,17 +975,15 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
@@ -1052,23 +1036,18 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-PF");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("S");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
-
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-PF");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("S");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -1076,16 +1055,19 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgram.setOptProgramCode("DD");
         specialProgram.setOptionalProgramName("Dual Dogwood");
 
-        StudentOptionalProgramEntity specialProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
         specialProgramEntity.setId(UUID.randomUUID());
         specialProgramEntity.setStudentID(studentID);
         specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
         specialProgramEntity.setPen(pen);
 
-        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
+        StudentOptionalProgramReq specialProgramReq = new StudentOptionalProgramReq();
+        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -1093,7 +1075,7 @@ public class StudentServiceWithMockRepositoryTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setId(UUID.randomUUID());
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
@@ -1212,18 +1194,15 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.empty());
-        when(this.graduationStudentRecordRepository.save(any(GraduationStudentRecordEntity.class))).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.studentOptionalProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.studentOptionalProgramRepository.save(any(StudentOptionalProgramEntity.class))).thenReturn(specialProgramEntity);
-        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, specialProgram.getOptionalProgramID())).thenReturn(Optional.of(specialProgramEntity));
-        when(this.studentCareerProgramRepository.save(studentCareerProgramEntity)).thenReturn(studentCareerProgramEntity);
-        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
-        when(this.studentOptionalProgramHistoryRepository.save(specialProgramHistoryEntity)).thenReturn(specialProgramHistoryEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
         when(this.restUtils.getOptionalProgram("2018-PF", "DD", "123")).thenReturn(specialProgram);
@@ -1276,17 +1255,17 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("1950");
-        gradStudentEntity.setStudentGrade("AD");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1950");
+        gradStudent.setStudentGrade("AD");
+        gradStudent.setStudentStatus("CUR");
 
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
@@ -1403,12 +1382,11 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
-        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -1455,17 +1433,17 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("SCCP");
-        gradStudentEntity.setStudentGrade("11");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("11");
+        gradStudent.setStudentStatus("CUR");
 
-        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-//        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
+//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
+////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
+//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
 
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
@@ -1582,12 +1560,11 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
-        when(this.graduationStudentRecordRepository.save(gradStudentEntity)).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.graduationStudentRecordHistoryRepository.save(gradStudentHistoryEntity)).thenReturn(gradStudentHistoryEntity);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -1630,14 +1607,14 @@ public class StudentServiceWithMockRepositoryTest {
         UUID studentID = UUID.randomUUID();
         String careerProgramCode = "XC";
 
-        StudentGradDTO requestStudent = new StudentGradDTO();
-        requestStudent.setStudentID(studentID);
+//        StudentGradDTO requestStudent = new StudentGradDTO();
+//        requestStudent.setStudentID(studentID);
 
-        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.empty());
+//        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.empty());
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.addStudentCareerProgram(careerProgramCode, requestStudent);
+            studentService.addStudentCareerProgram(careerProgramCode, studentID, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -1652,16 +1629,16 @@ public class StudentServiceWithMockRepositoryTest {
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
 
-        StudentCareerProgramEntity studentCareerProgram = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
         studentCareerProgram.setCareerProgramCode(careerProgramCode);
         studentCareerProgram.setStudentID(studentID);
         studentCareerProgram.setId(UUID.randomUUID());
 
-        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.of(studentCareerProgram));
+//        when(this.restUtils.getStudentCareerProgram(studentID, careerProgramCode)).thenReturn(Optional.of(studentCareerProgram));
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.removeStudentCareerProgram(careerProgramCode, requestStudent);
+            studentService.removeStudentCareerProgram(careerProgramCode, requestStudent, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -1673,12 +1650,12 @@ public class StudentServiceWithMockRepositoryTest {
         UUID studentID = UUID.randomUUID();
         String careerProgramCode = "XC";
 
-        StudentCareerProgramEntity studentCareerProgram = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
         studentCareerProgram.setCareerProgramCode(careerProgramCode);
         studentCareerProgram.setStudentID(studentID);
         studentCareerProgram.setId(UUID.randomUUID());
 
-        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
 
         var result = studentService.existsCareerProgram(studentID);
         assertThat(result).isTrue();
@@ -1702,7 +1679,8 @@ public class StudentServiceWithMockRepositoryTest {
         requestStudent.setProgram(program);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
-        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.empty());
+        // TODO (jsung) : new endpoint
+//        when(this.restUtils.getStudentOptionalProgram(studentID, optionalProgram.getOptionalProgramID(), "accessToken")).thenReturn(null);
 
         boolean exceptionIsThrown = false;
         try {
@@ -1730,13 +1708,13 @@ public class StudentServiceWithMockRepositoryTest {
         requestStudent.setStudentID(studentID);
         requestStudent.setProgram(program);
 
-        StudentOptionalProgramEntity studentOptionalProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram studentOptionalProgramEntity = new StudentOptionalProgram();
         studentOptionalProgramEntity.setOptionalProgramID(optionalProgram.getOptionalProgramID());
         studentOptionalProgramEntity.setStudentID(studentID);
         studentOptionalProgramEntity.setId(UUID.randomUUID());
 
         when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
-        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.of(studentOptionalProgramEntity));
+//        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.of(studentOptionalProgramEntity));
 
         boolean exceptionIsThrown = false;
         try {
@@ -1753,14 +1731,14 @@ public class StudentServiceWithMockRepositoryTest {
 
         UUID studentID = UUID.randomUUID();
 
-        GraduationStudentRecordEntity graduationStudentRecordEntity = new GraduationStudentRecordEntity();
-        graduationStudentRecordEntity.setStudentID(studentID);
-        graduationStudentRecordEntity.setProgram(program);
-        graduationStudentRecordEntity.setStudentGrade("11");
-        graduationStudentRecordEntity.setStudentStatus("A");
-        graduationStudentRecordEntity.setSchoolOfRecord("222336");
+        GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+        graduationStudentRecord.setStudentID(studentID);
+        graduationStudentRecord.setProgram(program);
+        graduationStudentRecord.setStudentGrade("11");
+        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setSchoolOfRecord("222336");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(graduationStudentRecordEntity));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "accessToken")).thenReturn(graduationStudentRecord);
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -1786,14 +1764,14 @@ public class StudentServiceWithMockRepositoryTest {
 
         UUID studentID = UUID.randomUUID();
 
-        GraduationStudentRecordEntity graduationStudentRecordEntity = new GraduationStudentRecordEntity();
-        graduationStudentRecordEntity.setStudentID(studentID);
-        graduationStudentRecordEntity.setProgram(program);
-        graduationStudentRecordEntity.setStudentGrade("11");
-        graduationStudentRecordEntity.setStudentStatus("A");
-        graduationStudentRecordEntity.setSchoolOfRecord("222336");
+        GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+        graduationStudentRecord.setStudentID(studentID);
+        graduationStudentRecord.setProgram(program);
+        graduationStudentRecord.setStudentGrade("11");
+        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setSchoolOfRecord("222336");
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(graduationStudentRecordEntity));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "accessToken")).thenReturn(graduationStudentRecord);
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -1856,7 +1834,7 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("2018-EN");
@@ -1867,9 +1845,9 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setSchoolOfRecord(mincode);
         gradStudentEntity.setEnglishCert("E");
         gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        StudentOptionalProgramEntity studentOptionalProgramEntity = new StudentOptionalProgramEntity();
+        StudentOptionalProgram studentOptionalProgramEntity = new StudentOptionalProgram();
         studentOptionalProgramEntity.setStudentID(studentID);
         studentOptionalProgramEntity.setPen(pen);
         studentOptionalProgramEntity.setOptionalProgramID(UUID.randomUUID());
@@ -1880,7 +1858,7 @@ public class StudentServiceWithMockRepositoryTest {
         optionalProgram.setOptProgramCode("FI");
         optionalProgram.setOptionalProgramName("French Immersion");
 
-        StudentCareerProgramEntity studentCareerProgramEntity = new StudentCareerProgramEntity();
+        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
         studentCareerProgramEntity.setStudentID(studentID);
         studentCareerProgramEntity.setCareerProgramCode("XC");
         studentCareerProgramEntity.setId(UUID.randomUUID());
@@ -1897,10 +1875,11 @@ public class StudentServiceWithMockRepositoryTest {
         studentAssessment.setAssessmentName("Test Assessment");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
+
         when(this.restUtils.getOptionalProgramByID(optionalProgram.getOptionalProgramID(), "123")).thenReturn(optionalProgram);
-        when(this.studentOptionalProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentOptionalProgramEntity));
-        when(this.studentCareerProgramRepository.findByStudentID(studentID)).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgramEntity));
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
         when(this.courseService.getStudentCourses(pen, "123")).thenReturn(Arrays.asList(studentCourse));
         when(this.assessmentService.getStudentAssessments(pen, "123")).thenReturn(Arrays.asList(studentAssessment));
 
@@ -1926,7 +1905,7 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("2018-EN");
@@ -1937,12 +1916,12 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setSchoolOfRecord(mincode);
         gradStudentEntity.setEnglishCert("E");
         gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
         boolean isExceptionThrown = false;
         try {
-            studentService.triggerGraduationBatchRun(studentID, "Y", "Y");
+            studentService.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }
@@ -1960,7 +1939,7 @@ public class StudentServiceWithMockRepositoryTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecordEntity gradStudentEntity = new GraduationStudentRecordEntity();
+        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
         gradStudentEntity.setStudentID(studentID);
         gradStudentEntity.setPen(pen);
         gradStudentEntity.setProgram("2018-EN");
@@ -1971,13 +1950,13 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setSchoolOfRecord(mincode);
         gradStudentEntity.setEnglishCert("E");
         gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(new Date(System.currentTimeMillis() - 600000L));
+        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        when(this.graduationStudentRecordRepository.findById(studentID)).thenReturn(Optional.of(gradStudentEntity));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
 
         boolean isExceptionThrown = false;
         try {
-            studentService.triggerGraduationBatchRun(studentID, "Y", "Y");
+            studentService.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }

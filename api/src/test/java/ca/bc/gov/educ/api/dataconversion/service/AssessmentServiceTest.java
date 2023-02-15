@@ -8,7 +8,6 @@ import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -42,9 +41,6 @@ public class AssessmentServiceTest {
 
     @Autowired
     private EducGradDataConversionApiConstants constants;
-
-    @Autowired
-    GradConversionTestUtils gradConversionTestUtils;
 
     @MockBean
     WebClient webClient;

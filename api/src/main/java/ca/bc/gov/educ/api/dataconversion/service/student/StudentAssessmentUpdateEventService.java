@@ -52,7 +52,7 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
 
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(studentAssessmentUpdate.getPen(), accessToken);
-            processAssessment(studentAssessmentUpdate, currentStudent);
+            processAssessment(studentAssessmentUpdate, currentStudent, accessToken);
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
@@ -63,9 +63,9 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
         });
     }
 
-    public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent) {
+    public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(),studentAssessmentUpdate.getPen());
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
     }
 
     @Override

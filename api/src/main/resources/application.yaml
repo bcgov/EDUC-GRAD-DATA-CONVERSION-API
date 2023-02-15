@@ -13,10 +13,6 @@ spring:
       username: ${CONV_USERNAME}
       password: ${CONV_PASSWORD}
       pool-name: conv-primary-cp
-    student:
-      username: ${STUDENT_USERNAME}
-      password: ${STUDENT_PASSWORD}
-      pool-name: conv-student-cp
   jpa:
     show-sql: ${SHOW_SQL_LOGS}
     database-platform: org.hibernate.dialect.Oracle12cDialect
@@ -174,6 +170,14 @@ endpoint:
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
+    save-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/conv/studentid/%s
+    read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
+    save-student-optional-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentoptionalprogram
+    remove-student-optional-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentoptionalprogram/%s/%s
+    read-student-optional-programs: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/studentid/%s
+    save-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram
+    remove-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram/%s/%s
+    read-student-career-programs: ${GRAD_STUDENT_API}api/v1/student/studentcareerprogram/studentid/%s
   grad-assessment-api:
     assessment-requirement:
       url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement

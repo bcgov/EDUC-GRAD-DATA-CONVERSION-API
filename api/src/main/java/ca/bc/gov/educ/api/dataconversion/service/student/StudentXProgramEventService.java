@@ -75,10 +75,10 @@ public class StudentXProgramEventService extends StudentBaseService implements E
             OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
             if (optionalProgram != null) {
                 log.info(" => removed optional program code : {}", p);
-                studentService.removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent);
+                studentService.removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent, accessToken);
             } else {
                 log.info(" => removed career program code : {}", p);
-                studentService.removeStudentCareerProgram(p, currentStudent);
+                studentService.removeStudentCareerProgram(p, currentStudent, accessToken);
             }
         });
 
@@ -86,10 +86,10 @@ public class StudentXProgramEventService extends StudentBaseService implements E
             OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
             if (optionalProgram != null) {
                 log.info(" => new optional program code : {}", p);
-                studentService.addStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent);
+                studentService.addStudentOptionalProgram(optionalProgram.getOptProgramCode(), currentStudent, accessToken);
             } else {
                 log.info(" => new career program code : {}", p);
-                studentService.addStudentCareerProgram(p, currentStudent);
+                studentService.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);
             }
         });
 
@@ -106,7 +106,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         currentStudent.setNewRecalculateGradStatus("Y");
         // TVR
         currentStudent.setNewRecalculateProjectedGrad("Y");
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad());
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
     }
 
     private void handleOptionalAndCareerProgramChange(List<String> reqProgramCodes,  List<String> curProgramCodes, StudentGradDTO currentStudent) {
