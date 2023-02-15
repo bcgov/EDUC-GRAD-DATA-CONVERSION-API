@@ -140,7 +140,7 @@ public class StudentService extends StudentBaseService {
         students.forEach(st -> {
             GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, summary);
             if (gradStudent != null) {
-                processDependencies(gradStudent.getStudentID(), convGradStudent, gradStudent, st, summary, accessToken);
+                processDependencies(convGradStudent, gradStudent, st, summary, accessToken);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -202,17 +202,11 @@ public class StudentService extends StudentBaseService {
         }
     }
 
-    private void processDependencies(UUID studentID,
-                                     ConvGradStudent convGradStudent,
+    private void processDependencies(ConvGradStudent convGradStudent,
                                      GraduationStudentRecord gradStudentEntity,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary, String accessToken) {
         ConversionResultType result;
-
-        // student guid - pen
-        if (constants.isStudentGuidPenXrefEnabled()) {
-            saveStudentGuidPenXref(studentID, convGradStudent.getPen());
-        }
 
         // process dependencies
         gradStudentEntity.setPen(convGradStudent.getPen());
@@ -587,21 +581,22 @@ public class StudentService extends StudentBaseService {
     private List<GradAlgorithmOptionalStudentProgram> buildOptionalGradStatus(ConvGradStudent student, GraduationStudentRecord gradStudent,
               List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList, ConversionStudentSummaryDTO summary) {
         List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
-        List<StudentOptionalProgram> list = new ArrayList<>();
+        List<StudentOptionalProgram> list = null;
         try {
             list = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), summary.getAccessToken());
         } catch (Exception e) {
             handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting StudentOptionalPrograms : " + e.getLocalizedMessage());
-            return null;
         }
-        for (StudentOptionalProgram obj : list) {
-            GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(student, obj, summary);
-            if (result != null) {
-                StudentCourses studentCourses = new StudentCourses();
-                studentCourses.setStudentCourseList(studentCourseList);
-                result.setOptionalStudentCourses(studentCourses);
+        if (list != null && !list.isEmpty()) {
+            for (StudentOptionalProgram obj : list) {
+                GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(student, obj, summary);
+                if (result != null) {
+                    StudentCourses studentCourses = new StudentCourses();
+                    studentCourses.setStudentCourseList(studentCourseList);
+                    result.setOptionalStudentCourses(studentCourses);
 
-                results.add(result);
+                    results.add(result);
+                }
             }
         }
         return results;
@@ -622,13 +617,16 @@ public class StudentService extends StudentBaseService {
     }
 
     private List<StudentCareerProgram> buildStudentCareerProgramList(ConvGradStudent student, StudentOptionalProgram object, ConversionStudentSummaryDTO summary) {
-        List<StudentCareerProgram> results = new ArrayList<>();
+        List<StudentCareerProgram> results = null;
         try {
             results = restUtils.getStudentCareerPrograms(object.getStudentID().toString(), summary.getAccessToken());
         } catch (Exception e) {
             handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting StudentCareerPrograms : " + e.getLocalizedMessage());
         }
-        return results;
+        if (results != null) {
+            return results;
+        }
+        return new ArrayList<>();
     }
 
     private List<GradRequirement> buildRequirementsMet(String programCode, List<TranscriptStudentCourse> tswStudentCourses, ConversionStudentSummaryDTO summary) {
@@ -830,11 +828,6 @@ public class StudentService extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
-    public void saveStudentGuidPenXref(UUID studentId, String pen) {
-        // TODO (jsung) : restUtils.saveStudentGuidPenXref
-
-    }
-
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
         Student penStudent;
         // PEN Student
@@ -889,7 +882,7 @@ public class StudentService extends StudentBaseService {
             log.error(GRAD_STUDENT_API_ERROR_MSG + "getting StudentOptionalPrograms : " + e.getLocalizedMessage());
         }
 
-        studentData.getProgramCodes().addAll(getOptionalProgramCodes(optionalPrograms, accessToken));
+        studentData.getProgramCodes().addAll(getOptionalProgramCodes(optionalPrograms));
 
         // career programs
         List<StudentCareerProgram> careerPrograms = new ArrayList<>();
@@ -910,23 +903,23 @@ public class StudentService extends StudentBaseService {
         return studentData;
     }
 
-    private List<String> getOptionalProgramCodes(List<StudentOptionalProgram> studentOptionalPrograms, String accessToken) {
+    private List<String> getOptionalProgramCodes(List<StudentOptionalProgram> studentOptionalPrograms) {
         List<String> codes = new ArrayList<>();
-        studentOptionalPrograms.forEach(e -> codes.add(e.getOptionalProgramCode())
-        );
+        if (studentOptionalPrograms != null && !studentOptionalPrograms.isEmpty()) {
+            studentOptionalPrograms.forEach(e -> codes.add(e.getOptionalProgramCode()));
+        }
         return codes;
     }
 
     private List<String> getCareerProgramCodes(List<StudentCareerProgram> studentCareerPrograms) {
         List<String> codes = new ArrayList<>();
-        studentCareerPrograms.forEach(
-            e -> codes.add(e.getCareerProgramCode())
-        );
+        if (studentCareerPrograms != null && !studentCareerPrograms.isEmpty()) {
+            studentCareerPrograms.forEach(e -> codes.add(e.getCareerProgramCode()));
+        }
         return codes;
     }
 
     public void saveGraduationStudent(StudentGradDTO gradStudent, String accessToken) {
-//        Optional<GraduationStudentRecordEntity> gradStatusOptional = graduationStudentRecordRepository.findById(gradStudent.getStudentID());
         GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
         if (object != null) {
             if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
@@ -952,8 +945,7 @@ public class StudentService extends StudentBaseService {
             }
 
             restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, accessToken);
-//            graduationStudentRecordRepository.save(entity);
-            // graduation student record history
+            // TODO (jsung): graduation student record history
 //            createGraduationStudentRecordHistory(entity, "TRAXUPDATE");
         }
 
@@ -997,25 +989,22 @@ public class StudentService extends StudentBaseService {
         restUtils.removeStudentCareerProgram(careerProgramCode, gradStudent.getStudentID(), accessToken);
     }
 
-    // TODO (jsung): implement this endpoint in Grad-Student-Api
-    public boolean existsCareerProgram(UUID studentID) {
-//        List<StudentCareerProgramEntity> list = studentCareerProgramRepository.findByStudentID(studentID);
-//        return list != null && !list.isEmpty();
-        return true;
+    public boolean existsCareerProgram(UUID studentID, String accessToken) {
+        List<StudentCareerProgram> list = restUtils.getStudentCareerPrograms(studentID.toString(), accessToken);
+        return list != null && !list.isEmpty();
     }
 
-    // TODO (jsung): implement this endpoint in Grad-Student-Api
-    public void triggerGraduationBatchRun(UUID studentID, String recalculateGradStatus, String recalcualteProjectedGrad, String accessToken) {
-        GraduationStudentRecord entity = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
-        if (entity != null) {
-            if (StringUtils.equals(entity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
-                entity.setRecalculateGradStatus(null);
-                entity.setRecalculateProjectedGrad(null);
+    public void triggerGraduationBatchRun(UUID studentID, String recalculateGradStatus, String recalculateProjectedGrad, String accessToken) {
+        GraduationStudentRecord object = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
+        if (object != null) {
+            if (StringUtils.equals(object.getStudentStatus(), STUDENT_STATUS_MERGED)) {
+                object.setRecalculateGradStatus(null);
+                object.setRecalculateProjectedGrad(null);
             } else {
-                entity.setRecalculateGradStatus("Y");
-                entity.setRecalculateProjectedGrad("Y");
+                object.setRecalculateGradStatus(recalculateGradStatus == null? "Y" : recalculateGradStatus);
+                object.setRecalculateProjectedGrad(recalculateProjectedGrad == null? "Y" : recalculateProjectedGrad);
             }
-//            graduationStudentRecordRepository.save(entity);
+            restUtils.saveStudentGradStatus(studentID.toString(), object, accessToken);
         }
     }
 

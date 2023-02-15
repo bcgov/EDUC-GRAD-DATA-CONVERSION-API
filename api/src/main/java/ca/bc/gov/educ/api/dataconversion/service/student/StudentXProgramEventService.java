@@ -94,7 +94,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         });
 
         // No Career Program?  then remove CP optional program
-        if (studentService.existsCareerProgram(currentStudent.getStudentID())) {
+        if (studentService.existsCareerProgram(currentStudent.getStudentID(), accessToken)) {
             log.info(" => [CP] optional program will be added if not exist.");
             studentService.addStudentOptionalProgram("CP", currentStudent, accessToken);
         } else {

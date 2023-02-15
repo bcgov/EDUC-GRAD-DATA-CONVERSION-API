@@ -585,11 +585,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudent.setEnglishCert("E");
         gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
-
-//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
+        gradStudent.setStudentCitizenship("C");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -610,11 +606,6 @@ public class StudentServiceWithMockRepositoryTest {
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
         specialProgramReq.setPen(pen);
-
-//        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-//        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-//        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-//        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -757,7 +748,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -781,7 +772,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .graduated(true)
                 .gpa("3.5")
                 .honoursStanding("Y")
-                .archiveFlag("I")
+                .archiveFlag("A")
                 .slpDate("0")
                 .englishCert("E")
                 .frenchCert("F")
@@ -829,6 +820,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudent.setEnglishCert("E");
         gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -976,7 +968,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -1000,7 +992,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .graduated(true)
                 .gpa("3.5")
                 .honoursStanding("Y")
-                .archiveFlag("I")
+                .archiveFlag("A")
                 .slpDate("0")
                 .englishCert("E")
                 .frenchCert("F")
@@ -1048,6 +1040,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudent.setEnglishCert("E");
         gradStudent.setFrenchCert("S");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -1195,7 +1188,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -1219,7 +1212,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .graduated(true)
                 .gpa("3.5")
                 .honoursStanding("Y")
-                .archiveFlag("I")
+                .archiveFlag("A")
                 .slpDate("0")
                 .englishCert("E")
                 .frenchCert("S")
@@ -1383,7 +1376,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -1399,7 +1392,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .graduated(true)
                 .gpa("3.5")
                 .honoursStanding("Y")
-                .archiveFlag("I")
+                .archiveFlag("A")
                 .slpDate("0")
                 .englishCert("E")
                 .frenchCert("F")
@@ -1561,7 +1554,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -1579,7 +1572,7 @@ public class StudentServiceWithMockRepositoryTest {
                 .graduated(true)
                 .gpa("3.5")
                 .honoursStanding("Y")
-                .archiveFlag("I")
+                .archiveFlag("A")
                 .englishCert("E")
                 .frenchCert("F")
                 .studentStatus("A")
@@ -1657,7 +1650,7 @@ public class StudentServiceWithMockRepositoryTest {
 
         when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
 
-        var result = studentService.existsCareerProgram(studentID);
+        var result = studentService.existsCareerProgram(studentID, "123");
         assertThat(result).isTrue();
     }
 
@@ -1679,8 +1672,6 @@ public class StudentServiceWithMockRepositoryTest {
         requestStudent.setProgram(program);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
-        // TODO (jsung) : new endpoint
-//        when(this.restUtils.getStudentOptionalProgram(studentID, optionalProgram.getOptionalProgramID(), "accessToken")).thenReturn(null);
 
         boolean exceptionIsThrown = false;
         try {
