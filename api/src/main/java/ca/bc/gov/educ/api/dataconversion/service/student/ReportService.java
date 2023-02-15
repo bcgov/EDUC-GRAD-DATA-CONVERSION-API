@@ -9,6 +9,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.report.*;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ReportService {
 
 	private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
@@ -408,7 +410,16 @@ public class ReportService {
 
 	private Certificate getCertificateData(GradAlgorithmGraduationStudentRecord gradResponse,ProgramCertificateTranscript certData) {
 		Certificate cert = new Certificate();
-		cert.setIssued(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(gradResponse.getProgramCompletionDate()));
+		Date issuedDate = null;
+		if (gradResponse.getProgramCompletionDate() != null) {
+			if (gradResponse.getProgramCompletionDate().length() > 7) {
+				issuedDate = EducGradDataConversionApiUtils.formatIssueDateForReportJasper(gradResponse.getProgramCompletionDate());
+			} else {
+				issuedDate = EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingNFormating(gradResponse.getProgramCompletionDate()));
+			}
+		}
+		cert.setIssued(issuedDate);
+
 		OrderType orTy = new OrderType();
 		orTy.setName("Certificate");
 		CertificateType certType = new CertificateType();

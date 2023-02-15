@@ -2,11 +2,11 @@ package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.constant.EventStatus;
 import ca.bc.gov.educ.api.dataconversion.constant.EventType;
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentXProgramEventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;

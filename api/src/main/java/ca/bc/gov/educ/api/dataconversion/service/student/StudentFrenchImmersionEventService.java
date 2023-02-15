@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -49,7 +49,7 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(frenchImmersionUpdate.getPen(), accessToken);
-            processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken, false);
+            processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken);
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
@@ -60,16 +60,12 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
         });
     }
 
-    public void processFrenchImmersion(TraxFrenchImmersionUpdateDTO frenchImmersionUpdate, StudentGradDTO currentStudent, String accessToken, boolean isDelete) {
-        log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(), isDelete? "DELETE" : "ADD");
-        if (isDelete && !studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
-            log.info(" => remove FI optional program");
-            studentService.removeStudentOptionalProgram("FI", currentStudent, accessToken);
-            studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
-        } else if (!isDelete && studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
+    public void processFrenchImmersion(TraxFrenchImmersionUpdateDTO frenchImmersionUpdate, StudentGradDTO currentStudent, String accessToken) {
+        log.info(" Process French Immersion : studentID = {}", currentStudent.getStudentID());
+        if (studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
             log.info(" => create FI optional program");
             studentService.addStudentOptionalProgram("FI", currentStudent, accessToken);
-            studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
+            studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
         }
     }
 

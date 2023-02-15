@@ -21,7 +21,7 @@ import java.util.HashMap;
 @Profile("!test")
 @EnableJpaRepositories(
         basePackages = {
-                "ca.bc.gov.educ.api.dataconversion.repository.conv"
+                "ca.bc.gov.educ.api.dataconversion.repository"
         },
         entityManagerFactoryRef = "convEntityManager",
         transactionManagerRef = "convTransactionManager"
@@ -32,26 +32,35 @@ public class ConvDbConfig {
     @Value("${batch.partitions.number}")
     private int numberOfPartitions;
 
+    @Value("${spring.db-connection.hikari.maximum-pool-size}")
+    private int maxPoolSize;
+
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-life-time}")
+    @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
+
+    @Value("${spring.db-connection.hikari.keepalive-time}")
+    private int keepAliveTime;
+
+    @Value("${spring.db-connection.hikari.idle-timeout}")
+    private int idleTimeout;
 
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.conv.pool-name}")
+    @Value("${spring.db-connection.hikari.pool-name}")
     private String convPoolName;
 
     // Connection String
     @Value("${spring.db-connection.url}")
     private String jdbcUrl;
 
-    @Value("${spring.db-connection.conv.username}")
+    @Value("${spring.db-connection.username}")
     private String convUsername;
 
-    @Value("${spring.db-connection.conv.password}")
+    @Value("${spring.db-connection.password}")
     private String convPassword;
 
     @Primary
@@ -65,11 +74,13 @@ public class ConvDbConfig {
         config.setPassword(convPassword);
         config.setPoolName(convPoolName);
 
-        config.setMinimumIdle(2);
-        config.setMaximumPoolSize(numberOfPartitions);
+        config.setMinimumIdle(numberOfPartitions);
+        config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
-        config.addDataSourceProperty("socketTimeout", maxLifetime);
+        config.setKeepaliveTime(keepAliveTime);
+        config.setIdleTimeout(idleTimeout);
+        config.addDataSourceProperty("socketTimeout", 36000000);
         config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
         return new HikariDataSource(config);
@@ -81,7 +92,7 @@ public class ConvDbConfig {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(convDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

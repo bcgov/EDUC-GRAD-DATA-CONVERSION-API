@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
-import ca.bc.gov.educ.api.dataconversion.entity.student.GraduationStudentRecordEntity;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
+import ca.bc.gov.educ.api.dataconversion.model.GraduationStudentRecord;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import org.modelmapper.ModelMapper;
@@ -18,8 +18,8 @@ public class GradDadaConversionApiConfig {
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();
 
-        modelMapper.typeMap(GraduationStudentRecordEntity.class, ConvGradStudent.class);
-        modelMapper.typeMap(ConvGradStudent.class, GraduationStudentRecordEntity.class);
+        modelMapper.typeMap(GraduationStudentRecord.class, ConvGradStudent.class);
+        modelMapper.typeMap(ConvGradStudent.class, GraduationStudentRecord.class);
 
         return modelMapper;
     }

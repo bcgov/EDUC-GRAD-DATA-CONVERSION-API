@@ -1,6 +1,6 @@
-package ca.bc.gov.educ.api.dataconversion.repository.conv;
+package ca.bc.gov.educ.api.dataconversion.repository;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

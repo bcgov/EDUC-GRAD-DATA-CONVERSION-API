@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.scheduler;
 
 import ca.bc.gov.educ.api.dataconversion.choreographer.ChoreographEventHandler;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.javacrumbs.shedlock.core.LockAssert;
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;

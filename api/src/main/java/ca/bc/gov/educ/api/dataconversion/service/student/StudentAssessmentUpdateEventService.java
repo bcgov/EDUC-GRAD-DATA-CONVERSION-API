@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentUpdateDTO;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -52,7 +52,7 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
 
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(studentAssessmentUpdate.getPen(), accessToken);
-            processAssessment(studentAssessmentUpdate, currentStudent);
+            processAssessment(studentAssessmentUpdate, currentStudent, accessToken);
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
@@ -63,9 +63,9 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
         });
     }
 
-    public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent) {
+    public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(),studentAssessmentUpdate.getPen());
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
     }
 
     @Override

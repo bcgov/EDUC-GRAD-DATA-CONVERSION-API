@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
+import ca.bc.gov.educ.api.dataconversion.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
@@ -16,6 +17,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +25,8 @@ import java.util.UUID;
 @Slf4j
 @Component
 public class RestUtils {
+
+    private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
 
     private final EducGradDataConversionApiConstants constants;
 
@@ -499,5 +503,84 @@ public class RestUtils {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+    }
+
+    // Read GraduationStudentRecord  - GET /student/studentid/{id}/algorithm
+    public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
+        return webClient.get().uri(String.format(constants.getReadGraduationStudentRecord(),studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
+    // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
+    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, boolean ongoingUpdate, String accessToken) {
+        return webClient.post()
+                .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
+                        uri -> uri.queryParam("ongoingUpdate", ongoingUpdate)
+                                .build())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
+    // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}
+    public List<StudentOptionalProgram> getStudentOptionalPrograms(String studentID, String accessToken) {
+        final ParameterizedTypeReference<List<StudentOptionalProgram>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get().uri(String.format(constants.getReadStudentOptionalPrograms(), studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(responseType).block();
+    }
+
+    // Save StudentOptionalProgram - POST /student/conv/studentoptionalprogram
+    public StudentOptionalProgram saveStudentOptionalProgram(StudentOptionalProgramReq toBeSaved, String accessToken) {
+        return webClient.post().uri(constants.getSaveStudentOptionalProgram())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+    }
+
+    // Remove StudentOptionalProgram - DELETE /student/conv/studentoptionalprogram/{optionalProramID}/{studentID}
+    public void removeStudentOptionalProgram(UUID optionalProgramID, UUID studentID, String accessToken) {
+        webClient.delete().uri(String.format(constants.getRemoveStudentOptionalProgram(), optionalProgramID, studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Optional Program Not Found"))).bodyToMono(Void.class).block();
+    }
+
+    // READ StudentCareerProgram - GET /student/studentcareerprogram/studentid/{id}
+    public List<StudentCareerProgram> getStudentCareerPrograms(String studentID, String accessToken) {
+        final ParameterizedTypeReference<List<StudentCareerProgram>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get().uri(String.format(constants.getReadStudentCareerPrograms(), studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(responseType).block();
+    }
+
+    // Save StudentCareerProgram - NEW - POST /student/conv/studentcareerprogram
+    public StudentCareerProgram saveStudentCareerProgram(StudentCareerProgram toBeSaved, String accessToken) {
+        return webClient.post().uri(constants.getSaveStudentCareerProgram())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentCareerProgram.class).block();
+    }
+
+    // Remove StudentCareerProgram - DELETE /student/conv/studentcareerprogram/{careerProgramCode}/{studentID}
+    public void removeStudentCareerProgram(String careerProgramCode, UUID studentID, String accessToken) {
+        webClient.delete().uri(String.format(constants.getRemoveStudentCareerProgram(), careerProgramCode, studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Career Program Not Found"))).bodyToMono(Void.class).block();
     }
 }

@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.entity.conv;
+package ca.bc.gov.educ.api.dataconversion.entity;
 
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
