@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentUpdateDTO;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;

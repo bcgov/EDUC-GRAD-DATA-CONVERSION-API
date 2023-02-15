@@ -34,9 +34,6 @@ public class StudentService extends StudentBaseService {
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
     private static final String TRAX_API_ERROR_MSG = "Grad Trax API is failed for ";
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
-    private static final String GRAD_PROGRAM_API_ERROR_MSG = "Grad Program API is failed for ";
-    private static final String GRAD_COURSE_API_ERROR_MSG = "Grad Course API is failed for ";
-    private static final String GRAD_ASSESSMENT_API_ERROR_MSG = "Grad Assessment API is failed for ";
     private static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
 
     private final EducGradDataConversionApiConstants constants;

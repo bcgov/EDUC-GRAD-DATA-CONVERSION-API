@@ -21,7 +21,7 @@ import java.util.HashMap;
 @Profile("!test")
 @EnableJpaRepositories(
         basePackages = {
-                "ca.bc.gov.educ.api.dataconversion.repository.conv"
+                "ca.bc.gov.educ.api.dataconversion.repository"
         },
         entityManagerFactoryRef = "convEntityManager",
         transactionManagerRef = "convTransactionManager"
@@ -84,7 +84,7 @@ public class ConvDbConfig {
         LocalContainerEntityManagerFactoryBean em
                 = new LocalContainerEntityManagerFactoryBean();
         em.setDataSource(convDataSource());
-        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity.conv"});
+        em.setPackagesToScan(new String[] {"ca.bc.gov.educ.api.dataconversion.entity"});
 
         HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
