@@ -515,8 +515,11 @@ public class RestUtils {
     }
 
     // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
-    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, String accessToken) {
-        return webClient.post().uri(String.format(constants.getSaveGraduationStudentRecord(),studentID))
+    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, boolean ongoingUpdate, String accessToken) {
+        return webClient.post()
+                .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
+                        uri -> uri.queryParam("ongoingUpdate", ongoingUpdate)
+                                .build())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());

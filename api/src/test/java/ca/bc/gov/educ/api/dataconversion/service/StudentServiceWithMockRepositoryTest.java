@@ -140,7 +140,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -177,7 +177,7 @@ public class StudentServiceWithMockRepositoryTest {
         gradStudentEntity.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -239,7 +239,7 @@ public class StudentServiceWithMockRepositoryTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -311,7 +311,7 @@ public class StudentServiceWithMockRepositoryTest {
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -388,7 +388,7 @@ public class StudentServiceWithMockRepositoryTest {
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false,"123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -465,7 +465,7 @@ public class StudentServiceWithMockRepositoryTest {
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false,"123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -537,7 +537,7 @@ public class StudentServiceWithMockRepositoryTest {
         studentCareerProgramEntity.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false, "123")).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
@@ -747,7 +747,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -967,7 +967,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -1187,7 +1187,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
@@ -1375,7 +1375,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -1553,7 +1553,7 @@ public class StudentServiceWithMockRepositoryTest {
         sc.setPassFlag("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));

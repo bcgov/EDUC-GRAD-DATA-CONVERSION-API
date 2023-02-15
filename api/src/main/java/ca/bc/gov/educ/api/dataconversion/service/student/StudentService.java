@@ -166,7 +166,7 @@ public class StudentService extends StudentBaseService {
                 gradStudent.setUpdateDate(null);
                 gradStudent.setUpdateUser(null);
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
@@ -184,7 +184,7 @@ public class StudentService extends StudentBaseService {
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
@@ -587,13 +587,10 @@ public class StudentService extends StudentBaseService {
         if (list != null && !list.isEmpty()) {
             for (StudentOptionalProgram obj : list) {
                 GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(student, obj, summary);
-                if (result != null) {
-                    StudentCourses studentCourses = new StudentCourses();
-                    studentCourses.setStudentCourseList(studentCourseList);
-                    result.setOptionalStudentCourses(studentCourses);
-
-                    results.add(result);
-                }
+                StudentCourses studentCourses = new StudentCourses();
+                studentCourses.setStudentCourseList(studentCourseList);
+                result.setOptionalStudentCourses(studentCourses);
+                results.add(result);
             }
         }
         return results;
@@ -858,7 +855,6 @@ public class StudentService extends StudentBaseService {
             log.error(GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
         }
         if (entity != null) {
-//            GraduationStudentRecordEntity entity = gradStatusOptional.get();
             studentData.setProgram(entity.getProgram());
             studentData.setStudentGrade(entity.getStudentGrade());
             studentData.setStudentStatus(entity.getStudentStatus());
@@ -941,9 +937,7 @@ public class StudentService extends StudentBaseService {
                 object.setRecalculateProjectedGrad(gradStudent.getNewRecalculateProjectedGrad());
             }
 
-            restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, accessToken);
-            // TODO (jsung): graduation student record history
-//            createGraduationStudentRecordHistory(entity, "TRAXUPDATE");
+            restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
         }
 
         if (gradStudent.isAddDualDogwood()) {
@@ -1001,7 +995,7 @@ public class StudentService extends StudentBaseService {
                 object.setRecalculateGradStatus(recalculateGradStatus == null? "Y" : recalculateGradStatus);
                 object.setRecalculateProjectedGrad(recalculateProjectedGrad == null? "Y" : recalculateProjectedGrad);
             }
-            restUtils.saveStudentGradStatus(studentID.toString(), object, accessToken);
+            restUtils.saveStudentGradStatus(studentID.toString(), object, false, accessToken);
         }
     }
 
