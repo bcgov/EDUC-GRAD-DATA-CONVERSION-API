@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.model.tsw;
 
+import ca.bc.gov.educ.api.dataconversion.model.StudentCareerProgram;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 

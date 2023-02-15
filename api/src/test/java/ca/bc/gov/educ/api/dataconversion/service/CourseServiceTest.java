@@ -3,10 +3,9 @@ package ca.bc.gov.educ.api.dataconversion.service;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.util.GradConversionTestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -44,9 +43,6 @@ public class CourseServiceTest {
 
     @Autowired
     private EducGradDataConversionApiConstants constants;
-
-    @Autowired
-    GradConversionTestUtils gradConversionTestUtils;
 
     // NATS
     @MockBean

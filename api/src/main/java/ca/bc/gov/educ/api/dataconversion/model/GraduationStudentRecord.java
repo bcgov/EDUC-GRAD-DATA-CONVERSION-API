@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.Transient;
 import java.util.UUID;
 
 @Data
@@ -20,17 +21,31 @@ public class GraduationStudentRecord extends BaseModel{
     private String programCompletionDate;
     private String gpa;
     private String honoursStanding;
-    private String recalculateGradStatus;   
+    private String recalculateGradStatus;
+    private String recalculateProjectedGrad;
     private String schoolOfRecord;
-    private String schoolName;
+//    private String schoolName;
     private String studentGrade;	
     private String studentStatus;
-    private String studentStatusName;
+//    private String studentStatusName;
     private UUID studentID;
+    private Long batchId;
     private String schoolAtGrad;
-    private String schoolAtGradName;
-    private String legalFirstName;
-    private String legalMiddleNames;
-    private String legalLastName;
+    private String consumerEducationRequirementMet;
+    private String studentCitizenship;
+    private String adultStartDate;
+//    private String schoolAtGradName;
+//    private String legalFirstName;
+//    private String legalMiddleNames;
+//    private String legalLastName;
+
+    // Mappings for Student_Master
+    @Transient
+    private String frenchCert;
+    @Transient
+    private String englishCert;
+    @Transient
+    private boolean dualDogwood = false;
+
 	private ExceptionMessage exception;
 }

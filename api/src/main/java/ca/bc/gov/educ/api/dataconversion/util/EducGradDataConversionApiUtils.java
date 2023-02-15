@@ -105,9 +105,7 @@ public class EducGradDataConversionApiUtils {
     public static String formatDate (Date date) {
         if (date == null)
             return null;
-
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
-        return simpleDateFormat.format(date);
+        return getSimpleDateFormat(date);
     }
 
     public static String formatDate (Date date, String dateFormat) {

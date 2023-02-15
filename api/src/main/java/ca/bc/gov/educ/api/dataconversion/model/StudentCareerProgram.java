@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.model.tsw;
+package ca.bc.gov.educ.api.dataconversion.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

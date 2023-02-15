@@ -1,10 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
-import ca.bc.gov.educ.api.dataconversion.entity.conv.Event;
+import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentUpdateDTO;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -51,7 +51,7 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(studentCourseUpdate.getPen(), accessToken);
-            processCourse(studentCourseUpdate, currentStudent);
+            processCourse(studentCourseUpdate, currentStudent, accessToken);
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
@@ -62,9 +62,9 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
         });
     }
 
-    public void processCourse(TraxStudentUpdateDTO studentCourseUpdate, StudentGradDTO currentStudent) {
+    public void processCourse(TraxStudentUpdateDTO studentCourseUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process Courses : studentID = {}, pen = {} ", currentStudent.getStudentID(), studentCourseUpdate.getPen());
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y");
+        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
     }
 
     @Override

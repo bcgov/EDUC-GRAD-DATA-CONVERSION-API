@@ -10,7 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportOptions;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Transcript;
-import ca.bc.gov.educ.api.dataconversion.repository.conv.EventRepository;
+import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import lombok.val;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;

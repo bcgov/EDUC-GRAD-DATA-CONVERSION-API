@@ -131,6 +131,14 @@ endpoint:
   grad-student-api:
     add-new-pen:
       url: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student
+    save-grad-student-record: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentid/%s
+    read-grad-student-record: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
+    save-student-optional-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentoptionalprogram
+    remove-student-optional-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentoptionalprogram/%s/%s
+    read-student-optional-programs: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram/studentid/%s
+    save-student-career-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentcareerprogram
+    remove-student-career-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentcareerprogram/%s/%s
+    read-student-career-programs: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentcareerprogram/studentid/%s
   grad-assessment-api:
     assessment-requirement:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
