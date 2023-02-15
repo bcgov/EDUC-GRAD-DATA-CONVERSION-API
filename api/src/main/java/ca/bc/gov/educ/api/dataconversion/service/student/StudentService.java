@@ -200,31 +200,31 @@ public class StudentService extends StudentBaseService {
     }
 
     private void processDependencies(ConvGradStudent convGradStudent,
-                                     GraduationStudentRecord gradStudentEntity,
+                                     GraduationStudentRecord gradStudent,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary, String accessToken) {
         ConversionResultType result;
 
         // process dependencies
-        gradStudentEntity.setPen(convGradStudent.getPen());
+        gradStudent.setPen(convGradStudent.getPen());
         if (convGradStudent.isGraduated()) {
-            result = processOptionalProgramsForGraduatedStudent(gradStudentEntity, accessToken, summary);
+            result = processOptionalProgramsForGraduatedStudent(gradStudent, accessToken, summary);
         } else {
-            result = processOptionalPrograms(gradStudentEntity, accessToken, summary);
+            result = processOptionalPrograms(gradStudent, accessToken, summary);
         }
 
         if (ConversionResultType.FAILURE != result) {
-            result = processProgramCodes(gradStudentEntity, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
+            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
         }
         if (ConversionResultType.FAILURE != result) {
-            result = processSccpFrenchCertificates(gradStudentEntity, convGradStudent.isGraduated(), accessToken, summary);
+            result = processSccpFrenchCertificates(gradStudent, convGradStudent.isGraduated(), accessToken, summary);
         }
 
-        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
+        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             // Building GraduationData CLOB data
-            GraduationData graduationData = buildGraduationData(convGradStudent, gradStudentEntity, penStudent, summary);
+            GraduationData graduationData = buildGraduationData(convGradStudent, gradStudent, penStudent, summary);
             try {
-                gradStudentEntity.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
+                gradStudent.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
             } catch (JsonProcessingException jpe) {
                 log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
             }
@@ -250,48 +250,48 @@ public class StudentService extends StudentBaseService {
         }
     }
 
-    private void convertStudentData(ConvGradStudent student, Student penStudent, GraduationStudentRecord studentEntity, ConversionStudentSummaryDTO summary) {
+    private void convertStudentData(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent, ConversionStudentSummaryDTO summary) {
         if (determineProgram(student, summary)) {
-            studentEntity.setProgram(student.getProgram());
+            gradStudent.setProgram(student.getProgram());
         } else {
             return;
         }
 
-        studentEntity.setGpa(null);
-        studentEntity.setHonoursStanding(null);
-        if ("SCCP".equalsIgnoreCase(studentEntity.getProgram())) {
-            if (!validateAndSetSlpDate(student, studentEntity, summary)) {
+        gradStudent.setGpa(null);
+        gradStudent.setHonoursStanding(null);
+        if ("SCCP".equalsIgnoreCase(gradStudent.getProgram())) {
+            if (!validateAndSetSlpDate(student, gradStudent, summary)) {
                 return;
             }
         } else {
-            studentEntity.setProgramCompletionDate(null);
+            gradStudent.setProgramCompletionDate(null);
         }
-        studentEntity.setStudentGradData(null);
-        studentEntity.setSchoolAtGrad(null);
+        gradStudent.setStudentGradData(null);
+        gradStudent.setSchoolAtGrad(null);
 
-        studentEntity.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
-        studentEntity.setStudentGrade(student.getStudentGrade());
-        studentEntity.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
+        gradStudent.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        gradStudent.setStudentGrade(student.getStudentGrade());
+        gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdult19Rule(student, penStudent, studentEntity);
+        handleAdult19Rule(student, penStudent, gradStudent);
 
         // flags
-        if (StringUtils.equalsIgnoreCase(studentEntity.getStudentStatus(), STUDENT_STATUS_MERGED)) {
-            studentEntity.setRecalculateGradStatus(null);
-            studentEntity.setRecalculateProjectedGrad(null);
+        if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
+            gradStudent.setRecalculateGradStatus(null);
+            gradStudent.setRecalculateProjectedGrad(null);
         } else {
-            studentEntity.setRecalculateGradStatus("Y");
-            studentEntity.setRecalculateProjectedGrad("Y");
+            gradStudent.setRecalculateGradStatus("Y");
+            gradStudent.setRecalculateProjectedGrad("Y");
         }
 
         // Mappings with Student_Master
-        studentEntity.setFrenchCert(student.getFrenchCert());
-        studentEntity.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
-        studentEntity.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
+        gradStudent.setFrenchCert(student.getFrenchCert());
+        gradStudent.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
+        gradStudent.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
 
         // extra
-        studentEntity.setCreateUser(DEFAULT_CREATED_BY);
-        studentEntity.setUpdateUser(DEFAULT_UPDATED_BY);
+        gradStudent.setCreateUser(DEFAULT_CREATED_BY);
+        gradStudent.setUpdateUser(DEFAULT_UPDATED_BY);
     }
 
     private void convertGraduatedStudentData(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent, ConversionStudentSummaryDTO summary) {
@@ -406,7 +406,7 @@ public class StudentService extends StudentBaseService {
         return graduationData;
     }
 
-    private GradSearchStudent populateGraduateStudentInfo(GraduationStudentRecord studentEntity,
+    private GradSearchStudent populateGraduateStudentInfo(GraduationStudentRecord gradStudent,
                                                           Student penStudent,
                                                           School school) {
         GradSearchStudent gradSearchStudent = GradSearchStudent.builder()
@@ -435,9 +435,9 @@ public class StudentService extends StudentBaseService {
                 .trueStudentID(penStudent.getTrueStudentID())
         .build();
 
-        gradSearchStudent.setProgram(studentEntity.getProgram());
-        gradSearchStudent.setStudentGrade(studentEntity.getStudentGrade());
-        gradSearchStudent.setStudentStatus(studentEntity.getStudentStatus());
+        gradSearchStudent.setProgram(gradStudent.getProgram());
+        gradSearchStudent.setStudentGrade(gradStudent.getStudentGrade());
+        gradSearchStudent.setStudentStatus(gradStudent.getStudentStatus());
         gradSearchStudent.setSchoolOfRecord(school.getMinCode());
         gradSearchStudent.setSchoolOfRecordName(school.getSchoolName());
         gradSearchStudent.setSchoolOfRecordindependentAffiliation(school.getIndependentAffiliation());
@@ -848,20 +848,20 @@ public class StudentService extends StudentBaseService {
         studentData.setMiddleName(penStudent.getLegalMiddleNames());
         studentData.setBirthday(penStudent.getDob());
 
-        GraduationStudentRecord entity = null;
+        GraduationStudentRecord gradStudent = null;
         try {
-            entity = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
+            gradStudent = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
         } catch (Exception e) {
             log.error(GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
         }
-        if (entity != null) {
-            studentData.setProgram(entity.getProgram());
-            studentData.setStudentGrade(entity.getStudentGrade());
-            studentData.setStudentStatus(entity.getStudentStatus());
-            studentData.setSchoolOfRecord(entity.getSchoolOfRecord());
-            studentData.setSchoolAtGrad(entity.getSchoolAtGrad());
-            studentData.setCitizenship(entity.getStudentCitizenship());
-            studentData.setAdultStartDate(entity.getAdultStartDate());
+        if (gradStudent != null) {
+            studentData.setProgram(gradStudent.getProgram());
+            studentData.setStudentGrade(gradStudent.getStudentGrade());
+            studentData.setStudentStatus(gradStudent.getStudentStatus());
+            studentData.setSchoolOfRecord(gradStudent.getSchoolOfRecord());
+            studentData.setSchoolAtGrad(gradStudent.getSchoolAtGrad());
+            studentData.setCitizenship(gradStudent.getStudentCitizenship());
+            studentData.setAdultStartDate(gradStudent.getAdultStartDate());
         } else {
             log.error("GraduationStudentRecord is not found for pen# [{}], studentID [{}]", pen, studentID);
             return null;

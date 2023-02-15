@@ -38,23 +38,29 @@ public class ConvDbConfig {
     @Value("${spring.db-connection.hikari.connection-timeout}")
     private int connectionTimeout;
 
-    @Value("${spring.db-connection.hikari.max-life-time}")
+    @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
+
+    @Value("${spring.db-connection.hikari.keepalive-time}")
+    private int keepAliveTime;
+
+    @Value("${spring.db-connection.hikari.idle-timeout}")
+    private int idleTimeout;
 
     @Value("${spring.db-connection.driver-class}")
     private String driverClassName;
 
-    @Value("${spring.db-connection.conv.pool-name}")
+    @Value("${spring.db-connection.hikari.pool-name}")
     private String convPoolName;
 
     // Connection String
     @Value("${spring.db-connection.url}")
     private String jdbcUrl;
 
-    @Value("${spring.db-connection.conv.username}")
+    @Value("${spring.db-connection.username}")
     private String convUsername;
 
-    @Value("${spring.db-connection.conv.password}")
+    @Value("${spring.db-connection.password}")
     private String convPassword;
 
     @Primary
