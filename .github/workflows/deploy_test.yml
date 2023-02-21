@@ -30,8 +30,7 @@ on:
 jobs:
   deploy-to-openshift-test:
     name: Deploy to OpenShift TEST
-    # ubuntu-20.04 can also be used.
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     environment: test
 
     outputs:
