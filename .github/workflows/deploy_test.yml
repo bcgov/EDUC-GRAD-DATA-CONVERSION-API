@@ -12,7 +12,7 @@ env:
 
   REPO_NAME: "educ-grad-data-conversion-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
-  NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+  NAMESPACE: ${{ secrets.GRAD_BUSINESS_NAMESPACE }}
   TAG: "latest"
 
   # TODO: add below to DC
