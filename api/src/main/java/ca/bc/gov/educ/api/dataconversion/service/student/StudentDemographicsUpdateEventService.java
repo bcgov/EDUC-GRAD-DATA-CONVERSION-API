@@ -50,7 +50,9 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(updateDemog.getPen(), accessToken);
-            processStudentDemographics(updateDemog, currentStudent, accessToken);
+            if (currentStudent != null) {
+                processStudentDemographics(updateDemog, currentStudent, accessToken);
+            }
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());

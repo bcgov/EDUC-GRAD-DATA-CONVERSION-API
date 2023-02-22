@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service;
 
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
+import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Code;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
@@ -28,10 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNotNull;
@@ -163,7 +161,7 @@ public class ReportServiceTest {
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
         when(this.restUtils.getProgramCertificateTranscriptList(any(), eq(accessToken))).thenReturn(clist);
 
-        List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -224,7 +222,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -285,7 +283,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getProgramCertificateTranscriptList(any(), eq(accessToken))).thenReturn(clist);
 
-        List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -340,7 +338,7 @@ public class ReportServiceTest {
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = new ArrayList<>();
         graduationDataStatus.setOptionalGradStatus(optionalGradStatus);
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -402,7 +400,7 @@ public class ReportServiceTest {
 
         graduationDataStatus.setOptionalGradStatus(list);
 
-        List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -464,7 +462,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, accessToken);
+        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -555,7 +553,7 @@ public class ReportServiceTest {
         programCertificateTranscript.setSchoolCategoryCode(commSch.getSchoolCategoryCode());
         programCertificateTranscript.setCertificateTypeCode("E");
 
-        when(this.restUtils.getTranscript(gP.getProgramCode(), "06011033", accessToken)).thenReturn(programCertificateTranscript);
+        when(this.restUtils.getTranscript(gP.getProgramCode(), commSch.getSchoolCategoryCode(), accessToken)).thenReturn(programCertificateTranscript);
 
         GradAlgorithmGraduationStudentRecord gradResponse = new GradAlgorithmGraduationStudentRecord();
         gradResponse.setPen("123090109");
@@ -566,7 +564,15 @@ public class ReportServiceTest {
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, accessToken);
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -628,7 +634,15 @@ public class ReportServiceTest {
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse, accessToken);
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse, student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -707,7 +721,16 @@ public class ReportServiceTest {
         gradResponse.setStudentGrade("11");
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -801,7 +824,15 @@ public class ReportServiceTest {
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken);
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -896,7 +927,15 @@ public class ReportServiceTest {
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken);
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -967,7 +1006,14 @@ public class ReportServiceTest {
         gradResponse.setStudentStatus("D");
         gradResponse.setLastUpdateDate(new Date(System.currentTimeMillis()));
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,accessToken);
+        ConvGradStudent student = ConvGradStudent.builder().pen("123090109").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(schoolObj)
+                .certificateSchool(schoolObj)
+//                .schoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -1125,7 +1171,7 @@ public class ReportServiceTest {
         sp.setLabel("AEG");
 
         when(this.restUtils.getSpecialCase("A", accessToken)).thenReturn(sp);
-        when(this.restUtils.getTranscript(gradProgram.getProgramCode(), "00502001", accessToken)).thenReturn(programCertificateTranscript);
+        when(this.restUtils.getTranscript(gradProgram.getProgramCode(), commSch.getSchoolCategoryCode(), accessToken)).thenReturn(programCertificateTranscript);
 
         GraduationData graduationDataStatus = new GraduationData();
         graduationDataStatus.setDualDogwood(false);
@@ -1143,12 +1189,20 @@ public class ReportServiceTest {
 
         graduationDataStatus.setGradProgram(gpCode);
 
-        ReportData transcriptData = reportService.prepareTranscriptData(graduationDataStatus, graduationStudentRecord, "accessToken");
+        ConvGradStudent student = ConvGradStudent.builder().pen("129382610").program("2018-EN")
+                .studentStatus("A").schoolOfRecord("06011033").graduationRequirementYear("2018")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
+                .programCodes(Arrays.asList("DD")).build();
+
+        ReportData transcriptData = reportService.prepareTranscriptData(graduationDataStatus, graduationStudentRecord, student, "accessToken");
         assertNotNull(transcriptData);
         assertNotNull(transcriptData.getStudent());
         assertNotNull(transcriptData.getTranscript());
 
-        ReportData certificateData = reportService.prepareCertificateData(graduationDataStatus, programCertificateTranscript, "accessToken");
+        ReportData certificateData = reportService.prepareCertificateData(graduationDataStatus, programCertificateTranscript, student, "accessToken");
         assertNotNull(certificateData);
         assertNotNull(certificateData.getStudent());
         assertNotNull(certificateData.getCertificate());

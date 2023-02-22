@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
+import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GradProgram;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GradRequirement;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GraduationData;
@@ -32,7 +33,7 @@ public class ReportService {
 	@Autowired
 	EducGradDataConversionApiConstants constants;
 
-	public ReportData prepareTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, String accessToken) {
+	public ReportData prepareTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, ConvGradStudent convStudent, String accessToken) {
 		ReportData data = new ReportData();
 		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
@@ -40,7 +41,7 @@ public class ReportService {
 		data.setGradProgram(getGradProgram(graduationDataStatus, accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
 		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
-		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse,accessToken));
+		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, convStudent, accessToken));
 		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
 		return data;
 	}
@@ -58,11 +59,11 @@ public class ReportService {
 		return nList;
 	}
 
-	private Transcript getTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, String accessToken) {
+	private Transcript getTranscriptData(GraduationData graduationDataStatus, GradAlgorithmGraduationStudentRecord gradResponse, ConvGradStudent convStudent, String accessToken) {
 		Transcript transcriptData = new Transcript();
 		transcriptData.setInterim("false");
 		ProgramCertificateTranscript pcObj = restUtils.getTranscript(gradResponse.getProgram(),
-				graduationDataStatus.getGradStatus().getSchoolOfRecord(), accessToken);
+				convStudent.getTranscriptSchoolCategoryCode(), accessToken);
 		if (pcObj != null) {
 			Code code = new Code();
 			code.setCode(pcObj.getTranscriptTypeCode());
@@ -281,7 +282,7 @@ public class ReportService {
 				}
 				data.setHonorsFlag(StringUtils.equals(graduationDataStatus.getGradStatus().getHonoursStanding(), "Y"));
 			} else {
-				data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(graduationDataStatus.getGradStatus().getProgramCompletionDate()));
+				data.setGraduationDate(EducGradDataConversionApiUtils.formatIssueDateForReportJasper(EducGradDataConversionApiUtils.parsingNFormating(graduationDataStatus.getGradStatus().getProgramCompletionDate())));
 			}
 		}
 
@@ -365,7 +366,7 @@ public class ReportService {
 		return new String(encoded, StandardCharsets.US_ASCII);
 	}
 
-	public List<ProgramCertificateTranscript> getCertificateList(GraduationData graduationDataStatus, String accessToken) {
+	public List<ProgramCertificateTranscript> getCertificateList(GraduationData graduationDataStatus, String schoolCategoryCode, String accessToken) {
 		ProgramCertificateReq req = new ProgramCertificateReq();
 		req.setProgramCode(graduationDataStatus.getGradStatus().getProgram());
 		for (GradAlgorithmOptionalStudentProgram optionalPrograms : graduationDataStatus.getOptionalGradStatus()) {
@@ -374,13 +375,17 @@ public class ReportService {
 				break;
 			}
 		}
-		req.setSchoolCategoryCode(this.restUtils.getSchoolCategoryCode(graduationDataStatus.getGradStatus().getSchoolOfRecord(), accessToken));
+		req.setSchoolCategoryCode(schoolCategoryCode);
 		return this.restUtils.getProgramCertificateTranscriptList(req, accessToken);
 	}
 
-	public ReportData prepareCertificateData(GraduationData graduationDataStatus, ProgramCertificateTranscript certType, String accessToken) {
+	public ReportData prepareCertificateData(GraduationData graduationDataStatus, ProgramCertificateTranscript certType, ConvGradStudent convStudent, String accessToken) {
 		ReportData data = new ReportData();
-		data.setSchool(getSchoolData(graduationDataStatus.getSchool()));
+		if (convStudent.getCertificateSchool() != null) {
+			data.setSchool(getSchoolData(convStudent.getCertificateSchool()));
+		} else {
+			data.setSchool(getSchoolData(convStudent.getTranscriptSchool()));
+		}
 		data.setStudent(getStudentData(graduationDataStatus.getGradStudent()));
 		data.setGradProgram(getGradProgram(graduationDataStatus,accessToken));
 		data.setGraduationData(getGraduationData(graduationDataStatus));
@@ -394,9 +399,9 @@ public class ReportService {
 		return data;
 	}
 
-	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, Date distributionDate,
+	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, ConvGradStudent convStudent,
 												   String accessToken, ProgramCertificateTranscript certType) {
-		ReportData certData = prepareCertificateData(graduationDataStatus, certType, accessToken);
+		ReportData certData = prepareCertificateData(graduationDataStatus, certType, convStudent, accessToken);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
 		requestObj.setPen(graduationDataStatus.getGradStatus().getPen());
@@ -404,7 +409,7 @@ public class ReportService {
 		requestObj.setCertificate(encodedPdfReportCertificate);
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
 		requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
-		requestObj.setDistributionDate(distributionDate);
+		requestObj.setDistributionDate(convStudent.getDistributionDate());
 		this.restUtils.saveGradStudentCertificate(requestObj, accessToken);
 	}
 

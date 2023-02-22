@@ -12,11 +12,13 @@ import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -70,51 +72,50 @@ public class StudentService extends StudentBaseService {
         specialCaseMap.clear();
     }
 
-    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) throws Exception {
         long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
-        try {
-            String accessToken = summary.getAccessToken();
+        String accessToken = summary.getAccessToken();
 
-            // School validation
-            Boolean schoolExists = validateSchool(convGradStudent, summary);
-            if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // Grad Trax API is failed
-                return convGradStudent;
-            } else if (schoolExists != null && !schoolExists) {
-                handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Invalid school of record " + convGradStudent.getSchoolOfRecord());
-                return convGradStudent;
-            }
-
-            // PEN Student
-            List<Student> students = getStudentsFromPEN(convGradStudent, summary);
-            if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // PEN Student API is failed
-                return convGradStudent;
-            } else if (students == null || students.isEmpty()) {
-                handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN does not exist: PEN Student API returns empty response.");
-                return convGradStudent;
-            }
-
-            // Student conversion process
-            processStudents(convGradStudent, students, summary, accessToken);
-
-        } catch (Exception e) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Unexpected Exception is occurred: " + e.getLocalizedMessage());
+        // School validation
+        validateSchool(convGradStudent, summary);
+        if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // Grad Trax API is failed
+            return convGradStudent;
         }
+
+        // PEN Student
+        List<Student> students = getStudentsFromPEN(convGradStudent, summary);
+        if (ConversionResultType.FAILURE == convGradStudent.getResult()) { // PEN Student API is failed
+            return convGradStudent;
+        } else if (students == null || students.isEmpty()) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN does not exist: PEN Student API returns empty response.");
+            return convGradStudent;
+        }
+
+        // Student conversion process
+        processStudents(convGradStudent, students, summary, accessToken);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
         log.info("************* TIME Taken for pen [{}]  ************ {} secs", convGradStudent.getPen(), diff);
         return convGradStudent;
     }
 
-    private Boolean validateSchool(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
-        // School validation
-        Boolean schoolExists = null;
-        try {
-            schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
-        } catch (Exception e) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
+    private void validateSchool(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        // School Category Code form School API
+        if (convGradStudent.isGraduated() && StringUtils.isBlank(convGradStudent.getTranscriptSchoolCategoryCode())) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "School does not exist in SPM School data : mincode [" + convGradStudent.getSchoolOfRecord() + "]");
+            return;
         }
-        return schoolExists;
+        // TRAX School validation
+        if (convGradStudent.getTranscriptSchool() == null) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Invalid school of record " + convGradStudent.getSchoolOfRecord());
+            return;
+        }
+//        try {
+//            schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
+//        } catch (Exception e) {
+//            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
+//        }
     }
 
     private List<Student> getStudentsFromPEN(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
@@ -226,27 +227,38 @@ public class StudentService extends StudentBaseService {
             try {
                 gradStudent.setStudentGradData(JsonUtil.getJsonStringFromObject(graduationData));
             } catch (JsonProcessingException jpe) {
-                log.error("Json Parsing Error: " + jpe.getLocalizedMessage());
+                log.error("Json Parsing Error for StudentGradData: " + jpe.getLocalizedMessage());
+            }
+            try {
+                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+            } catch (Exception e) {
+                handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "updating a GraduationStudentRecord with clob data : " + e.getLocalizedMessage());
             }
             if (convGradStudent.getDistributionDate() == null) {
-                Date distributionDate =  DateConversionUtils.getLastDayOfMonth(convGradStudent.getProgramCompletionDate());
+                Date distributionDate = null;
+                if (!"SCCP".equalsIgnoreCase(convGradStudent.getProgram())) {
+                    distributionDate = DateConversionUtils.getLastDayOfMonth(convGradStudent.getProgramCompletionDate());
+                } else {
+                    distributionDate = DateConversionUtils.convertStringToDate(convGradStudent.getSccDate());
+                }
                 convGradStudent.setDistributionDate(distributionDate);
             }
-            createAndStoreStudentTranscript(graduationData, convGradStudent.getDistributionDate(), accessToken);
-            createAndStoreStudentCertificates(graduationData, convGradStudent.getDistributionDate(), accessToken);
+            createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken);
+            createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken);
         }
         convGradStudent.setResult(result);
     }
 
-    private void createAndStoreStudentTranscript(GraduationData graduationData, Date distributionDate, String accessToken) {
-        ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(),accessToken);
-        reportService.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+    private void createAndStoreStudentTranscript(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
+        ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(), convStudent, accessToken);
+        reportService.saveStudentTranscriptReportJasper(data, convStudent.getDistributionDate(), accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
     }
 
-    private void createAndStoreStudentCertificates(GraduationData graduationData, Date distributionDate, String accessToken) {
-        List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,accessToken);
+    private void createAndStoreStudentCertificates(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
+        List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,
+            convStudent.getCertificateSchoolCategoryCode() != null? convStudent.getCertificateSchoolCategoryCode() : convStudent.getTranscriptSchoolCategoryCode(), accessToken);
         for (ProgramCertificateTranscript certType : certificateList) {
-            reportService.saveStudentCertificateReportJasper(graduationData, distributionDate, accessToken, certType);
+            reportService.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType);
         }
     }
 
@@ -353,11 +365,10 @@ public class StudentService extends StudentBaseService {
         graduationData.setGradStatus(gradStatus);
 
         // school
-        School school = restUtils.getSchoolGrad(transcriptStudentDemog.getMincode(), summary.getAccessToken());
-        graduationData.setSchool(school);
+        graduationData.setSchool(student.getTranscriptSchool());
 
         // graduated Student
-        GradSearchStudent gradSearchStudent = populateGraduateStudentInfo(gradStudent, penStudent, school);
+        GradSearchStudent gradSearchStudent = populateGraduateStudentInfo(gradStudent, penStudent, student.getTranscriptSchool());
         graduationData.setGradStudent(gradSearchStudent);
 
         // TSW_TRAN_CRSE
@@ -578,6 +589,10 @@ public class StudentService extends StudentBaseService {
     private List<GradAlgorithmOptionalStudentProgram> buildOptionalGradStatus(ConvGradStudent student, GraduationStudentRecord gradStudent,
               List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList, ConversionStudentSummaryDTO summary) {
         List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
+        if (student.getProgramCodes() == null || student.getProgramCodes().isEmpty()) {
+            return results;
+        }
+
         List<StudentOptionalProgram> list = null;
         try {
             list = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), summary.getAccessToken());
@@ -601,13 +616,25 @@ public class StudentService extends StudentBaseService {
         GradAlgorithmOptionalStudentProgram result = new GradAlgorithmOptionalStudentProgram();
         result.setOptionalProgramID(object.getOptionalProgramID());
         result.setOptionalProgramCode(object.getOptionalProgramCode());
-         result.setOptionalProgramName(object.getOptionalProgramName());
+        result.setOptionalProgramName(object.getOptionalProgramName());
         result.setOptionalProgramCompletionDate(object.getOptionalProgramCompletionDate());
         result.setOptionalRequirementsMet(new ArrayList<>());
         result.setStudentID(object.getStudentID());
         result.setOptionalGraduated(true);
+        try {
+            object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
+        } catch (JsonProcessingException e) {
+            log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
+        }
         result.setCpList(buildStudentCareerProgramList(student, object, summary));
+        updateStudentOptionalProgram(object, summary.getAccessToken());
         return result;
+    }
+
+    private void updateStudentOptionalProgram(StudentOptionalProgram object, String accessToken) {
+        StudentOptionalProgramRequestDTO requestDTO = new StudentOptionalProgramRequestDTO();
+        BeanUtils.copyProperties(object, requestDTO);
+        restUtils.saveStudentOptionalProgram(requestDTO, accessToken);
     }
 
     private List<StudentCareerProgram> buildStudentCareerProgramList(ConvGradStudent student, StudentOptionalProgram object, ConversionStudentSummaryDTO summary) {
@@ -789,7 +816,7 @@ public class StudentService extends StudentBaseService {
     }
 
     private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
-        StudentOptionalProgramReq object = new StudentOptionalProgramReq();
+        StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setPen(student.getPen());
         object.setStudentID(student.getStudentID());
         object.setMainProgramCode(student.getProgram());
@@ -853,6 +880,7 @@ public class StudentService extends StudentBaseService {
             gradStudent = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
         } catch (Exception e) {
             log.error(GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
+            return null;
         }
         if (gradStudent != null) {
             studentData.setProgram(gradStudent.getProgram());
@@ -874,7 +902,6 @@ public class StudentService extends StudentBaseService {
         } catch (Exception e) {
             log.error(GRAD_STUDENT_API_ERROR_MSG + "getting StudentOptionalPrograms : " + e.getLocalizedMessage());
         }
-
         studentData.getProgramCodes().addAll(getOptionalProgramCodes(optionalPrograms));
 
         // career programs
@@ -962,7 +989,7 @@ public class StudentService extends StudentBaseService {
     }
 
     public void addStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, String accessToken) {
-        StudentOptionalProgramReq object = new StudentOptionalProgramReq();
+        StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setStudentID(gradStudent.getStudentID());
         object.setMainProgramCode(gradStudent.getProgram());
         object.setOptionalProgramCode(optionalProgramCode);

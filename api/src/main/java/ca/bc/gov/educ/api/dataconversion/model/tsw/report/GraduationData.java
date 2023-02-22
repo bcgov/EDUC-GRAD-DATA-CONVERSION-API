@@ -3,6 +3,7 @@ package ca.bc.gov.educ.api.dataconversion.model.tsw.report;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class GraduationData implements Serializable {
     }
 
     public List<String> getProgramCodes() {
+        if(programCodes == null) {
+            programCodes = new ArrayList<>();
+        }
         return programCodes;
     }
 
@@ -50,6 +54,9 @@ public class GraduationData implements Serializable {
     }
 
     public List<String> getProgramNames() {
+        if(programNames == null) {
+            programNames = new ArrayList<>();
+        }
         return programNames;
     }
 

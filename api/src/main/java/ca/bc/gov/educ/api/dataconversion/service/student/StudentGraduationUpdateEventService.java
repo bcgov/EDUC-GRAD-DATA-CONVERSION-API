@@ -50,7 +50,9 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(updateGrad.getPen(), accessToken);
-            processStudent(updateGrad, currentStudent, accessToken);
+            if (currentStudent != null) {
+                processStudent(updateGrad, currentStudent, accessToken);
+            }
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());
