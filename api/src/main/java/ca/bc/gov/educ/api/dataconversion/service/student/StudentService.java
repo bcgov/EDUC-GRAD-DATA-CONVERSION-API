@@ -109,13 +109,7 @@ public class StudentService extends StudentBaseService {
         // TRAX School validation
         if (convGradStudent.getTranscriptSchool() == null) {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Invalid school of record " + convGradStudent.getSchoolOfRecord());
-            return;
         }
-//        try {
-//            schoolExists = restUtils.checkSchoolExists(convGradStudent.getSchoolOfRecord(), summary.getAccessToken());
-//        } catch (Exception e) {
-//            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, TRAX_API_ERROR_MSG + "validating school existence : " + e.getLocalizedMessage());
-//        }
     }
 
     private List<Student> getStudentsFromPEN(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
