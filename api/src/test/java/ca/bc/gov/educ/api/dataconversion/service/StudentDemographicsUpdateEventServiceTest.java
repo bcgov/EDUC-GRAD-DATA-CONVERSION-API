@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -54,7 +55,7 @@ public class StudentDemographicsUpdateEventServiceTest {
     private EducGradDataConversionApiConstants constants;
 
     @Test
-    public void testProcessStudentForGrad2018ENProgram_givenUpdated_UPD_DEMOG_then_returnsAPICallSuccess() {
+    public void testProcessStudentDemographicsForGrad2018ENProgram_givenUpdated_UPD_DEMOG_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -94,6 +95,34 @@ public class StudentDemographicsUpdateEventServiceTest {
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentDemographicsUpdateEventService.processEvent(traxDemogUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessStudentDemographics_whenException_isThrown_returnsAPICallError() throws Exception {
+        // ID
+        String pen = "111222333";
+        String updateType = "UPD_DEMOG";
+
+        TraxDemographicsUpdateDTO traxDemog = TraxDemographicsUpdateDTO.builder()
+                .lastName("Test")
+                .firstName("QA")
+                .build();
+        traxDemog.setPen(pen);
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_DEMOG.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+
+        studentDemographicsUpdateEventService.processEvent(traxDemog, event);
 
         assertThat(event).isNotNull();
         assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());

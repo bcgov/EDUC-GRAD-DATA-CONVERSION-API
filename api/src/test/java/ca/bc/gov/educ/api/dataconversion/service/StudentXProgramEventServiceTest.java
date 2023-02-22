@@ -436,4 +436,37 @@ public class StudentXProgramEventServiceTest {
         assertThat(event).isNotNull();
         assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
     }
+
+    @Test
+    public void testProcessStudentForXPrograms_whenException_isThrown_returnsAPICallError() throws Exception {
+        // ID
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String updateType = "XPROGRAM";
+
+        // ConvGradStudent = traxStudent with the recent updated info
+        TraxXProgramDTO traxXProgram = TraxXProgramDTO.builder()
+                        .programList(Arrays.asList("XC", "SN"))
+                        .build();
+        traxXProgram.setPen(pen);
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.XPROGRAM.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+
+        studentXProgramEventService.processEvent(traxXProgram, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
 }

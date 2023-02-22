@@ -30,11 +30,7 @@ public class StudentDataConversionJobCompletionNotificationListener extends JobE
 			LOGGER.info(" Processed count:	{}", summaryDTO.getProcessedCount());
 			LOGGER.info(" Created count:	{}", summaryDTO.getAddedCount());
 			LOGGER.info(" Updated count:	{}", summaryDTO.getUpdatedCount());
-			LOGGER.info(" --------------------------------------------------------------------------------------");
-			LOGGER.info(" Not Good: 		{}", summaryDTO.getErrors().size());
-			summaryDTO.getErrors().forEach(e ->
-				LOGGER.info("  {} - Pen: {}, Reason: {}", e.getLevel(), e.getItem(), e.getReason())
-			);
+			LOGGER.info(" Not Good:			{}", summaryDTO.getErroredCount());
 			LOGGER.info(" --------------------------------------------------------------------------------------");
 			summaryDTO.getProgramCountMap().entrySet().stream().forEach(e -> {
 				String key = e.getKey();

@@ -49,7 +49,9 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(frenchImmersionUpdate.getPen(), accessToken);
-            processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken);
+            if (currentStudent != null) {
+                processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken);
+            }
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());

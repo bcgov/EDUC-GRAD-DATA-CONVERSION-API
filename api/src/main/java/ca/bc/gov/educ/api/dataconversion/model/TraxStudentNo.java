@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class TraxStudentNo {
     private String studNo;
     private String status;
+    private String reason;
 }

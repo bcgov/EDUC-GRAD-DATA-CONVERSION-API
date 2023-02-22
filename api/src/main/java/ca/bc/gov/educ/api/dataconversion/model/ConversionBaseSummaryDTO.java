@@ -16,7 +16,7 @@ public class ConversionBaseSummaryDTO {
 
   private long addedCount = 0L;
   private long updatedCount = 0L;
-
+  private long erroredCount = 0L;
   private List<ConversionAlert> errors = new ArrayList<>();
   private String exception;
 

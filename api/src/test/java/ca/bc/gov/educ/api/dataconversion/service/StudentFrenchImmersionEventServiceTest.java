@@ -19,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -164,6 +165,35 @@ public class StudentFrenchImmersionEventServiceTest {
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentFrenchImmersionEventService.processEvent(traxFrenchImmersionUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessStudentForFrenchImmersion_whenException_isThrown_returnsAPICallError() throws Exception {
+        // ID
+        String pen = "111222333";
+        String updateType = "FI10ADD";
+
+        TraxFrenchImmersionUpdateDTO traxFrenchImmersion = TraxFrenchImmersionUpdateDTO.builder()
+                .graduationRequirementYear("2018")
+                .courseCode("Test")
+                .courseLevel("12")
+                .build();
+        traxFrenchImmersion.setPen(pen);
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.FI10ADD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+
+        studentFrenchImmersionEventService.processEvent(traxFrenchImmersion, event);
 
         assertThat(event).isNotNull();
         assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
