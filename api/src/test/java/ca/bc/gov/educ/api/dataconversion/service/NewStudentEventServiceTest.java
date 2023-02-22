@@ -67,7 +67,8 @@ public class NewStudentEventServiceTest {
         String updateType = "NEWSTUDENT";
 
         // ConvGradStudent = traxStudent with the recent updated info
-        ConvGradStudent traxNewStudent = ConvGradStudent.builder().pen(pen)
+        ConvGradStudent traxNewStudent = ConvGradStudent.builder()
+                .pen(pen)
                 .program(program)
                 .studentGrade("11")
                 .studentStatus("A")
@@ -87,6 +88,43 @@ public class NewStudentEventServiceTest {
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
+        newStudentEventService.processEvent(traxNewStudent, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessStudent_whenException_isThrown_returnsAPICallError() throws Exception {
+        // ID
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String updateType = "NEWSTUDENT";
+
+        // ConvGradStudent = traxStudent with the recent updated info
+        ConvGradStudent traxNewStudent = ConvGradStudent.builder()
+                .pen(pen)
+                .program(program)
+                .studentGrade("11")
+                .studentStatus("A")
+                .schoolOfRecord(mincode)
+                .schoolAtGrad(mincode)
+                .graduationRequirementYear("2018")
+                .programCodes(Arrays.asList("XC","FI")).build();
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.NEWSTUDENT.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
         newStudentEventService.processEvent(traxNewStudent, event);
 
         assertThat(event).isNotNull();
