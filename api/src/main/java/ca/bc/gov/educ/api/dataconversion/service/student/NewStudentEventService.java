@@ -49,7 +49,15 @@ public class NewStudentEventService extends StudentBaseService implements EventS
             }
             ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
             summary.setAccessToken(accessToken);
-            studentService.convertStudent(convStudent, new ConversionStudentSummaryDTO());
+            try {
+                studentService.convertStudent(convStudent, summary);
+            } catch (Exception e) {
+                ConversionAlert error = new ConversionAlert();
+                error.setItem(convStudent.getPen());
+                error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
+                summary.getErrors().add(error);
+                log.error("unknown exception: " + e.getLocalizedMessage());
+            }
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());

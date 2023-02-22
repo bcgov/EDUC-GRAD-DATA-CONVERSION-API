@@ -48,7 +48,7 @@ public class StudentPartitionReader implements ItemReader<String> {
         totalSummaryDTO.setProcessedCount(totalSummaryDTO.getProcessedCount() + summaryDTO.getProcessedCount());
         totalSummaryDTO.setAddedCount(totalSummaryDTO.getAddedCount() + summaryDTO.getAddedCount());
         totalSummaryDTO.setUpdatedCount(totalSummaryDTO.getUpdatedCount() + summaryDTO.getUpdatedCount());
-        totalSummaryDTO.getErrors().addAll(summaryDTO.getErrors());
+        totalSummaryDTO.setErroredCount(totalSummaryDTO.getErroredCount() + summaryDTO.getErroredCount());
 
         mergeMapCounts(totalSummaryDTO.getProgramCountMap(), summaryDTO.getProgramCountMap());
         mergeMapCounts(totalSummaryDTO.getOptionalProgramCountMap(), summaryDTO.getOptionalProgramCountMap());

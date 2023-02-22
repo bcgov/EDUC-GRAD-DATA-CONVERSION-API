@@ -21,6 +21,8 @@ public class DateConversionUtils {
           formatter = new SimpleDateFormat("yyyy/MM");
         } else if (dateStr.trim().length() == 8) {
           formatter = new SimpleDateFormat("yyyyMMdd");
+        } else if (dateStr.trim().length() > 8) {
+          formatter = new SimpleDateFormat("yyyy-MM-dd");
         }
         return formatter.parse(dateStr);
       } catch (ParseException pe) {

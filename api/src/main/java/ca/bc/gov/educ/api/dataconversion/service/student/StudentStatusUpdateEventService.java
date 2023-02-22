@@ -52,7 +52,9 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
             }
             // Load grad student
             StudentGradDTO currentStudent = studentService.loadStudentData(studentStatusUpdate.getPen(), accessToken);
-            processStudent(studentStatusUpdate, currentStudent, accessToken);
+            if (currentStudent != null) {
+                processStudent(studentStatusUpdate, currentStudent, accessToken);
+            }
         }
 
         var existingEvent = eventRepository.findByEventId(event.getEventId());

@@ -432,10 +432,10 @@ public class RestUtils {
                 }).retrieve().bodyToMono(SpecialCase.class).block();
     }
 
-    public ProgramCertificateTranscript getTranscript(String gradProgram, String mincode, String accessToken) {
+    public ProgramCertificateTranscript getTranscript(String gradProgram, String schoolCategoryCode, String accessToken) {
         ProgramCertificateReq req = new ProgramCertificateReq();
         req.setProgramCode(gradProgram);
-        req.setSchoolCategoryCode(getSchoolCategoryCode(mincode, accessToken));
+        req.setSchoolCategoryCode(schoolCategoryCode);
         return webClient.post().uri(constants.getTranscript())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
@@ -538,7 +538,7 @@ public class RestUtils {
     }
 
     // Save StudentOptionalProgram - POST /student/conv/studentoptionalprogram
-    public StudentOptionalProgram saveStudentOptionalProgram(StudentOptionalProgramReq toBeSaved, String accessToken) {
+    public StudentOptionalProgram saveStudentOptionalProgram(StudentOptionalProgramRequestDTO toBeSaved, String accessToken) {
         return webClient.post().uri(constants.getSaveStudentOptionalProgram())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);

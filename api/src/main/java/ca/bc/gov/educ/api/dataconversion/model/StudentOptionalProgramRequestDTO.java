@@ -9,10 +9,12 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Component
-public class StudentOptionalProgramReq extends BaseModel{
+public class StudentOptionalProgramRequestDTO extends BaseModel{
 
 	private UUID id;
     private String pen;
+    private UUID optionalProgramID;
+    private String studentOptionalProgramData;
     private String optionalProgramCompletionDate;
     private String optionalProgramCode;
     private String mainProgramCode;
