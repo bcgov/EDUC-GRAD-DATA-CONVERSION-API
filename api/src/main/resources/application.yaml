@@ -10,7 +10,7 @@ spring:
       minimum-idle: ${MIN_IDLE}
       idle-timeout: ${IDLE_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-      keepalive-time: ${KEEP_ALIVE_TIME}
+      #keepalive-time: ${KEEP_ALIVE_TIME}
     username: ${CONV_USERNAME}
     password: ${CONV_PASSWORD}
     url: ${CONNECTION_STRING}
