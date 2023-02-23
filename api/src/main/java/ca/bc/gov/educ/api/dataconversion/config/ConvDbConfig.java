@@ -41,8 +41,8 @@ public class ConvDbConfig {
     @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
 
-    @Value("${spring.db-connection.hikari.keepalive-time}")
-    private int keepAliveTime;
+    //@Value("${spring.db-connection.hikari.keepalive-time}")
+    //private int keepAliveTime;
 
     @Value("${spring.db-connection.hikari.idle-timeout}")
     private int idleTimeout;
@@ -78,7 +78,7 @@ public class ConvDbConfig {
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
-        config.setKeepaliveTime(keepAliveTime);
+        //config.setKeepaliveTime(keepAliveTime);
         config.setIdleTimeout(idleTimeout);
         config.addDataSourceProperty("socketTimeout", 36000000);
         config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
