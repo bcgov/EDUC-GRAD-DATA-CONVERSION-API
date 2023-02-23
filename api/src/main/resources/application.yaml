@@ -184,7 +184,7 @@ endpoint:
     assessment-requirement:
       url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement
     student-assessments-by-pen:
-      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen/%s
   grad-trax-api:
     student:
       get-student-no-list-by-page:
