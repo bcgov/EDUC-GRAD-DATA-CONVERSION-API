@@ -143,7 +143,7 @@ endpoint:
     assessment-requirement:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
     student-assessments-by-pen:
-      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen
+      url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen/%s
   grad-trax-api:
     student:
       get-student-no-list-by-page:
