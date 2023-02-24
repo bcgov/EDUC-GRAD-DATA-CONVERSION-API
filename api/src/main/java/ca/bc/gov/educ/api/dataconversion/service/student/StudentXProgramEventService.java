@@ -74,10 +74,9 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         }
 
         currentStudent.getRemovedProgramCodes().forEach(p -> {
-            OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
-            if (optionalProgram != null) {
+            if (isOptionalProgramCode(p)) {
                 log.info(" => removed optional program code : {}", p);
-                studentService.removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), currentStudent, accessToken);
+                studentService.removeStudentOptionalProgram(p, currentStudent, accessToken);
             } else {
                 log.info(" => removed career program code : {}", p);
                 studentService.removeStudentCareerProgram(p, currentStudent, accessToken);
@@ -85,10 +84,9 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         });
 
         currentStudent.getAddedProgramCodes().forEach(p -> {
-            OptionalProgram optionalProgram = restUtils.getOptionalProgram(currentStudent.getProgram(),p, accessToken);
-            if (optionalProgram != null) {
+            if (isOptionalProgramCode(p)) {
                 log.info(" => new optional program code : {}", p);
-                studentService.addStudentOptionalProgram(optionalProgram.getOptProgramCode(), currentStudent, accessToken);
+                studentService.addStudentOptionalProgram(p, currentStudent, accessToken);
             } else {
                 log.info(" => new career program code : {}", p);
                 studentService.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);

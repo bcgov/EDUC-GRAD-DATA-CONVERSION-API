@@ -6,6 +6,9 @@ import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class StudentBaseService {
 
     public static final String STUDENT_STATUS_CURRENT = "CUR";
@@ -13,6 +16,8 @@ public class StudentBaseService {
     public static final String STUDENT_STATUS_DECEASED = "DEC";
     public static final String STUDENT_STATUS_MERGED = "MER";
     public static final String STUDENT_STATUS_TERMINATED = "TER";
+
+    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
 
     protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
         ConversionAlert error = new ConversionAlert();
@@ -145,6 +150,10 @@ public class StudentBaseService {
         if (summary != null) {
             summary.increment(programCode, isGraduated);
         }
+    }
+
+    public boolean isOptionalProgramCode(String code) {
+        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
 }
