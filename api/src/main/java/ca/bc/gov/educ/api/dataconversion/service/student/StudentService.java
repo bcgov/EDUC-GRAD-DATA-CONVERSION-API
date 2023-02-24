@@ -903,10 +903,14 @@ public class StudentService extends StudentBaseService {
 
         // courses
         List<StudentCourse> courses = courseService.getStudentCourses(pen, accessToken);
-        studentData.getCourses().addAll(courses);
+        if (courses != null && !courses.isEmpty()) {
+            studentData.getCourses().addAll(courses);
+        }
         // assessments
         List<StudentAssessment> assessments = assessmentService.getStudentAssessments(pen, accessToken);
-        studentData.getAssessments().addAll(assessments);
+        if (assessments != null && !assessments.isEmpty()) {
+            studentData.getAssessments().addAll(assessments);
+        }
 
         return studentData;
     }
