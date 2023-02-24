@@ -33,8 +33,6 @@ import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiCo
 @Slf4j
 public class StudentService extends StudentBaseService {
 
-    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
-    private static final String TRAX_API_ERROR_MSG = "Grad Trax API is failed for ";
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
     private static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
 
@@ -803,10 +801,6 @@ public class StudentService extends StudentBaseService {
             return createStudentOptionalProgram("FR", student, isGraduated, accessToken, summary);
         }
         return ConversionResultType.SUCCESS;
-    }
-
-    private boolean isOptionalProgramCode(String code) {
-       return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
     private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
