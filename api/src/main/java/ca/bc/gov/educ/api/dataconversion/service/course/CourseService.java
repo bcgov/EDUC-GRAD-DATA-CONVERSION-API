@@ -585,21 +585,9 @@ public class CourseService {
         createCourseRequirement(populate(FRALP_STR, "10", "202"), summary);
         createCourseRequirement(populate(FRALP_STR, "10", "902"), summary);
 
-        // IBFRS 12A
-        createCourseRequirement(populate("IBFRS", "12A", "200"), summary);
-
-        // IBFRH 12A
-        createCourseRequirement(populate("IBFRH", "12A", "200"), summary);
-
         // IBFNS 11
         createCourseRequirement(populate("IBFNS", "11", "201"), summary);
         createCourseRequirement(populate("IBFNS", "11", "901"), summary);
-
-        // IBFRS 11
-        createCourseRequirement(populate("IBFRS", "11", "201"), summary);
-
-        // IBFRH 11
-        createCourseRequirement(populate("IBFRH", "11", "201"), summary);
 
         // SPLGF 11
         createCourseRequirement(populate("SPLGF", "11", "201"), summary);
