@@ -138,8 +138,8 @@ public class ReportServiceTest {
 
         GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
         spgm.setPen("123090109");
-        spgm.setOptionalProgramCode("DD");
-        spgm.setOptionalProgramName("International Bacculaurette");
+        spgm.setOptionalProgramCode("BD");
+        spgm.setOptionalProgramName("International Bacculaurette Diploma");
         spgm.setOptionalGraduated(true);
         spgm.setStudentID(UUID.fromString(studentID));
         List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
@@ -207,8 +207,8 @@ public class ReportServiceTest {
 
         GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
         spgm.setPen("123090109");
-        spgm.setOptionalProgramCode("DD");
-        spgm.setOptionalProgramName("International Bacculaurette");
+        spgm.setOptionalProgramCode("BD");
+        spgm.setOptionalProgramName("International Bacculaurette Diploma");
         spgm.setStudentID(UUID.fromString(studentID));
         List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
         list.add(spgm);
@@ -260,8 +260,8 @@ public class ReportServiceTest {
 
         GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
         spgm.setPen("123090109");
-        spgm.setOptionalProgramCode("DD");
-        spgm.setOptionalProgramName("International Bacculaurette");
+        spgm.setOptionalProgramCode("BD");
+        spgm.setOptionalProgramName("International Bacculaurette Diploma");
         spgm.setStudentID(UUID.fromString(studentID));
         List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
         list.add(spgm);
@@ -374,6 +374,16 @@ public class ReportServiceTest {
         graduationDataStatus.setSchool(schoolObj);
         graduationDataStatus.setStudentCourses(null);
 
+        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
+        spgm.setPen("123090109");
+        spgm.setOptionalProgramCode("BD");
+        spgm.setOptionalProgramName("International Bacculaurette Diploma");
+        spgm.setStudentID(UUID.fromString(studentID));
+        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
+        list.add(spgm);
+
+        graduationDataStatus.setOptionalGradStatus(list);
+
         List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
         ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
         pc.setCertificateTypeCode("E");
@@ -388,17 +398,6 @@ public class ReportServiceTest {
         comSchObj.setSchoolCategoryCode("02");
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
-
-        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
-        spgm.setPen("123090109");
-        spgm.setOptionalProgramCode("FI");
-        spgm.setOptionalProgramName("International Bacculaurette");
-        spgm.setStudentID(UUID.fromString(studentID));
-        spgm.setOptionalProgramCompletionDate("2020-09-01");
-        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
-        list.add(spgm);
-
-        graduationDataStatus.setOptionalGradStatus(list);
 
         List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
@@ -439,7 +438,7 @@ public class ReportServiceTest {
         GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
         spgm.setPen("123090109");
         spgm.setOptionalProgramCode("FI");
-        spgm.setOptionalProgramName("International Bacculaurette");
+        spgm.setOptionalProgramName("French Immersion");
         spgm.setStudentID(UUID.fromString(studentID));
         spgm.setOptionalProgramCompletionDate(null);
         List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<GradAlgorithmOptionalStudentProgram>();
@@ -529,6 +528,17 @@ public class ReportServiceTest {
         graduationDataStatus.setStudentAssessments(sAssessments);
         graduationDataStatus.setGradStudent(stuObj);
         graduationDataStatus.setGradProgram(gpCode);
+
+        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
+        spgm.setPen("123123123");
+        spgm.setOptionalProgramCode("FI");
+        spgm.setOptionalProgramName("French Immersion");
+        spgm.setStudentID(UUID.randomUUID());
+        spgm.setOptionalProgramCompletionDate("2020-09-01");
+        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
+        list.add(spgm);
+
+        graduationDataStatus.setOptionalGradStatus(list);
 
         GradProgram gP = new GradProgram();
         gP.setProgramCode("2018-EN");
@@ -737,6 +747,7 @@ public class ReportServiceTest {
     @Test
     public void testPrepareReportData_Desig_3() {
         String accessToken = "accessToken";
+        UUID studentID = UUID.randomUUID();
         GradAlgorithmGraduationStudentRecord gradAlgorithmGraduationStatus = new GradAlgorithmGraduationStudentRecord();
         gradAlgorithmGraduationStatus.setPen("123090109");
         gradAlgorithmGraduationStatus.setProgram("2018-EN");
@@ -791,6 +802,16 @@ public class ReportServiceTest {
         graduationDataStatus.setStudentCourses(sCourses);
         graduationDataStatus.setStudentAssessments(sAssessments);
         graduationDataStatus.setGradStudent(stuObj);
+
+        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
+        spgm.setPen("123123123");
+        spgm.setOptionalProgramCode("BD");
+        spgm.setOptionalProgramName("International Bacculaurette Diploma");
+        spgm.setStudentID(studentID);
+        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
+        list.add(spgm);
+
+        graduationDataStatus.setOptionalGradStatus(list);
 
         GradProgram gP = new GradProgram();
         gP.setProgramCode("2018-EN");
@@ -895,6 +916,16 @@ public class ReportServiceTest {
         graduationDataStatus.setStudentAssessments(sAssessments);
         graduationDataStatus.setGradStudent(stuObj);
 
+        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
+        spgm.setPen("123123123");
+        spgm.setOptionalProgramCode("CP");
+        spgm.setOptionalProgramName("Career Program");
+        spgm.setStudentID(UUID.randomUUID());
+        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
+        list.add(spgm);
+
+        graduationDataStatus.setOptionalGradStatus(list);
+
         GradProgram gP = new GradProgram();
         gP.setProgramCode("2018-EN");
         gP.setProgramName("2018 Graduation Program");
@@ -990,6 +1021,14 @@ public class ReportServiceTest {
         graduationDataStatus.setStudentCourses(sCourses);
         graduationDataStatus.setStudentAssessments(sAssessments);
         graduationDataStatus.setGradStudent(stuObj);
+
+        GradAlgorithmOptionalStudentProgram spgm = new GradAlgorithmOptionalStudentProgram();
+        spgm.setPen("123123123");
+        spgm.setOptionalProgramCode("FI");
+        spgm.setOptionalProgramName("French Immersion");
+        spgm.setStudentID(UUID.randomUUID());
+        List<GradAlgorithmOptionalStudentProgram> list = new ArrayList<>();
+        list.add(spgm);
 
         GradProgram gP = new GradProgram();
         gP.setProgramCode("2018-EN");

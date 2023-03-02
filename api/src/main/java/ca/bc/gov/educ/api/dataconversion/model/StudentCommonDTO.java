@@ -14,7 +14,7 @@ public class StudentCommonDTO extends StudentDemographicDTO {
     private String schoolAtGrad;
     private String studentGrade;
     private String studentStatus;
-    private String gradDate; // TODO(jsung): populate with programCompletionDate
+    private String gradDate;
 
     // citizenship
     private String citizenship;
