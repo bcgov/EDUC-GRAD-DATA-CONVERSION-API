@@ -33,10 +33,7 @@ import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiCo
 @Slf4j
 public class StudentService extends StudentBaseService {
 
-    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
-    private static final String TRAX_API_ERROR_MSG = "Grad Trax API is failed for ";
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
-    private static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
 
     private final EducGradDataConversionApiConstants constants;
     private final RestUtils restUtils;
@@ -92,6 +89,11 @@ public class StudentService extends StudentBaseService {
             return convGradStudent;
         }
 
+        // Program Completion for graduated student
+        if (!validateProgramCompletionDate(convGradStudent, summary)) {
+            return convGradStudent;
+        }
+
         // Student conversion process
         processStudents(convGradStudent, students, summary, accessToken);
 
@@ -121,6 +123,29 @@ public class StudentService extends StudentBaseService {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN Student API is failed: " + e.getLocalizedMessage());
         }
         return students;
+    }
+
+    /**
+     *
+     * @param convGradStudent
+     * @return true             Valid
+     *         false            Bad data (programCompletionDate is null)
+     */
+    private boolean validateProgramCompletionDate(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
+        if (!convGradStudent.isGraduated()) {
+            return true;
+        }
+        if (!"SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
+            convGradStudent.getProgramCompletionDate() == null) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: grad_date is null for " + convGradStudent.getGraduationRequirementYear());
+            return false;
+        }
+        if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
+                StringUtils.isBlank(convGradStudent.getSccDate())) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: scc_date is null for SCCP");
+            return false;
+        }
+        return true;
     }
 
     private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken) {
@@ -203,7 +228,7 @@ public class StudentService extends StudentBaseService {
         // process dependencies
         gradStudent.setPen(convGradStudent.getPen());
         if (convGradStudent.isGraduated()) {
-            result = processOptionalProgramsForGraduatedStudent(gradStudent, accessToken, summary);
+            result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, accessToken, summary);
         } else {
             result = processOptionalPrograms(gradStudent, accessToken, summary);
         }
@@ -211,8 +236,8 @@ public class StudentService extends StudentBaseService {
         if (ConversionResultType.FAILURE != result) {
             result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
         }
-        if (ConversionResultType.FAILURE != result) {
-            result = processSccpFrenchCertificates(gradStudent, convGradStudent.isGraduated(), accessToken, summary);
+        if (ConversionResultType.FAILURE != result && !convGradStudent.isGraduated()) {
+            result = processSccpFrenchCertificates(gradStudent, accessToken, summary);
         }
 
         if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -237,7 +262,9 @@ public class StudentService extends StudentBaseService {
                 }
                 convGradStudent.setDistributionDate(distributionDate);
             }
+            fetchAccessToken(summary);
             createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken);
+            fetchAccessToken(summary);
             createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken);
         }
         convGradStudent.setResult(result);
@@ -383,7 +410,7 @@ public class StudentService extends StudentBaseService {
         graduationData.setStudentAssessments(studentAssessments);
 
         // optionalGradStatus
-        List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = buildOptionalGradStatus(student, gradStudent, studentCourseList, summary);
+        List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = buildOptionalGradStatus(student, gradStudent, studentCourseList, studentAssessmentList, summary);
         graduationData.setOptionalGradStatus(optionalGradStatus);
 
         // requirements met
@@ -393,8 +420,7 @@ public class StudentService extends StudentBaseService {
         // gradMessage
         String gradMessage = transcriptStudentDemog.getGradMessage();
         if ("1950".equalsIgnoreCase(gradSearchStudent.getProgram())
-            && StringUtils.isNotBlank(gradMessage)
-            && StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG)) {
+            && isProgramFrancophone(gradMessage)) {
             gradMessage = StringUtils.remove(gradMessage, TSW_PF_GRAD_MSG).trim();
         }
         graduationData.setGradMessage(gradMessage);
@@ -581,7 +607,9 @@ public class StudentService extends StudentBaseService {
     }
 
     private List<GradAlgorithmOptionalStudentProgram> buildOptionalGradStatus(ConvGradStudent student, GraduationStudentRecord gradStudent,
-              List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList, ConversionStudentSummaryDTO summary) {
+                                                                              List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList,
+                                                                              List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessmentList,
+                                                                              ConversionStudentSummaryDTO summary) {
         List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
         if (student.getProgramCodes() == null || student.getProgramCodes().isEmpty()) {
             return results;
@@ -594,35 +622,82 @@ public class StudentService extends StudentBaseService {
             handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting StudentOptionalPrograms : " + e.getLocalizedMessage());
         }
         if (list != null && !list.isEmpty()) {
+            List<StudentCareerProgram> careerProgramList = buildStudentCareerProgramList(student, gradStudent.getStudentID(), summary);
             for (StudentOptionalProgram obj : list) {
-                GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(student, obj, summary);
-                StudentCourses studentCourses = new StudentCourses();
-                studentCourses.setStudentCourseList(studentCourseList);
-                result.setOptionalStudentCourses(studentCourses);
+                GradAlgorithmOptionalStudentProgram result = populateOptionStudentProgramStatus(obj, studentCourseList, studentAssessmentList, careerProgramList, summary);
                 results.add(result);
             }
         }
         return results;
-
     }
 
-    private GradAlgorithmOptionalStudentProgram populateOptionStudentProgramStatus(ConvGradStudent student, StudentOptionalProgram object, ConversionStudentSummaryDTO summary) {
+    private GradAlgorithmOptionalStudentProgram populateOptionStudentProgramStatus(StudentOptionalProgram object,
+                                                                                   List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentCourse> studentCourseList,
+                                                                                   List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessmentList,
+                                                                                   List<StudentCareerProgram> careerProgramList, ConversionStudentSummaryDTO summary) {
         GradAlgorithmOptionalStudentProgram result = new GradAlgorithmOptionalStudentProgram();
         result.setOptionalProgramID(object.getOptionalProgramID());
         result.setOptionalProgramCode(object.getOptionalProgramCode());
         result.setOptionalProgramName(object.getOptionalProgramName());
         result.setOptionalProgramCompletionDate(object.getOptionalProgramCompletionDate());
-        result.setOptionalRequirementsMet(new ArrayList<>());
         result.setStudentID(object.getStudentID());
         result.setOptionalGraduated(true);
+
+        // Optional Program Requirements Met
+        GradRequirement gradRequirement = createOptionalProgramRequirementMet(object.getOptionalProgramCode());
+        result.setOptionalRequirementsMet(gradRequirement != null? Arrays.asList(gradRequirement) : new ArrayList<>());
+        result.setOptionalNonGradReasons(new ArrayList<>());
         try {
             object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
         } catch (JsonProcessingException e) {
             log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
         }
-        result.setCpList(buildStudentCareerProgramList(student, object, summary));
+
+        // Career Programs
+        result.setCpList(careerProgramList);
+
+        // Student Courses
+        StudentCourses studentCourses = new StudentCourses();
+        studentCourses.setStudentCourseList(studentCourseList);
+        result.setOptionalStudentCourses(studentCourses);
+
+        // Student Assessments
+        StudentAssessments studentAssessments = new StudentAssessments();
+        studentAssessments.setStudentAssessmentList(studentAssessmentList);
+        result.setOptionalStudentAssessments(studentAssessments);
+
         updateStudentOptionalProgram(object, summary.getAccessToken());
         return result;
+    }
+
+    private GradRequirement createOptionalProgramRequirementMet(String optionalProgramCode) {
+        if (StringUtils.isBlank(optionalProgramCode)) {
+            return null;
+        }
+        GradRequirement gradRequirement = new GradRequirement();
+        gradRequirement.setProjected(false);
+        switch(optionalProgramCode) {
+            case "AD":  // 951
+                gradRequirement.setRule("951");
+                gradRequirement.setDescription("A school must report the student as participating in the Advanced Placement program");
+                break;
+            case "BC": //
+                gradRequirement.setRule("952");
+                gradRequirement.setDescription("The school must report the student as participating in the International Baccalaureate program as a Certificate candidate");
+                break;
+            case "BD":
+                gradRequirement.setRule("953");
+                gradRequirement.setDescription("The school must report the student as participating in the International Baccalaureate program as a Diploma candidate");
+                break;
+            case "CP":
+                gradRequirement.setRule("954");
+                gradRequirement.setDescription("The school must report the student as participating in a Career Program");
+                break;
+            default:
+                gradRequirement = null;
+                break;
+        }
+        return gradRequirement;
     }
 
     private void updateStudentOptionalProgram(StudentOptionalProgram object, String accessToken) {
@@ -631,10 +706,10 @@ public class StudentService extends StudentBaseService {
         restUtils.saveStudentOptionalProgram(requestDTO, accessToken);
     }
 
-    private List<StudentCareerProgram> buildStudentCareerProgramList(ConvGradStudent student, StudentOptionalProgram object, ConversionStudentSummaryDTO summary) {
+    private List<StudentCareerProgram> buildStudentCareerProgramList(ConvGradStudent student, UUID studentID, ConversionStudentSummaryDTO summary) {
         List<StudentCareerProgram> results = null;
         try {
-            results = restUtils.getStudentCareerPrograms(object.getStudentID().toString(), summary.getAccessToken());
+            results = restUtils.getStudentCareerPrograms(studentID.toString(), summary.getAccessToken());
         } catch (Exception e) {
             handleException(student, summary, student.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting StudentCareerPrograms : " + e.getLocalizedMessage());
         }
@@ -716,7 +791,7 @@ public class StudentService extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
-    private ConversionResultType processOptionalProgramsForGraduatedStudent(GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processOptionalProgramsForGraduatedStudent(ConvGradStudent convGradStudent, GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return ConversionResultType.SUCCESS;
         }
@@ -727,8 +802,8 @@ public class StudentService extends StudentBaseService {
             return createStudentOptionalProgram("DD", student, true, accessToken, summary);
         }
 
-        // French Immersion for mincode[1:3] <> '093' and french_cert = 'F'
-        if (student.getProgram().endsWith("-EN") && !student.getSchoolOfRecord().startsWith("093") && StringUtils.equalsIgnoreCase(student.getFrenchCert(), "F")) {
+        // French Immersion for yyyy-EN to check if their Graduation Message contains "Student has successfully completed the French Immersion program"
+        if (student.getProgram().endsWith("-EN") && isFrenchImmersion(convGradStudent.getTranscriptStudentDemog().getGradMessage())) {
             return createStudentOptionalProgram("FI", student, true, accessToken, summary);
         }
 
@@ -795,18 +870,14 @@ public class StudentService extends StudentBaseService {
         return Pair.of(resultType, isCareerProgramCreated);
     }
 
-    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
         if (StringUtils.equals(student.getProgram(), "SCCP")
             && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
                  && student.getSchoolOfRecord().startsWith("093") )
         ) {
-            return createStudentOptionalProgram("FR", student, isGraduated, accessToken, summary);
+            return createStudentOptionalProgram("FR", student, false, accessToken, summary);
         }
         return ConversionResultType.SUCCESS;
-    }
-
-    private boolean isOptionalProgramCode(String code) {
-       return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
     private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
@@ -831,7 +902,6 @@ public class StudentService extends StudentBaseService {
         StudentCareerProgram object = new StudentCareerProgram();
         object.setStudentID(student.getStudentID());
         object.setCareerProgramCode(careerProgramCode);
-
 
         try {
             restUtils.saveStudentCareerProgram(object, summary.getAccessToken());
@@ -909,10 +979,14 @@ public class StudentService extends StudentBaseService {
 
         // courses
         List<StudentCourse> courses = courseService.getStudentCourses(pen, accessToken);
-        studentData.getCourses().addAll(courses);
+        if (courses != null && !courses.isEmpty()) {
+            studentData.getCourses().addAll(courses);
+        }
         // assessments
         List<StudentAssessment> assessments = assessmentService.getStudentAssessments(pen, accessToken);
-        studentData.getAssessments().addAll(assessments);
+        if (assessments != null && !assessments.isEmpty()) {
+            studentData.getAssessments().addAll(assessments);
+        }
 
         return studentData;
     }
@@ -1059,6 +1133,14 @@ public class StudentService extends StudentBaseService {
             Date pcd = EducGradDataConversionApiUtils.parseDate(student.getSlpDate(), EducGradDataConversionApiConstants.TRAX_SLP_DATE_FORMAT);
             gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(pcd));
             return true;
+        }
+    }
+
+    private void fetchAccessToken(ConversionStudentSummaryDTO summaryDTO) {
+        ResponseObj res = restUtils.getTokenResponseObject();
+        if (res != null) {
+            summaryDTO.setAccessToken(res.getAccess_token());
+            log.debug("Setting the new access token in summaryDTO.");
         }
     }
 }

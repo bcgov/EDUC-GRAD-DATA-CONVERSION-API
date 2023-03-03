@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
 import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
 import ca.bc.gov.educ.api.dataconversion.service.student.ReportService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentBaseService;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
@@ -157,12 +158,11 @@ public class StudentServiceTest {
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
 
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenThrow(new RuntimeException("Test"));
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
-                .transcriptSchool(school)
+                .transcriptSchool(school).graduated(false)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -190,23 +190,22 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("SCCP");
-        gradStudentEntity.setStudentGrade("11");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("11");
+        gradStudent.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
-                .transcriptSchool(school)
+                .transcriptSchool(school).graduated(false)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -233,24 +232,23 @@ public class StudentServiceTest {
         penStudent.setDob("2000-06-30");
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("1950");
-        gradStudentEntity.setStudentGrade("AD");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1950");
+        gradStudent.setStudentGrade("AD");
+        gradStudent.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
                 .studentGrade("AD").studentStatus("A")
                 .schoolOfRecord(mincode).graduationRequirementYear("1950")
-                .transcriptSchool(school)
+                .transcriptSchool(school).graduated(false)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -276,12 +274,12 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -289,17 +287,17 @@ public class StudentServiceTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram.getId());
         specialProgramReq.setStudentID(studentID);
-        specialProgramReq.setMainProgramCode(gradStudentEntity.getProgram());
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
         specialProgramReq.setPen(pen);
 
@@ -309,18 +307,18 @@ public class StudentServiceTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
 //        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
-                .transcriptSchool(school)
+                .transcriptSchool(school).graduated(false)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -348,12 +346,12 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
@@ -361,17 +359,17 @@ public class StudentServiceTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram.getId());
         specialProgramReq.setStudentID(studentID);
-        specialProgramReq.setMainProgramCode(gradStudentEntity.getProgram());
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
         specialProgramReq.setPen(pen);
 
@@ -381,24 +379,24 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudentEntity, false, "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
 //        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
-                .transcriptSchool(school)
+                .transcriptSchool(school).graduated(false)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -433,26 +431,21 @@ public class StudentServiceTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("MER");
 
-//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
-
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
         specialProgram.setGraduationProgramCode("2018-EN");
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
@@ -464,23 +457,22 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false,"123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("2018")
+                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("2018").graduated(false)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -521,24 +513,19 @@ public class StudentServiceTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
         specialProgramReq.setPen(pen);
-
-//        StudentOptionalProgramHistoryEntity specialProgramHistoryEntity = new StudentOptionalProgramHistoryEntity();
-//        BeanUtils.copyProperties(specialProgramEntity, specialProgramHistoryEntity);
-//        specialProgramHistoryEntity.setStudentOptionalProgramID(specialProgramEntity.getId());
-//        specialProgramHistoryEntity.setActivityCode("DATACONVERT");
 
         CareerProgram careerProgram = new CareerProgram();
         careerProgram.setCode("XC");
@@ -546,23 +533,22 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false,"123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996")
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").graduated(false)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -603,15 +589,15 @@ public class StudentServiceTest {
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
         specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
@@ -623,24 +609,23 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(studentID.toString(), gradStudent, false, "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986")
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").graduated(false)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -678,24 +663,37 @@ public class StudentServiceTest {
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
-        OptionalProgram specialProgram = new OptionalProgram();
-        specialProgram.setOptionalProgramID(UUID.randomUUID());
-        specialProgram.setGraduationProgramCode("1986-EN");
-        specialProgram.setOptProgramCode("FI");
-        specialProgram.setOptionalProgramName("French Immersion");
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("1986-EN");
+        optionalProgram1.setOptProgramCode("FI");
+        optionalProgram1.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("1986-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram1.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
-        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
         specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
@@ -704,16 +702,15 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
         tranStudentDemog.setStudNo(pen);
         tranStudentDemog.setMincode(mincode);
-        tranStudentDemog.setSchoolName("Test School");
         tranStudentDemog.setStudentGrade("12");
         tranStudentDemog.setGradReqtYear("1986");
         tranStudentDemog.setUpdateDate(20220601L);
@@ -842,14 +839,13 @@ public class StudentServiceTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
-        when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("1986-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -888,7 +884,511 @@ public class StudentServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
         assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
-        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGiven2004Data_withInternationalBaccalaureateDiplomaProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2004-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2004-EN");
+        optionalProgram1.setOptProgramCode("BD");
+        optionalProgram1.setOptionalProgramName("International Baccalaureate Diploma Program ");
+
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("BD");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2004-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
+        specialProgramReq.setId(studentOptionalProgram1.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
+
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("12");
+        tranStudentDemog.setGradReqtYear("2004");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        // TSW
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setSpecialCase("E");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse3 = new TranscriptStudentCourse();
+        tswCourse3.setStudNo(pen);
+        tswCourse3.setReportType("2");
+        tswCourse3.setCourseCode("TestCourse2");
+        tswCourse3.setCourseName("Test Course2 Name");
+        tswCourse3.setCourseLevel("12");
+        tswCourse3.setFinalPercentage("XMT");
+        tswCourse3.setFinalLG("A");
+        tswCourse3.setCourseSession("202206");
+        tswCourse3.setNumberOfCredits("4");
+        tswCourse3.setUsedForGrad("4");
+        tswCourse3.setFoundationReq("11");
+        tswCourse3.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        // Rule 10
+        ProgramRequirement pr10 = new ProgramRequirement();
+        pr10.setProgramRequirementID(UUID.randomUUID());
+        pr10.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule10 = new ProgramRequirementCode();
+        rule10.setTraxReqNumber("10");
+        rule10.setProReqCode("110");
+        rule10.setLabel("Rule 10 Test Label");
+        rule10.setDescription("Rule 10 Test Description");
+
+        pr10.setProgramRequirementCode(rule10);
+
+        GradRuleDetails gradRule10Details = new GradRuleDetails();
+        gradRule10Details.setRuleCode("110");
+        gradRule10Details.setTraxReqNumber("10");
+        gradRule10Details.setProgramCode("2004-EN");
+        gradRule10Details.setRequirementName("Rule 10 Test Label");
+
+        // Rule 11
+        ProgramRequirement pr11 = new ProgramRequirement();
+        pr11.setProgramRequirementID(UUID.randomUUID());
+        pr11.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule11 = new ProgramRequirementCode();
+        rule11.setTraxReqNumber("11");
+        rule11.setProReqCode("111");
+        rule11.setLabel("Rule 11 Test Label");
+        rule11.setDescription("Rule 11 Test Description");
+
+        pr11.setProgramRequirementCode(rule11);
+
+        GradRuleDetails gradRule11Details = new GradRuleDetails();
+        gradRule11Details.setRuleCode("111");
+        gradRule11Details.setTraxReqNumber("11");
+        gradRule11Details.setProgramCode("2004-EN");
+        gradRule11Details.setRequirementName("Rule 11 Test Label");
+
+        // Rule 15
+        ProgramRequirement pr15 = new ProgramRequirement();
+        pr15.setProgramRequirementID(UUID.randomUUID());
+        pr15.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule15 = new ProgramRequirementCode();
+        rule15.setTraxReqNumber("15");
+        rule15.setProReqCode("115");
+        rule15.setLabel("Rule 15 Test Label");
+        rule15.setDescription("Rule 15 Test Description");
+
+        pr15.setProgramRequirementCode(rule15);
+
+        GradRuleDetails gradRule15Details = new GradRuleDetails();
+        gradRule15Details.setRuleCode("115");
+        gradRule15Details.setTraxReqNumber("15");
+        gradRule15Details.setProgramCode("2004-EN");
+        gradRule15Details.setRequirementName("Rule 15 Test Label");
+
+        // SpecialCase
+        SpecialCase sc = new SpecialCase();
+        sc.setSpCase("E");
+        sc.setLabel("XMT");
+        sc.setDescription("Exempt");
+        sc.setPassFlag("Y");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("2004-EN", "FI", "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+        when(this.restUtils.getGradProgramRules("2004-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
+        when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule11Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule11Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule15Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule15Details));
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2004-EN")
+                .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("0")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("2004")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .programCodes(Arrays.asList("XC", "BD")).build();
+        student.setTranscriptStudentDemog(tranStudentDemog);
+        student.setTranscriptStudentCourses(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        when(this.reportService.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2004");
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGiven2004Data_withInternationalBaccalaureateCertificateProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2004-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2004-EN");
+        optionalProgram1.setOptProgramCode("BC");
+        optionalProgram1.setOptionalProgramName("International Baccalaureate Certificate Program ");
+
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("BC");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2004-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
+        specialProgramReq.setId(studentOptionalProgram1.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
+
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("12");
+        tranStudentDemog.setGradReqtYear("2004");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        // TSW
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setSpecialCase("E");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse3 = new TranscriptStudentCourse();
+        tswCourse3.setStudNo(pen);
+        tswCourse3.setReportType("2");
+        tswCourse3.setCourseCode("TestCourse2");
+        tswCourse3.setCourseName("Test Course2 Name");
+        tswCourse3.setCourseLevel("12");
+        tswCourse3.setFinalPercentage("XMT");
+        tswCourse3.setFinalLG("A");
+        tswCourse3.setCourseSession("202206");
+        tswCourse3.setNumberOfCredits("4");
+        tswCourse3.setUsedForGrad("4");
+        tswCourse3.setFoundationReq("11");
+        tswCourse3.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        // Rule 10
+        ProgramRequirement pr10 = new ProgramRequirement();
+        pr10.setProgramRequirementID(UUID.randomUUID());
+        pr10.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule10 = new ProgramRequirementCode();
+        rule10.setTraxReqNumber("10");
+        rule10.setProReqCode("110");
+        rule10.setLabel("Rule 10 Test Label");
+        rule10.setDescription("Rule 10 Test Description");
+
+        pr10.setProgramRequirementCode(rule10);
+
+        GradRuleDetails gradRule10Details = new GradRuleDetails();
+        gradRule10Details.setRuleCode("110");
+        gradRule10Details.setTraxReqNumber("10");
+        gradRule10Details.setProgramCode("2004-EN");
+        gradRule10Details.setRequirementName("Rule 10 Test Label");
+
+        // Rule 11
+        ProgramRequirement pr11 = new ProgramRequirement();
+        pr11.setProgramRequirementID(UUID.randomUUID());
+        pr11.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule11 = new ProgramRequirementCode();
+        rule11.setTraxReqNumber("11");
+        rule11.setProReqCode("111");
+        rule11.setLabel("Rule 11 Test Label");
+        rule11.setDescription("Rule 11 Test Description");
+
+        pr11.setProgramRequirementCode(rule11);
+
+        GradRuleDetails gradRule11Details = new GradRuleDetails();
+        gradRule11Details.setRuleCode("111");
+        gradRule11Details.setTraxReqNumber("11");
+        gradRule11Details.setProgramCode("2004-EN");
+        gradRule11Details.setRequirementName("Rule 11 Test Label");
+
+        // Rule 15
+        ProgramRequirement pr15 = new ProgramRequirement();
+        pr15.setProgramRequirementID(UUID.randomUUID());
+        pr15.setGraduationProgramCode("2004-EN");
+        ProgramRequirementCode rule15 = new ProgramRequirementCode();
+        rule15.setTraxReqNumber("15");
+        rule15.setProReqCode("115");
+        rule15.setLabel("Rule 15 Test Label");
+        rule15.setDescription("Rule 15 Test Description");
+
+        pr15.setProgramRequirementCode(rule15);
+
+        GradRuleDetails gradRule15Details = new GradRuleDetails();
+        gradRule15Details.setRuleCode("115");
+        gradRule15Details.setTraxReqNumber("15");
+        gradRule15Details.setProgramCode("2004-EN");
+        gradRule15Details.setRequirementName("Rule 15 Test Label");
+
+        // SpecialCase
+        SpecialCase sc = new SpecialCase();
+        sc.setSpCase("E");
+        sc.setLabel("XMT");
+        sc.setDescription("Exempt");
+        sc.setPassFlag("Y");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("2004-EN", "FI", "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+        when(this.restUtils.getGradProgramRules("2004-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
+        when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule11Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule11Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule15Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule15Details));
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2004-EN")
+                .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("0")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("2004")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .programCodes(Arrays.asList("XC", "BC")).build();
+        student.setTranscriptStudentDemog(tranStudentDemog);
+        student.setTranscriptStudentCourses(Arrays.asList(tswCourse1, tswCourse2, tswCourse3, tswAssessment));
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        when(this.reportService.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("2004");
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
 
     }
 
@@ -917,24 +1417,39 @@ public class StudentServiceTest {
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
-        OptionalProgram specialProgram = new OptionalProgram();
-        specialProgram.setOptionalProgramID(UUID.randomUUID());
-        specialProgram.setGraduationProgramCode("2018-EN");
-        specialProgram.setOptProgramCode("FI");
-        specialProgram.setOptionalProgramName("French Immersion");
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2018-EN");
+        optionalProgram1.setOptProgramCode("FI");
+        optionalProgram1.setOptionalProgramName("French Immersion");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("FI");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2018-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram1.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
-        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
         specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
@@ -943,16 +1458,15 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
         tranStudentDemog.setStudNo(pen);
         tranStudentDemog.setMincode(mincode);
-        tranStudentDemog.setSchoolName("Test School");
         tranStudentDemog.setStudentGrade("12");
         tranStudentDemog.setGradReqtYear("2018");
         tranStudentDemog.setUpdateDate(20220601L);
@@ -1066,14 +1580,13 @@ public class StudentServiceTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
-        when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -1112,7 +1625,245 @@ public class StudentServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
         assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
-        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGiven1996Data_withAdvancedPlacementProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1996-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("1996-EN");
+        optionalProgram1.setOptProgramCode("AD");
+        optionalProgram1.setOptionalProgramName("Advanced Placement");
+
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("AD");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("1996-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
+        specialProgramReq.setId(studentOptionalProgram1.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
+
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("12");
+        tranStudentDemog.setGradReqtYear("1996");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        // TSW
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        // Rule 10
+        ProgramRequirement pr10 = new ProgramRequirement();
+        pr10.setProgramRequirementID(UUID.randomUUID());
+        pr10.setGraduationProgramCode("1996-EN");
+        ProgramRequirementCode rule10 = new ProgramRequirementCode();
+        rule10.setTraxReqNumber("10");
+        rule10.setProReqCode("110");
+        rule10.setLabel("Rule 10 Test Label");
+        rule10.setDescription("Rule 10 Test Description");
+
+        pr10.setProgramRequirementCode(rule10);
+
+        GradRuleDetails gradRule10Details = new GradRuleDetails();
+        gradRule10Details.setRuleCode("110");
+        gradRule10Details.setTraxReqNumber("10");
+        gradRule10Details.setProgramCode("1996-EN");
+        gradRule10Details.setRequirementName("Rule 10 Test Label");
+
+        // Rule 11
+        ProgramRequirement pr11 = new ProgramRequirement();
+        pr11.setProgramRequirementID(UUID.randomUUID());
+        pr11.setGraduationProgramCode("1996-EN");
+        ProgramRequirementCode rule11 = new ProgramRequirementCode();
+        rule11.setTraxReqNumber("11");
+        rule11.setProReqCode("111");
+        rule11.setLabel("Rule 11 Test Label");
+        rule11.setDescription("Rule 11 Test Description");
+
+        pr11.setProgramRequirementCode(rule11);
+
+        GradRuleDetails gradRule11Details = new GradRuleDetails();
+        gradRule11Details.setRuleCode("111");
+        gradRule11Details.setTraxReqNumber("11");
+        gradRule11Details.setProgramCode("1996-EN");
+        gradRule11Details.setRequirementName("Rule 11 Test Label");
+
+        // Rule 15
+        ProgramRequirement pr15 = new ProgramRequirement();
+        pr15.setProgramRequirementID(UUID.randomUUID());
+        pr15.setGraduationProgramCode("1996-EN");
+        ProgramRequirementCode rule15 = new ProgramRequirementCode();
+        rule15.setTraxReqNumber("15");
+        rule15.setProReqCode("115");
+        rule15.setLabel("Rule 15 Test Label");
+        rule15.setDescription("Rule 15 Test Description");
+
+        pr15.setProgramRequirementCode(rule15);
+
+        GradRuleDetails gradRule15Details = new GradRuleDetails();
+        gradRule15Details.setRuleCode("115");
+        gradRule15Details.setTraxReqNumber("15");
+        gradRule15Details.setProgramCode("1996-EN");
+        gradRule15Details.setRequirementName("Rule 15 Test Label");
+
+        // SpecialCase
+        SpecialCase sc = new SpecialCase();
+        sc.setSpCase("E");
+        sc.setLabel("XMT");
+        sc.setDescription("Exempt");
+        sc.setPassFlag("Y");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
+//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+        when(this.restUtils.getGradProgramRules("1996-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
+        when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule11Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule11Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule15Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule15Details));
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
+                .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("0")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("1996")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .programCodes(Arrays.asList("XC","AD")).build();
+        student.setTranscriptStudentDemog(tranStudentDemog);
+        student.setTranscriptStudentCourses(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        when(this.reportService.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1996");
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
 
     }
 
@@ -1141,24 +1892,39 @@ public class StudentServiceTest {
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
-        OptionalProgram specialProgram = new OptionalProgram();
-        specialProgram.setOptionalProgramID(UUID.randomUUID());
-        specialProgram.setGraduationProgramCode("2018-PF");
-        specialProgram.setOptProgramCode("DD");
-        specialProgram.setOptionalProgramName("Dual Dogwood");
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2018-PF");
+        optionalProgram1.setOptProgramCode("DD");
+        optionalProgram1.setOptionalProgramName("Dual Dogwood");
 
-        StudentOptionalProgram specialProgramEntity = new StudentOptionalProgram();
-        specialProgramEntity.setId(UUID.randomUUID());
-        specialProgramEntity.setStudentID(studentID);
-        specialProgramEntity.setOptionalProgramID(specialProgram.getOptionalProgramID());
-        specialProgramEntity.setOptionalProgramName(specialProgram.getOptionalProgramName());
-        specialProgramEntity.setPen(pen);
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("DD");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2018-PF");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
 
         StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
-        specialProgramReq.setId(specialProgramEntity.getId());
+        specialProgramReq.setId(studentOptionalProgram1.getId());
         specialProgramReq.setStudentID(studentID);
         specialProgramReq.setMainProgramCode(gradStudent.getProgram());
-        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setOptionalProgramCode(optionalProgram1.getOptProgramCode());
         specialProgramReq.setPen(pen);
 
         CareerProgram careerProgram = new CareerProgram();
@@ -1167,19 +1933,19 @@ public class StudentServiceTest {
         careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
         careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setId(UUID.randomUUID());
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
         tranStudentDemog.setStudNo(pen);
         tranStudentDemog.setMincode(mincode);
-        tranStudentDemog.setSchoolName("Test School");
         tranStudentDemog.setStudentGrade("12");
         tranStudentDemog.setGradReqtYear("2018");
         tranStudentDemog.setUpdateDate(20220601L);
+        tranStudentDemog.setGradMessage(StudentBaseService.TSW_PF_GRAD_MSG);
 
         // TSW
         TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
@@ -1290,14 +2056,13 @@ public class StudentServiceTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
-        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(specialProgramEntity));
-        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(specialProgramEntity);
-        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
-        when(this.restUtils.saveStudentCareerProgram(studentCareerProgramEntity, "123")).thenReturn(studentCareerProgramEntity);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getOptionalProgramByID(specialProgram.getOptionalProgramID(), "123")).thenReturn(specialProgram);
-        when(this.restUtils.getOptionalProgram("2018-PF", "DD", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getOptionalProgram("2018-PF", "DD", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-PF", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -1336,7 +2101,7 @@ public class StudentServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
         assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
-        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+        assertThat(result.getProgram()).isEqualTo(optionalProgram1.getGraduationProgramCode());
 
     }
 
@@ -1359,19 +2124,13 @@ public class StudentServiceTest {
         gradStudent.setStudentGrade("AD");
         gradStudent.setStudentStatus("CUR");
 
-//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
-
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
         tranStudentDemog.setStudNo(pen);
         tranStudentDemog.setMincode(mincode);
-        tranStudentDemog.setSchoolName("Test School");
         tranStudentDemog.setStudentGrade("AD");
         tranStudentDemog.setGradReqtYear("1950");
-        tranStudentDemog.setGradMessage("Test Message. Student has successfully completed the Programme Francophone.");
+        tranStudentDemog.setGradMessage(StudentBaseService.TSW_PF_GRAD_MSG);
         tranStudentDemog.setUpdateDate(20220601L);
 
         // TSW
@@ -1482,7 +2241,6 @@ public class StudentServiceTest {
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -1541,19 +2299,13 @@ public class StudentServiceTest {
         gradStudent.setStudentGrade("11");
         gradStudent.setStudentStatus("CUR");
 
-//        GraduationStudentRecordHistoryEntity gradStudentHistoryEntity = new GraduationStudentRecordHistoryEntity();
-//        BeanUtils.copyProperties(gradStudentEntity, gradStudentHistoryEntity);
-////        gradStudentHistoryEntity.setHistoryID(UUID.randomUUID());
-//        gradStudentHistoryEntity.setActivityCode("DATACONVERT");
-
         // TSW
         TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
         tranStudentDemog.setStudNo(pen);
         tranStudentDemog.setMincode(mincode);
-        tranStudentDemog.setSchoolName("Test School");
         tranStudentDemog.setStudentGrade("11");
         tranStudentDemog.setGradReqtYear("SCCP");
-        tranStudentDemog.setGradMessage("Test Message. Student has successfully completed the Programme Francophone.");
+        tranStudentDemog.setGradMessage(StudentBaseService.TSW_PF_GRAD_MSG);
         tranStudentDemog.setUpdateDate(20220601L);
 
         // TSW
@@ -1712,11 +2464,6 @@ public class StudentServiceTest {
         UUID studentID = UUID.randomUUID();
         String careerProgramCode = "XC";
 
-//        StudentGradDTO requestStudent = new StudentGradDTO();
-//        requestStudent.setStudentID(studentID);
-
-//        when(this.studentCareerProgramRepository.findByStudentIDAndCareerProgramCode(studentID, careerProgramCode)).thenReturn(Optional.empty());
-
         boolean exceptionIsThrown = false;
         try {
             studentService.addStudentCareerProgram(careerProgramCode, studentID, "123");
@@ -1738,8 +2485,6 @@ public class StudentServiceTest {
         studentCareerProgram.setCareerProgramCode(careerProgramCode);
         studentCareerProgram.setStudentID(studentID);
         studentCareerProgram.setId(UUID.randomUUID());
-
-//        when(this.restUtils.getStudentCareerProgram(studentID, careerProgramCode)).thenReturn(Optional.of(studentCareerProgram));
 
         boolean exceptionIsThrown = false;
         try {
@@ -1811,13 +2556,7 @@ public class StudentServiceTest {
         requestStudent.setStudentID(studentID);
         requestStudent.setProgram(program);
 
-        StudentOptionalProgram studentOptionalProgramEntity = new StudentOptionalProgram();
-        studentOptionalProgramEntity.setOptionalProgramID(optionalProgram.getOptionalProgramID());
-        studentOptionalProgramEntity.setStudentID(studentID);
-        studentOptionalProgramEntity.setId(UUID.randomUUID());
-
         when(this.restUtils.getOptionalProgram(eq(program), eq(optionalProgramCode), any())).thenReturn(optionalProgram);
-//        when(this.studentOptionalProgramRepository.findByStudentIDAndOptionalProgramID(studentID, optionalProgram.getOptionalProgramID())).thenReturn(Optional.of(studentOptionalProgramEntity));
 
         boolean exceptionIsThrown = false;
         try {
@@ -1937,34 +2676,57 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        StudentOptionalProgram studentOptionalProgramEntity = new StudentOptionalProgram();
-        studentOptionalProgramEntity.setStudentID(studentID);
-        studentOptionalProgramEntity.setPen(pen);
-        studentOptionalProgramEntity.setOptionalProgramID(UUID.randomUUID());
-        studentOptionalProgramEntity.setStudentID(UUID.randomUUID());
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2018-EN");
+        optionalProgram1.setOptProgramCode("FI");
+        optionalProgram1.setOptionalProgramName("French Immersion");
 
-        OptionalProgram optionalProgram = new OptionalProgram();
-        optionalProgram.setOptionalProgramID(studentOptionalProgramEntity.getOptionalProgramID());
-        optionalProgram.setOptProgramCode("FI");
-        optionalProgram.setOptionalProgramName("French Immersion");
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("FI");
+        studentOptionalProgram1.setPen(pen);
 
-        StudentCareerProgram studentCareerProgramEntity = new StudentCareerProgram();
-        studentCareerProgramEntity.setStudentID(studentID);
-        studentCareerProgramEntity.setCareerProgramCode("XC");
-        studentCareerProgramEntity.setId(UUID.randomUUID());
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2018-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
+
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
 
         StudentCourse studentCourse = new StudentCourse();
         studentCourse.setPen(pen);
@@ -1978,11 +2740,11 @@ public class StudentServiceTest {
         studentAssessment.setAssessmentName("Test Assessment");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
 
-        when(this.restUtils.getOptionalProgramByID(optionalProgram.getOptionalProgramID(), "123")).thenReturn(optionalProgram);
-        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgramEntity));
-        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgramEntity));
+        when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
         when(this.courseService.getStudentCourses(pen, "123")).thenReturn(Arrays.asList(studentCourse));
         when(this.assessmentService.getStudentAssessments(pen, "123")).thenReturn(Arrays.asList(studentAssessment));
 
@@ -1990,7 +2752,7 @@ public class StudentServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getStudentID()).isEqualTo(studentID);
         assertThat(result.getProgramCodes()).isNotEmpty();
-        assertThat(result.getProgramCodes()).hasSize(2);
+        assertThat(result.getProgramCodes()).hasSize(3);
         assertThat(result.getCourses()).isNotEmpty();
         assertThat(result.getCourses()).hasSize(1);
         assertThat(result.getAssessments()).isNotEmpty();
@@ -2008,20 +2770,20 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("MER");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("MER");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         boolean isExceptionThrown = false;
         try {
             studentService.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
@@ -2042,20 +2804,20 @@ public class StudentServiceTest {
         penStudent.setStudentID(studentID.toString());
         penStudent.setPen(pen);
 
-        GraduationStudentRecord gradStudentEntity = new GraduationStudentRecord();
-        gradStudentEntity.setStudentID(studentID);
-        gradStudentEntity.setPen(pen);
-        gradStudentEntity.setProgram("2018-EN");
-        gradStudentEntity.setStudentGrade("12");
-        gradStudentEntity.setStudentStatus("CUR");
-        gradStudentEntity.setHonoursStanding("Y");
-        gradStudentEntity.setSchoolAtGrad(mincode);
-        gradStudentEntity.setSchoolOfRecord(mincode);
-        gradStudentEntity.setEnglishCert("E");
-        gradStudentEntity.setFrenchCert("F");
-        gradStudentEntity.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setEnglishCert("E");
+        gradStudent.setFrenchCert("F");
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudentEntity);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
 
         boolean isExceptionThrown = false;
         try {

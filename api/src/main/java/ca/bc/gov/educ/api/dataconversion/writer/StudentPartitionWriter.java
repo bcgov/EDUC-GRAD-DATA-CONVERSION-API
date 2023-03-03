@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.writer;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -30,6 +27,7 @@ public class StudentPartitionWriter implements ItemWriter<ConvGradStudent> {
     public void write(List<? extends ConvGradStudent> list) {
         if (!list.isEmpty()) {
             ConvGradStudent student = list.get(0);
+            fetchAccessToken();
             saveConversionStatus(student, summaryDTO.getErrors());
             LOGGER.info("Processed student[{}] - PEN: {} in total {}", summaryDTO.getProcessedCount(), student.getPen(), summaryDTO.getReadCount());
         }
@@ -60,5 +58,13 @@ public class StudentPartitionWriter implements ItemWriter<ConvGradStudent> {
         traxStudentNo.setStatus(status.toString());
         restUtils.saveTraxStudentNo(traxStudentNo, summaryDTO.getAccessToken());
         summaryDTO.getErrors().clear();
+    }
+
+    private void fetchAccessToken() {
+        ResponseObj res = restUtils.getTokenResponseObject();
+        if (res != null) {
+            summaryDTO.setAccessToken(res.getAccess_token());
+            LOGGER.debug("Setting the new access token in summaryDTO.");
+        }
     }
 }

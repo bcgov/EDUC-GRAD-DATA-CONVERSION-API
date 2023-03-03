@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
+import ca.bc.gov.educ.api.dataconversion.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GradProgram;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GradRequirement;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.GraduationData;
@@ -160,7 +161,7 @@ public class ReportService {
 		return res;
 	}
 
-	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, GraduationData graduationDataStatus, List<TranscriptResult> tList, String accessToken) {
+	private void createAssessmentListForTranscript(List<StudentAssessment> studentAssessmentList, List<TranscriptResult> tList, String accessToken) {
 		for (StudentAssessment sc : studentAssessmentList) {
 			TranscriptResult result = new TranscriptResult();
 			TranscriptCourse crse = new TranscriptCourse();
@@ -184,7 +185,9 @@ public class ReportService {
 			result.setMark(mrk);
 			result.setRequirement(sc.getGradReqMet());
 			result.setRequirementName(sc.getGradReqMetDetail());
-			tList.add(result);
+			if (!tList.contains(result)) {
+				tList.add(result);
+			}
 		}
 	}
 
@@ -218,7 +221,7 @@ public class ReportService {
 			studentAssessmentList.sort(Comparator.comparing(StudentAssessment::getAssessmentCode));
 		}
 
-		createAssessmentListForTranscript(studentAssessmentList, graduationDataStatus, tList, accessToken);
+		createAssessmentListForTranscript(studentAssessmentList, tList, accessToken);
 		return tList;
 	}
 
@@ -286,7 +289,32 @@ public class ReportService {
 			}
 		}
 
+		if (graduationDataStatus.getOptionalGradStatus() != null) {
+			for (GradAlgorithmOptionalStudentProgram op : graduationDataStatus.getOptionalGradStatus()) {
+				switch (op.getOptionalProgramCode()) {
+					case "FR":
+					case "DD":
+					case "FI":
+						break;
+					case "CP":
+						setGraduationDataSpecialPrograms(data, op.getCpList());
+						break;
+					default: // "AD", "BC", "BD"
+						data.getProgramCodes().add(op.getOptionalProgramCode());
+						break;
+				}
+			}
+		}
+
 		return data;
+	}
+
+	private void setGraduationDataSpecialPrograms(ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData data, List<StudentCareerProgram> studentCareerPrograms) {
+		if (studentCareerPrograms != null) {
+			for (StudentCareerProgram cp : studentCareerPrograms) {
+				data.getProgramCodes().add(cp.getCareerProgramCode());
+			}
+		}
 	}
 
 	private ca.bc.gov.educ.api.dataconversion.model.tsw.report.GradProgram getGradProgram(GraduationData graduationDataStatus, String accessToken) {

@@ -10,7 +10,7 @@ spring:
       minimum-idle: ${MIN_IDLE}
       idle-timeout: ${IDLE_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-      keepalive-time: ${KEEP_ALIVE_TIME}
+      #keepalive-time: ${KEEP_ALIVE_TIME}
     username: ${CONV_USERNAME}
     password: ${CONV_PASSWORD}
     url: ${CONNECTION_STRING}
@@ -184,7 +184,7 @@ endpoint:
     assessment-requirement:
       url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement
     student-assessments-by-pen:
-      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen
+      url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen/%s
   grad-trax-api:
     student:
       get-student-no-list-by-page:

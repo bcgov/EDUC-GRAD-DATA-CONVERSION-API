@@ -6,13 +6,24 @@ import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class StudentBaseService {
 
+    // Student Status
     public static final String STUDENT_STATUS_CURRENT = "CUR";
     public static final String STUDENT_STATUS_ARCHIVED = "ARC";
     public static final String STUDENT_STATUS_DECEASED = "DEC";
     public static final String STUDENT_STATUS_MERGED = "MER";
     public static final String STUDENT_STATUS_TERMINATED = "TER";
+
+    // GRAD Messages
+    public static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
+    public static final String TSW_FI_GRAD_MSG = "Student has successfully completed the French Immersion program.";
+
+    // Optional Program Codes
+    private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
 
     protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
         ConversionAlert error = new ConversionAlert();
@@ -42,7 +53,7 @@ public class StudentBaseService {
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
         String gradProgram = student.isGraduated() ?
-            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchCert(), student.getStudentGrade())
+            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getTranscriptStudentDemog().getGradMessage())
             : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
@@ -93,41 +104,26 @@ public class StudentBaseService {
                 gradProgram = "SCCP";
                 break;
             default:
-                return null;
+                break;
         }
         return gradProgram;
     }
 
-    protected String getGradProgramForGraduatedStudent(String graduationRequirementYear, String schoolOfRecord, String frenchCert, String studentGrade) {
+    protected String getGradProgramForGraduatedStudent(String graduationRequirementYear, String gradMessage) {
         String gradProgram = null;
         switch(graduationRequirementYear) {
             case "2018":
-                if (schoolOfRecord.startsWith("093") &&
-                    (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {
-                    gradProgram = "2018-PF";
-                } else {
-                    gradProgram = "2018-EN";
-                }
+                gradProgram = isProgramFrancophone(gradMessage)? "2018-PF" : "2018-EN";
                 break;
             case "2004":
-                if (schoolOfRecord.startsWith("093") &&
-                    (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {
-                    gradProgram = "2004-PF";
-                } else {
-                    gradProgram = "2004-EN";
-                }
+                gradProgram = isProgramFrancophone(gradMessage)? "2004-PF" : "2004-EN";
                 break;
             case "1996":
             case "1995":
-                if (schoolOfRecord.startsWith("093") &&
-                    (StringUtils.equalsIgnoreCase(frenchCert, "F") || StringUtils.equalsIgnoreCase(frenchCert, "S")) ) {
-                    gradProgram = "1996-PF";
-                } else {
-                    gradProgram = "1996-EN";
-                }
+                gradProgram = isProgramFrancophone(gradMessage)? "1996-PF" : "1996-EN";
                 break;
             case "1986":
-                gradProgram = "1986-EN";
+                gradProgram = isProgramFrancophone(gradMessage)? "1986-PF" : "1986-EN";
                 break;
             case "1950":
                 gradProgram = "1950";
@@ -136,7 +132,7 @@ public class StudentBaseService {
                 gradProgram = "SCCP";
                 break;
             default:
-                return null;
+                break;
         }
         return gradProgram;
     }
@@ -145,6 +141,18 @@ public class StudentBaseService {
         if (summary != null) {
             summary.increment(programCode, isGraduated);
         }
+    }
+
+    public boolean isFrenchImmersion(String gradMessage) {
+        return StringUtils.contains(gradMessage, TSW_FI_GRAD_MSG);
+    }
+
+    public boolean isProgramFrancophone(String gradMessage) {
+        return StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG);
+    }
+
+    public boolean isOptionalProgramCode(String code) {
+        return OPTIONAL_PROGRAM_CODES.contains(code);
     }
 
 }
