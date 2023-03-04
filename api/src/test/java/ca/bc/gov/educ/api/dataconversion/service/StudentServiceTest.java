@@ -658,8 +658,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -908,8 +908,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1160,8 +1160,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1412,8 +1412,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1649,8 +1649,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1887,8 +1887,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("S");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("S");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -2685,8 +2685,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram optionalProgram1 = new OptionalProgram();
@@ -2779,8 +2779,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
@@ -2813,8 +2813,8 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
+//        gradStudent.setEnglishCert("E");
+//        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);

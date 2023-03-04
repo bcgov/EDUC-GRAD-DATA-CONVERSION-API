@@ -318,7 +318,6 @@ public class StudentService extends StudentBaseService {
         }
 
         // Mappings with Student_Master
-        gradStudent.setFrenchCert(student.getFrenchCert());
         gradStudent.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
         gradStudent.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
 
@@ -355,8 +354,6 @@ public class StudentService extends StudentBaseService {
         gradStudent.setRecalculateProjectedGrad(null);
 
         // Mappings with Student_Master
-        gradStudent.setFrenchCert(student.getFrenchCert());
-        gradStudent.setEnglishCert(student.getEnglishCert());
         gradStudent.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
         gradStudent.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
 
@@ -611,10 +608,6 @@ public class StudentService extends StudentBaseService {
                                                                               List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessmentList,
                                                                               ConversionStudentSummaryDTO summary) {
         List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
-        if (student.getProgramCodes() == null || student.getProgramCodes().isEmpty()) {
-            return results;
-        }
-
         List<StudentOptionalProgram> list = null;
         try {
             list = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), summary.getAccessToken());
@@ -647,11 +640,6 @@ public class StudentService extends StudentBaseService {
         GradRequirement gradRequirement = createOptionalProgramRequirementMet(object.getOptionalProgramCode());
         result.setOptionalRequirementsMet(gradRequirement != null? Arrays.asList(gradRequirement) : new ArrayList<>());
         result.setOptionalNonGradReasons(new ArrayList<>());
-        try {
-            object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
-        } catch (JsonProcessingException e) {
-            log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
-        }
 
         // Career Programs
         result.setCpList(careerProgramList);
@@ -665,6 +653,13 @@ public class StudentService extends StudentBaseService {
         StudentAssessments studentAssessments = new StudentAssessments();
         studentAssessments.setStudentAssessmentList(studentAssessmentList);
         result.setOptionalStudentAssessments(studentAssessments);
+
+        // Clob
+        try {
+            object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
+        } catch (JsonProcessingException e) {
+            log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
+        }
 
         updateStudentOptionalProgram(object, summary.getAccessToken());
         return result;
@@ -797,7 +792,7 @@ public class StudentService extends StudentBaseService {
         }
 
         // Dual Dogwood for yyyy-PF
-        if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(student.getEnglishCert(), "E")) {
+        if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(convGradStudent.getEnglishCert(), "E")) {
             student.setDualDogwood(true);
             return createStudentOptionalProgram("DD", student, true, accessToken, summary);
         }
