@@ -34,8 +34,8 @@ import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiCo
 public class StudentService extends StudentBaseService {
 
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
+    private static final String EXCEPTION_MSG = "Exception occurred: ";
 
-    private final EducGradDataConversionApiConstants constants;
     private final RestUtils restUtils;
     private final AssessmentService assessmentService;
     private final CourseService courseService;
@@ -52,12 +52,10 @@ public class StudentService extends StudentBaseService {
     private final Map<String, SpecialCase> specialCaseMap = new ConcurrentHashMap<>();
 
     @Autowired
-    public StudentService(EducGradDataConversionApiConstants constants,
-                          RestUtils restUtils,
+    public StudentService(RestUtils restUtils,
                           AssessmentService assessmentService,
                           CourseService courseService,
                           ReportService reportService) {
-        this.constants = constants;
         this.restUtils = restUtils;
         this.assessmentService = assessmentService;
         this.courseService = courseService;
@@ -120,7 +118,7 @@ public class StudentService extends StudentBaseService {
             // Call PEN Student API
             students = restUtils.getStudentsByPen(convGradStudent.getPen(), summary.getAccessToken());
         } catch (Exception e) {
-            log.error("Unknown exception: ", e);
+            log.error(EXCEPTION_MSG, e);
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN Student API is failed: " + e.getLocalizedMessage());
         }
         return students;
@@ -173,7 +171,7 @@ public class StudentService extends StudentBaseService {
         try {
             gradStudent = restUtils.getStudentGradStatus(penStudent.getStudentID(), summary.getAccessToken());
         } catch (Exception e) {
-            log.error("Unknown exception: ", e);
+            log.error(EXCEPTION_MSG, e);
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
             return null;
         }
@@ -190,7 +188,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
-                    log.error("Unknown exception: ", e);
+                    log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
@@ -209,7 +207,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
-                    log.error("Unknown exception: ", e);
+                    log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
