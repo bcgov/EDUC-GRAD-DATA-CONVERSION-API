@@ -2949,7 +2949,7 @@ public class StudentServiceTest {
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
-        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
@@ -2961,6 +2961,9 @@ public class StudentServiceTest {
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
         requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setNewStudentStatus("ARC");
+        requestStudent.setNewRecalculateGradStatus("Y");
+        requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setAddDualDogwood(true);
 
         boolean exceptionIsThrown = false;
@@ -2982,7 +2985,7 @@ public class StudentServiceTest {
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
-        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
@@ -2994,6 +2997,9 @@ public class StudentServiceTest {
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
         requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setNewStudentStatus("ARC");
+        requestStudent.setNewRecalculateGradStatus("Y");
+        requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setDeleteDualDogwood(true);
 
         boolean exceptionIsThrown = false;
@@ -3035,6 +3041,130 @@ public class StudentServiceTest {
 
         var result = studentService.loadStudentData(pen, "123");
         assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGraduationStudentIsNotFound_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDown_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is down!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDownForStudentOptionalPrograms_returnsSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is donw!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDownForStudentCareerPrograms_returnsSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2018-EN");
+        optionalProgram1.setOptProgramCode("FI");
+        optionalProgram1.setOptionalProgramName("French Immersion");
+
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("FI");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2018-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is donw!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNotNull();
     }
 
     @Test
