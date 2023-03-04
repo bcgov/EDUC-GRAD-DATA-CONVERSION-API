@@ -141,8 +141,8 @@ public class StudentService extends StudentBaseService {
             return false;
         }
         if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-                StringUtils.isBlank(convGradStudent.getSccDate())) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: scc_date is null for SCCP");
+                StringUtils.isBlank(convGradStudent.getSlpDate())) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
             return false;
         }
         return true;
