@@ -120,6 +120,7 @@ public class StudentService extends StudentBaseService {
             // Call PEN Student API
             students = restUtils.getStudentsByPen(convGradStudent.getPen(), summary.getAccessToken());
         } catch (Exception e) {
+            e.printStackTrace();
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN Student API is failed: " + e.getLocalizedMessage());
         }
         return students;
@@ -172,6 +173,7 @@ public class StudentService extends StudentBaseService {
         try {
             gradStudent = restUtils.getStudentGradStatus(penStudent.getStudentID(), summary.getAccessToken());
         } catch (Exception e) {
+            e.printStackTrace();
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
             return null;
         }
@@ -188,6 +190,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
@@ -206,6 +209,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
+                    e.printStackTrace();
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
