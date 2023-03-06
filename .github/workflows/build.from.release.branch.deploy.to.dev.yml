@@ -20,6 +20,12 @@ env:
   REPO_NAME: "educ-grad-data-conversion-api"
   APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
   TAG: "latest"
+  MIN_CPU: "50m"
+  MAX_CPU: "500m"
+  MIN_MEM: "500Mi"
+  MAX_MEM: "2Gi"
+  MIN_REPLICAS: "3"
+  MAX_REPLICAS: "3"
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
@@ -104,7 +110,7 @@ jobs:
           oc -n ${{ env.OPENSHIFT_NAMESPACE }} tag ${{ steps.push-image.outputs.registry-path }} ${{ env.REPO_NAME }}:${{ env.TAG }}
 
           # Process and apply deployment template
-          oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }}  \
+          oc process -f tools/openshift/api.dc.yaml -p IS_NAMESPACE=${{ env.OPENSHIFT_NAMESPACE }} -p REPO_NAME=${{ env.REPO_NAME }} -p TAG_NAME=${{ env.TAG }} -p HOST_ROUTE=${{ env.REPO_NAME }}-${{ env.OPENSHIFT_NAMESPACE }}.${{ env.APP_DOMAIN }} -p MIN_REPLICAS=${{ env.MIN_REPLICAS }} -p MAX_REPLICAS=${{ env.MAX_REPLICAS }} -p MIN_CPU=${{ env.MIN_CPU }} -p MAX_CPU=${{ env.MAX_CPU }} -p MIN_MEM=${{ env.MIN_MEM }} -p MAX_MEM=${{ env.MAX_MEM }}  \
           | oc apply -f -
 
           # Start rollout (if necessary) and follow it

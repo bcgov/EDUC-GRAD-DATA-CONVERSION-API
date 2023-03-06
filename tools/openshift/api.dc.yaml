@@ -59,11 +59,11 @@ objects:
                   protocol: TCP
               resources:
                 requests:
-                  cpu: "50m"
-                  memory: "1024Mi"
+                  cpu: "${MIN_CPU}"
+                  memory: "${MIN_MEM}"
                 limits:
-                  cpu: "300m"
-                  memory: "3072Mi"
+                  cpu: "${MAX_CPU}"
+                  memory: "${MAX_MEM}"
               envFrom:
                 - configMapRef:
                     name: educ-grad-api-config-map
@@ -134,6 +134,30 @@ objects:
       selector:
         app: "${REPO_NAME}"
         deploymentconfig: "${REPO_NAME}-dc"
+  - apiVersion: autoscaling/v2beta2
+    kind: HorizontalPodAutoscaler
+    metadata:
+      name: "${REPO_NAME}-cpu-autoscaler"
+    spec:
+      scaleTargetRef:
+        apiVersion: apps.openshift.io/v1
+        kind: DeploymentConfig
+        name: "${REPO_NAME}-dc"
+      minReplicas: ${{MIN_REPLICAS}}
+      maxReplicas: ${{MAX_REPLICAS}}
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              averageUtilization: 800
+              type: Utilization
+        - type: Resource
+          resource:
+            name: memory
+            target:
+              averageUtilization: 350
+              type: Utilization
 parameters:
   - name: REPO_NAME
     description: Application repository name
@@ -156,3 +180,21 @@ parameters:
     description: The path appended to the HOST_ROUTE where the root of this project will be served
     required: false
     value: "/"
+  - name: MIN_REPLICAS
+    description: The minimum amount of replicas
+    required: true
+  - name: MAX_REPLICAS
+    description: The maximum amount of replicas
+    required: true
+  - name: MIN_CPU
+    description: The minimum amount of cpu
+    required: true
+  - name: MAX_CPU
+    description: The maximum amount of cpu
+    required: true
+  - name: MIN_MEM
+    description: The minimum amount of memory
+    required: true
+  - name: MAX_MEM
+    description: The maximum amount of memory
+    required: true

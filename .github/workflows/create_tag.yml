@@ -13,7 +13,7 @@ env:
 
   REPO_NAME: "educ-grad-data-conversion-api"
   BRANCH: "master"
-  NAMESPACE: ${{ secrets.GRAD_NAMESPACE }}
+  NAMESPACE: ${{ secrets.GRAD_BUSINESS_NAMESPACE }}
 
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
