@@ -29,8 +29,8 @@ import java.util.HashMap;
 @EnableTransactionManagement
 public class ConvDbConfig {
     // Hikari Pool
-    @Value("${batch.partitions.number}")
-    private int numberOfPartitions;
+    @Value("${spring.db-connection.hikari.minimum-idle}")
+    private int minimumIdle;
 
     @Value("${spring.db-connection.hikari.maximum-pool-size}")
     private int maxPoolSize;
@@ -40,9 +40,6 @@ public class ConvDbConfig {
 
     @Value("${spring.db-connection.hikari.max-lifetime}")
     private int maxLifetime;
-
-    //@Value("${spring.db-connection.hikari.keepalive-time}")
-    //private int keepAliveTime;
 
     @Value("${spring.db-connection.hikari.idle-timeout}")
     private int idleTimeout;
@@ -74,13 +71,12 @@ public class ConvDbConfig {
         config.setPassword(convPassword);
         config.setPoolName(convPoolName);
 
-        config.setMinimumIdle(numberOfPartitions);
+        config.setMinimumIdle(minimumIdle);
         config.setMaximumPoolSize(maxPoolSize);
         config.setMaxLifetime(maxLifetime);
         config.setConnectionTimeout(connectionTimeout);
-        //config.setKeepaliveTime(keepAliveTime);
         config.setIdleTimeout(idleTimeout);
-        config.addDataSourceProperty("socketTimeout", 36000000);
+        config.addDataSourceProperty("socketTimeout", 72000000);
         config.addDataSourceProperty("oracle.jdbc.javaNetNio", "false");
 
         return new HikariDataSource(config);

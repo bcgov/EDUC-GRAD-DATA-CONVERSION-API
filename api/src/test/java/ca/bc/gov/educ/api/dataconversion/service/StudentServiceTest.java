@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -197,7 +198,7 @@ public class StudentServiceTest {
         gradStudent.setStudentGrade("11");
         gradStudent.setStudentStatus("CUR");
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
@@ -239,9 +240,8 @@ public class StudentServiceTest {
         gradStudent.setStudentGrade("AD");
         gradStudent.setStudentStatus("CUR");
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
@@ -306,11 +306,10 @@ public class StudentServiceTest {
         studentCareerProgram.setStudentID(studentID);
         studentCareerProgram.setCareerProgramCode("XC");
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -388,7 +387,6 @@ public class StudentServiceTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists("222333", "123")).thenReturn(true);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -427,13 +425,13 @@ public class StudentServiceTest {
         GraduationStudentRecord gradStudent = new GraduationStudentRecord();
         gradStudent.setStudentID(studentID);
         gradStudent.setPen(pen);
-        gradStudent.setProgram("2018-EN");
+        gradStudent.setProgram("1986-EN");
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("MER");
 
         OptionalProgram specialProgram = new OptionalProgram();
         specialProgram.setOptionalProgramID(UUID.randomUUID());
-        specialProgram.setGraduationProgramCode("2018-EN");
+        specialProgram.setGraduationProgramCode("1986-EN");
         specialProgram.setOptProgramCode("FI");
         specialProgram.setOptionalProgramName("French Immersion");
 
@@ -464,23 +462,23 @@ public class StudentServiceTest {
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
 
-        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("2018").graduated(false)
-                .programCodes(Arrays.asList("XC")).build();
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
+                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("1986").graduated(false)
+                .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
-        assertThat(result.getGraduationRequirementYear()).isEqualTo("2018");
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
     }
@@ -540,7 +538,7 @@ public class StudentServiceTest {
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourse(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
@@ -549,7 +547,7 @@ public class StudentServiceTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").graduated(false)
-                .programCodes(Arrays.asList("XC")).build();
+                .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
@@ -616,7 +614,7 @@ public class StudentServiceTest {
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.courseService.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
         when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
@@ -626,7 +624,7 @@ public class StudentServiceTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").graduated(false)
-                .programCodes(Arrays.asList("XC")).build();
+                .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
         var result = studentService.convertStudent(student, summary);
@@ -636,6 +634,356 @@ public class StudentServiceTest {
         assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
         assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
 
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGiven1950Data_withoutProgramCompletionDate_thenReturnFailure() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1950");
+        gradStudent.setStudentGrade("AD");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("N");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
+                .programCompletionDate(null)
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("0")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("AD")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("1950")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Bad data: grad_date is null for");
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGivenSCCPData_withoutSlpDate_thenReturnFailure() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("N");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
+                .programCompletionDate(null)
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate(null)
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("SCCP")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Bad data: slp_date is null for SCCP");
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGraduationStudentRecordIsRetrievedAndGradStudentAPIisDown_thenThrowsExceptionWithFailure() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("N");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is down!"));
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
+                .programCompletionDate(null)
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("20200118")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("SCCP")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Grad Student API is failed for");
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGraduationStudentRecordIsCreatedAndGradStudentAPIisDown_thenThrowsExceptionWithFailure() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("N");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("12");
+        tranStudentDemog.setGradReqtYear("SCCP");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
+                .programCompletionDate(null)
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("20200118")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("SCCP")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .transcriptStudentDemog(tranStudentDemog)
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Grad Student API is failed for");
+    }
+
+    @Test
+    public void convertGraduatedStudent_whenGraduationStudentRecordIsUpdatedAndGradStudentAPIisDown_thenThrowsExceptionWithFailure() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("N");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+        gradStudent.setStudentCitizenship("C");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("12");
+        tranStudentDemog.setGradReqtYear("SCCP");
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
+                .programCompletionDate(null)
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .slpDate("20200118")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentGrade("12")
+                .studentStatus("A").schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("SCCP")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .transcriptStudentDemog(tranStudentDemog)
+                .build();
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
+        assertThat(summary.getErrors()).isNotEmpty();
+        assertThat(summary.getErrors().get(0).getReason()).startsWith("Grad Student API is failed for");
     }
 
     @Test
@@ -658,8 +1006,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -835,6 +1181,11 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
@@ -908,8 +1259,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1087,6 +1436,11 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
@@ -1160,8 +1514,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1339,6 +1691,11 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
@@ -1412,8 +1769,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1470,6 +1825,7 @@ public class StudentServiceTest {
         tranStudentDemog.setStudentGrade("12");
         tranStudentDemog.setGradReqtYear("2018");
         tranStudentDemog.setUpdateDate(20220601L);
+        tranStudentDemog.setGradMessage(StudentBaseService.TSW_FI_GRAD_MSG);
 
         // TSW
         TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
@@ -1576,6 +1932,11 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
@@ -1649,8 +2010,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -1813,11 +2172,14 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
         when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentCareerProgram));
@@ -1887,8 +2249,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("S");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
         gradStudent.setStudentCitizenship("C");
 
@@ -2052,9 +2412,13 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
@@ -2238,9 +2602,13 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
-        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -2413,10 +2781,14 @@ public class StudentServiceTest {
         sc.setDescription("Exempt");
         sc.setPassFlag("Y");
 
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
-//        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -2457,6 +2829,187 @@ public class StudentServiceTest {
         assertThat(result.getGraduationRequirementYear()).isEqualTo("SCCP");
         assertThat(summary.getErrors()).isNotEmpty();
         assertThat(summary.getErrors().get(0).getReason()).startsWith("Bad data : slp_date format");
+    }
+
+    @Test
+    public void convertGraduatedStudent_forSCCP_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("SCCP");
+        gradStudent.setStudentGrade("11");
+        gradStudent.setStudentStatus("CUR");
+
+        // TSW
+        TranscriptStudentDemog tranStudentDemog = new TranscriptStudentDemog();
+        tranStudentDemog.setStudNo(pen);
+        tranStudentDemog.setMincode(mincode);
+        tranStudentDemog.setStudentGrade("11");
+        tranStudentDemog.setGradReqtYear("SCCP");
+        tranStudentDemog.setGradMessage(StudentBaseService.TSW_PF_GRAD_MSG);
+        tranStudentDemog.setUpdateDate(20220601L);
+
+        // TSW
+        TranscriptStudentCourse tswCourse1 = new TranscriptStudentCourse();
+        tswCourse1.setStudNo(pen);
+        tswCourse1.setReportType("1");
+        tswCourse1.setCourseCode("Generic");
+        tswCourse1.setCourseName("Generic Course Name");
+        tswCourse1.setCourseLevel("12");
+        tswCourse1.setFinalPercentage("91.00");
+        tswCourse1.setFinalLG("A");
+        tswCourse1.setCourseSession("202206");
+        tswCourse1.setNumberOfCredits("4");
+        tswCourse1.setUsedForGrad("4");
+        tswCourse1.setFoundationReq("10");
+        tswCourse1.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswCourse2 = new TranscriptStudentCourse();
+        tswCourse2.setStudNo(pen);
+        tswCourse2.setReportType("2");
+        tswCourse2.setCourseCode("TestCourse");
+        tswCourse2.setCourseName("Test Course Name");
+        tswCourse2.setCourseLevel("12");
+        tswCourse2.setFinalPercentage("92.00");
+        tswCourse2.setFinalLG("A");
+        tswCourse2.setCourseSession("202206");
+        tswCourse2.setNumberOfCredits("4");
+        tswCourse2.setUsedForGrad("4");
+        tswCourse2.setFoundationReq("11");
+        tswCourse2.setUpdateDate(20220601L);
+
+        TranscriptStudentCourse tswAssessment = new TranscriptStudentCourse();
+        tswAssessment.setStudNo(pen);
+        tswAssessment.setReportType("3");
+        tswAssessment.setCourseCode("TestAssmt");
+        tswAssessment.setCourseName("Test Assessment Name");
+        tswAssessment.setCourseLevel("12");
+        tswAssessment.setFinalPercentage("XMT");
+        tswAssessment.setCourseSession("202206");
+        tswAssessment.setFoundationReq("15");
+        tswAssessment.setUpdateDate(new Date(System.currentTimeMillis() - 100000L).getTime());
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        // Rule 10
+        ProgramRequirement pr10 = new ProgramRequirement();
+        pr10.setProgramRequirementID(UUID.randomUUID());
+        pr10.setGraduationProgramCode("SCCP");
+        ProgramRequirementCode rule10 = new ProgramRequirementCode();
+        rule10.setTraxReqNumber("10");
+        rule10.setProReqCode("110");
+        rule10.setLabel("Rule 10 Test Label");
+        rule10.setDescription("Rule 10 Test Description");
+
+        pr10.setProgramRequirementCode(rule10);
+
+        GradRuleDetails gradRule10Details = new GradRuleDetails();
+        gradRule10Details.setRuleCode("110");
+        gradRule10Details.setTraxReqNumber("10");
+        gradRule10Details.setProgramCode("SCCP");
+        gradRule10Details.setRequirementName("Rule 10 Test Label");
+
+        // Rule 11
+        ProgramRequirement pr11 = new ProgramRequirement();
+        pr11.setProgramRequirementID(UUID.randomUUID());
+        pr11.setGraduationProgramCode("SCCP");
+        ProgramRequirementCode rule11 = new ProgramRequirementCode();
+        rule11.setTraxReqNumber("11");
+        rule11.setProReqCode("111");
+        rule11.setLabel("Rule 11 Test Label");
+        rule11.setDescription("Rule 11 Test Description");
+
+        pr11.setProgramRequirementCode(rule11);
+
+        GradRuleDetails gradRule11Details = new GradRuleDetails();
+        gradRule11Details.setRuleCode("111");
+        gradRule11Details.setTraxReqNumber("11");
+        gradRule11Details.setProgramCode("SCCP");
+        gradRule11Details.setRequirementName("Rule 11 Test Label");
+
+        // Rule 15
+        ProgramRequirement pr15 = new ProgramRequirement();
+        pr15.setProgramRequirementID(UUID.randomUUID());
+        pr15.setGraduationProgramCode("SCCP");
+        ProgramRequirementCode rule15 = new ProgramRequirementCode();
+        rule15.setTraxReqNumber("15");
+        rule15.setProReqCode("115");
+        rule15.setLabel("Rule 15 Test Label");
+        rule15.setDescription("Rule 15 Test Description");
+
+        pr15.setProgramRequirementCode(rule15);
+
+        GradRuleDetails gradRule15Details = new GradRuleDetails();
+        gradRule15Details.setRuleCode("115");
+        gradRule15Details.setTraxReqNumber("15");
+        gradRule15Details.setProgramCode("SCCP");
+        gradRule15Details.setRequirementName("Rule 15 Test Label");
+
+        // SpecialCase
+        SpecialCase sc = new SpecialCase();
+        sc.setSpCase("E");
+        sc.setLabel("XMT");
+        sc.setDescription("Exempt");
+        sc.setPassFlag("Y");
+
+        ResponseObj responseObj = new ResponseObj();
+        responseObj.setAccess_token("123");
+        responseObj.setRefresh_token("123");
+
+        when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseService.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
+        when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
+        when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule11Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule11Details));
+        when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule15Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule15Details));
+
+        ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
+                .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
+                .slpDate("20220601")
+                .sccDate("20220601")
+                .graduated(true)
+                .gpa("3.5")
+                .honoursStanding("Y")
+                .archiveFlag("A")
+                .englishCert("E")
+                .frenchCert("F")
+                .studentStatus("A")
+                .studentGrade("11")
+                .schoolOfRecord(mincode).schoolAtGrad(mincode)
+                .graduationRequirementYear("SCCP")
+                .transcriptSchool(school)
+                .certificateSchool(school)
+                .transcriptSchoolCategoryCode("02")
+                .certificateSchoolCategoryCode("02")
+                .programCodes(new ArrayList<>())
+                .build();
+        student.setTranscriptStudentDemog(tranStudentDemog);
+        student.setTranscriptStudentCourses(Arrays.asList(tswCourse1, tswCourse2, tswAssessment));
+
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentService.convertStudent(student, summary);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("SCCP");
+        assertThat(summary.getErrors()).isEmpty();
     }
 
     @Test
@@ -2532,7 +3085,7 @@ public class StudentServiceTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.addStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+            studentService.addStudentOptionalProgram(optionalProgramCode, requestStudent, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -2560,7 +3113,7 @@ public class StudentServiceTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.removeStudentOptionalProgram(optionalProgramCode, requestStudent, "accessToken");
+            studentService.removeStudentOptionalProgram(optionalProgramCode, requestStudent, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -2577,10 +3130,10 @@ public class StudentServiceTest {
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
-        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "accessToken")).thenReturn(graduationStudentRecord);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -2589,11 +3142,14 @@ public class StudentServiceTest {
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
         requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setNewStudentStatus("ARC");
+        requestStudent.setNewRecalculateGradStatus("Y");
+        requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setAddDualDogwood(true);
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.saveGraduationStudent(requestStudent, "accessToken");
+            studentService.saveGraduationStudent(requestStudent, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -2610,10 +3166,10 @@ public class StudentServiceTest {
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
-        graduationStudentRecord.setStudentStatus("A");
+        graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
-        when(this.restUtils.getStudentGradStatus(studentID.toString(), "accessToken")).thenReturn(graduationStudentRecord);
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -2622,11 +3178,14 @@ public class StudentServiceTest {
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
         requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setNewStudentStatus("ARC");
+        requestStudent.setNewRecalculateGradStatus("Y");
+        requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setDeleteDualDogwood(true);
 
         boolean exceptionIsThrown = false;
         try {
-            studentService.saveGraduationStudent(requestStudent, "accessToken");
+            studentService.saveGraduationStudent(requestStudent, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -2666,6 +3225,130 @@ public class StudentServiceTest {
     }
 
     @Test
+    public void testLoadStudentData_whenGraduationStudentIsNotFound_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDown_returnsNull() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is down!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDownForStudentOptionalPrograms_returnsSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is donw!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testLoadStudentData_whenGradStudentAPIisDownForStudentCareerPrograms_returnsSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("2018-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("CUR");
+        gradStudent.setHonoursStanding("Y");
+        gradStudent.setSchoolAtGrad(mincode);
+        gradStudent.setSchoolOfRecord(mincode);
+        gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
+
+        OptionalProgram optionalProgram1 = new OptionalProgram();
+        optionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram1.setGraduationProgramCode("2018-EN");
+        optionalProgram1.setOptProgramCode("FI");
+        optionalProgram1.setOptionalProgramName("French Immersion");
+
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramID(optionalProgram1.getOptionalProgramID());
+        studentOptionalProgram1.setOptionalProgramName(optionalProgram1.getOptionalProgramName());
+        studentOptionalProgram1.setOptionalProgramCode("FI");
+        studentOptionalProgram1.setPen(pen);
+
+        OptionalProgram optionalProgram2 = new OptionalProgram();
+        optionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        optionalProgram2.setGraduationProgramCode("2018-EN");
+        optionalProgram2.setOptProgramCode("CP");
+        optionalProgram2.setOptionalProgramName("Career Program");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramID(optionalProgram2.getOptionalProgramID());
+        studentOptionalProgram2.setOptionalProgramName(optionalProgram2.getOptionalProgramName());
+        studentOptionalProgram2.setOptionalProgramCode("CP");
+        studentOptionalProgram2.setPen(pen);
+
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
+        when(this.restUtils.getStudentCareerPrograms(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is donw!"));
+
+        var result = studentService.loadStudentData(pen, "123");
+        assertThat(result).isNotNull();
+    }
+
+    @Test
     public void testLoadStudentData_withGivenData_returnsStudentGradDTO_withAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
@@ -2685,8 +3368,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram optionalProgram1 = new OptionalProgram();
@@ -2779,8 +3460,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
@@ -2813,8 +3492,6 @@ public class StudentServiceTest {
         gradStudent.setHonoursStanding("Y");
         gradStudent.setSchoolAtGrad(mincode);
         gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setEnglishCert("E");
-        gradStudent.setFrenchCert("F");
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);

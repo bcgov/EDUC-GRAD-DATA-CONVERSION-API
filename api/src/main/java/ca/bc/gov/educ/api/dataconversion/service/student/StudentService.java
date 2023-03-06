@@ -34,8 +34,8 @@ import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiCo
 public class StudentService extends StudentBaseService {
 
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
+    private static final String EXCEPTION_MSG = "Exception occurred: ";
 
-    private final EducGradDataConversionApiConstants constants;
     private final RestUtils restUtils;
     private final AssessmentService assessmentService;
     private final CourseService courseService;
@@ -52,12 +52,10 @@ public class StudentService extends StudentBaseService {
     private final Map<String, SpecialCase> specialCaseMap = new ConcurrentHashMap<>();
 
     @Autowired
-    public StudentService(EducGradDataConversionApiConstants constants,
-                          RestUtils restUtils,
+    public StudentService(RestUtils restUtils,
                           AssessmentService assessmentService,
                           CourseService courseService,
                           ReportService reportService) {
-        this.constants = constants;
         this.restUtils = restUtils;
         this.assessmentService = assessmentService;
         this.courseService = courseService;
@@ -120,6 +118,7 @@ public class StudentService extends StudentBaseService {
             // Call PEN Student API
             students = restUtils.getStudentsByPen(convGradStudent.getPen(), summary.getAccessToken());
         } catch (Exception e) {
+            log.error(EXCEPTION_MSG, e);
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "PEN Student API is failed: " + e.getLocalizedMessage());
         }
         return students;
@@ -141,8 +140,8 @@ public class StudentService extends StudentBaseService {
             return false;
         }
         if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-                StringUtils.isBlank(convGradStudent.getSccDate())) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: scc_date is null for SCCP");
+                StringUtils.isBlank(convGradStudent.getSlpDate())) {
+            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
             return false;
         }
         return true;
@@ -172,6 +171,7 @@ public class StudentService extends StudentBaseService {
         try {
             gradStudent = restUtils.getStudentGradStatus(penStudent.getStudentID(), summary.getAccessToken());
         } catch (Exception e) {
+            log.error(EXCEPTION_MSG, e);
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "getting a GraduationStudentRecord : " + e.getLocalizedMessage());
             return null;
         }
@@ -188,6 +188,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
+                    log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
@@ -206,6 +207,7 @@ public class StudentService extends StudentBaseService {
                 try {
                     gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
                 } catch (Exception e) {
+                    log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
                     return null;
                 }
@@ -318,7 +320,6 @@ public class StudentService extends StudentBaseService {
         }
 
         // Mappings with Student_Master
-        gradStudent.setFrenchCert(student.getFrenchCert());
         gradStudent.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
         gradStudent.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
 
@@ -355,8 +356,6 @@ public class StudentService extends StudentBaseService {
         gradStudent.setRecalculateProjectedGrad(null);
 
         // Mappings with Student_Master
-        gradStudent.setFrenchCert(student.getFrenchCert());
-        gradStudent.setEnglishCert(student.getEnglishCert());
         gradStudent.setConsumerEducationRequirementMet(student.getConsumerEducationRequirementMet());
         gradStudent.setStudentCitizenship(StringUtils.isBlank(student.getStudentCitizenship())? "U" : student.getStudentCitizenship());
 
@@ -611,10 +610,6 @@ public class StudentService extends StudentBaseService {
                                                                               List<ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment> studentAssessmentList,
                                                                               ConversionStudentSummaryDTO summary) {
         List<GradAlgorithmOptionalStudentProgram> results = new ArrayList<>();
-        if (student.getProgramCodes() == null || student.getProgramCodes().isEmpty()) {
-            return results;
-        }
-
         List<StudentOptionalProgram> list = null;
         try {
             list = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), summary.getAccessToken());
@@ -647,11 +642,6 @@ public class StudentService extends StudentBaseService {
         GradRequirement gradRequirement = createOptionalProgramRequirementMet(object.getOptionalProgramCode());
         result.setOptionalRequirementsMet(gradRequirement != null? Arrays.asList(gradRequirement) : new ArrayList<>());
         result.setOptionalNonGradReasons(new ArrayList<>());
-        try {
-            object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
-        } catch (JsonProcessingException e) {
-            log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
-        }
 
         // Career Programs
         result.setCpList(careerProgramList);
@@ -665,6 +655,13 @@ public class StudentService extends StudentBaseService {
         StudentAssessments studentAssessments = new StudentAssessments();
         studentAssessments.setStudentAssessmentList(studentAssessmentList);
         result.setOptionalStudentAssessments(studentAssessments);
+
+        // Clob
+        try {
+            object.setStudentOptionalProgramData(new ObjectMapper().writeValueAsString(result));
+        } catch (JsonProcessingException e) {
+            log.error("Json Parsing Error for StudentOptionalProgramData: " + e.getLocalizedMessage());
+        }
 
         updateStudentOptionalProgram(object, summary.getAccessToken());
         return result;
@@ -797,7 +794,7 @@ public class StudentService extends StudentBaseService {
         }
 
         // Dual Dogwood for yyyy-PF
-        if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(student.getEnglishCert(), "E")) {
+        if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(convGradStudent.getEnglishCert(), "E")) {
             student.setDualDogwood(true);
             return createStudentOptionalProgram("DD", student, true, accessToken, summary);
         }

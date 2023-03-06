@@ -35,10 +35,6 @@ public class GraduationStudentRecord extends BaseModel{
 
     // Mappings for Student_Master
     @Transient
-    private String frenchCert;
-    @Transient
-    private String englishCert;
-    @Transient
     private boolean dualDogwood = false;
 
 	private ExceptionMessage exception;
