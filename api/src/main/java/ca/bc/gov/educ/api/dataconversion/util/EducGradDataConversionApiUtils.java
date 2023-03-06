@@ -151,14 +151,14 @@ public class EducGradDataConversionApiUtils {
 
     public static Integer getNumberOfCredits(final String credits) {
         String digits = StringUtils.getDigits(credits);
-        if (StringUtils.isNotBlank(digits) && NumberUtils.isCreatable(digits)) {
+        if (StringUtils.isNotBlank(digits) && NumberUtils.isCreatable(digits.trim())) {
             return Integer.valueOf(digits.trim());
         }
         return null;
     }
 
     public static Double getPercentage(final String percentage) {
-        if (StringUtils.isNotBlank(percentage) && NumberUtils.isCreatable(percentage)) {
+        if (StringUtils.isNotBlank(percentage) && NumberUtils.isCreatable(percentage.trim())) {
             return Double.valueOf(percentage.trim());
         }
         return null;
