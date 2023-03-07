@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.model.tsw;
 
-import ca.bc.gov.educ.api.dataconversion.model.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

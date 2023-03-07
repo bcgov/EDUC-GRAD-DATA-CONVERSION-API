@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service.student;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -7,12 +7,12 @@ import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 
-import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
-import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
+import ca.bc.gov.educ.api.dataconversion.service.student.StudentBaseService;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -20,7 +20,8 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,17 +30,17 @@ import java.util.stream.Collectors;
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_UPDATED_BY;
 
-@Service
+@Component
 @Slf4j
-public class StudentService extends StudentBaseService {
+public class StudentProcess extends StudentBaseService {
 
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
     private static final String EXCEPTION_MSG = "Exception occurred: ";
 
     private final RestUtils restUtils;
-    private final AssessmentService assessmentService;
-    private final CourseService courseService;
-    private final ReportService reportService;
+    private final AssessmentProcess assessmentProcess;
+    private final CourseProcess courseProcess;
+    private final ReportProcess reportProcess;
 
     /**
      * The Program Rules map.
@@ -52,14 +53,14 @@ public class StudentService extends StudentBaseService {
     private final Map<String, SpecialCase> specialCaseMap = new ConcurrentHashMap<>();
 
     @Autowired
-    public StudentService(RestUtils restUtils,
-                          AssessmentService assessmentService,
-                          CourseService courseService,
-                          ReportService reportService) {
+    public StudentProcess(RestUtils restUtils,
+                          AssessmentProcess assessmentProcess,
+                          CourseProcess courseProcess,
+                          ReportProcess reportProcess) {
         this.restUtils = restUtils;
-        this.assessmentService = assessmentService;
-        this.courseService = courseService;
-        this.reportService = reportService;
+        this.assessmentProcess = assessmentProcess;
+        this.courseProcess = courseProcess;
+        this.reportProcess = reportProcess;
     }
 
     public void clearMaps() {
@@ -165,6 +166,7 @@ public class StudentService extends StudentBaseService {
         });
     }
 
+    @Retry(name = "rt-convertStudent", fallbackMethod = "rtConvertStudentFallback")
     private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, ConversionStudentSummaryDTO summary) {
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         GraduationStudentRecord gradStudent = null;
@@ -273,15 +275,15 @@ public class StudentService extends StudentBaseService {
     }
 
     private void createAndStoreStudentTranscript(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
-        ReportData data = reportService.prepareTranscriptData(graduationData, graduationData.getGradStatus(), convStudent, accessToken);
-        reportService.saveStudentTranscriptReportJasper(data, convStudent.getDistributionDate(), accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+        ReportData data = reportProcess.prepareTranscriptData(graduationData, graduationData.getGradStatus(), convStudent, accessToken);
+        reportProcess.saveStudentTranscriptReportJasper(data, convStudent.getDistributionDate(), accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
     }
 
     private void createAndStoreStudentCertificates(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
-        List<ProgramCertificateTranscript> certificateList = reportService.getCertificateList(graduationData,
+        List<ProgramCertificateTranscript> certificateList = reportProcess.getCertificateList(graduationData,
             convStudent.getCertificateSchoolCategoryCode() != null? convStudent.getCertificateSchoolCategoryCode() : convStudent.getTranscriptSchoolCategoryCode(), accessToken);
         for (ProgramCertificateTranscript certType : certificateList) {
-            reportService.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType);
+            reportProcess.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType);
         }
     }
 
@@ -372,6 +374,7 @@ public class StudentService extends StudentBaseService {
         // gradStatus
         GradAlgorithmGraduationStudentRecord gradStatus = new GradAlgorithmGraduationStudentRecord();
         gradStatus.setStudentID(gradStudent.getStudentID());
+        gradStatus.setPen(student.getPen());
         gradStatus.setProgram(gradStudent.getProgram());
         gradStatus.setProgramCompletionDate(gradStudent.getProgramCompletionDate());
         gradStatus.setGpa(gradStudent.getGpa());
@@ -812,17 +815,17 @@ public class StudentService extends StudentBaseService {
         switch(program) {
             case "2018-EN":
             case "2004-EN":
-                if (courseService.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
+                if (courseProcess.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
                     frenchImmersion = true;
                 }
                 break;
             case "1996-EN":
-                if (courseService.isFrenchImmersionCourse(pen, "11", accessToken)) { // FRAL 11 or FRALP 11
+                if (courseProcess.isFrenchImmersionCourse(pen, "11", accessToken)) { // FRAL 11 or FRALP 11
                     frenchImmersion = true;
                 }
                 break;
             case "1986-EN":
-                if (courseService.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
+                if (courseProcess.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
                     frenchImmersion = true;
                 }
                 break;
@@ -975,12 +978,12 @@ public class StudentService extends StudentBaseService {
         studentData.getProgramCodes().addAll(getCareerProgramCodes(careerPrograms));
 
         // courses
-        List<StudentCourse> courses = courseService.getStudentCourses(pen, accessToken);
+        List<StudentCourse> courses = courseProcess.getStudentCourses(pen, accessToken);
         if (courses != null && !courses.isEmpty()) {
             studentData.getCourses().addAll(courses);
         }
         // assessments
-        List<StudentAssessment> assessments = assessmentService.getStudentAssessments(pen, accessToken);
+        List<StudentAssessment> assessments = assessmentProcess.getStudentAssessments(pen, accessToken);
         if (assessments != null && !assessments.isEmpty()) {
             studentData.getAssessments().addAll(assessments);
         }
@@ -1139,5 +1142,10 @@ public class StudentService extends StudentBaseService {
             summaryDTO.setAccessToken(res.getAccess_token());
             log.debug("Setting the new access token in summaryDTO.");
         }
+    }
+
+    public ConvGradStudent rtConvertStudentFallback(HttpServerErrorException exception){
+        log.error("STUDENT NOT LOADABLE after many attempts: {}", exception);
+        return null;
     }
 }

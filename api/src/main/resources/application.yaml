@@ -10,7 +10,6 @@ spring:
       minimum-idle: ${MIN_IDLE}
       idle-timeout: ${IDLE_TIMEOUT}
       max-lifetime: ${MAX_LIFETIME}
-      #keepalive-time: ${KEEP_ALIVE_TIME}
     username: ${CONV_USERNAME}
     password: ${CONV_PASSWORD}
     url: ${CONNECTION_STRING}
@@ -102,6 +101,41 @@ resilience4j.retry:
   instances:
     rt-getToken:
       maxAttempts: 35
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-getTraxStudent:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-transcript:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-certificate:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-convertStudent:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-conversionStatus:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
       waitDuration: 5s
       retryExceptions:
         - org.springframework.web.client.HttpServerErrorException
@@ -225,11 +259,6 @@ endpoint:
     transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
     certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
     achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
-
-#Conversion option
-data-conversion:
-  student-guid-pen-xref:
-    enabled:  ${ENABLE_STUDENT_ID_PEN_XREF}
 
 #Incremental Grad Update
 grad:

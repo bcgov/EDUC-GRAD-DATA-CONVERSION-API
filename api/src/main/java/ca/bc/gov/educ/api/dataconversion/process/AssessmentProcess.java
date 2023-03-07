@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service.assessment;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirement;
 import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirementCode;
@@ -8,18 +8,18 @@ import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Service
-public class AssessmentService {
+@Component
+public class AssessmentProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(AssessmentService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssessmentProcess.class);
     private final RestUtils restUtils;
 
     @Autowired
-    public AssessmentService(RestUtils restUtils) {
+    public AssessmentProcess(RestUtils restUtils) {
         this.restUtils = restUtils;
     }
 

@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Code;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Transcript;
-import ca.bc.gov.educ.api.dataconversion.service.student.ReportService;
+import ca.bc.gov.educ.api.dataconversion.process.ReportProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,10 +42,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @SpringBootTest
 @ActiveProfiles("test")
 @SuppressWarnings({"unchecked","rawtypes"})
-public class ReportServiceTest {
+public class ReportProcessTest {
 
     @Autowired
-    private ReportService reportService;
+    private ReportProcess reportProcess;
 
     @Autowired
     private ExceptionMessage exception;
@@ -100,7 +100,7 @@ public class ReportServiceTest {
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(commSch.getSchoolCategoryCode());
         when(this.restUtils.getTranscriptReport(any(), eq(accessToken))).thenReturn(bytesSAR);
 
-        reportService.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, UUID.fromString(studentID),isGraduated);
+        reportProcess.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, UUID.fromString(studentID),isGraduated);
         assertThat(exception.getExceptionName()).isNull();
     }
 
@@ -161,7 +161,7 @@ public class ReportServiceTest {
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
         when(this.restUtils.getProgramCertificateTranscriptList(any(), eq(accessToken))).thenReturn(clist);
 
-        List<ProgramCertificateTranscript> listCC =reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC = reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -222,7 +222,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC = reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -283,7 +283,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getProgramCertificateTranscriptList(any(), eq(accessToken))).thenReturn(clist);
 
-        List<ProgramCertificateTranscript> listCC= reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC= reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -338,7 +338,7 @@ public class ReportServiceTest {
         List<GradAlgorithmOptionalStudentProgram> optionalGradStatus = new ArrayList<>();
         graduationDataStatus.setOptionalGradStatus(optionalGradStatus);
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC = reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -399,7 +399,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
 
-        List<ProgramCertificateTranscript> listCC =  reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC =  reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -461,7 +461,7 @@ public class ReportServiceTest {
 
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(comSchObj.getSchoolCategoryCode());
 
-        List<ProgramCertificateTranscript> listCC = reportService.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
+        List<ProgramCertificateTranscript> listCC = reportProcess.getCertificateList(graduationDataStatus, comSchObj.getSchoolCategoryCode(), accessToken);
         assertThat(listCC).hasSize(1);
     }
 
@@ -582,7 +582,7 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus, gradResponse, student, accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus, gradResponse, student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -652,7 +652,7 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse, student, accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus,gradResponse, student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -740,7 +740,7 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -853,7 +853,7 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student, accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus,gradResponse,student, accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -966,7 +966,7 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -1052,7 +1052,7 @@ public class ReportServiceTest {
 //                .schoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData dta = reportService.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
+        ReportData dta = reportProcess.prepareTranscriptData(graduationDataStatus,gradResponse,student,accessToken);
         assertThat(dta).isNotNull();
     }
 
@@ -1236,12 +1236,12 @@ public class ReportServiceTest {
                 .certificateSchoolCategoryCode(commSch.getSchoolCategoryCode())
                 .programCodes(Arrays.asList("DD")).build();
 
-        ReportData transcriptData = reportService.prepareTranscriptData(graduationDataStatus, graduationStudentRecord, student, "accessToken");
+        ReportData transcriptData = reportProcess.prepareTranscriptData(graduationDataStatus, graduationStudentRecord, student, "accessToken");
         assertNotNull(transcriptData);
         assertNotNull(transcriptData.getStudent());
         assertNotNull(transcriptData.getTranscript());
 
-        ReportData certificateData = reportService.prepareCertificateData(graduationDataStatus, programCertificateTranscript, student, "accessToken");
+        ReportData certificateData = reportProcess.prepareCertificateData(graduationDataStatus, programCertificateTranscript, student, "accessToken");
         assertNotNull(certificateData);
         assertNotNull(certificateData.getStudent());
         assertNotNull(certificateData.getCertificate());
@@ -1249,7 +1249,7 @@ public class ReportServiceTest {
     }
 
     protected GraduationData createGraduationData(String jsonPath) throws Exception {
-        File file = new File(Objects.requireNonNull(ReportServiceTest.class.getClassLoader().getResource(jsonPath)).getFile());
+        File file = new File(Objects.requireNonNull(ReportProcessTest.class.getClassLoader().getResource(jsonPath)).getFile());
         return new ObjectMapper().readValue(file, GraduationData.class);
 
     }

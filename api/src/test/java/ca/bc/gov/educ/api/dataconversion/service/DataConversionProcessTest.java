@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.process.DataConversionProcess;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -28,10 +28,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class DataConversionServiceTest {
+public class DataConversionProcessTest {
 
     @Autowired
-    DataConversionService dataConversionService;
+    DataConversionProcess dataConversionProcess;
 
     @MockBean
     EventRepository eventRepository;
@@ -74,7 +74,7 @@ public class DataConversionServiceTest {
 
         when(this.restUtils.getTraxStudentMasterDataByPen("123456789", "123")).thenReturn(results);
 
-        var result = dataConversionService.getStudentMasterDataFromTrax("123456789", "123");
+        var result = dataConversionProcess.getStudentMasterDataFromTrax("123456789", "123");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         ConvGradStudent responseStudent = result.get(0);
@@ -94,7 +94,7 @@ public class DataConversionServiceTest {
 
         when(this.restUtils.getTraxCourseRestrictions("123")).thenReturn(results);
 
-        var result = dataConversionService.loadGradCourseRestrictionsDataFromTrax("123");
+        var result = dataConversionProcess.loadGradCourseRestrictionsDataFromTrax("123");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         CourseRestriction responseCourseRestriction = result.get(0);
@@ -123,7 +123,7 @@ public class DataConversionServiceTest {
 
         when(this.restUtils.getTraxStudentDemographicsDataByPen("123456789", "123")).thenReturn(results);
 
-        var result = dataConversionService.getStudentDemographicsDataFromTrax("123456789", "123");
+        var result = dataConversionProcess.getStudentDemographicsDataFromTrax("123456789", "123");
         assertThat(result).isNotNull();
         assertThat(result.size()).isEqualTo(1);
         assertThat(result.get(0).getPen()).isEqualTo("123456789");
@@ -164,7 +164,7 @@ public class DataConversionServiceTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        var result = dataConversionProcess.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
         assertThat(result.getStudNo()).isEqualTo(pen);
     }
@@ -205,7 +205,7 @@ public class DataConversionServiceTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        var result = dataConversionProcess.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
         assertThat(result.getStudNo()).isEqualTo(pen);
     }
@@ -246,7 +246,7 @@ public class DataConversionServiceTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        var result = dataConversionProcess.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNull();
     }
 
@@ -286,7 +286,7 @@ public class DataConversionServiceTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        var result = dataConversionProcess.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
         assertThat(result.getStudNo()).isEqualTo(pen);
     }
@@ -322,7 +322,7 @@ public class DataConversionServiceTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = dataConversionService.readTraxStudentAndAddNewPen(convGradStudent, summary);
+        var result = dataConversionProcess.readTraxStudentAndAddNewPen(convGradStudent, summary);
         assertThat(result).isNotNull();
         assertThat(result.getStudNo()).isEqualTo(pen);
     }

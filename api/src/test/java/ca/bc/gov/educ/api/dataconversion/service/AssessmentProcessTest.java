@@ -6,7 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirement;
 import ca.bc.gov.educ.api.dataconversion.model.AssessmentRequirementCode;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.service.assessment.AssessmentService;
+import ca.bc.gov.educ.api.dataconversion.process.AssessmentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
@@ -28,10 +28,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class AssessmentServiceTest {
+public class AssessmentProcessTest {
 
     @Autowired
-    AssessmentService assessmentService;
+    AssessmentProcess assessmentProcess;
 
     @MockBean
     EventRepository eventRepository;
@@ -86,7 +86,7 @@ public class AssessmentServiceTest {
         when(this.restUtils.addAssessmentRequirement(assessmentRequirement1, "123")).thenReturn(assessmentRequirement1);
         when(this.restUtils.addAssessmentRequirement(assessmentRequirement2, "123")).thenReturn(assessmentRequirement2);
 
-        assessmentService.createAssessmentRequirements(summary);
+        assessmentProcess.createAssessmentRequirements(summary);
     }
 
 }

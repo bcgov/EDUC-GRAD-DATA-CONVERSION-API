@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
+import ca.bc.gov.educ.api.dataconversion.process.CourseProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
@@ -27,10 +27,10 @@ import static org.mockito.MockitoAnnotations.openMocks;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles("test")
-public class CourseServiceTest {
+public class CourseProcessTest {
 
     @Autowired
-    CourseService courseService;
+    CourseProcess courseProcess;
 
     @MockBean
     EventRepository eventRepository;
@@ -78,7 +78,7 @@ public class CourseServiceTest {
         when(this.restUtils.getCourseRestriction("main", "12", "rest", "12", "123")).thenReturn(null);
         when(this.restUtils.saveCourseRestriction(courseRestriction, "123")).thenReturn(savedCourseRestriction);
 
-        courseService.convertCourseRestriction(courseRestriction, summary);
+        courseProcess.convertCourseRestriction(courseRestriction, summary);
         assertThat(summary.getAddedCountForCourseRestriction()).isEqualTo(1L);
     }
 
@@ -101,7 +101,7 @@ public class CourseServiceTest {
         when(this.restUtils.getCourseRestriction("main", "12", "rest", "12", "123")).thenReturn(savedCourseRestriction);
         when(this.restUtils.saveCourseRestriction(courseRestriction, "123")).thenReturn(savedCourseRestriction);
 
-        courseService.convertCourseRestriction(courseRestriction, summary);
+        courseProcess.convertCourseRestriction(courseRestriction, summary);
         assertThat(summary.getUpdatedCountForCourseRestriction()).isEqualTo(1L);
     }
 
@@ -114,7 +114,7 @@ public class CourseServiceTest {
                 null, "CLEA", "12", "CLEB", "12", null, null
         );
 
-        courseService.convertCourseRestriction(courseRestriction, summary);
+        courseProcess.convertCourseRestriction(courseRestriction, summary);
         assertThat(summary.getErrors()).hasSize(1);
     }
 
@@ -130,7 +130,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -145,7 +145,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -160,7 +160,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -175,7 +175,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -190,7 +190,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -205,7 +205,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -220,7 +220,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -236,7 +236,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -251,7 +251,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -266,7 +266,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -281,7 +281,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -296,7 +296,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -311,7 +311,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -326,7 +326,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -341,7 +341,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -356,7 +356,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -371,7 +371,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "11", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "11", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -387,7 +387,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getUpdatedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -402,7 +402,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -417,7 +417,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -432,7 +432,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -447,7 +447,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -462,7 +462,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -477,7 +477,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -492,7 +492,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -507,7 +507,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(true);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(false);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -522,7 +522,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -537,7 +537,7 @@ public class CourseServiceTest {
         when(this.restUtils.checkFrenchLanguageCourse("ENG", "12", "123")).thenReturn(false);
         when(this.restUtils.checkBlankLanguageCourse("ENG", "12", "123")).thenReturn(true);
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L);
     }
 
@@ -550,7 +550,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "SOC", "10", "104", null,false);
         traxCourse.setSocials10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -562,7 +562,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "SOC", "10", "704", null,false);
         traxCourse.setSocials10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -574,7 +574,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "SOC", "11", "105", null,false);
         traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -586,7 +586,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "SOC", "11", "705", null,false);
         traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -598,7 +598,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1950", "SOC", "11", "502", null,false);
         traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -610,7 +610,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "SOC", "11", "723", null,false);
         traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -622,7 +622,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1986", "SOC", "11", "742", null,false);
         traxCourse.setSocials("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -635,7 +635,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "MAT", "10", "106", null,false);
         traxCourse.setMath10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -647,7 +647,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "MAT", "10", "706", null,false);
         traxCourse.setMath10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -659,7 +659,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "MAT", "11", "107", null,false);
         traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -671,7 +671,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "MAT", "11", "707", null,false);
         traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -683,7 +683,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1950", "MAT", "11", "501", null,false);
         traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -695,7 +695,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "MAT", "11", "724", null,false);
         traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -707,7 +707,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1986", "MAT", "11", "743", null,false);
         traxCourse.setMath("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -720,7 +720,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "PHY", "10", "108", null,false);
         traxCourse.setScience10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -732,7 +732,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "PHY", "10", "708", null,false);
         traxCourse.setScience10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -744,7 +744,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "PHY", "11", "109", null,false);
         traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -756,7 +756,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "PHY", "11", "709", null,false);
         traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -768,7 +768,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "PHY", "11", "725", null,false);
         traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -780,7 +780,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1986", "PHY", "11", "744", null,false);
         traxCourse.setScience("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -793,7 +793,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "CPP", "10", "112", null,false);
         traxCourse.setCareerPersonal10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -805,7 +805,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "CPP", "10", "710", null,false);
         traxCourse.setCareerPersonal10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -817,7 +817,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "CPP", "11", "728", null,false);
         traxCourse.setCareerPersonal11("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -829,7 +829,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "CPP", "12", "729", null,false);
         traxCourse.setCareerPersonal12("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -842,7 +842,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "PHE", "10", "110", null,false);
         traxCourse.setPhysEd10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -854,7 +854,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "PHE", "10", "711", null,false);
         traxCourse.setPhysEd10("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -867,7 +867,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "ASK", "10", "111", null,false);
         traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -879,7 +879,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "ASK", "10", "712", null,false);
         traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -892,7 +892,7 @@ public class CourseServiceTest {
         traxCourse.setAppliedSkills("Y");
         traxCourse.setFineArts("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -904,7 +904,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "ASK", "10", "727", null,false);
         traxCourse.setAppliedSkills("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -917,7 +917,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2004", "PFL", "11", "713", null,false);
         traxCourse.setPortfolio("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -930,7 +930,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1986", "CED", "11", "745", null,false);
         traxCourse.setConsEd("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -943,7 +943,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("2018", "CLC", "11", "113", null,false);
         traxCourse.setCareerLifeConnections("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -956,7 +956,7 @@ public class CourseServiceTest {
         GradCourse traxCourse = prepareCourseRequirementData("1996", "ART", "11", "726", null,false);
         traxCourse.setFineArts("Y");
 
-        courseService.convertCourseRequirement(traxCourse, summary);
+        courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
     }
 
@@ -966,7 +966,7 @@ public class CourseServiceTest {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
 
-        courseService.createCourseRequirements(summary);
+        courseProcess.createCourseRequirements(summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isGreaterThan(0L);
     }
 

@@ -194,9 +194,6 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-trax-api.school.school-by-min-code.url}")
     private String schoolByMincode;
 
-    @Value("${data-conversion.student-guid-pen-xref.enabled}")
-    private boolean studentGuidPenXrefEnabled;
-
     // Incremental Grad Update
     @Value("${grad.update.enabled}")
     private boolean gradUpdateEnabled;

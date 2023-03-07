@@ -185,11 +185,6 @@ endpoint:
     certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
     achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
 
-#Conversion option
-data-conversion:
-  student-guid-pen-xref:
-    enabled:  false
-
 #Incremental Grad Update
 grad:
   update:

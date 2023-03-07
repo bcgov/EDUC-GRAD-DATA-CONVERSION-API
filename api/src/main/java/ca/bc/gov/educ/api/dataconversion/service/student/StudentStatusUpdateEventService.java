@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentStatusUpdateDTO;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -24,18 +25,18 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public StudentStatusUpdateEventService(EventRepository eventRepository,
-                                           StudentService studentService,
+                                           StudentProcess studentProcess,
                                            RestUtils restUtils,
                                            EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -51,7 +52,7 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
                 accessToken = res.getAccess_token();
             }
             // Load grad student
-            StudentGradDTO currentStudent = studentService.loadStudentData(studentStatusUpdate.getPen(), accessToken);
+            StudentGradDTO currentStudent = studentProcess.loadStudentData(studentStatusUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processStudent(studentStatusUpdate, currentStudent, accessToken);
             }
@@ -87,7 +88,7 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), studentStatusUpdate.getPen());
-            studentService.saveGraduationStudent(currentStudent, accessToken);
+            studentProcess.saveGraduationStudent(currentStudent, accessToken);
         }
     }
 
