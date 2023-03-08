@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
@@ -7,7 +7,6 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Code;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Transcript;
-import ca.bc.gov.educ.api.dataconversion.process.ReportProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;

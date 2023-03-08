@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;

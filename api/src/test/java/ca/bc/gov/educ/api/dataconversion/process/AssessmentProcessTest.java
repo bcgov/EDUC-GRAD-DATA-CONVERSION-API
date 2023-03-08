@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
@@ -22,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.openMocks;
 
@@ -87,6 +88,7 @@ public class AssessmentProcessTest {
         when(this.restUtils.addAssessmentRequirement(assessmentRequirement2, "123")).thenReturn(assessmentRequirement2);
 
         assessmentProcess.createAssessmentRequirements(summary);
+        assertThat(summary.getErrors()).hasSize(0);
     }
 
 }
