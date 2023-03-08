@@ -8,7 +8,7 @@ import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentDemographicsUpdateEventService;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public class StudentDemographicsUpdateEventServiceTest {
     EventRepository eventRepository;
 
     @MockBean
-    StudentService studentService;
+    StudentProcess studentProcess;
 
     @MockBean
     RestUtils restUtils;
@@ -91,7 +90,7 @@ public class StudentDemographicsUpdateEventServiceTest {
         currentStudent.setSchoolOfRecord(mincode);
         currentStudent.setSchoolAtGrad(mincode);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentDemographicsUpdateEventService.processEvent(traxDemogUpdate, event);
@@ -120,7 +119,7 @@ public class StudentDemographicsUpdateEventServiceTest {
         event.setEventId(UUID.randomUUID());
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
-        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+        when(this.studentProcess.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
 
         studentDemographicsUpdateEventService.processEvent(traxDemog, event);
 

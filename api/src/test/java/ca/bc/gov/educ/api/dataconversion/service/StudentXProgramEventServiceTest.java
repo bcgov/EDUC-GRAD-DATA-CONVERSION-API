@@ -7,7 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentXProgramEventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
@@ -41,7 +41,7 @@ public class StudentXProgramEventServiceTest {
     EventRepository eventRepository;
 
     @MockBean
-    StudentService studentService;
+    StudentProcess studentProcess;
 
     @MockBean
     RestUtils restUtils;
@@ -102,7 +102,7 @@ public class StudentXProgramEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         // ConvGradStudent = traxStudent with the recent updated info
         ConvGradStudent traxStudent = ConvGradStudent.builder().pen(pen)
@@ -171,7 +171,7 @@ public class StudentXProgramEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq("XC"), any())).thenReturn(null);
 
@@ -242,7 +242,7 @@ public class StudentXProgramEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq("XC"), any())).thenReturn(null);
 
@@ -313,7 +313,7 @@ public class StudentXProgramEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq("XC"), any())).thenReturn(null);
 
@@ -392,7 +392,7 @@ public class StudentXProgramEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         when(this.restUtils.getOptionalProgram(eq(program), eq("XC"), any())).thenReturn(null);
 
@@ -462,7 +462,7 @@ public class StudentXProgramEventServiceTest {
         event.setEventId(UUID.randomUUID());
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
-        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+        when(this.studentProcess.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
 
         studentXProgramEventService.processEvent(traxXProgram, event);
 

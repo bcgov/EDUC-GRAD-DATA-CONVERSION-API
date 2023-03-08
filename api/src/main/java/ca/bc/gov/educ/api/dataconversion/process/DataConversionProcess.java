@@ -1,21 +1,21 @@
-package ca.bc.gov.educ.api.dataconversion.service.conv;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Service
+@Component
 @Slf4j
-public class DataConversionService {
+public class DataConversionProcess {
     private final RestUtils restUtils;
 
     @Autowired
-    public DataConversionService(RestUtils restUtils) {
+    public DataConversionProcess(RestUtils restUtils) {
         this.restUtils = restUtils;
     }
 

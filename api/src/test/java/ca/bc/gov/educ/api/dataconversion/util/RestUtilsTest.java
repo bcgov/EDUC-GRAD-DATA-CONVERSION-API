@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -22,8 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.reactive.function.BodyInserter;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -553,5 +554,11 @@ public class RestUtilsTest {
 
         val result = restUtils.getProgramCertificateTranscriptList(req, "123");
         assertThat(result).isNotNull();
+    }
+
+    @Test
+    public void testTokenFallBackMethod_givenException_shouldReturnNull(){
+        val result = this.restUtils.rtGetTokenFallBack(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
+        assertThat(result).isNull();
     }
 }

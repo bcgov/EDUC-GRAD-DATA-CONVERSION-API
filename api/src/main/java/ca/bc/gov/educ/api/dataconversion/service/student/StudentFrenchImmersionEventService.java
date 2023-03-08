@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -21,18 +22,18 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public StudentFrenchImmersionEventService(EventRepository eventRepository,
-                                              StudentService studentService,
+                                              StudentProcess studentProcess,
                                               RestUtils restUtils,
                                               EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -48,7 +49,7 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
                 accessToken = res.getAccess_token();
             }
             // Load grad student
-            StudentGradDTO currentStudent = studentService.loadStudentData(frenchImmersionUpdate.getPen(), accessToken);
+            StudentGradDTO currentStudent = studentProcess.loadStudentData(frenchImmersionUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken);
             }
@@ -64,10 +65,10 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
 
     public void processFrenchImmersion(TraxFrenchImmersionUpdateDTO frenchImmersionUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process French Immersion : studentID = {}", currentStudent.getStudentID());
-        if (studentService.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
+        if (studentProcess.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
             log.info(" => create FI optional program");
-            studentService.addStudentOptionalProgram("FI", currentStudent, accessToken);
-            studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
+            studentProcess.addStudentOptionalProgram("FI", currentStudent, accessToken);
+            studentProcess.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
         }
     }
 

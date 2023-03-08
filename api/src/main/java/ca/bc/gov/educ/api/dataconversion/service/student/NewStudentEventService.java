@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -21,18 +22,18 @@ public class NewStudentEventService extends StudentBaseService implements EventS
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public NewStudentEventService(EventRepository eventRepository,
-                                  StudentService studentService,
+                                  StudentProcess studentProcess,
                                   RestUtils restUtils,
                                   EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -50,7 +51,7 @@ public class NewStudentEventService extends StudentBaseService implements EventS
             ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
             summary.setAccessToken(accessToken);
             try {
-                studentService.convertStudent(convStudent, summary);
+                studentProcess.convertStudent(convStudent, summary);
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convStudent.getPen());

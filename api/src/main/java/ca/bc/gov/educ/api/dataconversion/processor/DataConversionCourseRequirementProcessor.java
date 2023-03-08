@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
-import ca.bc.gov.educ.api.dataconversion.service.course.CourseService;
+import ca.bc.gov.educ.api.dataconversion.process.CourseProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
@@ -17,7 +17,7 @@ public class DataConversionCourseRequirementProcessor implements ItemProcessor<G
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementProcessor.class);
 
     @Autowired
-	private CourseService courseService;
+	private CourseProcess courseProcess;
 
 	private ConversionCourseSummaryDTO summaryDTO;
 
@@ -30,6 +30,6 @@ public class DataConversionCourseRequirementProcessor implements ItemProcessor<G
 
 	@Override
 	public GradCourse process(GradCourse graduationCourse) throws Exception {
-		return courseService.convertCourseRequirement(graduationCourse, summaryDTO);
+		return courseProcess.convertCourseRequirement(graduationCourse, summaryDTO);
 	}
 }

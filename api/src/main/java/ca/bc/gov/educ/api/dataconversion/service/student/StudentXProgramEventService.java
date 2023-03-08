@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -23,18 +24,18 @@ public class StudentXProgramEventService extends StudentBaseService implements E
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public StudentXProgramEventService(EventRepository eventRepository,
-                                       StudentService studentService,
+                                       StudentProcess studentProcess,
                                        RestUtils restUtils,
                                        EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -50,7 +51,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
                 accessToken = res.getAccess_token();
             }
             // Load grad student
-            StudentGradDTO currentStudent = studentService.loadStudentData(xprogram.getPen(), accessToken);
+            StudentGradDTO currentStudent = studentProcess.loadStudentData(xprogram.getPen(), accessToken);
             if (currentStudent != null) {
                 processOptionalAndCareerPrograms(xprogram, currentStudent, accessToken);
             }
@@ -76,37 +77,37 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         currentStudent.getRemovedProgramCodes().forEach(p -> {
             if (isOptionalProgramCode(p)) {
                 log.info(" => removed optional program code : {}", p);
-                studentService.removeStudentOptionalProgram(p, currentStudent, accessToken);
+                studentProcess.removeStudentOptionalProgram(p, currentStudent, accessToken);
             } else {
                 log.info(" => removed career program code : {}", p);
-                studentService.removeStudentCareerProgram(p, currentStudent, accessToken);
+                studentProcess.removeStudentCareerProgram(p, currentStudent, accessToken);
             }
         });
 
         currentStudent.getAddedProgramCodes().forEach(p -> {
             if (isOptionalProgramCode(p)) {
                 log.info(" => new optional program code : {}", p);
-                studentService.addStudentOptionalProgram(p, currentStudent, accessToken);
+                studentProcess.addStudentOptionalProgram(p, currentStudent, accessToken);
             } else {
                 log.info(" => new career program code : {}", p);
-                studentService.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);
+                studentProcess.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);
             }
         });
 
         // No Career Program?  then remove CP optional program
-        if (studentService.existsCareerProgram(currentStudent.getStudentID(), accessToken)) {
+        if (studentProcess.existsCareerProgram(currentStudent.getStudentID(), accessToken)) {
             log.info(" => [CP] optional program will be added if not exist.");
-            studentService.addStudentOptionalProgram("CP", currentStudent, accessToken);
+            studentProcess.addStudentOptionalProgram("CP", currentStudent, accessToken);
         } else {
             log.info(" => [CP] optional program will be removed if exist.");
-            studentService.removeStudentOptionalProgram("CP", currentStudent, accessToken);
+            studentProcess.removeStudentOptionalProgram("CP", currentStudent, accessToken);
         }
 
         // Transcript
         currentStudent.setNewRecalculateGradStatus("Y");
         // TVR
         currentStudent.setNewRecalculateProjectedGrad("Y");
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
+        studentProcess.triggerGraduationBatchRun(currentStudent.getStudentID(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
     }
 
     private void handleOptionalAndCareerProgramChange(List<String> reqProgramCodes,  List<String> curProgramCodes, StudentGradDTO currentStudent) {

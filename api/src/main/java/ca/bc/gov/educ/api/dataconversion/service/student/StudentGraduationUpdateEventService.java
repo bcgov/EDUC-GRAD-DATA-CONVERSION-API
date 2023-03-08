@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -22,18 +23,18 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public StudentGraduationUpdateEventService(EventRepository eventRepository,
-                                               StudentService studentService,
+                                               StudentProcess studentProcess,
                                                RestUtils restUtils,
                                                EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -49,7 +50,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
                 accessToken = res.getAccess_token();
             }
             // Load grad student
-            StudentGradDTO currentStudent = studentService.loadStudentData(updateGrad.getPen(), accessToken);
+            StudentGradDTO currentStudent = studentProcess.loadStudentData(updateGrad.getPen(), accessToken);
             if (currentStudent != null) {
                 processStudent(updateGrad, currentStudent, accessToken);
             }
@@ -135,7 +136,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-            studentService.saveGraduationStudent(currentStudent, accessToken);
+            studentProcess.saveGraduationStudent(currentStudent, accessToken);
         }
     }
 

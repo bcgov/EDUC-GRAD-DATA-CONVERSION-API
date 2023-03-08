@@ -29,7 +29,7 @@
             src/main/java/ca/bc/gov/educ/api/dataconversion/reader/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/writer/**,
             src/main/java/ca/bc/gov/educ/api/dataconversion/scheduler/**,
-            src/main/java/ca/bc/gov/educ/api/dataconversion/service/EducGradDataConversionApplication,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/EducGradDataConversionApplication,
             src/main/java/ca/bc/gov/educ/api/dataconversion/service/ChoreographedEventPersistenceService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/service/EventHandlerDelegatorService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/service/StudentBaseService,

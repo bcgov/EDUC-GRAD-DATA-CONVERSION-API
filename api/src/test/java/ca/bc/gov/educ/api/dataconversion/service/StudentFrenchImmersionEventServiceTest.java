@@ -8,7 +8,7 @@ import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentFrenchImmersionEventService;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.Test;
@@ -19,7 +19,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +39,7 @@ public class StudentFrenchImmersionEventServiceTest {
     EventRepository eventRepository;
 
     @MockBean
-    StudentService studentService;
+    StudentProcess studentProcess;
 
     @MockBean
     RestUtils restUtils;
@@ -101,8 +100,8 @@ public class StudentFrenchImmersionEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
-        when(this.studentService.hasAnyFrenchImmersionCourse(any(), any(), any())).thenReturn(true);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.hasAnyFrenchImmersionCourse(any(), any(), any())).thenReturn(true);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentFrenchImmersionEventService.processEvent(traxFrenchImmersionUpdate, event);
@@ -160,8 +159,8 @@ public class StudentFrenchImmersionEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
-        when(this.studentService.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
-        when(this.studentService.hasAnyFrenchImmersionCourse(any(), any(), any())).thenReturn(false);
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.hasAnyFrenchImmersionCourse(any(), any(), any())).thenReturn(false);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentFrenchImmersionEventService.processEvent(traxFrenchImmersionUpdate, event);
@@ -191,7 +190,7 @@ public class StudentFrenchImmersionEventServiceTest {
         event.setEventId(UUID.randomUUID());
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
-        when(this.studentService.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+        when(this.studentProcess.convertStudent(any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
 
         studentFrenchImmersionEventService.processEvent(traxFrenchImmersion, event);
 
