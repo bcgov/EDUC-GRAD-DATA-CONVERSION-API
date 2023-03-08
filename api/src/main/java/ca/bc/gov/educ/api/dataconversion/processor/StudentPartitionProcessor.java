@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
-import ca.bc.gov.educ.api.dataconversion.service.student.StudentService;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentPartitionProcessor.class);
 
     @Autowired
-	private StudentService studentService;
+	private StudentProcess studentProcess;
 
 	@Autowired
 	private RestUtils restUtils;
@@ -36,7 +36,7 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 				responseStudent = students.get(0);
 
 				// convert
-				responseStudent = studentService.convertStudent(students.get(0), summaryDTO);
+				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

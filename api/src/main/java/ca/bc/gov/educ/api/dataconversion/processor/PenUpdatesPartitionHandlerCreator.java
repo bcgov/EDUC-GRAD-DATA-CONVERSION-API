@@ -2,7 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
-import ca.bc.gov.educ.api.dataconversion.service.conv.DataConversionService;
+import ca.bc.gov.educ.api.dataconversion.process.DataConversionProcess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -15,7 +15,7 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
     private static final Logger LOGGER = LoggerFactory.getLogger(PenUpdatesPartitionHandlerCreator.class);
 
     @Autowired
-    DataConversionService dataConversionService;
+    DataConversionProcess dataConversionProcess;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
@@ -29,7 +29,7 @@ public class PenUpdatesPartitionHandlerCreator extends BasePartitionHandlerCreat
             TraxStudentNo st = new TraxStudentNo();
             st.setStudNo(pen);
             try {
-                dataConversionService.readTraxStudentAndAddNewPen(st, summaryDTO);
+                dataConversionProcess.readTraxStudentAndAddNewPen(st, summaryDTO);
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(pen);

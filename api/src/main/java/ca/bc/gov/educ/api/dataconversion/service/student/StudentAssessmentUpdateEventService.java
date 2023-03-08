@@ -4,6 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentUpdateDTO;
+import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
@@ -23,18 +24,18 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
 
     private final EventRepository eventRepository;
 
-    private final StudentService studentService;
+    private final StudentProcess studentProcess;
     private final RestUtils restUtils;
 
     private final EducGradDataConversionApiConstants constants;
 
     @Autowired
     public StudentAssessmentUpdateEventService(EventRepository eventRepository,
-                                               StudentService studentService,
+                                               StudentProcess studentProcess,
                                                RestUtils restUtils,
                                                EducGradDataConversionApiConstants constants) {
         this.eventRepository = eventRepository;
-        this.studentService = studentService;
+        this.studentProcess = studentProcess;
         this.restUtils = restUtils;
         this.constants = constants;
     }
@@ -51,7 +52,7 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
             }
 
             // Load grad student
-            StudentGradDTO currentStudent = studentService.loadStudentData(studentAssessmentUpdate.getPen(), accessToken);
+            StudentGradDTO currentStudent = studentProcess.loadStudentData(studentAssessmentUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processAssessment(studentAssessmentUpdate, currentStudent, accessToken);
             }
@@ -67,7 +68,7 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
 
     public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process French Immersion : studentID = {}, pen = {} ", currentStudent.getStudentID(),studentAssessmentUpdate.getPen());
-        studentService.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
+        studentProcess.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
     }
 
     @Override

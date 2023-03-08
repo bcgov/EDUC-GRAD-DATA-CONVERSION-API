@@ -8,6 +8,8 @@ import ca.bc.gov.educ.api.dataconversion.reader.*;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.writer.*;
+import io.netty.channel.ConnectTimeoutException;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -22,7 +24,14 @@ import org.springframework.context.annotation.Configuration;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.retry.RetryPolicy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.netty.http.client.PrematureCloseException;
+
+import java.sql.SQLException;
+import java.sql.SQLTransientConnectionException;
 
 @Configuration
 @EnableBatchProcessing
@@ -219,6 +228,15 @@ public class BatchJobConfig {
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())
+                .faultTolerant()
+                .retryLimit(3)
+                .retry(TransactionSystemException.class)
+                .retry(PrematureCloseException.class)
+                .retry(WebClientResponseException.class)
+                .retry(ConnectTimeoutException.class)
+                .retry(SQLTransientConnectionException.class)
+                .retry(JDBCConnectionException.class)
+                .retry(SQLException.class)
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service.student;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCareerProgram;
@@ -15,16 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @Slf4j
-public class ReportService {
+public class ReportProcess {
 
 	private static final String DOCUMENT_STATUS_COMPLETED = "COMPL";
 
@@ -338,10 +338,13 @@ public class ReportService {
 		std.setGrade(gradStudent.getStudentGrade());
 		std.setStudStatus(gradStudent.getStudentStatus());
 		std.setFirstName(gradStudent.getLegalFirstName());
-		std.setGender(gradStudent.getGenderCode());
+		std.setMiddleName(gradStudent.getLegalMiddleNames());
 		std.setLastName(gradStudent.getLegalLastName());
+		std.setGender(gradStudent.getGenderCode());
+		std.setCitizenship(gradStudent.getStudentCitizenship());
 		Pen pen = new Pen();
 		pen.setPen(gradStudent.getPen());
+		pen.setEntityID(gradStudent.getStudentID());
 		std.setPen(pen);
 		return std;
 	}

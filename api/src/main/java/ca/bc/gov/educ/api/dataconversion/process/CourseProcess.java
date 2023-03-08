@@ -1,4 +1,4 @@
-package ca.bc.gov.educ.api.dataconversion.service.course;
+package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.util.DateConversionUtils;
@@ -10,14 +10,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
-@Service
-public class CourseService {
+@Component
+public class CourseProcess {
 
-    private static final Logger logger = LoggerFactory.getLogger(CourseService.class);
+    private static final Logger logger = LoggerFactory.getLogger(CourseProcess.class);
 
     private static final String COURSE_RESTRICTION_ID = "courseRestrictionId";
     private static final String CREATE_USER = "createUser";
@@ -66,7 +66,7 @@ public class CourseService {
     private final RestUtils restUtils;
 
     @Autowired
-    public CourseService(RestUtils restUtils) {
+    public CourseProcess(RestUtils restUtils) {
         this.restUtils = restUtils;
     }
 

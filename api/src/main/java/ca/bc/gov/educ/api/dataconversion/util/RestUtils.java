@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -61,6 +62,11 @@ public class RestUtils {
                 .body(BodyInserters.fromFormData(map))
                 .retrieve()
                 .bodyToMono(ResponseObj.class).block();
+    }
+
+    public ResponseObj rtGetTokenFallBack(HttpServerErrorException exception){
+        log.error("{} NOT REACHABLE after many attempts: {}", constants.getTokenUrl(), exception);
+        return null;
     }
 
     public List<Student> getStudentsByPen(String pen, String accessToken) {
@@ -280,6 +286,7 @@ public class RestUtils {
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
+    @Retry(name = "rt-getTraxStudent")
     public List<ConvGradStudent> getTraxStudentMasterDataByPen(String pen, String accessToken) {
         final ParameterizedTypeReference<List<ConvGradStudent>> responseType = new ParameterizedTypeReference<>() {
         };
@@ -353,6 +360,7 @@ public class RestUtils {
                 .retrieve().bodyToMono(responseType).block();
     }
 
+    @Retry(name = "rt-conversionStatus")
     public TraxStudentNo saveTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveTraxStudentNoUrl())
@@ -464,6 +472,7 @@ public class RestUtils {
                 }).retrieve().bodyToMono(GradProgram.class).block();
     }
 
+    @Retry(name = "rt-transcript")
     public void saveGradStudentTranscript(GradStudentTranscripts requestObj, boolean isGraduated, String accessToken) {
         webClient.post().uri(String.format(constants.getUpdateGradStudentTranscript(), isGraduated))
                 .headers(h -> {
@@ -489,6 +498,7 @@ public class RestUtils {
                 }).block();
     }
 
+    @Retry(name = "rt-certificate")
     public void saveGradStudentCertificate(GradStudentCertificates requestObj, String accessToken) {
         webClient.post().uri(constants.getUpdateGradStudentCertificate())
                 .headers(h -> {
