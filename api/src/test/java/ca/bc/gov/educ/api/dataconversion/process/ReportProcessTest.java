@@ -99,7 +99,7 @@ public class ReportProcessTest {
         when(this.restUtils.getSchoolCategoryCode("06011033", accessToken)).thenReturn(commSch.getSchoolCategoryCode());
         when(this.restUtils.getTranscriptReport(any(), eq(accessToken))).thenReturn(bytesSAR);
 
-        reportProcess.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, UUID.fromString(studentID),isGraduated);
+        reportProcess.saveStudentTranscriptReportJasper(data, distributionDate, accessToken, UUID.fromString(studentID),isGraduated,false);
         assertThat(exception.getExceptionName()).isNull();
     }
 

@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -27,6 +28,9 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 	@Value("#{stepExecutionContext['summary']}")
 	private ConversionStudentSummaryDTO summaryDTO;
 
+	@Value("#{stepExecutionContext['reload']}")
+	private String reload;
+
 	@Override
 	public ConvGradStudent process(String pen) throws Exception {
 		ConvGradStudent responseStudent = null;
@@ -34,9 +38,8 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 			List<ConvGradStudent> students = restUtils.getTraxStudentMasterDataByPen(pen, summaryDTO.getAccessToken());
 			if (students != null && !students.isEmpty()) {
 				responseStudent = students.get(0);
-
 				// convert
-				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO);
+				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO, StringUtils.equalsIgnoreCase(reload, "Y"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

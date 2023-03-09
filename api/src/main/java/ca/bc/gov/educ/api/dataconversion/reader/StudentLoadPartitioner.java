@@ -6,8 +6,10 @@ import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +20,9 @@ import java.util.stream.Collectors;
 public class StudentLoadPartitioner extends SimplePartitioner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentLoadPartitioner.class);
+
+    @Value("#{stepExecution.jobExecution}")
+    JobExecution jobExecution;
 
     private final RestUtils restUtils;
 
@@ -33,6 +38,7 @@ public class StudentLoadPartitioner extends SimplePartitioner {
             accessToken = res.getAccess_token();
         }
 
+        String reload = jobExecution.getJobParameters().getString("reload");
         Integer total = restUtils.getTotalNumberOfTraxStudentNoList(accessToken);
         Integer pageSize = (total / gridSize) + 1;
         LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, pageSize);
@@ -46,6 +52,7 @@ public class StudentLoadPartitioner extends SimplePartitioner {
             summaryDTO.setReadCount(data.size());
             executionContext.put("summary", summaryDTO);
             executionContext.put("index", Integer.valueOf(0));
+            executionContext.put("reload", reload);
             String key = "partition" + i;
             map.put(key, executionContext);
         }

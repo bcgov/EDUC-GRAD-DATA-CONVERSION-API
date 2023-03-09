@@ -68,7 +68,7 @@ public class StudentProcess extends StudentBaseService {
         specialCaseMap.clear();
     }
 
-    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) throws Exception {
+    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload) throws Exception {
         long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         String accessToken = summary.getAccessToken();
@@ -94,7 +94,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // Student conversion process
-        processStudents(convGradStudent, students, summary, accessToken);
+        processStudents(convGradStudent, students, summary, accessToken, reload);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
         log.info("************* TIME Taken for pen [{}]  ************ {} secs", convGradStudent.getPen(), diff);
@@ -148,16 +148,19 @@ public class StudentProcess extends StudentBaseService {
         return true;
     }
 
-    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken) {
+    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken, boolean reload) {
         if (convGradStudent.isGraduated()) {
             log.debug("Process Graduated Students for pen# : " + convGradStudent.getPen());
         } else {
             log.debug("Process Non-Graduated Students for pen# : " + convGradStudent.getPen());
         }
         students.forEach(st -> {
+            if (reload) {
+                restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), accessToken);
+            }
             GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, summary);
             if (gradStudent != null) {
-                processDependencies(convGradStudent, gradStudent, st, summary, accessToken);
+                processDependencies(convGradStudent, gradStudent, st, summary, accessToken, reload);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -226,7 +229,8 @@ public class StudentProcess extends StudentBaseService {
     private void processDependencies(ConvGradStudent convGradStudent,
                                      GraduationStudentRecord gradStudent,
                                      Student penStudent,
-                                     ConversionStudentSummaryDTO summary, String accessToken) {
+                                     ConversionStudentSummaryDTO summary, String accessToken,
+                                     boolean reload) {
         ConversionResultType result;
 
         // process dependencies
@@ -267,23 +271,23 @@ public class StudentProcess extends StudentBaseService {
                 convGradStudent.setDistributionDate(distributionDate);
             }
             fetchAccessToken(summary);
-            createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken);
+            createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken, reload);
             fetchAccessToken(summary);
-            createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken);
+            createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken, reload);
         }
         convGradStudent.setResult(result);
     }
 
-    private void createAndStoreStudentTranscript(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
+    private void createAndStoreStudentTranscript(GraduationData graduationData, ConvGradStudent convStudent, String accessToken, boolean reload) {
         ReportData data = reportProcess.prepareTranscriptData(graduationData, graduationData.getGradStatus(), convStudent, accessToken);
-        reportProcess.saveStudentTranscriptReportJasper(data, convStudent.getDistributionDate(), accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated());
+        reportProcess.saveStudentTranscriptReportJasper(data, convStudent.getDistributionDate(), accessToken, graduationData.getGradStatus().getStudentID(), graduationData.isGraduated(), reload);
     }
 
-    private void createAndStoreStudentCertificates(GraduationData graduationData, ConvGradStudent convStudent, String accessToken) {
+    private void createAndStoreStudentCertificates(GraduationData graduationData, ConvGradStudent convStudent, String accessToken, boolean reload) {
         List<ProgramCertificateTranscript> certificateList = reportProcess.getCertificateList(graduationData,
             convStudent.getCertificateSchoolCategoryCode() != null? convStudent.getCertificateSchoolCategoryCode() : convStudent.getTranscriptSchoolCategoryCode(), accessToken);
         for (ProgramCertificateTranscript certType : certificateList) {
-            reportProcess.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType);
+            reportProcess.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType, reload);
         }
     }
 

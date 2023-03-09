@@ -19,7 +19,7 @@ import org.jboss.threads.EnhancedQueueExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.ArrayList;

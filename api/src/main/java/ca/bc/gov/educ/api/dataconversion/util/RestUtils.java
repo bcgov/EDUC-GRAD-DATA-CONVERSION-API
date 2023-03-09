@@ -536,6 +536,15 @@ public class RestUtils {
                 }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
+    // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
+    public void removeAllStudentRelatedData(UUID studentID, String accessToken) {
+        webClient.delete().uri(String.format(constants.getSaveGraduationStudentRecord(),studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Data Not Found"))).bodyToMono(Void.class).block();
+    }
+
     // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}
     public List<StudentOptionalProgram> getStudentOptionalPrograms(String studentID, String accessToken) {
         final ParameterizedTypeReference<List<StudentOptionalProgram>> responseType = new ParameterizedTypeReference<>() {
