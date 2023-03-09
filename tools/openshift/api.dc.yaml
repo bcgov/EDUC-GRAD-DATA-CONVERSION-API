@@ -134,7 +134,7 @@ objects:
       selector:
         app: "${REPO_NAME}"
         deploymentconfig: "${REPO_NAME}-dc"
-  - apiVersion: autoscaling/v2beta2
+  - apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
     metadata:
       name: "${REPO_NAME}-cpu-autoscaler"
