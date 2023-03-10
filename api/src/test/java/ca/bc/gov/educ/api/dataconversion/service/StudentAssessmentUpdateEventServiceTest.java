@@ -136,7 +136,7 @@ public class StudentAssessmentUpdateEventServiceTest {
         event.setEventId(UUID.randomUUID());
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
-        when(this.studentProcess.convertStudent(any(), any(), any())).thenThrow(new RuntimeException("Test Exception is thrown!"));
+        when(this.studentProcess.convertStudent(any(), any(), eq(false))).thenThrow(new RuntimeException("Test Exception is thrown!"));
 
         studentAssessmentUpdateEventService.processEvent(traxStudentUpdate, event);
 
