@@ -51,7 +51,7 @@ public class NewStudentEventService extends StudentBaseService implements EventS
             ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
             summary.setAccessToken(accessToken);
             try {
-                studentProcess.convertStudent(convStudent, summary);
+                studentProcess.convertStudent(convStudent, summary, false);
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convStudent.getPen());

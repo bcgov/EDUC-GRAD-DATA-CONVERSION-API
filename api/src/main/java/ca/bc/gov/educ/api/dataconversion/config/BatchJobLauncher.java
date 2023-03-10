@@ -41,8 +41,8 @@ public class BatchJobLauncher {
     }
 
     private JobParameters newExecution() {
-        Map<String, JobParameter> parameters = new HashMap<>();
-        JobParameter parameter = new JobParameter(new Date());
+        Map<String, JobParameter<?>> parameters = new HashMap<>();
+        JobParameter<?> parameter = new JobParameter(new Date(), Date.class);
         parameters.put("currentTime", parameter);
         return new JobParameters(parameters);
     }

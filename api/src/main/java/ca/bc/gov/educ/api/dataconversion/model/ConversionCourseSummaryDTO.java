@@ -3,13 +3,14 @@ package ca.bc.gov.educ.api.dataconversion.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
 @NoArgsConstructor
-public class ConversionCourseSummaryDTO extends ConversionBaseSummaryDTO {
+public class ConversionCourseSummaryDTO extends ConversionBaseSummaryDTO implements Serializable {
 
   private long addedCountForCourseRequirement = 0L;
   private long updatedCountForCourseRequirement = 0L;

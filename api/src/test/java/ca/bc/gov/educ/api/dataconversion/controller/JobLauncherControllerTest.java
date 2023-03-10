@@ -30,7 +30,7 @@ public class JobLauncherControllerTest {
     public void testLaunchGradStudentWithPartitions_DataConversionJob_thenReturnError() {
         boolean exceptionIsThrown = false;
         try {
-            jobLauncherController.launchStudentDataConversionPartitionJob();
+            jobLauncherController.launchStudentDataConversionPartitionJob(true);
         } catch (Exception e) {
             exceptionIsThrown = true;
         }

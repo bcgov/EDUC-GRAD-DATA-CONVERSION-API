@@ -61,7 +61,7 @@ public class StudentPartitionReader implements ItemReader<String> {
 
         fetchAccessToken();
         String nextStudent = null;
-        
+
         if (indexForStudent < studentList.size()) {
             nextStudent = studentList.get(indexForStudent);
             indexForStudent++;

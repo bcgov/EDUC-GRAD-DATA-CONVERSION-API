@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
 
@@ -24,11 +25,11 @@ public class DataConversionCourseRequirementWriter implements ItemWriter<GradCou
         ExecutionContext jobContext = jobExecution.getExecutionContext();
         summaryDTO = (ConversionCourseSummaryDTO)jobContext.get("courseRequirementSummaryDTO");
     }
-    
+
     @Override
-    public void write(List<? extends GradCourse> list) {
-        if (!list.isEmpty()) {
-            GradCourse graduationCourse = list.get(0);
+    public void write(Chunk<? extends GradCourse> chunk) throws Exception {
+        if (!chunk.isEmpty()) {
+            GradCourse graduationCourse = chunk.getItems().get(0);
             LOGGER.info("Processed course requirement: {} in total {}", summaryDTO.getProcessedCount(), summaryDTO.getReadCount());
             LOGGER.info("-------------------------------------------------------");
         }
