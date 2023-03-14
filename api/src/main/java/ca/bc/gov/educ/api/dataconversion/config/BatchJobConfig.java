@@ -8,8 +8,6 @@ import ca.bc.gov.educ.api.dataconversion.reader.*;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.writer.*;
-import io.netty.channel.ConnectTimeoutException;
-import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -235,10 +233,6 @@ public class BatchJobConfig {
                 .retry(TransactionSystemException.class)
                 .retry(PrematureCloseException.class)
                 .retry(WebClientResponseException.class)
-                .retry(ConnectTimeoutException.class)
-                .retry(SQLTransientConnectionException.class)
-                .retry(JDBCConnectionException.class)
-                .retry(SQLException.class)
                 .build();
     }
 

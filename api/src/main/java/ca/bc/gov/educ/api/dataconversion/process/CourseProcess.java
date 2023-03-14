@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class CourseProcess {
@@ -42,25 +43,33 @@ public class CourseProcess {
 
     private static final String ERR_MSG_FORMAT = "For {} : {}";
 
-    private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>();
+    private static final List<CourseRequirementDTO> REMOVAL_LIST = new ArrayList<>();
     static {
-        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEB_STR));
-        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEBF_STR));
-        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEB_STR));
-        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEBF_STR));
-        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEA_STR));
-        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
-        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
-        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSNMF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSPF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSSLF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("10").ruleCode("302").build());
+    }
 
-        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCB_STR));
-        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCBF_STR));
-        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCB_STR));
-        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCBF_STR));
-        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCA_STR));
-        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCAF_STR));
-        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCA_STR));
-        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCAF_STR));
+    private static final List<Pair<String, String>> RESTRICTION_IGNORE_LIST = new ArrayList<>();
+    static {
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEA_STR, CLEB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEA_STR, CLEBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEB_STR, CLEA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCA_STR, CLCB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCA_STR, CLCBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCB_STR, CLCA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCB_STR, CLCAF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCAF_STR));
     }
 
     private final RestUtils restUtils;
@@ -131,7 +140,7 @@ public class CourseProcess {
 
     private boolean isInvalidData(String mainCourseCode, String restrictedCourseCode) {
         Pair<String, String> pair = Pair.of(mainCourseCode, restrictedCourseCode);
-        return IGNORE_LIST.contains(pair);
+        return RESTRICTION_IGNORE_LIST.contains(pair);
     }
 
     private void convertCourseRestrictionData(CourseRestriction courseRestriction) {
@@ -986,6 +995,8 @@ public class CourseProcess {
         createCourseRequirement(populate("TPCF", "12", "303"), summary);
         createCourseRequirement(populate("TPCF", "12", "304"), summary);
         createCourseRequirement(populate(FRAL_STR, "12", "203"), summary);
+
+        // GRAD2-1958
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
@@ -1001,9 +1012,14 @@ public class CourseProcess {
     }
 
     private CourseRequirement createCourseRequirement(CourseRequirement courseRequirement, ConversionCourseSummaryDTO summary) {
-        logger.info(" Create CourseRequirement: course [{} / {}], rule [{}]",
+        boolean isValid = validateCourseRequirement(courseRequirement);
+        logger.info(" {} CourseRequirement: course [{} / {}], rule [{}]",
+                isValid? "Create" : "Skip",
                 courseRequirement.getCourseCode(), courseRequirement.getCourseLevel(),
                 courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "");
+        if (!isValid) {
+            return null;
+        }
 
         boolean isUpdate;
         try {
@@ -1043,6 +1059,18 @@ public class CourseProcess {
             logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
+    }
+
+    private boolean validateCourseRequirement(CourseRequirement courseRequirement) {
+        AtomicBoolean result = new AtomicBoolean(true);
+        REMOVAL_LIST.forEach(r -> {
+            if (StringUtils.equalsIgnoreCase(r.getCourseCode(), courseRequirement.getCourseCode()) &&
+                StringUtils.equalsIgnoreCase(r.getCourseLevel(), courseRequirement.getCourseLevel()) &&
+                StringUtils.equalsIgnoreCase(r.getRuleCode(), courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "")) {
+                result.set(false);
+            }
+        });
+        return result.get();
     }
 
     private boolean isInvalidCourseForRule727(String courseCode, String courseLevel) {
