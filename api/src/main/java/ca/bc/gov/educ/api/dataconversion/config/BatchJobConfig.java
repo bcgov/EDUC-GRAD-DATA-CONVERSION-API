@@ -29,11 +29,8 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.netty.http.client.PrematureCloseException;
 
 import java.sql.SQLException;
-import java.sql.SQLTransientConnectionException;
 
 @Configuration
 @EnableBatchProcessing(dataSourceRef = "convDataSource", transactionManagerRef = "convTransactionManager")
@@ -212,27 +209,26 @@ public class BatchJobConfig {
 
     // Partitioning for student load ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
+    public Step masterStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils, EducGradDataConversionApiConstants constants, SkipSQLTransactionExceptionsListener skipListener) {
         return new StepBuilder("masterStepForStudent", jobRepository)
-                .partitioner(slaveStepForStudent(jobRepository, transactionManager, restUtils).getName(), partitioner(restUtils))
-                .step(slaveStepForStudent(jobRepository, transactionManager, restUtils))
+                .partitioner(slaveStepForStudent(jobRepository, transactionManager, restUtils, skipListener).getName(), partitioner(restUtils))
+                .step(slaveStepForStudent(jobRepository, transactionManager, restUtils, skipListener))
                 .gridSize(constants.getNumberOfPartitions())
                 .taskExecutor(taskExecutor(constants))
                 .build();
     }
 
     @Bean
-    public Step slaveStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils) {
+    public Step slaveStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils, SkipSQLTransactionExceptionsListener skipListener) {
         return new StepBuilder("slaveStepForStudent", jobRepository)
                 .<String, ConvGradStudent>chunk(1, transactionManager)
+                .faultTolerant()
+                .skip(SQLException.class)
+                .skip(TransactionSystemException.class)
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())
-                .faultTolerant()
-                .retryLimit(3)
-                .retry(TransactionSystemException.class)
-                .retry(PrematureCloseException.class)
-                .retry(WebClientResponseException.class)
+                .listener(skipListener)
                 .build();
     }
 
@@ -259,11 +255,12 @@ public class BatchJobConfig {
             JobRepository jobRepository, PlatformTransactionManager transactionManager,
             RestUtils restUtils,
             EducGradDataConversionApiConstants constants,
-            StudentDataConversionJobCompletionNotificationListener listener) {
+            StudentDataConversionJobCompletionNotificationListener listener,
+            SkipSQLTransactionExceptionsListener skipListener) {
         return new JobBuilder("studentLoadJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForStudent(jobRepository, transactionManager, restUtils,constants))
+                .flow(masterStepForStudent(jobRepository, transactionManager, restUtils, constants, skipListener))
                 .end()
                 .build();
     }
