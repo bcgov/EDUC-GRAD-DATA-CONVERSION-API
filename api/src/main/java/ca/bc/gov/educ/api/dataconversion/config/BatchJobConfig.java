@@ -261,7 +261,8 @@ public class BatchJobConfig {
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(masterStepForStudent(jobRepository, transactionManager, restUtils, constants, skipListener))
-                .end()
+                .on("*")
+                .end().build()
                 .build();
     }
 
