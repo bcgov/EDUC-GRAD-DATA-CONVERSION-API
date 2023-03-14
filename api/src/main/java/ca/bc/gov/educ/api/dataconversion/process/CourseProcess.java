@@ -986,6 +986,102 @@ public class CourseProcess {
         createCourseRequirement(populate("TPCF", "12", "303"), summary);
         createCourseRequirement(populate("TPCF", "12", "304"), summary);
         createCourseRequirement(populate(FRAL_STR, "12", "203"), summary);
+
+        //Grad2-1976 Adding course requirement codes
+        createCourseRequirement(populate("GITX", "10", "119"), summary);
+        createCourseRequirement(populate("HALQ", "10", "119"), summary);
+        createCourseRequirement(populate("HLT", "10", "119"), summary);
+        createCourseRequirement(populate("HULQ", "10", "119"), summary);
+        createCourseRequirement(populate("KWAK", "10", "119"), summary);
+        createCourseRequirement(populate("LIKW", "10", "119"), summary);
+        createCourseRequirement(populate("OK", "10", "119"), summary);
+        createCourseRequirement(populate("NTE", "10", "119"), summary);
+        createCourseRequirement(populate("NCN", "10", "119"), summary);
+        createCourseRequirement(populate("SWP", "10", "119"), summary);
+        createCourseRequirement(populate("SENC", "10", "119"), summary);
+
+        createCourseRequirement(populate("SHLM", "10", "119"), summary);
+        createCourseRequirement(populate("SN", "10", "119"), summary);
+        createCourseRequirement(populate("SLGX", "10", "119"), summary);
+        createCourseRequirement(populate("CETS", "10", "119"), summary);
+        createCourseRequirement(populate("TSK", "10", "119"), summary);
+        createCourseRequirement(populate("STA", "10", "119"), summary);
+        createCourseRequirement(populate("AAY", "10", "119"), summary);
+        createCourseRequirement(populate("EFLS", "10", "119"), summary);
+        createCourseRequirement(populate("EFNM", "10", "119"), summary);
+        createCourseRequirement(populate("EFSL", "10", "119"), summary);
+        createCourseRequirement(populate("EFWR", "10", "119"), summary);
+
+        createCourseRequirement(populate("GITX", "11", "119"), summary);
+        createCourseRequirement(populate("GITI", "11", "119"), summary);
+        createCourseRequirement(populate("HALQ", "11", "119"), summary);
+        createCourseRequirement(populate("IHALQ", "11", "119"), summary);
+        createCourseRequirement(populate("HLT", "11", "119"), summary);
+        createCourseRequirement(populate("IHLT", "11", "119"), summary);
+        createCourseRequirement(populate("HULQ", "11", "119"), summary);
+        createCourseRequirement(populate("IHULQ", "11", "119"), summary);
+        createCourseRequirement(populate("KWAK", "11", "119"), summary);
+        createCourseRequirement(populate("IKWA", "11", "119"), summary);
+        createCourseRequirement(populate("LIKW", "11", "119"), summary);
+
+        createCourseRequirement(populate("ILIK", "11", "119"), summary);
+        createCourseRequirement(populate("OK", "11", "119"), summary);
+        createCourseRequirement(populate("IOK", "11", "119"), summary);
+        createCourseRequirement(populate("INTE", "11", "119"), summary);
+        createCourseRequirement(populate("NTE", "11", "119"), summary);
+        createCourseRequirement(populate("INCN", "11", "119"), summary);
+        createCourseRequirement(populate("NCN", "11", "119"), summary);
+        createCourseRequirement(populate("ISWP", "11", "119"), summary);
+        createCourseRequirement(populate("SWP", "11", "119"), summary);
+        createCourseRequirement(populate("SENI", "11", "119"), summary);
+        createCourseRequirement(populate("SENC", "11", "119"), summary);
+
+        createCourseRequirement(populate("ISHLM", "11", "119"), summary);
+        createCourseRequirement(populate("SHLM", "11", "119"), summary);
+        createCourseRequirement(populate("ISN", "11", "119"), summary);
+        createCourseRequirement(populate("SN", "11", "119"), summary);
+        createCourseRequirement(populate("ISLGX", "11", "119"), summary);
+        createCourseRequirement(populate("SLGX", "11", "119"), summary);
+        createCourseRequirement(populate("CETS", "11", "119"), summary);
+        createCourseRequirement(populate("CETI", "11", "119"), summary);
+        createCourseRequirement(populate("ITSK", "11", "119"), summary);
+        createCourseRequirement(populate("TSK", "11", "119"), summary);
+        createCourseRequirement(populate("ISTA", "11", "119"), summary);
+
+        createCourseRequirement(populate("STA", "11", "119"), summary);
+        createCourseRequirement(populate("AAY", "11", "119"), summary);
+        createCourseRequirement(populate("AAI", "11", "119"), summary);
+        createCourseRequirement(populate("ELNM", "11", "119"), summary);
+        createCourseRequirement(populate("ELSL", "11", "119"), summary);
+        createCourseRequirement(populate("EFLS", "11", "119"), summary);
+        createCourseRequirement(populate("GITX", "12", "119"), summary);
+        createCourseRequirement(populate("HALQ", "12", "119"), summary);
+        createCourseRequirement(populate("IHLT", "12", "119"), summary);
+        createCourseRequirement(populate("HULQ", "12", "119"), summary);
+        createCourseRequirement(populate("KWAK", "12", "119"), summary);
+
+        createCourseRequirement(populate("LIKW", "12", "119"), summary);
+        createCourseRequirement(populate("OK", "12", "119"), summary);
+        createCourseRequirement(populate("NTE", "12", "119"), summary);
+        createCourseRequirement(populate("NCN", "12", "119"), summary);
+        createCourseRequirement(populate("SWP", "12", "119"), summary);
+        createCourseRequirement(populate("SENC", "12", "119"), summary);
+        createCourseRequirement(populate("SHLM", "12", "119"), summary);
+        createCourseRequirement(populate("ISN", "12", "119"), summary);
+        createCourseRequirement(populate("SN", "12", "119"), summary);
+        createCourseRequirement(populate("SLGX", "12", "119"), summary);
+        createCourseRequirement(populate("CETS", "12", "119"), summary);
+
+        createCourseRequirement(populate("TSK", "12", "119"), summary);
+        createCourseRequirement(populate("STA", "12", "119"), summary);
+        createCourseRequirement(populate("AAY", "12", "119"), summary);
+        createCourseRequirement(populate("ENFP", "12", "119"), summary);
+        createCourseRequirement(populate("BCFP", "12", "119"), summary);
+        createCourseRequirement(populate("BCFPF", "12", "119"), summary);
+        createCourseRequirement(populate("INST", "12", "119"), summary);
+        createCourseRequirement(populate("INSTF", "12", "119"), summary);
+
+
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
