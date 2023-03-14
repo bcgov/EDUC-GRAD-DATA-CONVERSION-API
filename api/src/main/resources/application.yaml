@@ -36,9 +36,10 @@ spring:
           issuer-uri: ${TOKEN_ISSUER_URL}
           jwk-set-uri: ${TOKEN_ISSUER_URL}/protocol/openid-connect/certs
   batch:
-    initialize-schema: NEVER
     job:
       enabled: false
+    jdbc:
+      initialize-schema: NEVER
   flyway:
     enabled: ${ENABLE_FLYWAY}
     baseline-on-migrate: ${BASELINE_ON_MIGRATE}

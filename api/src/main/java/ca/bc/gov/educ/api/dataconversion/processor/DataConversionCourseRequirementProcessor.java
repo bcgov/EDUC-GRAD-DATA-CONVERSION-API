@@ -12,11 +12,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@SuppressWarnings("ALL")
 public class DataConversionCourseRequirementProcessor implements ItemProcessor<GradCourse, GradCourse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRequirementProcessor.class);
 
-    @Autowired
+
+	@Autowired
 	private CourseService courseService;
 
 	private ConversionCourseSummaryDTO summaryDTO;
