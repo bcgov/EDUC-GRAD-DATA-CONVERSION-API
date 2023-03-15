@@ -8,37 +8,33 @@ import ca.bc.gov.educ.api.dataconversion.reader.*;
 
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.writer.*;
-import io.netty.channel.ConnectTimeoutException;
-import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
 import org.springframework.batch.core.configuration.annotation.*;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.retry.RetryPolicy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionSystemException;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-import reactor.netty.http.client.PrematureCloseException;
 
 import java.sql.SQLException;
-import java.sql.SQLTransientConnectionException;
 
 @Configuration
 @EnableBatchProcessing
 public class BatchJobConfig {
-
-    @Autowired
-    JobRegistry jobRegistry;
 
     @Bean
     public ItemReader<CourseRestriction> courseRestrictionReader(RestUtils restUtils) {
@@ -84,12 +80,13 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step courseRestrictionDataConversionJobStep(ItemReader<CourseRestriction> courseRestrictionReader,
-                                                    ItemProcessor<? super CourseRestriction, ? extends CourseRestriction> courseRestrictionProcessor,
-                                                    ItemWriter<CourseRestriction> courseRestrictionWriter,
-                                                    StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("courseRestrictionDataConversionJobStep")
-                .<CourseRestriction, CourseRestriction>chunk(1)
+    public Step courseRestrictionDataConversionJobStep(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            ItemReader<CourseRestriction> courseRestrictionReader,
+            ItemProcessor<? super CourseRestriction, ? extends CourseRestriction> courseRestrictionProcessor,
+            ItemWriter<CourseRestriction> courseRestrictionWriter) {
+        return new StepBuilder("courseRestrictionDataConversionJobStep", jobRepository)
+                .<CourseRestriction, CourseRestriction>chunk(1, transactionManager)
                 .reader(courseRestrictionReader)
                 .processor(courseRestrictionProcessor)
                 .writer(courseRestrictionWriter)
@@ -100,10 +97,11 @@ public class BatchJobConfig {
      * Creates a bean that represents our batch job.
      */
     @Bean
-    public Job courseRestrictionDataConversionBatchJob(Step courseRestrictionDataConversionJobStep,
-                                                       CourseRestrictionDataConversionJobCompletionNotificationListener listener,
-                                                       JobBuilderFactory jobBuilderFactory) {
-        return jobBuilderFactory.get("courseRestrictionDataConversionBatchJob")
+    public Job courseRestrictionDataConversionBatchJob(
+            JobRepository jobRepository,
+            Step courseRestrictionDataConversionJobStep,
+            CourseRestrictionDataConversionJobCompletionNotificationListener listener) {
+        return new JobBuilder("courseRestrictionDataConversionBatchJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(courseRestrictionDataConversionJobStep)
@@ -115,12 +113,13 @@ public class BatchJobConfig {
      * Creates a bean that represents the only steps of our batch job.
      */
     @Bean
-    public Step courseRequirementDataConversionJobStep(ItemReader<GradCourse> courseRequirementReader,
-                                                       ItemProcessor<? super GradCourse, ? extends GradCourse> courseRequirementProcessor,
-                                                       ItemWriter<GradCourse> courseRequirementWriter,
-                                                       StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("courseRequirementDataConversionJobStep")
-                .<GradCourse, GradCourse>chunk(1)
+    public Step courseRequirementDataConversionJobStep(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            ItemReader<GradCourse> courseRequirementReader,
+            ItemProcessor<? super GradCourse, ? extends GradCourse> courseRequirementProcessor,
+            ItemWriter<GradCourse> courseRequirementWriter) {
+        return new StepBuilder("courseRequirementDataConversionJobStep", jobRepository)
+                .<GradCourse, GradCourse>chunk(1, transactionManager)
                 .reader(courseRequirementReader)
                 .processor(courseRequirementProcessor)
                 .writer(courseRequirementWriter)
@@ -128,16 +127,16 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public Step createAssessmentRequirementsJobStep(StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("createAssessmentRequirementsJobStep")
-                .tasklet(assessmentRequirementCreator())
+    public Step createAssessmentRequirementsJobStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("createAssessmentRequirementsJobStep", jobRepository)
+                .tasklet(assessmentRequirementCreator(), transactionManager)
                 .build();
     }
 
     @Bean
-    public Step createCourseRequirementsJobStep(StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("createCourseRequirementsJobStep")
-                .tasklet(courseRequirementCreator())
+    public Step createCourseRequirementsJobStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("createCourseRequirementsJobStep", jobRepository)
+                .tasklet(courseRequirementCreator(), transactionManager)
                 .build();
     }
 
@@ -145,12 +144,13 @@ public class BatchJobConfig {
      * Creates a bean that represents our batch job.
      */
     @Bean
-    public Job courseRequirementDataConversionBatchJob(Step courseRequirementDataConversionJobStep,
-                                                       Step createAssessmentRequirementsJobStep,
-                                                       Step createCourseRequirementsJobStep,
-                                                       CourseRequirementDataConversionJobCompletionNotificationListener listener,
-                                                       JobBuilderFactory jobBuilderFactory) {
-        return jobBuilderFactory.get("courseRequirementDataConversionBatchJob")
+    public Job courseRequirementDataConversionBatchJob(
+            JobRepository jobRepository,
+            Step courseRequirementDataConversionJobStep,
+            Step createAssessmentRequirementsJobStep,
+            Step createCourseRequirementsJobStep,
+            CourseRequirementDataConversionJobCompletionNotificationListener listener) {
+        return new JobBuilder("courseRequirementDataConversionBatchJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .start(courseRequirementDataConversionJobStep)
@@ -159,34 +159,30 @@ public class BatchJobConfig {
                 .build();
     }
 
-    @Bean
-    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor() {
-        JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
-        postProcessor.setJobRegistry(jobRegistry);
-        return postProcessor;
-    }
-
     // Partitioning for pen updates ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForPenUpdates(StepBuilderFactory stepBuilderFactory, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
-        return stepBuilderFactory.get("masterStepForPenUpdates")
-                .partitioner(slaveStepForPenUpdates(stepBuilderFactory).getName(), partitioner(restUtils))
-                .step(slaveStepForPenUpdates(stepBuilderFactory))
+    public Step masterStepForPenUpdates(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            RestUtils restUtils, EducGradDataConversionApiConstants constants) {
+        return new StepBuilder("masterStepForPenUpdates", jobRepository)
+                .partitioner(slaveStepForPenUpdates(jobRepository, transactionManager).getName(), partitioner(restUtils))
+                .step(slaveStepForPenUpdates(jobRepository, transactionManager))
                 .gridSize(constants.getNumberOfPartitions())
                 .taskExecutor(taskExecutor(constants))
                 .build();
     }
 
     @Bean
+    @StepScope
     public StudentLoadPartitioner partitioner(RestUtils restUtils) {
         // Reader to feed input data for each partition
         return new StudentLoadPartitioner(restUtils);
     }
 
     @Bean
-    public Step slaveStepForPenUpdates(StepBuilderFactory stepBuilderFactory) {
-        return stepBuilderFactory.get("slaveStepForPenUpdates")
-                .tasklet(penUpdatesPartitionHandler())
+    public Step slaveStepForPenUpdates(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("slaveStepForPenUpdates", jobRepository)
+                .tasklet(penUpdatesPartitionHandler(), transactionManager)
                 .build();
     }
 
@@ -198,45 +194,41 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public Job penUpdatesJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-                             RestUtils restUtils,
-                             EducGradDataConversionApiConstants constants,
-                             PenUpdatesJobCompletionNotificationListener listener) {
-        return jobBuilderFactory.get("penUpdatesJob")
+    public Job penUpdatesJob(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            RestUtils restUtils,
+            EducGradDataConversionApiConstants constants,
+            PenUpdatesJobCompletionNotificationListener listener) {
+        return new JobBuilder("penUpdatesJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForPenUpdates(stepBuilderFactory, restUtils, constants))
+                .flow(masterStepForPenUpdates(jobRepository, transactionManager, restUtils, constants))
                 .end()
                 .build();
     }
 
     // Partitioning for student load ---------------------------------------------------------------------------
     @Bean
-    public Step masterStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils, EducGradDataConversionApiConstants constants) {
-        return stepBuilderFactory.get("masterStepForStudent")
-                .partitioner(slaveStepForStudent(stepBuilderFactory, restUtils).getName(), partitioner(restUtils))
-                .step(slaveStepForStudent(stepBuilderFactory, restUtils))
+    public Step masterStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils, EducGradDataConversionApiConstants constants, SkipSQLTransactionExceptionsListener skipListener) {
+        return new StepBuilder("masterStepForStudent", jobRepository)
+                .partitioner(slaveStepForStudent(jobRepository, transactionManager, restUtils, skipListener).getName(), partitioner(restUtils))
+                .step(slaveStepForStudent(jobRepository, transactionManager, restUtils, skipListener))
                 .gridSize(constants.getNumberOfPartitions())
                 .taskExecutor(taskExecutor(constants))
                 .build();
     }
 
     @Bean
-    public Step slaveStepForStudent(StepBuilderFactory stepBuilderFactory, RestUtils restUtils) {
-        return stepBuilderFactory.get("slaveStepForStudent")
-                .<String, ConvGradStudent>chunk(1)
+    public Step slaveStepForStudent(JobRepository jobRepository, PlatformTransactionManager transactionManager, RestUtils restUtils, SkipSQLTransactionExceptionsListener skipListener) {
+        return new StepBuilder("slaveStepForStudent", jobRepository)
+                .<String, ConvGradStudent>chunk(1, transactionManager)
+                .faultTolerant()
+                .skip(SQLException.class)
+                .skip(TransactionSystemException.class)
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())
-                .faultTolerant()
-                .retryLimit(3)
-                .retry(TransactionSystemException.class)
-                .retry(PrematureCloseException.class)
-                .retry(WebClientResponseException.class)
-                .retry(ConnectTimeoutException.class)
-                .retry(SQLTransientConnectionException.class)
-                .retry(JDBCConnectionException.class)
-                .retry(SQLException.class)
+                .listener(skipListener)
                 .build();
     }
 
@@ -259,15 +251,18 @@ public class BatchJobConfig {
     }
 
     @Bean
-    public Job studentLoadJob(JobBuilderFactory jobBuilderFactory, StepBuilderFactory stepBuilderFactory,
-                              RestUtils restUtils,
-                              EducGradDataConversionApiConstants constants,
-                              StudentDataConversionJobCompletionNotificationListener listener) {
-        return jobBuilderFactory.get("studentLoadJob")
+    public Job studentLoadJob(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            RestUtils restUtils,
+            EducGradDataConversionApiConstants constants,
+            StudentDataConversionJobCompletionNotificationListener listener,
+            SkipSQLTransactionExceptionsListener skipListener) {
+        return new JobBuilder("studentLoadJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForStudent(stepBuilderFactory, restUtils,constants))
-                .end()
+                .start(masterStepForStudent(jobRepository, transactionManager, restUtils, constants, skipListener))
+                .on("*")
+                .end().build()
                 .build();
     }
 
@@ -283,4 +278,18 @@ public class BatchJobConfig {
         return executor;
     }
 
+    @Bean
+    public JobLauncher jobLauncher(JobRepository jobRepository) throws Exception {
+        TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
+        jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.afterPropertiesSet();
+        return jobLauncher;
+    }
+
+    @Bean
+    public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
+        JobRegistryBeanPostProcessor postProcessor = new JobRegistryBeanPostProcessor();
+        postProcessor.setJobRegistry(jobRegistry);
+        return postProcessor;
+    }
 }

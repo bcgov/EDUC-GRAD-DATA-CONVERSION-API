@@ -7,6 +7,7 @@ import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.process.CourseProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -955,6 +956,21 @@ public class CourseProcessTest {
 
         GradCourse traxCourse = prepareCourseRequirementData("1996", "ART", "11", "726", null,false);
         traxCourse.setFineArts("Y");
+
+        courseProcess.convertCourseRequirement(traxCourse, summary);
+        assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);
+    }
+
+    // Fine Arts
+    @Test
+    public void testConvertCourseRequirement_inRemovalList_forFrenchLanguage_2018() {
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
+        summary.setAccessToken("123");
+
+        GradCourse traxCourse = prepareCourseRequirementData("2018", "LTSTF", "10", "302", null,false);
+        traxCourse.setEnglish10("Y");
+
+        when(this.restUtils.checkFrenchLanguageCourse("LTSTF", "10", "123")).thenReturn(true);
 
         courseProcess.convertCourseRequirement(traxCourse, summary);
         assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(1L);

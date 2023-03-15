@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,9 +25,9 @@ public class StudentPartitionWriter implements ItemWriter<ConvGradStudent> {
     private ConversionStudentSummaryDTO summaryDTO;
 
     @Override
-    public void write(List<? extends ConvGradStudent> list) {
-        if (!list.isEmpty()) {
-            ConvGradStudent student = list.get(0);
+    public void write(Chunk<? extends ConvGradStudent> chunk) throws Exception {
+        if (!chunk.isEmpty()) {
+            ConvGradStudent student = chunk.getItems().get(0);
             fetchAccessToken();
             saveConversionStatus(student, summaryDTO.getErrors());
             LOGGER.info("Processed student[{}] - PEN: {} in total {}", summaryDTO.getProcessedCount(), student.getPen(), summaryDTO.getReadCount());

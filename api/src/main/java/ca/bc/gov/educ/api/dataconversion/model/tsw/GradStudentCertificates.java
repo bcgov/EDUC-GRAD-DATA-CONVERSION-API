@@ -20,4 +20,5 @@ public class GradStudentCertificates extends BaseModel {
 	private Date distributionDate;
 	private String documentStatusCode;
 	private String documentStatusLabel;
+	private boolean overwrite = false;
 }

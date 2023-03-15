@@ -370,7 +370,7 @@ public class ReportProcess {
 		return schObj;
 	}
 
-	public void saveStudentTranscriptReportJasper(ReportData sample, Date distributionDate, String accessToken, UUID studentID, boolean isGraduated) {
+	public void saveStudentTranscriptReportJasper(ReportData sample, Date distributionDate, String accessToken, UUID studentID, boolean isGraduated, boolean reload) {
 
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken);
 		GradStudentTranscripts requestObj = new GradStudentTranscripts();
@@ -379,6 +379,7 @@ public class ReportProcess {
 		requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
 		requestObj.setDocumentStatusCode("IP");
 		requestObj.setDistributionDate(distributionDate);
+		requestObj.setOverwrite(reload);
 		if (isGraduated)
 			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
@@ -431,7 +432,7 @@ public class ReportProcess {
 	}
 
 	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, ConvGradStudent convStudent,
-												   String accessToken, ProgramCertificateTranscript certType) {
+												   String accessToken, ProgramCertificateTranscript certType, boolean reload) {
 		ReportData certData = prepareCertificateData(graduationDataStatus, certType, convStudent, accessToken);
 		String encodedPdfReportCertificate = generateStudentCertificateReportJasper(certData,accessToken);
 		GradStudentCertificates requestObj = new GradStudentCertificates();
@@ -441,6 +442,7 @@ public class ReportProcess {
 		requestObj.setGradCertificateTypeCode(certType.getCertificateTypeCode());
 		requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 		requestObj.setDistributionDate(convStudent.getDistributionDate());
+		requestObj.setOverwrite(reload);
 		this.restUtils.saveGradStudentCertificate(requestObj, accessToken);
 	}
 

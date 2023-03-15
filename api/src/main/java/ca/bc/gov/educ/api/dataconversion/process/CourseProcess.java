@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class CourseProcess {
@@ -42,25 +43,33 @@ public class CourseProcess {
 
     private static final String ERR_MSG_FORMAT = "For {} : {}";
 
-    private static final List<Pair<String, String>> IGNORE_LIST = new ArrayList<>();
+    private static final List<CourseRequirementDTO> REMOVAL_LIST = new ArrayList<>();
     static {
-        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEB_STR));
-        IGNORE_LIST.add(Pair.of(CLEA_STR, CLEBF_STR));
-        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEB_STR));
-        IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEBF_STR));
-        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEA_STR));
-        IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
-        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
-        IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSNMF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSPF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSSLF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("10").ruleCode("302").build());
+    }
 
-        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCB_STR));
-        IGNORE_LIST.add(Pair.of(CLCA_STR, CLCBF_STR));
-        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCB_STR));
-        IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCBF_STR));
-        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCA_STR));
-        IGNORE_LIST.add(Pair.of(CLCB_STR, CLCAF_STR));
-        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCA_STR));
-        IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCAF_STR));
+    private static final List<Pair<String, String>> RESTRICTION_IGNORE_LIST = new ArrayList<>();
+    static {
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEA_STR, CLEB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEA_STR, CLEBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEAF_STR, CLEBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEB_STR, CLEA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEB_STR, CLEAF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLEBF_STR, CLEAF_STR));
+
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCA_STR, CLCB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCA_STR, CLCBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCB_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCAF_STR, CLCBF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCB_STR, CLCA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCB_STR, CLCAF_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCA_STR));
+        RESTRICTION_IGNORE_LIST.add(Pair.of(CLCBF_STR, CLCAF_STR));
     }
 
     private final RestUtils restUtils;
@@ -131,7 +140,7 @@ public class CourseProcess {
 
     private boolean isInvalidData(String mainCourseCode, String restrictedCourseCode) {
         Pair<String, String> pair = Pair.of(mainCourseCode, restrictedCourseCode);
-        return IGNORE_LIST.contains(pair);
+        return RESTRICTION_IGNORE_LIST.contains(pair);
     }
 
     private void convertCourseRestrictionData(CourseRestriction courseRestriction) {
@@ -986,6 +995,101 @@ public class CourseProcess {
         createCourseRequirement(populate("TPCF", "12", "303"), summary);
         createCourseRequirement(populate("TPCF", "12", "304"), summary);
         createCourseRequirement(populate(FRAL_STR, "12", "203"), summary);
+
+        //Grad2-1976 Adding course requirement codes
+        createCourseRequirement(populate("GITX", "10", "119"), summary);
+        createCourseRequirement(populate("HALQ", "10", "119"), summary);
+        createCourseRequirement(populate("HLT", "10", "119"), summary);
+        createCourseRequirement(populate("HULQ", "10", "119"), summary);
+        createCourseRequirement(populate("KWAK", "10", "119"), summary);
+        createCourseRequirement(populate("LIKW", "10", "119"), summary);
+        createCourseRequirement(populate("OK", "10", "119"), summary);
+        createCourseRequirement(populate("NTE", "10", "119"), summary);
+        createCourseRequirement(populate("NCN", "10", "119"), summary);
+        createCourseRequirement(populate("SWP", "10", "119"), summary);
+        createCourseRequirement(populate("SENC", "10", "119"), summary);
+
+        createCourseRequirement(populate("SHLM", "10", "119"), summary);
+        createCourseRequirement(populate("SN", "10", "119"), summary);
+        createCourseRequirement(populate("SLGX", "10", "119"), summary);
+        createCourseRequirement(populate("CETS", "10", "119"), summary);
+        createCourseRequirement(populate("TSK", "10", "119"), summary);
+        createCourseRequirement(populate("STA", "10", "119"), summary);
+        createCourseRequirement(populate("AAY", "10", "119"), summary);
+        createCourseRequirement(populate("EFLS", "10", "119"), summary);
+        createCourseRequirement(populate("EFNM", "10", "119"), summary);
+        createCourseRequirement(populate("EFSL", "10", "119"), summary);
+        createCourseRequirement(populate("EFWR", "10", "119"), summary);
+
+        createCourseRequirement(populate("GITX", "11", "119"), summary);
+        createCourseRequirement(populate("GITI", "11", "119"), summary);
+        createCourseRequirement(populate("HALQ", "11", "119"), summary);
+        createCourseRequirement(populate("IHALQ", "11", "119"), summary);
+        createCourseRequirement(populate("HLT", "11", "119"), summary);
+        createCourseRequirement(populate("IHLT", "11", "119"), summary);
+        createCourseRequirement(populate("HULQ", "11", "119"), summary);
+        createCourseRequirement(populate("IHULQ", "11", "119"), summary);
+        createCourseRequirement(populate("KWAK", "11", "119"), summary);
+        createCourseRequirement(populate("IKWA", "11", "119"), summary);
+        createCourseRequirement(populate("LIKW", "11", "119"), summary);
+
+        createCourseRequirement(populate("ILIK", "11", "119"), summary);
+        createCourseRequirement(populate("OK", "11", "119"), summary);
+        createCourseRequirement(populate("IOK", "11", "119"), summary);
+        createCourseRequirement(populate("INTE", "11", "119"), summary);
+        createCourseRequirement(populate("NTE", "11", "119"), summary);
+        createCourseRequirement(populate("INCN", "11", "119"), summary);
+        createCourseRequirement(populate("NCN", "11", "119"), summary);
+        createCourseRequirement(populate("ISWP", "11", "119"), summary);
+        createCourseRequirement(populate("SWP", "11", "119"), summary);
+        createCourseRequirement(populate("SENI", "11", "119"), summary);
+        createCourseRequirement(populate("SENC", "11", "119"), summary);
+
+        createCourseRequirement(populate("ISHLM", "11", "119"), summary);
+        createCourseRequirement(populate("SHLM", "11", "119"), summary);
+        createCourseRequirement(populate("ISN", "11", "119"), summary);
+        createCourseRequirement(populate("SN", "11", "119"), summary);
+        createCourseRequirement(populate("ISLGX", "11", "119"), summary);
+        createCourseRequirement(populate("SLGX", "11", "119"), summary);
+        createCourseRequirement(populate("CETS", "11", "119"), summary);
+        createCourseRequirement(populate("CETI", "11", "119"), summary);
+        createCourseRequirement(populate("ITSK", "11", "119"), summary);
+        createCourseRequirement(populate("TSK", "11", "119"), summary);
+        createCourseRequirement(populate("ISTA", "11", "119"), summary);
+
+        createCourseRequirement(populate("STA", "11", "119"), summary);
+        createCourseRequirement(populate("AAY", "11", "119"), summary);
+        createCourseRequirement(populate("AAI", "11", "119"), summary);
+        createCourseRequirement(populate("ELNM", "11", "119"), summary);
+        createCourseRequirement(populate("ELSL", "11", "119"), summary);
+        createCourseRequirement(populate("EFLS", "11", "119"), summary);
+        createCourseRequirement(populate("GITX", "12", "119"), summary);
+        createCourseRequirement(populate("HALQ", "12", "119"), summary);
+        createCourseRequirement(populate("IHLT", "12", "119"), summary);
+        createCourseRequirement(populate("HULQ", "12", "119"), summary);
+        createCourseRequirement(populate("KWAK", "12", "119"), summary);
+
+        createCourseRequirement(populate("LIKW", "12", "119"), summary);
+        createCourseRequirement(populate("OK", "12", "119"), summary);
+        createCourseRequirement(populate("NTE", "12", "119"), summary);
+        createCourseRequirement(populate("NCN", "12", "119"), summary);
+        createCourseRequirement(populate("SWP", "12", "119"), summary);
+        createCourseRequirement(populate("SENC", "12", "119"), summary);
+        createCourseRequirement(populate("SHLM", "12", "119"), summary);
+        createCourseRequirement(populate("ISN", "12", "119"), summary);
+        createCourseRequirement(populate("SN", "12", "119"), summary);
+        createCourseRequirement(populate("SLGX", "12", "119"), summary);
+        createCourseRequirement(populate("CETS", "12", "119"), summary);
+
+        createCourseRequirement(populate("TSK", "12", "119"), summary);
+        createCourseRequirement(populate("STA", "12", "119"), summary);
+        createCourseRequirement(populate("AAY", "12", "119"), summary);
+        createCourseRequirement(populate("ENFP", "12", "119"), summary);
+        createCourseRequirement(populate("BCFP", "12", "119"), summary);
+        createCourseRequirement(populate("BCFPF", "12", "119"), summary);
+        createCourseRequirement(populate("INST", "12", "119"), summary);
+        createCourseRequirement(populate("INSTF", "12", "119"), summary);
+
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
@@ -1001,9 +1105,14 @@ public class CourseProcess {
     }
 
     private CourseRequirement createCourseRequirement(CourseRequirement courseRequirement, ConversionCourseSummaryDTO summary) {
-        logger.info(" Create CourseRequirement: course [{} / {}], rule [{}]",
+        boolean isValid = validateCourseRequirement(courseRequirement);
+        logger.info(" {} CourseRequirement: course [{} / {}], rule [{}]",
+                isValid? "Create" : "Skip",
                 courseRequirement.getCourseCode(), courseRequirement.getCourseLevel(),
                 courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "");
+        if (!isValid) {
+            return null;
+        }
 
         boolean isUpdate;
         try {
@@ -1043,6 +1152,18 @@ public class CourseProcess {
             logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
         }
+    }
+
+    private boolean validateCourseRequirement(CourseRequirement courseRequirement) {
+        AtomicBoolean result = new AtomicBoolean(true);
+        REMOVAL_LIST.forEach(r -> {
+            if (StringUtils.equalsIgnoreCase(r.getCourseCode(), courseRequirement.getCourseCode()) &&
+                StringUtils.equalsIgnoreCase(r.getCourseLevel(), courseRequirement.getCourseLevel()) &&
+                StringUtils.equalsIgnoreCase(r.getRuleCode(), courseRequirement.getRuleCode() != null? courseRequirement.getRuleCode().getCourseRequirementCode() : "")) {
+                result.set(false);
+            }
+        });
+        return result.get();
     }
 
     private boolean isInvalidCourseForRule727(String courseCode, String courseLevel) {

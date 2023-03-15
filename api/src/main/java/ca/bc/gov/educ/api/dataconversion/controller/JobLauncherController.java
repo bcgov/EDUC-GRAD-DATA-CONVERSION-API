@@ -31,6 +31,7 @@ public class JobLauncherController {
     private static final Logger logger = LoggerFactory.getLogger(JobLauncherController.class);
     private static final String TIME="time";
     private static final String JOB_PARAM="job";
+    private static final String RELOAD_PARAM="reload";
 
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
@@ -76,11 +77,13 @@ public class JobLauncherController {
 
     @GetMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB)
     @Operation(summary = "Initial Load of Students in Async Parallel Processing", description = "Loading students from TRAX into GRAD in Parallel using the partitions that are getting the paginated list from TRAX_STUDENT_NO table", tags = { "Students" })
-    public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionPartitionJob( ) {
+    public ResponseEntity<ConversionBaseSummaryDTO> launchStudentDataConversionPartitionJob(
+            @RequestParam(value = "reload", required = false, defaultValue = "false") boolean isReload) {
         logger.info("Inside Launch Student Data Conversion Partition Job - Parallel Processing");
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
         builder.addString(JOB_PARAM, "studentLoadJob");
+        builder.addString(RELOAD_PARAM, isReload? "Y" : "N");
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("studentLoadJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();

@@ -5,21 +5,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
-import org.springframework.batch.core.listener.JobExecutionListenerSupport;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
 import java.util.Date;
 
 @Component
-public class CourseRequirementDataConversionJobCompletionNotificationListener extends JobExecutionListenerSupport {
+public class CourseRequirementDataConversionJobCompletionNotificationListener implements JobExecutionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CourseRequirementDataConversionJobCompletionNotificationListener.class);
     
     @Override
     public void afterJob(JobExecution jobExecution) {
-    	if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
-	    	long elapsedTimeMillis = new Date().getTime() - jobExecution.getStartTime().getTime();
+		if (jobExecution.getStatus() == BatchStatus.COMPLETED ||
+			jobExecution.getStatus() == BatchStatus.FAILED ||
+			jobExecution.getStatus() == BatchStatus.UNKNOWN) {
+			long elapsedTimeMillis = new Date().getTime() - jobExecution.getStartTime().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 			LOGGER.info("=======================================================================================");
 	    	LOGGER.info("Data Conversion - Course Requirement Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus().toString());
 
