@@ -33,7 +33,7 @@ import org.springframework.transaction.TransactionSystemException;
 import java.sql.SQLException;
 
 @Configuration
-@EnableBatchProcessing(dataSourceRef = "convDataSource", transactionManagerRef = "convTransactionManager")
+@EnableBatchProcessing
 public class BatchJobConfig {
 
     @Bean
@@ -260,7 +260,7 @@ public class BatchJobConfig {
         return new JobBuilder("studentLoadJob", jobRepository)
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
-                .flow(masterStepForStudent(jobRepository, transactionManager, restUtils, constants, skipListener))
+                .start(masterStepForStudent(jobRepository, transactionManager, restUtils, constants, skipListener))
                 .on("*")
                 .end().build()
                 .build();

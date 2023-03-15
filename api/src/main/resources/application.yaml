@@ -2,7 +2,7 @@
 spring:
   jmx:
     enabled: false
-  db-connection:
+  datasource:
     hikari:
       pool-name: conv-primary-cp
       connection-timeout: ${CONNECTION_TIMEOUT}
