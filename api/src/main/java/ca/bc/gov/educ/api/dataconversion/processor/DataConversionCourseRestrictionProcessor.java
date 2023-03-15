@@ -12,6 +12,7 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@SuppressWarnings("ALL")
 public class DataConversionCourseRestrictionProcessor implements ItemProcessor<CourseRestriction, CourseRestriction> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionCourseRestrictionProcessor.class);
