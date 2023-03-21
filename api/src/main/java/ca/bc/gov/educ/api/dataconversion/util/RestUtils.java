@@ -27,8 +27,6 @@ import java.util.UUID;
 @Component
 public class RestUtils {
 
-    private static String studentAPIDown = "GRAD-STUDENT-API IS DOWN";
-
     private final EducGradDataConversionApiConstants constants;
 
     private ResponseObjCache responseObjCache;
@@ -276,16 +274,6 @@ public class RestUtils {
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
-    public Boolean checkSchoolExists(String minCode, String accessToken) {
-        return this.webClient.get()
-                .uri(constants.getCheckSchoolByMincodeUrl(), uri -> uri.path("/{minCode}").build(minCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(Boolean.class).block();
-    }
-
     @Retry(name = "rt-getTraxStudent")
     public List<ConvGradStudent> getTraxStudentMasterDataByPen(String pen, String accessToken) {
         final ParameterizedTypeReference<List<ConvGradStudent>> responseType = new ParameterizedTypeReference<>() {
@@ -392,17 +380,6 @@ public class RestUtils {
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 })
                 .retrieve().bodyToMono(responseType).block();
-    }
-
-    public School getSchoolGrad(String minCode, String accessToken) {
-        return webClient.get()
-                .uri(String.format(constants.getSchoolByMincode(), minCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve()
-                .bodyToMono(School.class).block();
     }
 
     public List<ProgramRequirement> getGradProgramRules(String gradProgramCode, String accessToken) {

@@ -32,6 +32,8 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionSystemException;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 
 @Configuration
@@ -227,6 +229,9 @@ public class BatchJobConfig {
                 .faultTolerant()
                 .skip(SQLException.class)
                 .skip(TransactionSystemException.class)
+                .skip(IOException.class)
+                .skip(SocketTimeoutException.class)
+                .skipLimit(100)
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())

@@ -97,7 +97,7 @@ public class StudentProcess extends StudentBaseService {
         processStudents(convGradStudent, students, summary, accessToken, reload);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
-        log.info("************* TIME Taken for pen [{}]  ************ {} secs", convGradStudent.getPen(), diff);
+        log.info("** PEN: {} - {} secs", convGradStudent.getPen(), diff);
         return convGradStudent;
     }
 
@@ -270,10 +270,14 @@ public class StudentProcess extends StudentBaseService {
                 }
                 convGradStudent.setDistributionDate(distributionDate);
             }
-            fetchAccessToken(summary);
-            createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken, reload);
-            fetchAccessToken(summary);
-            createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken, reload);
+            if (convGradStudent.getTranscriptSchool() != null && "Y".equalsIgnoreCase(convGradStudent.getTranscriptSchool().getTranscriptEligibility())) {
+                fetchAccessToken(summary);
+                createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken, reload);
+            }
+            if (convGradStudent.getCertificateSchool() != null && "Y".equalsIgnoreCase(convGradStudent.getCertificateSchool().getCertificateEligibility())) {
+                fetchAccessToken(summary);
+                createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken, reload);
+            }
         }
         convGradStudent.setResult(result);
     }

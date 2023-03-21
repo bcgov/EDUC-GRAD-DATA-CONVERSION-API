@@ -39,7 +39,7 @@ public class JetStreamEventScheduler {
         this.choreographer = choreographer;
     }
 
-    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // every 1 minute
+    @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // minimum = every 5 minute
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
     public void findAndProcessEvents() {
         LockAssert.assertLocked();
