@@ -88,8 +88,6 @@ public class StudentProcessTest {
         String pen = "111222333";
         String mincode = "222333";
 
-        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(false);
-
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
                 .programCodes(new ArrayList<>()).build();
@@ -108,8 +106,6 @@ public class StudentProcessTest {
     public void convertGraduatedStudent_forSchoolValidation_whenGivenSPMSchool_doesNotExist_thenReturnFailure() throws Exception {
         String pen = "111222333";
         String mincode = "222333";
-
-        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(false);
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
@@ -135,7 +131,6 @@ public class StudentProcessTest {
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
 
-        when(this.restUtils.checkSchoolExists(mincode, "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
@@ -665,12 +660,13 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
                 .programCompletionDate(null)
@@ -727,6 +723,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         ResponseObj responseObj = new ResponseObj();
         responseObj.setAccess_token("123");
@@ -738,8 +736,6 @@ public class StudentProcessTest {
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
-
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
@@ -796,6 +792,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         ResponseObj responseObj = new ResponseObj();
         responseObj.setAccess_token("123");
@@ -806,7 +804,6 @@ public class StudentProcessTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
@@ -871,6 +868,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         ResponseObj responseObj = new ResponseObj();
         responseObj.setAccess_token("123");
@@ -881,7 +880,6 @@ public class StudentProcessTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
@@ -947,6 +945,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         ResponseObj responseObj = new ResponseObj();
         responseObj.setAccess_token("123");
@@ -957,7 +957,6 @@ public class StudentProcessTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
@@ -1122,6 +1121,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -1201,7 +1202,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("1986-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1377,6 +1377,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -1456,7 +1458,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("2004-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2004-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1632,6 +1633,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -1711,7 +1714,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("2004-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2004-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -1873,6 +1875,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -1952,7 +1956,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -2113,6 +2116,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -2191,7 +2196,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("1996-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -2353,6 +2357,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -2431,7 +2437,6 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgramByID(optionalProgram1.getOptionalProgramID(), "123")).thenReturn(optionalProgram1);
         when(this.restUtils.getOptionalProgram("2018-PF", "DD", "123")).thenReturn(optionalProgram1);
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-PF", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -2543,6 +2548,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -2613,7 +2620,6 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -2722,6 +2728,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -2793,7 +2801,6 @@ public class StudentProcessTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));
@@ -2904,6 +2911,8 @@ public class StudentProcessTest {
         School school = new School();
         school.setMinCode(mincode);
         school.setSchoolName("Test School");
+        school.setTranscriptEligibility("Y");
+        school.setCertificateEligibility("Y");
 
         // Rule 10
         ProgramRequirement pr10 = new ProgramRequirement();
@@ -2975,7 +2984,6 @@ public class StudentProcessTest {
         when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
-        when(this.restUtils.getSchoolGrad(mincode, "123")).thenReturn(school);
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
         when(this.restUtils.getGradProgramRulesByTraxReqNumber(gradRule10Details.getTraxReqNumber(), "123")).thenReturn(Arrays.asList(gradRule10Details));

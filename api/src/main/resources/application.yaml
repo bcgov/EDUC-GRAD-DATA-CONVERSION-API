@@ -237,11 +237,6 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
       get-course-requirements:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-requirements
-    school:
-      check-school-by-mincode:
-        url: ${GRAD_TRAX_API}api/v1/trax/school/check
-      school-by-min-code:
-        url: ${GRAD_TRAX_API}api/v1/trax/school/%s
   grad-graduation-report-api:
     get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
