@@ -320,7 +320,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdult19Rule(student, penStudent, gradStudent);
+        handleAdultStartRule(student, penStudent, gradStudent);
 
         // flags
         if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -361,7 +361,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdult19Rule(student, penStudent, gradStudent);
+        handleAdultStartRule(student, penStudent, gradStudent);
 
         // flags
         gradStudent.setRecalculateGradStatus(null);
@@ -1127,10 +1127,15 @@ public class StudentProcess extends StudentBaseService {
         return "SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade));
     }
 
-    private void handleAdult19Rule(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent) {
-        if ("1950".equalsIgnoreCase(gradStudent.getProgram()) && "AD".equalsIgnoreCase(gradStudent.getStudentGrade())) {
+    private void handleAdultStartRule(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent) {
+        if ("1950".equalsIgnoreCase(gradStudent.getProgram())) {
             Date dob = EducGradDataConversionApiUtils.parseDate(penStudent.getDob());
-            Date adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule()? 19 : 18);
+            Date adultStartDate;
+            if ("AD".equalsIgnoreCase(gradStudent.getStudentGrade())) {
+                adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule() ? 19 : 18);
+            } else {
+                adultStartDate = DateUtils.addYears(dob, 18);
+            }
             gradStudent.setAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
     }
