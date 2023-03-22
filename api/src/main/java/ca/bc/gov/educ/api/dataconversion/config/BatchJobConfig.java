@@ -16,6 +16,7 @@ import org.springframework.batch.core.configuration.support.JobRegistryBeanPostP
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
@@ -25,11 +26,14 @@ import org.springframework.context.annotation.Configuration;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionSystemException;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 
 @Configuration
@@ -225,6 +229,9 @@ public class BatchJobConfig {
                 .faultTolerant()
                 .skip(SQLException.class)
                 .skip(TransactionSystemException.class)
+                .skip(IOException.class)
+                .skip(SocketTimeoutException.class)
+                .skipLimit(100)
                 .reader(studentPartitionReader(restUtils))
                 .processor(studentPartitionProcessor())
                 .writer(studentPartitionWriter())
@@ -282,6 +289,7 @@ public class BatchJobConfig {
     public JobLauncher jobLauncher(JobRepository jobRepository) throws Exception {
         TaskExecutorJobLauncher jobLauncher = new TaskExecutorJobLauncher();
         jobLauncher.setJobRepository(jobRepository);
+        jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
         jobLauncher.afterPropertiesSet();
         return jobLauncher;
     }

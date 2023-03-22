@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -8,6 +9,7 @@ import java.util.*;
 
 @Data
 @NoArgsConstructor
+@JsonSerialize
 public class ConversionStudentSummaryDTO extends ConversionBaseSummaryDTO implements Serializable {
 
   // stats

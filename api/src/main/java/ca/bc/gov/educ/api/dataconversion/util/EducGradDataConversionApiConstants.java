@@ -143,9 +143,6 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-course-api.check-french-language-course.url}")
     private String checkFrenchLanguageCourse;
 
-    @Value("${endpoint.grad-trax-api.school.check-school-by-mincode.url}")
-    private String checkSchoolByMincodeUrl;
-
     @Value("${endpoint.grad-trax-api.student.get-student-no-list-by-page.url}")
     private String traxStudentNoListByPageUrl;
 
@@ -190,9 +187,6 @@ public class EducGradDataConversionApiConstants {
     private String updateGradStudentReport;
     @Value("${endpoint.report-api.achievement_report}")
     private String achievementReport;
-    //sree
-    @Value("${endpoint.grad-trax-api.school.school-by-min-code.url}")
-    private String schoolByMincode;
 
     // Incremental Grad Update
     @Value("${grad.update.enabled}")

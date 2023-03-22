@@ -71,7 +71,6 @@ public class StudentProcess extends StudentBaseService {
     public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload) throws Exception {
         long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
-        String accessToken = summary.getAccessToken();
 
         // School validation
         validateSchool(convGradStudent, summary);
@@ -94,10 +93,10 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // Student conversion process
-        processStudents(convGradStudent, students, summary, accessToken, reload);
+        processStudents(convGradStudent, students, summary, reload);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
-        log.info("************* TIME Taken for pen [{}]  ************ {} secs", convGradStudent.getPen(), diff);
+        log.info("** PEN: {} - {} secs", convGradStudent.getPen(), diff);
         return convGradStudent;
     }
 
@@ -127,7 +126,6 @@ public class StudentProcess extends StudentBaseService {
 
     /**
      *
-     * @param convGradStudent
      * @return true             Valid
      *         false            Bad data (programCompletionDate is null)
      */
@@ -148,7 +146,7 @@ public class StudentProcess extends StudentBaseService {
         return true;
     }
 
-    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, String accessToken, boolean reload) {
+    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
         if (convGradStudent.isGraduated()) {
             log.debug("Process Graduated Students for pen# : " + convGradStudent.getPen());
         } else {
@@ -156,11 +154,11 @@ public class StudentProcess extends StudentBaseService {
         }
         students.forEach(st -> {
             if (reload) {
-                restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), accessToken);
+                restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), summary.getAccessToken());
             }
             GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, summary);
             if (gradStudent != null) {
-                processDependencies(convGradStudent, gradStudent, st, summary, accessToken, reload);
+                processDependencies(convGradStudent, gradStudent, st, summary, reload);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -229,23 +227,23 @@ public class StudentProcess extends StudentBaseService {
     private void processDependencies(ConvGradStudent convGradStudent,
                                      GraduationStudentRecord gradStudent,
                                      Student penStudent,
-                                     ConversionStudentSummaryDTO summary, String accessToken,
+                                     ConversionStudentSummaryDTO summary,
                                      boolean reload) {
         ConversionResultType result;
 
         // process dependencies
         gradStudent.setPen(convGradStudent.getPen());
         if (convGradStudent.isGraduated()) {
-            result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, accessToken, summary);
+            result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, summary);
         } else {
-            result = processOptionalPrograms(gradStudent, accessToken, summary);
+            result = processOptionalPrograms(gradStudent, summary);
         }
 
         if (ConversionResultType.FAILURE != result) {
-            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), accessToken, summary);
+            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), summary);
         }
         if (ConversionResultType.FAILURE != result && !convGradStudent.isGraduated()) {
-            result = processSccpFrenchCertificates(gradStudent, accessToken, summary);
+            result = processSccpFrenchCertificates(gradStudent, summary);
         }
 
         if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -270,12 +268,20 @@ public class StudentProcess extends StudentBaseService {
                 }
                 convGradStudent.setDistributionDate(distributionDate);
             }
-            fetchAccessToken(summary);
-            createAndStoreStudentTranscript(graduationData, convGradStudent, accessToken, reload);
-            fetchAccessToken(summary);
-            createAndStoreStudentCertificates(graduationData, convGradStudent, accessToken, reload);
+            processReports(graduationData, convGradStudent, summary, reload);
         }
         convGradStudent.setResult(result);
+    }
+
+    private void processReports(GraduationData graduationData, ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload) {
+        if (convGradStudent.getTranscriptSchool() != null && "Y".equalsIgnoreCase(convGradStudent.getTranscriptSchool().getTranscriptEligibility())) {
+            fetchAccessToken(summary);
+            createAndStoreStudentTranscript(graduationData, convGradStudent, summary.getAccessToken(), reload);
+        }
+        if (convGradStudent.getCertificateSchool() != null && "Y".equalsIgnoreCase(convGradStudent.getCertificateSchool().getCertificateEligibility())) {
+            fetchAccessToken(summary);
+            createAndStoreStudentCertificates(graduationData, convGradStudent, summary.getAccessToken(), reload);
+        }
     }
 
     private void createAndStoreStudentTranscript(GraduationData graduationData, ConvGradStudent convStudent, String accessToken, boolean reload) {
@@ -314,7 +320,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdult19Rule(student, penStudent, gradStudent);
+        handleAdultStartRule(student, penStudent, gradStudent);
 
         // flags
         if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -355,7 +361,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdult19Rule(student, penStudent, gradStudent);
+        handleAdultStartRule(student, penStudent, gradStudent);
 
         // flags
         gradStudent.setRecalculateGradStatus(null);
@@ -777,25 +783,25 @@ public class StudentProcess extends StudentBaseService {
         return rules;
     }
 
-    private ConversionResultType processOptionalPrograms(GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processOptionalPrograms(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return ConversionResultType.SUCCESS;
         }
 
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF")) {
-            return createStudentOptionalProgram("DD", student, false, accessToken, summary);
+            return createStudentOptionalProgram("DD", student, false, summary);
         }
 
         // French Immersion for 2018-EN, 2004-EN, 1996-EN, 1986-EN
-        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), accessToken)) {
-            return createStudentOptionalProgram("FI", student, false, accessToken, summary);
+        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), summary.getAccessToken())) {
+            return createStudentOptionalProgram("FI", student, false, summary);
         }
 
         return ConversionResultType.SUCCESS;
     }
 
-    private ConversionResultType processOptionalProgramsForGraduatedStudent(ConvGradStudent convGradStudent, GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processOptionalProgramsForGraduatedStudent(ConvGradStudent convGradStudent, GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
         if (StringUtils.isBlank(student.getProgram())) {
             return ConversionResultType.SUCCESS;
         }
@@ -803,12 +809,12 @@ public class StudentProcess extends StudentBaseService {
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(convGradStudent.getEnglishCert(), "E")) {
             student.setDualDogwood(true);
-            return createStudentOptionalProgram("DD", student, true, accessToken, summary);
+            return createStudentOptionalProgram("DD", student, true, summary);
         }
 
         // French Immersion for yyyy-EN to check if their Graduation Message contains "Student has successfully completed the French Immersion program"
         if (student.getProgram().endsWith("-EN") && isFrenchImmersion(convGradStudent.getTranscriptStudentDemog().getGradMessage())) {
-            return createStudentOptionalProgram("FI", student, true, accessToken, summary);
+            return createStudentOptionalProgram("FI", student, true, summary);
         }
 
         return ConversionResultType.SUCCESS;
@@ -839,12 +845,12 @@ public class StudentProcess extends StudentBaseService {
         return frenchImmersion;
     }
 
-    private ConversionResultType processProgramCodes(GraduationStudentRecord student, List<String> programCodes, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processProgramCodes(GraduationStudentRecord student, List<String> programCodes, boolean isGraduated, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType = ConversionResultType.SUCCESS;
         Boolean isCareerProgramCreated = Boolean.FALSE;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
-                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, isGraduated, accessToken, summary);
+                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, isGraduated, summary);
                 if (Boolean.TRUE.equals(res.getRight())) {
                     isCareerProgramCreated = Boolean.TRUE;
                 }
@@ -854,17 +860,17 @@ public class StudentProcess extends StudentBaseService {
                 }
             }
             if (Boolean.TRUE.equals(isCareerProgramCreated)) {
-                resultType = createStudentOptionalProgram("CP", student, isGraduated, accessToken, summary);
+                resultType = createStudentOptionalProgram("CP", student, isGraduated, summary);
             }
         }
         return resultType;
     }
 
-    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
+    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecord student, boolean isGraduated, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType;
         boolean isCareerProgramCreated = false;
         if (isOptionalProgramCode(programCode)) {
-            resultType = createStudentOptionalProgram(programCode, student, isGraduated, accessToken, summary);
+            resultType = createStudentOptionalProgram(programCode, student, isGraduated, summary);
         } else {
             resultType = createStudentCareerProgram(programCode, student, summary);
             if (ConversionResultType.SUCCESS == resultType) {
@@ -874,17 +880,17 @@ public class StudentProcess extends StudentBaseService {
         return Pair.of(resultType, isCareerProgramCreated);
     }
 
-    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
         if (StringUtils.equals(student.getProgram(), "SCCP")
             && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
                  && student.getSchoolOfRecord().startsWith("093") )
         ) {
-            return createStudentOptionalProgram("FR", student, false, accessToken, summary);
+            return createStudentOptionalProgram("FR", student, false, summary);
         }
         return ConversionResultType.SUCCESS;
     }
 
-    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, String accessToken, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setPen(student.getPen());
         object.setStudentID(student.getStudentID());
@@ -893,7 +899,7 @@ public class StudentProcess extends StudentBaseService {
         object.setOptionalProgramCompletionDate(isGraduated? student.getProgramCompletionDate() : null);
 
         try {
-            restUtils.saveStudentOptionalProgram(object, accessToken);
+            restUtils.saveStudentOptionalProgram(object, summary.getAccessToken());
         } catch (Exception e) {
             handleException(null, summary, student.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a StudentOptionalProgram : " + e.getLocalizedMessage());
             return ConversionResultType.FAILURE;
@@ -1121,10 +1127,15 @@ public class StudentProcess extends StudentBaseService {
         return "SCCP".equalsIgnoreCase(graduationProgram) || ("1950".equalsIgnoreCase(graduationProgram) && "AD".equalsIgnoreCase(grade));
     }
 
-    private void handleAdult19Rule(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent) {
-        if ("1950".equalsIgnoreCase(gradStudent.getProgram()) && "AD".equalsIgnoreCase(gradStudent.getStudentGrade())) {
+    private void handleAdultStartRule(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent) {
+        if ("1950".equalsIgnoreCase(gradStudent.getProgram())) {
             Date dob = EducGradDataConversionApiUtils.parseDate(penStudent.getDob());
-            Date adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule()? 19 : 18);
+            Date adultStartDate;
+            if ("AD".equalsIgnoreCase(gradStudent.getStudentGrade())) {
+                adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule() ? 19 : 18);
+            } else {
+                adultStartDate = DateUtils.addYears(dob, 18);
+            }
             gradStudent.setAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
     }
