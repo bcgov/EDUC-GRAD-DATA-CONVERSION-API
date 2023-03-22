@@ -49,6 +49,11 @@ public class CourseProcess {
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSPF").courseLevel("10").ruleCode("302").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSSLF").courseLevel("10").ruleCode("302").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("10").ruleCode("302").build());
+
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("NMDF").courseLevel("11").ruleCode("301").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("11").ruleCode("301").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("SPLFG").courseLevel("11").ruleCode("301").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LCFF").courseLevel("11").ruleCode("301").build());
     }
 
     private static final List<Pair<String, String>> RESTRICTION_IGNORE_LIST = new ArrayList<>();
