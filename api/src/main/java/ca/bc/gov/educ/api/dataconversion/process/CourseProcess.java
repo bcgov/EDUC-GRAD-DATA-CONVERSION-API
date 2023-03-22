@@ -24,6 +24,9 @@ public class CourseProcess {
     private static final String CREATE_USER = "createUser";
     private static final String CREATE_DATE = "createDate";
 
+    // Removal List for Course Requirement
+    private static final String LTSTF_STR = "LTSTF";
+
     // Ignore List for Course Restriction
     private static final String CLEA_STR = "CLEA";
     private static final String CLEB_STR = "CLEB";
@@ -48,10 +51,10 @@ public class CourseProcess {
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSNMF").courseLevel("10").ruleCode("302").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSPF").courseLevel("10").ruleCode("302").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LSSLF").courseLevel("10").ruleCode("302").build());
-        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("10").ruleCode("302").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode(LTSTF_STR).courseLevel("10").ruleCode("302").build());
 
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("NMDF").courseLevel("11").ruleCode("301").build());
-        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LTSTF").courseLevel("11").ruleCode("301").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode(LTSTF_STR).courseLevel("11").ruleCode("301").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("SPLFG").courseLevel("11").ruleCode("301").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LCFF").courseLevel("11").ruleCode("301").build());
     }
@@ -613,7 +616,7 @@ public class CourseProcess {
         createCourseRequirement(populate("NMDF", "11", "201"), summary);
 
         // LTSTF 11
-        createCourseRequirement(populate("LTSTF", "11", "201"), summary);
+        createCourseRequirement(populate(LTSTF_STR, "11", "201"), summary);
 
         // Adult Work Experience
         createCourseRequirement(populate("CPWE", "12", "506"), summary);
