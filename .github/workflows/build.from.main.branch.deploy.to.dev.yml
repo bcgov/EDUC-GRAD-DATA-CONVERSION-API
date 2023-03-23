@@ -23,7 +23,7 @@ env:
   TAG: "latest"
   MIN_CPU: "50m"
   MAX_CPU: "500m"
-  MIN_MEM: "1024Mi"
+  MIN_MEM: "1Gi"
   MAX_MEM: "2Gi"
   MIN_REPLICAS: "3"
   MAX_REPLICAS: "3"
