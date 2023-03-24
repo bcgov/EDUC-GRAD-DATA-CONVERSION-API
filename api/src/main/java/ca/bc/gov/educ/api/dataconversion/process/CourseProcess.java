@@ -55,7 +55,7 @@ public class CourseProcess {
 
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("NMDF").courseLevel("11").ruleCode("301").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode(LTSTF_STR).courseLevel("11").ruleCode("301").build());
-        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("SPLFG").courseLevel("11").ruleCode("301").build());
+        REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("SPLGF").courseLevel("11").ruleCode("301").build());
         REMOVAL_LIST.add(CourseRequirementDTO.builder().courseCode("LCFF").courseLevel("11").ruleCode("301").build());
     }
 
