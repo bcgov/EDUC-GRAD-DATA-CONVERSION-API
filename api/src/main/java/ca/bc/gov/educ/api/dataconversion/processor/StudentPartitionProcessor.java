@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.TraxStudentNo;
 import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +40,20 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 			List<ConvGradStudent> students = restUtils.getTraxStudentMasterDataByPen(pen, summaryDTO.getAccessToken());
 			if (students != null && !students.isEmpty()) {
 				responseStudent = students.get(0);
+				if (responseStudent.getResult() != null &&
+					responseStudent.getResult().equals(ConversionResultType.FAILURE)) {
+					String reason = "";
+					if (responseStudent.getStudentLoadType() == StudentLoadType.GRAD_TWO) {
+						reason = "ERROR-Skip data: [graduated - two programs] not implemented yet";
+					} else if (responseStudent.getStudentLoadType() == StudentLoadType.NONE) {
+						reason = "ERROR-Bad data: student is not in [ungrad, grad_one, grad_two]";
+					} else {
+						reason = "ERROR-Bad data: unknown error from TRAX";
+					}
+					summaryDTO.setErroredCount(summaryDTO.getErroredCount() + 1L);
+					restUtils.saveTraxStudentNo(new TraxStudentNo(pen, "F", reason), summaryDTO.getAccessToken());
+					return null;
+				}
 				// convert
 				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO, StringUtils.equalsIgnoreCase(reload, "Y"));
 			}

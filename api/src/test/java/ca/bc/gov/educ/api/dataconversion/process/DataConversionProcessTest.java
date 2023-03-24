@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
+import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -67,7 +68,7 @@ public class DataConversionProcessTest {
                 .studentStatus("A")
                 .archiveFlag("A")
                 .graduationRequirementYear("2020")
-                .graduated(false)
+                .studentLoadType(StudentLoadType.UNGRAD)
             .build();
         List<ConvGradStudent> results = new ArrayList<>();
         results.add(obj);

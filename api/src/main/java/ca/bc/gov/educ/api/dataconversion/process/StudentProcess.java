@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
@@ -102,7 +103,7 @@ public class StudentProcess extends StudentBaseService {
 
     private void validateSchool(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
         // School Category Code form School API
-        if (convGradStudent.isGraduated() && StringUtils.isBlank(convGradStudent.getTranscriptSchoolCategoryCode())) {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE && StringUtils.isBlank(convGradStudent.getTranscriptSchoolCategoryCode())) {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "School does not exist in SPM School data : mincode [" + convGradStudent.getSchoolOfRecord() + "]");
             return;
         }
@@ -130,7 +131,7 @@ public class StudentProcess extends StudentBaseService {
      *         false            Bad data (programCompletionDate is null)
      */
     private boolean validateProgramCompletionDate(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
-        if (!convGradStudent.isGraduated()) {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
             return true;
         }
         if (!"SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
@@ -147,7 +148,7 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
-        if (convGradStudent.isGraduated()) {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
             log.debug("Process Graduated Students for pen# : " + convGradStudent.getPen());
         } else {
             log.debug("Process Non-Graduated Students for pen# : " + convGradStudent.getPen());
@@ -180,7 +181,7 @@ public class StudentProcess extends StudentBaseService {
         }
         if (gradStudent != null) { // update
             gradStudent.setPen(penStudent.getPen());
-            if (convGradStudent.isGraduated()) {
+            if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
                 convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
             } else {
                 convertStudentData(convGradStudent, penStudent, gradStudent, summary);
@@ -201,7 +202,7 @@ public class StudentProcess extends StudentBaseService {
             gradStudent = new GraduationStudentRecord();
             gradStudent.setPen(penStudent.getPen());
             gradStudent.setStudentID(studentID);
-            if (convGradStudent.isGraduated()) {
+            if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
                 convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
             } else {
                 convertStudentData(convGradStudent, penStudent, gradStudent, summary);
@@ -233,20 +234,20 @@ public class StudentProcess extends StudentBaseService {
 
         // process dependencies
         gradStudent.setPen(convGradStudent.getPen());
-        if (convGradStudent.isGraduated()) {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
             result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, summary);
         } else {
             result = processOptionalPrograms(gradStudent, summary);
         }
 
         if (ConversionResultType.FAILURE != result) {
-            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.isGraduated(), summary);
+            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE, summary);
         }
-        if (ConversionResultType.FAILURE != result && !convGradStudent.isGraduated()) {
+        if (ConversionResultType.FAILURE != result && convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
             result = processSccpFrenchCertificates(gradStudent, summary);
         }
 
-        if (convGradStudent.isGraduated() && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             // Building GraduationData CLOB data
             GraduationData graduationData = buildGraduationData(convGradStudent, gradStudent, penStudent, summary);
             try {
