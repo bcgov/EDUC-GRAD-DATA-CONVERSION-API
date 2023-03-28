@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
@@ -109,7 +110,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -161,7 +162,8 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
-                .transcriptSchool(school).graduated(false)
+                .transcriptSchool(school)
+                .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -204,7 +206,8 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
-                .transcriptSchool(school).graduated(false)
+                .transcriptSchool(school)
+                .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -246,7 +249,8 @@ public class StudentProcessTest {
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
                 .studentGrade("AD").studentStatus("A")
                 .schoolOfRecord(mincode).graduationRequirementYear("1950")
-                .transcriptSchool(school).graduated(false)
+                .transcriptSchool(school)
+                .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -315,7 +319,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
-                .transcriptSchool(school).graduated(false)
+                .transcriptSchool(school).studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -392,7 +396,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
                 .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
-                .transcriptSchool(school).graduated(false)
+                .transcriptSchool(school).studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -468,7 +472,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("1986").graduated(false)
+                .studentStatus("M").schoolOfRecord(mincode).graduationRequirementYear("1986").studentLoadType(StudentLoadType.UNGRAD)
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -544,7 +548,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").graduated(false)
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").studentLoadType(StudentLoadType.UNGRAD)
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -621,7 +625,7 @@ public class StudentProcessTest {
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").graduated(false)
+                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").studentLoadType(StudentLoadType.UNGRAD)
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -670,7 +674,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
                 .programCompletionDate(null)
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -739,7 +743,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -807,7 +811,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -883,7 +887,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -960,7 +964,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
                 .programCompletionDate(null)
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -1210,7 +1214,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -1466,7 +1470,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2004-EN")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -1722,7 +1726,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2004-EN")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -1964,7 +1968,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -2204,7 +2208,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -2445,7 +2449,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-PF")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -2628,7 +2632,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("1950")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -2809,7 +2813,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("1950")
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -2992,7 +2996,7 @@ public class StudentProcessTest {
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
                 .slpDate("202206")
                 .sccDate("20220601")
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")
@@ -3175,7 +3179,7 @@ public class StudentProcessTest {
                 .programCompletionDate(new Date(System.currentTimeMillis() - 100000L))
                 .slpDate("20220601")
                 .sccDate("20220601")
-                .graduated(true)
+                .studentLoadType(StudentLoadType.GRAD_ONE)
                 .gpa("3.5")
                 .honoursStanding("Y")
                 .archiveFlag("A")

@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
@@ -52,12 +53,12 @@ public class StudentBaseService {
     }
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
-        String gradProgram = student.isGraduated() ?
+        String gradProgram = student.getStudentLoadType() == StudentLoadType.GRAD_ONE ?
             getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getTranscriptStudentDemog().getGradMessage())
             : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
-            updateProgramCountsInSummary(summary, gradProgram, student.isGraduated());
+            updateProgramCountsInSummary(summary, gradProgram, student.getStudentLoadType() == StudentLoadType.GRAD_ONE );
             return true;
         } else {
             // error
