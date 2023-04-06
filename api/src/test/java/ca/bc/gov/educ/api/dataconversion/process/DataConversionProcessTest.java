@@ -5,7 +5,6 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.process.DataConversionProcess;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.After;
 import org.junit.Before;

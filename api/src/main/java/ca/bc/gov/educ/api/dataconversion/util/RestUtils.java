@@ -493,6 +493,7 @@ public class RestUtils {
     }
 
     // Read GraduationStudentRecord  - GET /student/studentid/{id}/algorithm
+    @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
     public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
         return webClient.get().uri(String.format(constants.getReadGraduationStudentRecord(),studentID))
                 .headers(h -> {
@@ -502,6 +503,7 @@ public class RestUtils {
     }
 
     // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
+    @Retry(name = "rt-saveStudentGradStatus", fallbackMethod = "rtSaveStudentGradStatusFallback")
     public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, boolean ongoingUpdate, String accessToken) {
         return webClient.post()
                 .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
@@ -578,5 +580,15 @@ public class RestUtils {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Career Program Not Found"))).bodyToMono(Void.class).block();
+    }
+
+    public ConvGradStudent rtGetStudentGradStatusFallback(HttpServerErrorException exception){
+        log.error("STUDENT GRAD STATUS NOT Retrievable after many attempts: {}", exception);
+        return null;
+    }
+
+    public ConvGradStudent rtSaveStudentGradStatusFallback(HttpServerErrorException exception){
+        log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception);
+        return null;
     }
 }

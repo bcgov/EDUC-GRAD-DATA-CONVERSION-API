@@ -13,7 +13,6 @@ import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import ca.bc.gov.educ.api.dataconversion.util.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -22,7 +21,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -94,7 +92,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // Student conversion process
-        processStudents(convGradStudent, students, summary, reload);
+        process(convGradStudent, students, summary, reload);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
         log.info("** PEN: {} - {} secs", convGradStudent.getPen(), diff);
@@ -103,7 +101,7 @@ public class StudentProcess extends StudentBaseService {
 
     private void validateSchool(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
         // School Category Code form School API
-        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE && StringUtils.isBlank(convGradStudent.getTranscriptSchoolCategoryCode())) {
+        if (convGradStudent.getStudentLoadType() != StudentLoadType.UNGRAD && StringUtils.isBlank(convGradStudent.getTranscriptSchoolCategoryCode())) {
             handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "School does not exist in SPM School data : mincode [" + convGradStudent.getSchoolOfRecord() + "]");
             return;
         }
@@ -131,28 +129,66 @@ public class StudentProcess extends StudentBaseService {
      *         false            Bad data (programCompletionDate is null)
      */
     private boolean validateProgramCompletionDate(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
-        if (convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
-            return true;
-        }
-        if (!"SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-            convGradStudent.getProgramCompletionDate() == null) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: grad_date is null for " + convGradStudent.getGraduationRequirementYear());
-            return false;
-        }
-        if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-                StringUtils.isBlank(convGradStudent.getSlpDate())) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
-            return false;
+        switch(convGradStudent.getStudentLoadType()) {
+            case GRAD_ONE -> {
+                if (!"SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
+                        convGradStudent.getProgramCompletionDate() == null) {
+                    handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: grad_date is null for " + convGradStudent.getGraduationRequirementYear());
+                    return false;
+                }
+                if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
+                        StringUtils.isBlank(convGradStudent.getSlpDate())) {
+                    handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
+                    return false;
+                }
+            }
+            case GRAD_TWO -> {
+                if (!"SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
+                        StringUtils.isBlank(convGradStudent.getSccDate())) {
+                    handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data for graduated - 2 programs: scc_date is null for " + convGradStudent.getGraduationRequirementYear());
+                    return false;
+                }
+            }
+            default -> {
+                return true;
+            }
         }
         return true;
     }
 
-    private void processStudents(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
-        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
-            log.debug("Process Graduated Students for pen# : " + convGradStudent.getPen());
-        } else {
-            log.debug("Process Non-Graduated Students for pen# : " + convGradStudent.getPen());
+    private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+        switch (convGradStudent.getStudentLoadType()) {
+            case GRAD_ONE -> {
+                log.debug("Process Graduated Student - 1 Program for pen# : " + convGradStudent.getPen());
+                processConversion(convGradStudent, students, summary, reload);
+            }
+            case UNGRAD -> {
+                log.debug("Process Non-Graduated Student for pen# : " + convGradStudent.getPen());
+                processConversion(convGradStudent, students, summary, reload);
+            }
+            case GRAD_TWO -> {
+                log.debug("Process Graduated Student - 2 Programs for pen# : " + convGradStudent.getPen());
+                // phase 1
+                String graduationRequirementYear = convGradStudent.getGraduationRequirementYear();
+                convGradStudent.setGraduationRequirementYear("SCCP");
+                convGradStudent.setStudentLoadType(StudentLoadType.GRAD_ONE);
+                processConversion(convGradStudent, students, summary, reload);
+                // phase 2
+                convGradStudent.setGraduationRequirementYear(graduationRequirementYear);
+                convGradStudent.setSccDate(null);
+                convGradStudent.setSlpDate(null);
+                if (convGradStudent.getProgramCompletionDate() != null) {
+                    convGradStudent.setStudentLoadType(StudentLoadType.GRAD_ONE);
+                } else {
+                    convGradStudent.setStudentLoadType(StudentLoadType.UNGRAD);
+                }
+                processConversion(convGradStudent, students, summary, false);
+            }
+            default -> log.debug("skip process");
         }
+    }
+
+    private void processConversion(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
         students.forEach(st -> {
             if (reload) {
                 restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), summary.getAccessToken());
@@ -168,7 +204,6 @@ public class StudentProcess extends StudentBaseService {
         });
     }
 
-    @Retry(name = "rt-convertStudent", fallbackMethod = "rtConvertStudentFallback")
     private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, ConversionStudentSummaryDTO summary) {
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         GraduationStudentRecord gradStudent = null;
@@ -181,10 +216,10 @@ public class StudentProcess extends StudentBaseService {
         }
         if (gradStudent != null) { // update
             gradStudent.setPen(penStudent.getPen());
-            if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
-                convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
-            } else {
+            if (convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
                 convertStudentData(convGradStudent, penStudent, gradStudent, summary);
+            } else {
+                convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 gradStudent.setUpdateDate(null);
@@ -202,10 +237,10 @@ public class StudentProcess extends StudentBaseService {
             gradStudent = new GraduationStudentRecord();
             gradStudent.setPen(penStudent.getPen());
             gradStudent.setStudentID(studentID);
-            if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
-                convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
-            } else {
+            if (convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
                 convertStudentData(convGradStudent, penStudent, gradStudent, summary);
+            } else {
+                convertGraduatedStudentData(convGradStudent, penStudent, gradStudent, summary);
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 try {
@@ -234,20 +269,20 @@ public class StudentProcess extends StudentBaseService {
 
         // process dependencies
         gradStudent.setPen(convGradStudent.getPen());
-        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE) {
-            result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, summary);
-        } else {
+        if (convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
             result = processOptionalPrograms(gradStudent, summary);
+        } else {
+            result = processOptionalProgramsForGraduatedStudent(convGradStudent, gradStudent, summary);
         }
 
         if (ConversionResultType.FAILURE != result) {
-            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE, summary);
+            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.getStudentLoadType() != StudentLoadType.UNGRAD, summary);
         }
         if (ConversionResultType.FAILURE != result && convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
             result = processSccpFrenchCertificates(gradStudent, summary);
         }
 
-        if (convGradStudent.getStudentLoadType() == StudentLoadType.GRAD_ONE && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
+        if (convGradStudent.getStudentLoadType() != StudentLoadType.UNGRAD && !StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             // Building GraduationData CLOB data
             GraduationData graduationData = buildGraduationData(convGradStudent, gradStudent, penStudent, summary);
             try {
@@ -293,8 +328,10 @@ public class StudentProcess extends StudentBaseService {
     private void createAndStoreStudentCertificates(GraduationData graduationData, ConvGradStudent convStudent, String accessToken, boolean reload) {
         List<ProgramCertificateTranscript> certificateList = reportProcess.getCertificateList(graduationData,
             convStudent.getCertificateSchoolCategoryCode() != null? convStudent.getCertificateSchoolCategoryCode() : convStudent.getTranscriptSchoolCategoryCode(), accessToken);
+        int i = 0;
         for (ProgramCertificateTranscript certType : certificateList) {
-            reportProcess.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType, reload);
+            reportProcess.saveStudentCertificateReportJasper(graduationData, convStudent, accessToken, certType, i == 0 && reload);
+            i++;
         }
     }
 
@@ -687,26 +724,24 @@ public class StudentProcess extends StudentBaseService {
         }
         GradRequirement gradRequirement = new GradRequirement();
         gradRequirement.setProjected(false);
-        switch(optionalProgramCode) {
-            case "AD":  // 951
+        switch (optionalProgramCode) {
+            case "AD" -> {  // 951
                 gradRequirement.setRule("951");
                 gradRequirement.setDescription("A school must report the student as participating in the Advanced Placement program");
-                break;
-            case "BC": //
+            }
+            case "BC" -> { //
                 gradRequirement.setRule("952");
                 gradRequirement.setDescription("The school must report the student as participating in the International Baccalaureate program as a Certificate candidate");
-                break;
-            case "BD":
+            }
+            case "BD" -> {
                 gradRequirement.setRule("953");
                 gradRequirement.setDescription("The school must report the student as participating in the International Baccalaureate program as a Diploma candidate");
-                break;
-            case "CP":
+            }
+            case "CP" -> {
                 gradRequirement.setRule("954");
                 gradRequirement.setDescription("The school must report the student as participating in a Career Program");
-                break;
-            default:
-                gradRequirement = null;
-                break;
+            }
+            default -> gradRequirement = null;
         }
         return gradRequirement;
     }
@@ -823,25 +858,22 @@ public class StudentProcess extends StudentBaseService {
 
     public boolean hasAnyFrenchImmersionCourse(String program, String pen, String accessToken) {
         boolean frenchImmersion = false;
-        switch(program) {
-            case "2018-EN":
-            case "2004-EN":
+        switch (program) {
+            case "2018-EN", "2004-EN" -> {
                 if (courseProcess.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
                     frenchImmersion = true;
                 }
-                break;
-            case "1996-EN":
+            }
+            case "1996-EN" -> {
                 if (courseProcess.isFrenchImmersionCourse(pen, "11", accessToken)) { // FRAL 11 or FRALP 11
                     frenchImmersion = true;
                 }
-                break;
-            case "1986-EN":
+            }
+            case "1986-EN" -> {
                 if (courseProcess.isFrenchImmersionCourseForEN(pen, "11", accessToken)) { // FRAL 11
                     frenchImmersion = true;
                 }
-                break;
-            default:
-                break;
+            }
         }
         return frenchImmersion;
     }
@@ -1158,10 +1190,5 @@ public class StudentProcess extends StudentBaseService {
             summaryDTO.setAccessToken(res.getAccess_token());
             log.debug("Setting the new access token in summaryDTO.");
         }
-    }
-
-    public ConvGradStudent rtConvertStudentFallback(HttpServerErrorException exception){
-        log.error("STUDENT NOT LOADABLE after many attempts: {}", exception);
-        return null;
     }
 }
