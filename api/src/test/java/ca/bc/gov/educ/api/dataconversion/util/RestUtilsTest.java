@@ -561,4 +561,16 @@ public class RestUtilsTest {
         val result = this.restUtils.rtGetTokenFallBack(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
         assertThat(result).isNull();
     }
+
+    @Test
+    public void testGetStudentFallBackMethod_givenException_shouldReturnNull(){
+        val result = this.restUtils.rtGetStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testSaveStudentFallBackMethod_givenException_shouldReturnNull(){
+        val result = this.restUtils.rtSaveStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
+        assertThat(result).isNull();
+    }
 }

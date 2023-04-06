@@ -53,12 +53,12 @@ public class StudentBaseService {
     }
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
-        String gradProgram = student.getStudentLoadType() == StudentLoadType.GRAD_ONE ?
-            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getTranscriptStudentDemog().getGradMessage())
-            : getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
+        String gradProgram = student.getStudentLoadType() == StudentLoadType.UNGRAD?
+            getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood()) :
+            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getTranscriptStudentDemog().getGradMessage());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
-            updateProgramCountsInSummary(summary, gradProgram, student.getStudentLoadType() == StudentLoadType.GRAD_ONE );
+            updateProgramCountsInSummary(summary, gradProgram, student.getStudentLoadType() != StudentLoadType.UNGRAD);
             return true;
         } else {
             // error
@@ -69,71 +69,50 @@ public class StudentBaseService {
 
     protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord, String frenchDogwood) {
         String gradProgram = null;
-        switch(graduationRequirementYear) {
-            case "2018":
+        switch (graduationRequirementYear) {
+            case "2018" -> {
                 if (schoolOfRecord.startsWith("093")) {
                     gradProgram = "2018-PF";
                 } else {
                     gradProgram = "2018-EN";
                 }
-                break;
-            case "2004":
+            }
+            case "2004" -> {
                 if (schoolOfRecord.startsWith("093")) {
                     gradProgram = "2004-PF";
                 } else {
                     gradProgram = "2004-EN";
                 }
-                break;
-            case "1996":
+            }
+            case "1996" -> {
                 if (schoolOfRecord.startsWith("093")) {
                     gradProgram = "1996-PF";
                 } else {
                     gradProgram = "1996-EN";
                 }
-                break;
-            case "1986":
+            }
+            case "1986" -> {
                 if ("Y".equalsIgnoreCase(frenchDogwood)) {
                     gradProgram = "1986-PF";
                 } else {
                     gradProgram = "1986-EN";
                 }
-                break;
-            case "1950":
-                gradProgram = "1950";
-                break;
-            case "SCCP":
-                gradProgram = "SCCP";
-                break;
-            default:
-                break;
+            }
+            case "1950" -> gradProgram = "1950";
+            case "SCCP" -> gradProgram = "SCCP";
         }
         return gradProgram;
     }
 
     protected String getGradProgramForGraduatedStudent(String graduationRequirementYear, String gradMessage) {
         String gradProgram = null;
-        switch(graduationRequirementYear) {
-            case "2018":
-                gradProgram = isProgramFrancophone(gradMessage)? "2018-PF" : "2018-EN";
-                break;
-            case "2004":
-                gradProgram = isProgramFrancophone(gradMessage)? "2004-PF" : "2004-EN";
-                break;
-            case "1996":
-            case "1995":
-                gradProgram = isProgramFrancophone(gradMessage)? "1996-PF" : "1996-EN";
-                break;
-            case "1986":
-                gradProgram = isProgramFrancophone(gradMessage)? "1986-PF" : "1986-EN";
-                break;
-            case "1950":
-                gradProgram = "1950";
-                break;
-            case "SCCP":
-                gradProgram = "SCCP";
-                break;
-            default:
-                break;
+        switch (graduationRequirementYear) {
+            case "2018" -> gradProgram = isProgramFrancophone(gradMessage) ? "2018-PF" : "2018-EN";
+            case "2004" -> gradProgram = isProgramFrancophone(gradMessage) ? "2004-PF" : "2004-EN";
+            case "1996", "1995" -> gradProgram = isProgramFrancophone(gradMessage) ? "1996-PF" : "1996-EN";
+            case "1986" -> gradProgram = isProgramFrancophone(gradMessage) ? "1986-PF" : "1986-EN";
+            case "1950" -> gradProgram = "1950";
+            case "SCCP" -> gradProgram = "SCCP";
         }
         return gradProgram;
     }
