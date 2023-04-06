@@ -128,7 +128,14 @@ resilience4j.retry:
         - org.springframework.web.client.HttpServerErrorException
       ignoreExceptions:
         - java.lang.NullPointerException
-    rt-convertStudent:
+    rt-getStudentGradStatus:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
+    rt-saveStudentGradStatus:
       maxAttempts: ${MAX_RETRY_ATTEMPTS}
       waitDuration: 5s
       retryExceptions:
