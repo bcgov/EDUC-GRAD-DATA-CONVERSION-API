@@ -986,12 +986,28 @@ public class CourseProcessTest {
         assertThat(summary.getAddedCountForCourseRequirement()).isGreaterThan(0L);
     }
 
+    @Test
+    public void testConvertCourseRequirement_whenStartSessionIsSameAsEndSession_then_skipLoading() {
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
+        summary.setAccessToken("123");
+
+        GradCourse traxCourse = prepareCourseRequirementData("1996", "ASK", "10", "732", null,false);
+        traxCourse.setEndSession(traxCourse.getStartSession());
+        traxCourse.setAppliedSkills("Y");
+        traxCourse.setFineArts("Y");
+
+        courseProcess.convertCourseRequirement(traxCourse, summary);
+        assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(0L);
+    }
+
 
     private GradCourse prepareCourseRequirementData(String reqtYear, String courseCode, String courseLevel, String ruleCode, String lang, boolean isUpdateMode) {
         GradCourse traxCourse = new GradCourse();
         traxCourse.setCourseCode(courseCode);
         traxCourse.setCourseLevel(courseLevel);
         traxCourse.setGradReqtYear(reqtYear);
+        traxCourse.setStartSession("200107");
+        traxCourse.setEndSession("208001");
 
         CourseRequirementCodeDTO ruleCodeEntity = new CourseRequirementCodeDTO();
         ruleCodeEntity.setCourseRequirementCode(ruleCode);
