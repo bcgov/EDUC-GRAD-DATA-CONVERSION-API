@@ -997,7 +997,7 @@ public class CourseProcessTest {
         traxCourse.setFineArts("Y");
 
         courseProcess.convertCourseRequirement(traxCourse, summary);
-        assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(0L);
+        assertThat(summary.getAddedCountForCourseRequirement()).isZero();
     }
 
 
