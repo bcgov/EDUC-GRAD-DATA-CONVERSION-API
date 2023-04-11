@@ -83,7 +83,7 @@ public class StudentProcessTest {
         String mincode = "222333";
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
                 .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -129,7 +129,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
                 .transcriptSchool(school)
                 .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
@@ -200,7 +200,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("SCCP")
                 .transcriptSchool(school)
                 .studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(new ArrayList<>()).build();
@@ -242,7 +242,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
-                .studentGrade("AD").studentStatus("A")
+                .studentGrade("AD").archiveFlag("A").studentStatus("A")
                 .schoolOfRecord(mincode).graduationRequirementYear("1950")
                 .transcriptSchool(school)
                 .studentLoadType(StudentLoadType.UNGRAD)
@@ -313,7 +313,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
                 .transcriptSchool(school).studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -390,7 +390,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("2018")
                 .transcriptSchool(school).studentLoadType(StudentLoadType.UNGRAD)
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -543,7 +543,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").studentLoadType(StudentLoadType.UNGRAD)
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1996").studentLoadType(StudentLoadType.UNGRAD)
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -620,7 +620,84 @@ public class StudentProcessTest {
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").studentLoadType(StudentLoadType.UNGRAD)
+                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").studentLoadType(StudentLoadType.UNGRAD)
+                .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
+        ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
+        summary.setAccessToken("123");
+        var result = studentProcess.convertStudent(student, summary, false);
+
+        assertThat(result).isNotNull();
+        assertThat(result.getPen()).isEqualTo(pen);
+        assertThat(result.getGraduationRequirementYear()).isEqualTo("1986");
+        assertThat(result.getProgram()).isEqualTo(specialProgram.getGraduationProgramCode());
+
+    }
+
+    @Test
+    public void convertArchivedStudent_whenGiven1986Data_withFrenchImmersionSpecialProgram_thenReturnSuccess() throws Exception {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+        String mincode = "222333";
+
+        School school = new School();
+        school.setMinCode(mincode);
+        school.setSchoolName("Test School");
+
+        Student penStudent = new Student();
+        penStudent.setStudentID(studentID.toString());
+        penStudent.setPen(pen);
+
+        GraduationStudentRecord gradStudent = new GraduationStudentRecord();
+        gradStudent.setStudentID(studentID);
+        gradStudent.setPen(pen);
+        gradStudent.setProgram("1986-EN");
+        gradStudent.setStudentGrade("12");
+        gradStudent.setStudentStatus("ARC");
+
+        OptionalProgram specialProgram = new OptionalProgram();
+        specialProgram.setOptionalProgramID(UUID.randomUUID());
+        specialProgram.setGraduationProgramCode("1986-EN");
+        specialProgram.setOptProgramCode("FI");
+        specialProgram.setOptionalProgramName("French Immersion");
+
+        StudentOptionalProgram studentOptionalProgram = new StudentOptionalProgram();
+        studentOptionalProgram.setId(UUID.randomUUID());
+        studentOptionalProgram.setStudentID(studentID);
+        studentOptionalProgram.setOptionalProgramID(specialProgram.getOptionalProgramID());
+        studentOptionalProgram.setOptionalProgramName(specialProgram.getOptionalProgramName());
+        studentOptionalProgram.setPen(pen);
+
+        StudentOptionalProgramRequestDTO specialProgramReq = new StudentOptionalProgramRequestDTO();
+        specialProgramReq.setId(studentOptionalProgram.getId());
+        specialProgramReq.setStudentID(studentID);
+        specialProgramReq.setMainProgramCode(gradStudent.getProgram());
+        specialProgramReq.setOptionalProgramCode(specialProgram.getOptProgramCode());
+        specialProgramReq.setPen(pen);
+
+        CareerProgram careerProgram = new CareerProgram();
+        careerProgram.setCode("XC");
+        careerProgram.setDescription("XC Test");
+        careerProgram.setStartDate(new Date(System.currentTimeMillis() - 100000L).toString());
+        careerProgram.setEndDate(new Date(System.currentTimeMillis() + 100000L).toString());
+
+        StudentCareerProgram studentCareerProgram = new StudentCareerProgram();
+        studentCareerProgram.setId(UUID.randomUUID());
+        studentCareerProgram.setStudentID(studentID);
+        studentCareerProgram.setCareerProgramCode("XC");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
+        when(this.courseProcess.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
+        when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
+        when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
+        when(this.restUtils.saveStudentCareerProgram(studentCareerProgram, "123")).thenReturn(studentCareerProgram);
+        when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
+        when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
+        when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
+
+        ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
+                .archiveFlag("I").studentStatus("A").schoolOfRecord(mincode).graduationRequirementYear("1986").studentLoadType(StudentLoadType.UNGRAD)
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");

@@ -364,6 +364,9 @@ public class StudentProcess extends StudentBaseService {
         if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
             gradStudent.setRecalculateGradStatus(null);
             gradStudent.setRecalculateProjectedGrad(null);
+        } else if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_ARCHIVED)) {
+            gradStudent.setRecalculateGradStatus("Y");
+            gradStudent.setRecalculateProjectedGrad(null);
         } else {
             gradStudent.setRecalculateGradStatus("Y");
             gradStudent.setRecalculateProjectedGrad("Y");
