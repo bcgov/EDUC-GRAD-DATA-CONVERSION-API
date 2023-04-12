@@ -169,6 +169,9 @@ public class CourseProcess {
 
     public GradCourse convertCourseRequirement(GradCourse courseRequirement, ConversionCourseSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
+        if (!validateGradCourse(courseRequirement)) {
+            return courseRequirement;
+        }
         processEnglish(courseRequirement, summary);
         processSocials(courseRequirement, summary);
         processMath(courseRequirement, summary);
@@ -181,6 +184,10 @@ public class CourseProcess {
         processFineArts(courseRequirement, summary);
         processCareerLifeConnections(courseRequirement, summary);
         return courseRequirement;
+    }
+
+    private boolean validateGradCourse(GradCourse gradCourse) {
+        return !StringUtils.equalsIgnoreCase(gradCourse.getStartSession(), gradCourse.getEndSession());
     }
 
     private void processEnglish(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
