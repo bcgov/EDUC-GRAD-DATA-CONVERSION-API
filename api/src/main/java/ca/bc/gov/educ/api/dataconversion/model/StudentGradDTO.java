@@ -19,7 +19,8 @@ public class StudentGradDTO extends  StudentCommonDTO {
     private String newSchoolOfRecord;
     private String newSchoolAtGrad;
     private String newStudentGrade;
-    private String newStudentStatus;;
+    private String newStudentStatus;
+    private String newAdultStartDate;
 
     // new flags
     private String newRecalculateGradStatus;

@@ -3708,6 +3708,42 @@ public class StudentProcessTest {
     }
 
     @Test
+    public void testSaveGraduationStudent_whenENisChangedTo1950Adult_then_returnAPICallSuccess() {
+        String program = "2018-EN";
+
+        UUID studentID = UUID.randomUUID();
+
+        GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
+        graduationStudentRecord.setStudentID(studentID);
+        graduationStudentRecord.setProgram(program);
+        graduationStudentRecord.setStudentGrade("11");
+        graduationStudentRecord.setStudentStatus("CUR");
+        graduationStudentRecord.setSchoolOfRecord("222336");
+
+        when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
+
+        StudentGradDTO requestStudent = new StudentGradDTO();
+        requestStudent.setStudentID(studentID);
+        requestStudent.setProgram(program);
+        requestStudent.setNewProgram("1950");
+        requestStudent.setNewStudentGrade("AD");
+        requestStudent.setNewSchoolOfRecord("333456");
+        requestStudent.setNewSchoolAtGrad("333456");
+        requestStudent.setNewStudentStatus("ARC");
+        requestStudent.setNewRecalculateGradStatus("Y");
+        requestStudent.setNewRecalculateProjectedGrad("Y");
+        requestStudent.setNewAdultStartDate("2010-01-01");
+
+        boolean exceptionIsThrown = false;
+        try {
+            studentProcess.saveGraduationStudent(requestStudent, "123");
+        } catch (Exception e) {
+            exceptionIsThrown = true;
+        }
+        assertThat(exceptionIsThrown).isFalse();
+    }
+
+    @Test
     public void testLoadStudentData_whenPENStudentAPIisDown_returnsNull() {
         // ID
         UUID studentID = UUID.randomUUID();
