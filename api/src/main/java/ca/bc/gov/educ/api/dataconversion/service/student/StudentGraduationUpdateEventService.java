@@ -6,13 +6,16 @@ import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import static ca.bc.gov.educ.api.dataconversion.constant.EventStatus.PROCESSED;
 import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPD_GRAD;
@@ -72,6 +75,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord(), null);
         if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
             handleProgramChange(gradProgram, currentStudent);
+            handleAdultStartDate(currentStudent);
             if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
                 // Transcript
                 currentStudent.setNewRecalculateGradStatus("Y");
@@ -153,6 +157,14 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         currentStudent.setAddDualDogwood(addDualDogwood);
         currentStudent.setDeleteDualDogwood(deleteDualDogwood);
         currentStudent.setNewProgram(newGradProgram);
+    }
+
+    private void handleAdultStartDate(StudentGradDTO currentStudent) {
+        if (StringUtils.equalsIgnoreCase(currentStudent.getNewProgram(), "1950") && StringUtils.isBlank(currentStudent.getAdultStartDate())) {
+            Date dob = EducGradDataConversionApiUtils.parseDate(currentStudent.getBirthday());
+            Date adultStartDate = DateUtils.addYears(dob, 18);
+            currentStudent.setNewAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
+        }
     }
 
     @Override

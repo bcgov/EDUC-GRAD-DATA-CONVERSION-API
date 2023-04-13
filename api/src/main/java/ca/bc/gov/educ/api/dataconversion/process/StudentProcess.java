@@ -1071,6 +1071,9 @@ public class StudentProcess extends StudentBaseService {
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolAtGrad())) {
                 object.setSchoolAtGrad(gradStudent.getNewSchoolAtGrad());
             }
+            if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
+                object.setAdultStartDate(gradStudent.getNewAdultStartDate());
+            }
             if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
                 object.setRecalculateGradStatus(gradStudent.getNewRecalculateGradStatus());
             }
