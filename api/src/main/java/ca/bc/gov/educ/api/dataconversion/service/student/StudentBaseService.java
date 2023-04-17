@@ -84,7 +84,7 @@ public class StudentBaseService {
                     gradProgram = "2004-EN";
                 }
             }
-            case "1996" -> {
+            case "1996", "1995" -> {
                 if (schoolOfRecord.startsWith("093")) {
                     gradProgram = "1996-PF";
                 } else {
