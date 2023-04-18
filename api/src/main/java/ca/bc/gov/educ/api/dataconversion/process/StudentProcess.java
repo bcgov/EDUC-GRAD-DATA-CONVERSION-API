@@ -157,13 +157,14 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+        convGradStudent.setOriginalStudentLoadType(convGradStudent.getStudentLoadType());
         switch (convGradStudent.getStudentLoadType()) {
-            case GRAD_ONE -> {
-                log.debug("Process Graduated Student - 1 Program for pen# : " + convGradStudent.getPen());
-                processConversion(convGradStudent, students, summary, reload);
-            }
             case UNGRAD -> {
                 log.debug("Process Non-Graduated Student for pen# : " + convGradStudent.getPen());
+                processConversion(convGradStudent, students, summary, reload);
+            }
+            case GRAD_ONE -> {
+                log.debug("Process Graduated Student - 1 Program for pen# : " + convGradStudent.getPen());
                 processConversion(convGradStudent, students, summary, reload);
             }
             case GRAD_TWO -> {
@@ -276,7 +277,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         if (ConversionResultType.FAILURE != result) {
-            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.getStudentLoadType() != StudentLoadType.UNGRAD, summary);
+            result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), convGradStudent.getStudentLoadType(), convGradStudent.getOriginalStudentLoadType(), summary);
         }
         if (ConversionResultType.FAILURE != result && convGradStudent.getStudentLoadType() == StudentLoadType.UNGRAD) {
             result = processSccpFrenchCertificates(gradStudent, summary);
@@ -829,12 +830,12 @@ public class StudentProcess extends StudentBaseService {
 
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF")) {
-            return createStudentOptionalProgram("DD", student, false, summary);
+            return createStudentOptionalProgram("DD", student, StudentLoadType.UNGRAD, summary);
         }
 
         // French Immersion for 2018-EN, 2004-EN, 1996-EN, 1986-EN
         if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), summary.getAccessToken())) {
-            return createStudentOptionalProgram("FI", student, false, summary);
+            return createStudentOptionalProgram("FI", student, StudentLoadType.UNGRAD, summary);
         }
 
         return ConversionResultType.SUCCESS;
@@ -848,12 +849,12 @@ public class StudentProcess extends StudentBaseService {
         // Dual Dogwood for yyyy-PF
         if (student.getProgram().endsWith("-PF") && StringUtils.equalsIgnoreCase(convGradStudent.getEnglishCert(), "E")) {
             student.setDualDogwood(true);
-            return createStudentOptionalProgram("DD", student, true, summary);
+            return createStudentOptionalProgram("DD", student, StudentLoadType.GRAD_ONE, summary);
         }
 
         // French Immersion for yyyy-EN to check if their Graduation Message contains "Student has successfully completed the French Immersion program"
         if (student.getProgram().endsWith("-EN") && isFrenchImmersion(convGradStudent.getTranscriptStudentDemog().getGradMessage())) {
-            return createStudentOptionalProgram("FI", student, true, summary);
+            return createStudentOptionalProgram("FI", student, StudentLoadType.GRAD_ONE, summary);
         }
 
         return ConversionResultType.SUCCESS;
@@ -881,12 +882,12 @@ public class StudentProcess extends StudentBaseService {
         return frenchImmersion;
     }
 
-    private ConversionResultType processProgramCodes(GraduationStudentRecord student, List<String> programCodes, boolean isGraduated, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processProgramCodes(GraduationStudentRecord student, List<String> programCodes, StudentLoadType studentLoadType, StudentLoadType originalStudentLoadType, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType = ConversionResultType.SUCCESS;
         Boolean isCareerProgramCreated = Boolean.FALSE;
         if (StringUtils.isNotBlank(student.getProgram()) && !programCodes.isEmpty()) {
             for (String programCode : programCodes) {
-                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, isGraduated, summary);
+                Pair<ConversionResultType, Boolean> res = handleProgramCode(programCode, student, studentLoadType, originalStudentLoadType, summary);
                 if (Boolean.TRUE.equals(res.getRight())) {
                     isCareerProgramCreated = Boolean.TRUE;
                 }
@@ -896,17 +897,18 @@ public class StudentProcess extends StudentBaseService {
                 }
             }
             if (Boolean.TRUE.equals(isCareerProgramCreated)) {
-                resultType = createStudentOptionalProgram("CP", student, isGraduated, summary);
+                resultType = createStudentOptionalProgram("CP", student, studentLoadType, summary);
             }
         }
         return resultType;
     }
 
-    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecord student, boolean isGraduated, ConversionStudentSummaryDTO summary) {
+    private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecord student, StudentLoadType studentLoadType, StudentLoadType originalStudentLoadType, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType;
         boolean isCareerProgramCreated = false;
         if (isOptionalProgramCode(programCode)) {
-            resultType = createStudentOptionalProgram(programCode, student, isGraduated, summary);
+            resultType = isStudentSCCPForTwoPrograms(student.getProgram(), originalStudentLoadType)? ConversionResultType.SUCCESS :
+                createStudentOptionalProgram(programCode, student, studentLoadType, summary);
         } else {
             resultType = createStudentCareerProgram(programCode, student, summary);
             if (ConversionResultType.SUCCESS == resultType) {
@@ -916,23 +918,28 @@ public class StudentProcess extends StudentBaseService {
         return Pair.of(resultType, isCareerProgramCreated);
     }
 
+    // GRAD2-2013: skip optional programs for SCCP during 1st pass
+    private boolean isStudentSCCPForTwoPrograms(String graduationProgramCode, StudentLoadType originalStudentLoadType) {
+        return "SCCP".equalsIgnoreCase(graduationProgramCode) && originalStudentLoadType == StudentLoadType.GRAD_TWO;
+    }
+
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
         if (StringUtils.equals(student.getProgram(), "SCCP")
             && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
                  && student.getSchoolOfRecord().startsWith("093") )
         ) {
-            return createStudentOptionalProgram("FR", student, false, summary);
+            return createStudentOptionalProgram("FR", student, StudentLoadType.UNGRAD, summary);
         }
         return ConversionResultType.SUCCESS;
     }
 
-    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, boolean isGraduated, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType createStudentOptionalProgram(String optionalProgramCode, GraduationStudentRecord student, StudentLoadType studentLoadType, ConversionStudentSummaryDTO summary) {
         StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setPen(student.getPen());
         object.setStudentID(student.getStudentID());
         object.setMainProgramCode(student.getProgram());
         object.setOptionalProgramCode(optionalProgramCode);
-        object.setOptionalProgramCompletionDate(isGraduated? student.getProgramCompletionDate() : null);
+        object.setOptionalProgramCompletionDate(studentLoadType == StudentLoadType.UNGRAD? null : student.getProgramCompletionDate());
 
         try {
             restUtils.saveStudentOptionalProgram(object, summary.getAccessToken());
