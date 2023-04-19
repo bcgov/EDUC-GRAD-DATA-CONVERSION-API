@@ -45,6 +45,7 @@ public class ConvGradStudent {
 
   // grad or non-grad
   private StudentLoadType studentLoadType;
+  private StudentLoadType originalStudentLoadType;
   private Date distributionDate;
   private String transcriptSchoolCategoryCode;
   private String certificateSchoolCategoryCode;
