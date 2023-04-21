@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
@@ -613,12 +614,18 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment populateStudentAssessment(TranscriptStudentCourse tswCourse, String graduationProgramCode, String accessToken) {
+        Double proficiencyScore;
+        if ("LTE10".equalsIgnoreCase(tswCourse.getCourseCode()) || "LTP10".equalsIgnoreCase(tswCourse.getCourseCode())) {
+            proficiencyScore = getProficiencyScoreFromTrax(tswCourse.getStudNo(), tswCourse.getCourseCode(), tswCourse.getCourseSession(), accessToken);
+        } else {
+            proficiencyScore = EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage());
+        }
         ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment result = ca.bc.gov.educ.api.dataconversion.model.tsw.StudentAssessment.builder()
                 .pen(tswCourse.getStudNo())
                 .assessmentCode(tswCourse.getCourseCode())
                 .assessmentName(tswCourse.getCourseName())
                 .sessionDate(tswCourse.getCourseSession())
-                .proficiencyScore(EducGradDataConversionApiUtils.getPercentage(tswCourse.getFinalPercentage()))
+                .proficiencyScore(proficiencyScore)
                 .specialCase(StringUtils.isNotBlank(tswCourse.getSpecialCase())? tswCourse.getSpecialCase().trim() : null)
                 .isUsed(StringUtils.isNotBlank(tswCourse.getFoundationReq()))
                 .isProjected(false)
@@ -641,6 +648,18 @@ public class StudentProcess extends StudentBaseService {
             result.setSpecialCase(sc.getSpCase());
         }
         return result;
+    }
+
+    private Double getProficiencyScoreFromTrax(String pen, String assessmentCode, String sessionDate, String accessToken) {
+        Double proficiencyScore = null;
+        List<StudentAssessment> studentAssessments = restUtils.getStudentAssessmentsByPenAndAssessmentCode(pen, assessmentCode, accessToken);
+        for (StudentAssessment sA : studentAssessments) {
+            if (StringUtils.equalsIgnoreCase(sA.getSessionDate(), sessionDate)) {
+                proficiencyScore = sA.getProficiencyScore();
+                break;
+            }
+        }
+        return proficiencyScore;
     }
 
     // SpecialCase
