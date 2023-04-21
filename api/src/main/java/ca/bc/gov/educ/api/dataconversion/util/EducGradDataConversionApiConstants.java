@@ -113,7 +113,10 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
     private String addAssessmentRequirementApiUrl;
 
-    @Value("${endpoint.grad-assessment-api.student-assessments-by-pen.url}")
+    @Value("${endpoint.grad-assessment-api.student-assessments.by-pen-and-assessment-code.url}")
+    private String studentAssessmentsByPenAndAssessmentCodeApiUrl;
+
+    @Value("${endpoint.grad-assessment-api.student-assessments.by-pen.url}")
     private String studentAssessmentsByPenApiUrl;
 
     @Value("${endpoint.grad-course-api.student-courses-by-pen.url}")

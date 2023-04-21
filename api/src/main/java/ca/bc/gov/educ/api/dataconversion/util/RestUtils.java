@@ -132,6 +132,18 @@ public class RestUtils {
                 .retrieve().bodyToMono(AssessmentRequirement.class).block();
     }
 
+    public List<StudentAssessment> getStudentAssessmentsByPenAndAssessmentCode(String pen, String assessmentCode, String accessToken) {
+        final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(String.format(constants.getStudentAssessmentsByPenAndAssessmentCodeApiUrl(), assessmentCode, pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
     public List<StudentAssessment> getStudentAssessmentsByPen(String pen, String accessToken) {
         final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
         };
