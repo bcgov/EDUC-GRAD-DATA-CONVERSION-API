@@ -4,7 +4,6 @@ import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.service.EventService;
 import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.jboss.threads.EnhancedQueueExecutor;
@@ -25,7 +24,6 @@ import static ca.bc.gov.educ.api.dataconversion.constant.EventType.*;
 @Component
 @Slf4j
 public class ChoreographEventHandler {
-  private final ObjectMapper mapper = new ObjectMapper();
   private final Executor singleTaskExecutor = new EnhancedQueueExecutor.Builder()
       .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("single-task-executor-%d").build())
       .setCorePoolSize(1).setMaximumPoolSize(1).build();
