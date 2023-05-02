@@ -43,10 +43,10 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 				if (responseStudent.getResult() != null &&
 					responseStudent.getResult().equals(ConversionResultType.FAILURE)) {
 					String reason = "";
-					if (responseStudent.getStudentLoadType() == StudentLoadType.GRAD_TWO) {
-						reason = "ERROR-Skip data: [graduated - two programs] not implemented yet";
-					} else if (responseStudent.getStudentLoadType() == StudentLoadType.NONE) {
+					if (responseStudent.getStudentLoadType() == StudentLoadType.NONE) {
 						reason = "ERROR-Bad data: student is not in [ungrad, grad_one, grad_two]";
+					} else if (responseStudent.getStudentLoadType() == StudentLoadType.NO_UTG) {
+						reason = "ERROR-Bad data: [graduated - two programs] UTG data is not found";
 					} else {
 						reason = "ERROR-Bad data: unknown error from TRAX";
 					}
