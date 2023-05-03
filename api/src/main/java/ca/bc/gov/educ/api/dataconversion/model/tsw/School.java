@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.model.tsw;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
@@ -7,6 +8,7 @@ import java.util.Objects;
 
 @Data
 @Component
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class School implements Comparable<School> {
 
 	private String minCode;
