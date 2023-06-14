@@ -70,8 +70,15 @@ public class StudentBaseService {
     protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord, String frenchDogwood) {
         String gradProgram = null;
         switch (graduationRequirementYear) {
+            case "2023" -> {
+                if (isSchoolForProgramFrancophone(schoolOfRecord)) {
+                    gradProgram = "2023-PF";
+                } else {
+                    gradProgram = "2023-EN";
+                }
+            }
             case "2018" -> {
-                if (schoolOfRecord.startsWith("093")) {
+                if (isSchoolForProgramFrancophone(schoolOfRecord)) {
                     gradProgram = "2018-PF";
                 } else {
                     gradProgram = "2018-EN";
@@ -127,12 +134,18 @@ public class StudentBaseService {
         return StringUtils.contains(gradMessage, TSW_FI_GRAD_MSG);
     }
 
+    // initial load
     public boolean isProgramFrancophone(String gradMessage) {
         return StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG);
     }
 
     public boolean isOptionalProgramCode(String code) {
         return OPTIONAL_PROGRAM_CODES.contains(code);
+    }
+
+    // GRAD2-2103: applied to 2023 & 2018 programs.
+    private boolean isSchoolForProgramFrancophone(String schoolOfRecord) {
+        return schoolOfRecord.startsWith("093") || "09898009".equalsIgnoreCase(schoolOfRecord) || "09898047".equalsIgnoreCase(schoolOfRecord);
     }
 
 }

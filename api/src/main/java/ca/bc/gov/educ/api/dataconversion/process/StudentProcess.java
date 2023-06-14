@@ -1116,6 +1116,9 @@ public class StudentProcess extends StudentBaseService {
         } else if (gradStudent.isDeleteDualDogwood()) {
             log.info(" => [DD] optional program will be removed if exist.");
             removeStudentOptionalProgram("DD", gradStudent, accessToken);
+        } else if (gradStudent.isDeleteFrenchImmersion()) {
+            log.info(" => [FI] optional program will be removed if exist.");
+            removeStudentOptionalProgram("FI", gradStudent, accessToken);
         }
     }
 

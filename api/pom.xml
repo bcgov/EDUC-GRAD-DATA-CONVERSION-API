@@ -31,7 +31,7 @@
             src/main/java/ca/bc/gov/educ/api/dataconversion/EducGradDataConversionApplication,
             src/main/java/ca/bc/gov/educ/api/dataconversion/service/ChoreographedEventPersistenceService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/service/EventHandlerDelegatorService,
-            src/main/java/ca/bc/gov/educ/api/dataconversion/service/StudentBaseService,
+            src/main/java/ca/bc/gov/educ/api/dataconversion/service/student/StudentBaseService,
             src/main/java/ca/bc/gov/educ/api/dataconversion/util/**
         </sonar.exclusions>
         <java.version>18</java.version>
