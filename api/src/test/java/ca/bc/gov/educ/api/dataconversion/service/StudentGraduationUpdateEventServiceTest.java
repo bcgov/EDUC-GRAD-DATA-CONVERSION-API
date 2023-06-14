@@ -179,16 +179,140 @@ public class StudentGraduationUpdateEventServiceTest {
     }
 
     @Test
+    public void testProcessStudentForGrad2018ENProgram_givenUpdated_STUDENT_whenSlpDateAndCitizenshipAreChanged_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String newSlpDate = "2020/06";
+        String newCitizenship = "C";
+
+        String updateType = "UPD_GRAD";
+
+        // TraxGraduationUpdateDTO
+        TraxGraduationUpdateDTO traxGraduationUpdate = new TraxGraduationUpdateDTO();
+        traxGraduationUpdate.setPen(pen);
+        traxGraduationUpdate.setGraduationRequirementYear("2018");
+        traxGraduationUpdate.setStudentGrade("12");
+        traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setCitizenship(newCitizenship);
+        traxGraduationUpdate.setSlpDate(newSlpDate);
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_GRAD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("CUR");
+        currentStudent.setCitizenship(null);
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setGradDate(null);
+        // Optional Program Codes
+        currentStudent.getProgramCodes().add("XC");
+        currentStudent.getProgramCodes().add("FI");
+        // Courses
+        StudentCourse course1 = new StudentCourse();
+        course1.setCourseCode("Test");
+        course1.setCourseLevel("12");
+        course1.setCourseName("Test Course");
+        course1.setCreditsUsedForGrad(Integer.valueOf("4"));
+        course1.setCompletedCoursePercentage(Double.valueOf("92.00"));
+        course1.setCredits(Integer.valueOf("4"));
+        course1.setPen(pen);
+        currentStudent.getCourses().add(course1);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
     public void testProcessStudentForGrad2018ENProgram_givenUpdated_STUDENT_whenProgramIsChanged_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
 
         // Program & School
-        String program = "2018-PF";
+        String program = "2018-EN";
         String mincode = "222333";
 
-        String newProgram = "2018-EN";
+        String newMincode = "093444";
+
+        String updateType = "UPD_GRAD";
+
+        // TraxGraduationUpdateDTO
+        TraxGraduationUpdateDTO traxGraduationUpdate = new TraxGraduationUpdateDTO();
+        traxGraduationUpdate.setPen(pen);
+        traxGraduationUpdate.setGraduationRequirementYear("2018");
+        traxGraduationUpdate.setStudentGrade("12");
+        traxGraduationUpdate.setSchoolOfRecord(newMincode);
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_GRAD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("CUR");
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+        // Optional Program Codes
+        currentStudent.getProgramCodes().add("XC");
+        currentStudent.getProgramCodes().add("DD");
+        // Courses
+        StudentCourse course1 = new StudentCourse();
+        course1.setCourseCode("Test");
+        course1.setCourseLevel("12");
+        course1.setCourseName("Test Course");
+        course1.setCreditsUsedForGrad(Integer.valueOf("4"));
+        course1.setCompletedCoursePercentage(Double.valueOf("92.00"));
+        course1.setCredits(Integer.valueOf("4"));
+        course1.setPen(pen);
+        currentStudent.getCourses().add(course1);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessStudentForGrad2018PFProgram_givenUpdated_STUDENT_whenProgramIsChanged_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-PF";
+        String mincode = "093333";
+
         String newMincode = "333444";
 
         String updateType = "UPD_GRAD";
@@ -249,7 +373,6 @@ public class StudentGraduationUpdateEventServiceTest {
         String program = "2018-EN";
         String mincode = "222333";
 
-        String newProgram = "1950";
         String newMincode = "333444";
 
         String updateType = "UPD_GRAD";

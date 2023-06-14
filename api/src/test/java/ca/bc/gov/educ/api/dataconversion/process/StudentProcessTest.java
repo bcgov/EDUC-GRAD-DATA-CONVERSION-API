@@ -3861,6 +3861,7 @@ public class StudentProcessTest {
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setAddDualDogwood(true);
+        requestStudent.setDeleteFrenchImmersion(true);
 
         boolean exceptionIsThrown = false;
         try {
@@ -3933,6 +3934,7 @@ public class StudentProcessTest {
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setNewAdultStartDate("2010-01-01");
+        requestStudent.setDeleteFrenchImmersion(true);
 
         boolean exceptionIsThrown = false;
         try {
