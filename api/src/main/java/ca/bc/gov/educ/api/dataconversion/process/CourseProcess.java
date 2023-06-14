@@ -1198,8 +1198,7 @@ public class CourseProcess {
          return (StringUtils.equals(courseCode.trim(), "AC") && StringUtils.equals(courseLevel, "11 "))
             || (StringUtils.equals(courseCode.trim(), "ACC") && StringUtils.equals(courseLevel, "12 "))
             || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "11 "))
-            || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "12 "))
-            || (StringUtils.equals(courseCode.trim(), "FA") && StringUtils.equals(courseLevel, "12 "));
+            || (StringUtils.equals(courseCode.trim(), "COP") && StringUtils.equals(courseLevel, "12 "));
     }
 
     public boolean hasFrenchLanguageCourse(String courseCode, String courseLevel, String accessToken) {
