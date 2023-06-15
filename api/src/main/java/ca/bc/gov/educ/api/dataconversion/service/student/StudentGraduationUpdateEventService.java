@@ -147,16 +147,33 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
     private void handleProgramChange(String newGradProgram, StudentGradDTO currentStudent) {
         boolean addDualDogwood = false;
         boolean deleteDualDogwood = false;
+        boolean deleteFrenchImmersion = false;
 
-        if (newGradProgram.endsWith("-PF") && !currentStudent.getProgram().endsWith("-PF")) {
+        if (currentStudent.getProgram().endsWith("-EN") && newGradProgram.endsWith("-PF")) {
+            // From EN to PF
             addDualDogwood = true;
-        } else if (!newGradProgram.endsWith("-PF") && currentStudent.getProgram().endsWith("-PF")) {
+        }
+
+        if (currentStudent.getProgram().endsWith("-PF") && isNonPF(newGradProgram)) {
+            // From PF to non-PF
             deleteDualDogwood = true;
+        } else if (currentStudent.getProgram().endsWith("-EN") && isNonEN(newGradProgram)) {
+            // From EN to non-EN
+            deleteFrenchImmersion = true;
         }
 
         currentStudent.setAddDualDogwood(addDualDogwood);
         currentStudent.setDeleteDualDogwood(deleteDualDogwood);
+        currentStudent.setDeleteFrenchImmersion(deleteFrenchImmersion);
         currentStudent.setNewProgram(newGradProgram);
+    }
+
+    private boolean isNonPF(String program) {
+        return program.endsWith("-EN") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
+    }
+
+    private boolean isNonEN(String program) {
+        return program.endsWith("-PF") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
     }
 
     private void handleAdultStartDate(StudentGradDTO currentStudent) {
