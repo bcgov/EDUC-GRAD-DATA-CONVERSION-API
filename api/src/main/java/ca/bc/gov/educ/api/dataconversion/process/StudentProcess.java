@@ -1112,6 +1112,8 @@ public class StudentProcess extends StudentBaseService {
 
         if (gradStudent.isAddDualDogwood()) {
             log.info(" => [DD] optional program will be added if not exist.");
+            // new grad program has to be used
+            gradStudent.setProgram(gradStudent.getNewProgram());
             addStudentOptionalProgram("DD", gradStudent, accessToken);
         } else if (gradStudent.isDeleteDualDogwood()) {
             log.info(" => [DD] optional program will be removed if exist.");
