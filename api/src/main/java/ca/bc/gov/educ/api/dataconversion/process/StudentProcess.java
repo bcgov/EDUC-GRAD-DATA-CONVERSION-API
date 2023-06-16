@@ -882,7 +882,7 @@ public class StudentProcess extends StudentBaseService {
     public boolean hasAnyFrenchImmersionCourse(String program, String pen, String accessToken) {
         boolean frenchImmersion = false;
         switch (program) {
-            case "2018-EN", "2004-EN" -> {
+            case "2023-EN", "2018-EN", "2004-EN" -> {
                 if (courseProcess.isFrenchImmersionCourse(pen, "10", accessToken)) { // FRAL 10 or FRALP 10
                     frenchImmersion = true;
                 }
