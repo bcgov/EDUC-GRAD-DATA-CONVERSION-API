@@ -1118,6 +1118,17 @@ public class CourseProcess {
         createCourseRequirement(populate("YILB", "10", "119"), summary);
         createCourseRequirement(populate("YILB", "11", "119"), summary);
         createCourseRequirement(populate("YILB", "12", "119"), summary);
+
+        // GRAD2-2156
+        createCourseRequirement(populate("YFNC", "10", "119"), summary);
+        createCourseRequirement(populate("YFNC", "11", "119"), summary);
+        createCourseRequirement(populate("YFNC", "12", "119"), summary);
+        createCourseRequirement(populate("YFNB", "10", "119"), summary);
+        createCourseRequirement(populate("YFNB", "11", "119"), summary);
+        createCourseRequirement(populate("YFNB", "12", "119"), summary);
+        createCourseRequirement(populate("YFND", "10", "119"), summary);
+        createCourseRequirement(populate("YFND", "11", "119"), summary);
+        createCourseRequirement(populate("YFND", "12", "119"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
