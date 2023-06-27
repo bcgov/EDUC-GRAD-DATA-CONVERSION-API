@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
@@ -36,6 +35,8 @@ public class StudentProcess extends StudentBaseService {
 
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
     private static final String EXCEPTION_MSG = "Exception occurred: ";
+
+    private static final List<String> OPTIONAL_PROGRAMS_CODES = Arrays.asList("AD", "BI", "BD", "CP");
 
     private final RestUtils restUtils;
     private final AssessmentProcess assessmentProcess;
@@ -1110,17 +1111,39 @@ public class StudentProcess extends StudentBaseService {
             restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
         }
 
+        removeAndReCreateOptionalPrograms(gradStudent, accessToken);
+        handleFIorDDOptionalProgram(gradStudent, accessToken);
+    }
+
+    private void removeAndReCreateOptionalPrograms(StudentGradDTO gradStudent, String accessToken) {
+        List<String> optionalProgramCodes = new ArrayList<>();
+
+        // Remove all optional programs
+        List<StudentOptionalProgram> studentOptionalPrograms = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), accessToken);
+        studentOptionalPrograms.forEach(op -> {
+            log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
+            removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
+            if (OPTIONAL_PROGRAMS_CODES.contains(op.getOptionalProgramCode())) {
+                optionalProgramCodes.add(op.getOptionalProgramCode());
+            }
+        });
+
+        // Recreate nonFI & nonDD optional programs
+        optionalProgramCodes.forEach(opc -> {
+            log.info(" => [{}] optional program will be added if not exist.", opc);
+            addStudentOptionalProgram(opc, gradStudent, true, accessToken);
+        });
+    }
+
+    private void handleFIorDDOptionalProgram(StudentGradDTO gradStudent, String accessToken) {
         if (gradStudent.isAddDualDogwood()) {
             log.info(" => [DD] optional program will be added if not exist.");
             // new grad program has to be used
-            gradStudent.setProgram(gradStudent.getNewProgram());
-            addStudentOptionalProgram("DD", gradStudent, accessToken);
-        } else if (gradStudent.isDeleteDualDogwood()) {
-            log.info(" => [DD] optional program will be removed if exist.");
-            removeStudentOptionalProgram("DD", gradStudent, accessToken);
-        } else if (gradStudent.isDeleteFrenchImmersion()) {
-            log.info(" => [FI] optional program will be removed if exist.");
-            removeStudentOptionalProgram("FI", gradStudent, accessToken);
+            addStudentOptionalProgram("DD", gradStudent, true, accessToken);
+        } else if (gradStudent.isAddFrenchImmersion()) {
+            log.info(" => [FI] optional program will be added if not exist.");
+            // new grad program has to be used
+            addStudentOptionalProgram("FI", gradStudent, true, accessToken);
         }
     }
 
@@ -1136,10 +1159,10 @@ public class StudentProcess extends StudentBaseService {
         restUtils.removeStudentOptionalProgram(optionalProgramID, gradStudent.getStudentID(), accessToken);
     }
 
-    public void addStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, String accessToken) {
+    public void addStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, boolean isNewGradProgram, String accessToken) {
         StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setStudentID(gradStudent.getStudentID());
-        object.setMainProgramCode(gradStudent.getProgram());
+        object.setMainProgramCode(isNewGradProgram && gradStudent.getNewProgram() != null? gradStudent.getNewProgram() : gradStudent.getProgram());
         object.setOptionalProgramCode(optionalProgramCode);
         restUtils.saveStudentOptionalProgram(object, accessToken);
     }

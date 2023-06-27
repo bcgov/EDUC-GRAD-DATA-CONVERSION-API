@@ -74,7 +74,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         // Grad Program
         String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord(), null);
         if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
-            handleProgramChange(gradProgram, currentStudent);
+            handleProgramChange(gradProgram, currentStudent, updateGrad.getPen(), accessToken);
             handleAdultStartDate(currentStudent);
             if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
                 // Transcript
@@ -144,36 +144,22 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         }
     }
 
-    private void handleProgramChange(String newGradProgram, StudentGradDTO currentStudent) {
+    private void handleProgramChange(String newGradProgram, StudentGradDTO currentStudent, String pen, String accessToken) {
         boolean addDualDogwood = false;
-        boolean deleteDualDogwood = false;
-        boolean deleteFrenchImmersion = false;
+        boolean addFrenchImmersion = false;
 
-        if (currentStudent.getProgram().endsWith("-EN") && newGradProgram.endsWith("-PF")) {
+        if (newGradProgram.endsWith("-PF")) {
             // From EN to PF
             addDualDogwood = true;
-        }
-
-        if (currentStudent.getProgram().endsWith("-PF") && isNonPF(newGradProgram)) {
-            // From PF to non-PF
-            deleteDualDogwood = true;
-        } else if (currentStudent.getProgram().endsWith("-EN") && isNonEN(newGradProgram)) {
-            // From EN to non-EN
-            deleteFrenchImmersion = true;
+        } else if (newGradProgram.endsWith("-EN")
+                && studentProcess.hasAnyFrenchImmersionCourse(newGradProgram, pen, accessToken)) {
+            addFrenchImmersion = true;
         }
 
         currentStudent.setAddDualDogwood(addDualDogwood);
-        currentStudent.setDeleteDualDogwood(deleteDualDogwood);
-        currentStudent.setDeleteFrenchImmersion(deleteFrenchImmersion);
+        currentStudent.setAddFrenchImmersion(addFrenchImmersion);
+
         currentStudent.setNewProgram(newGradProgram);
-    }
-
-    private boolean isNonPF(String program) {
-        return program.endsWith("-EN") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
-    }
-
-    private boolean isNonEN(String program) {
-        return program.endsWith("-PF") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
     }
 
     private void handleAdultStartDate(StudentGradDTO currentStudent) {

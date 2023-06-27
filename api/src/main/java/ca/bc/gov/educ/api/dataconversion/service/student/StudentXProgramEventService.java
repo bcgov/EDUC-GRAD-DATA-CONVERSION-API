@@ -87,7 +87,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         currentStudent.getAddedProgramCodes().forEach(p -> {
             if (isOptionalProgramCode(p)) {
                 log.info(" => new optional program code : {}", p);
-                studentProcess.addStudentOptionalProgram(p, currentStudent, accessToken);
+                studentProcess.addStudentOptionalProgram(p, currentStudent, false, accessToken);
             } else {
                 log.info(" => new career program code : {}", p);
                 studentProcess.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);
@@ -97,7 +97,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         // No Career Program?  then remove CP optional program
         if (studentProcess.existsCareerProgram(currentStudent.getStudentID(), accessToken)) {
             log.info(" => [CP] optional program will be added if not exist.");
-            studentProcess.addStudentOptionalProgram("CP", currentStudent, accessToken);
+            studentProcess.addStudentOptionalProgram("CP", currentStudent, false, accessToken);
         } else {
             log.info(" => [CP] optional program will be removed if exist.");
             studentProcess.removeStudentOptionalProgram("CP", currentStudent, accessToken);
