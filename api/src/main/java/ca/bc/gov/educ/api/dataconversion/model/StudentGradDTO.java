@@ -13,8 +13,7 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     // new values for update
     private boolean addDualDogwood = false;
-    private boolean deleteDualDogwood = false;
-    private boolean deleteFrenchImmersion = false;
+    private boolean addFrenchImmersion = false;
 
     private String newProgram;
     private String newSchoolOfRecord;

@@ -244,7 +244,7 @@ public class StudentGraduationUpdateEventServiceTest {
     }
 
     @Test
-    public void testProcessStudentForGrad2018ENProgram_givenUpdated_STUDENT_whenProgramIsChanged_then_returnsAPICallSuccess() {
+    public void testProcessStudentForGrad2018ENProgram_givenUpdated_STUDENT_whenProgramIsChangedTo2018PF_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -304,7 +304,7 @@ public class StudentGraduationUpdateEventServiceTest {
     }
 
     @Test
-    public void testProcessStudentForGrad2018PFProgram_givenUpdated_STUDENT_whenProgramIsChanged_then_returnsAPICallSuccess() {
+    public void testProcessStudentForGrad2018PFProgram_givenUpdated_STUDENT_whenProgramIsChangedTo2018EN_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -355,6 +355,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.getCourses().add(course1);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.studentProcess.hasAnyFrenchImmersionCourse(eq("2018-EN"), eq(pen), any())).thenReturn(true);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
         studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
@@ -364,7 +365,7 @@ public class StudentGraduationUpdateEventServiceTest {
     }
 
     @Test
-    public void testProcessStudentFor1950AdultProgram_givenUpdated_STUDENT_whenProgramIsChanged_then_returnsAPICallSuccess() {
+    public void testProcessStudentFor2018EN_givenUpdated_STUDENT_whenProgramIsChangedTo1950Adult_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";

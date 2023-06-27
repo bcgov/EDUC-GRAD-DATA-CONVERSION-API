@@ -3800,7 +3800,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.addStudentOptionalProgram(optionalProgramCode, requestStudent, "123");
+            studentProcess.addStudentOptionalProgram(optionalProgramCode, requestStudent, true, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -3848,7 +3848,20 @@ public class StudentProcessTest {
         graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramCode("FI");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramCode("BD");
+
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(List.of(studentOptionalProgram1, studentOptionalProgram2));
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -3861,7 +3874,6 @@ public class StudentProcessTest {
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setAddDualDogwood(true);
-        requestStudent.setDeleteFrenchImmersion(true);
 
         boolean exceptionIsThrown = false;
         try {
@@ -3885,7 +3897,20 @@ public class StudentProcessTest {
         graduationStudentRecord.setStudentStatus("CUR");
         graduationStudentRecord.setSchoolOfRecord("222336");
 
+        StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
+        studentOptionalProgram1.setId(UUID.randomUUID());
+        studentOptionalProgram1.setOptionalProgramID(UUID.randomUUID());
+        studentOptionalProgram1.setStudentID(studentID);
+        studentOptionalProgram1.setOptionalProgramCode("DD");
+
+        StudentOptionalProgram studentOptionalProgram2 = new StudentOptionalProgram();
+        studentOptionalProgram2.setId(UUID.randomUUID());
+        studentOptionalProgram2.setOptionalProgramID(UUID.randomUUID());
+        studentOptionalProgram2.setStudentID(studentID);
+        studentOptionalProgram2.setOptionalProgramCode("BD");
+
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
+        when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(List.of(studentOptionalProgram1, studentOptionalProgram2));
 
         StudentGradDTO requestStudent = new StudentGradDTO();
         requestStudent.setStudentID(studentID);
@@ -3897,7 +3922,7 @@ public class StudentProcessTest {
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
-        requestStudent.setDeleteDualDogwood(true);
+        requestStudent.setAddFrenchImmersion(true);
 
         boolean exceptionIsThrown = false;
         try {
@@ -3934,7 +3959,6 @@ public class StudentProcessTest {
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setNewAdultStartDate("2010-01-01");
-        requestStudent.setDeleteFrenchImmersion(true);
 
         boolean exceptionIsThrown = false;
         try {
