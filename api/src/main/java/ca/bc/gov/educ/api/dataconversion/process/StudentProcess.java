@@ -36,8 +36,6 @@ public class StudentProcess extends StudentBaseService {
     private static final String GRAD_STUDENT_API_ERROR_MSG = "Grad Student API is failed for ";
     private static final String EXCEPTION_MSG = "Exception occurred: ";
 
-    private static final List<String> OPTIONAL_PROGRAMS_CODES = Arrays.asList("AD", "BI", "BD", "CP");
-
     private final RestUtils restUtils;
     private final AssessmentProcess assessmentProcess;
     private final CourseProcess courseProcess;
@@ -1123,7 +1121,7 @@ public class StudentProcess extends StudentBaseService {
         studentOptionalPrograms.forEach(op -> {
             log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
             removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
-            if (OPTIONAL_PROGRAMS_CODES.contains(op.getOptionalProgramCode())) {
+            if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
                 optionalProgramCodes.add(op.getOptionalProgramCode());
             }
         });
