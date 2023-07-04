@@ -3956,6 +3956,8 @@ public class StudentProcessTest {
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setNewAdultStartDate("2010-01-01");
+        requestStudent.setNewCitizenship("C");
+        requestStudent.setNewGradDate("2022/06/01");
 
         boolean exceptionIsThrown = false;
         try {
