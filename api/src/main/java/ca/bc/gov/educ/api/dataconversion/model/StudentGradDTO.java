@@ -16,10 +16,11 @@ public class StudentGradDTO extends  StudentCommonDTO {
     private boolean addFrenchImmersion = false;
 
     private String newProgram;
+    private String newGradDate;
     private String newSchoolOfRecord;
-    private String newSchoolAtGrad;
     private String newStudentGrade;
     private String newStudentStatus;
+    private String newCitizenship;
     private String newAdultStartDate;
 
     // new flags

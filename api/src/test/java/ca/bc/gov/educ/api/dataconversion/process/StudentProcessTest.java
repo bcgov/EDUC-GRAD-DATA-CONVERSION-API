@@ -3869,7 +3869,6 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("2018-PF");
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -3918,7 +3917,6 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("2018-EN");
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -3954,7 +3952,6 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("1950");
         requestStudent.setNewStudentGrade("AD");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");

@@ -984,6 +984,14 @@ public class StudentProcess extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
+    /**
+     * Load Student Data in GRAD
+     *      for ongoing updates from TRAX to GRAD
+     *
+     * @param pen
+     * @param accessToken
+     * @return
+     */
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
         Student penStudent;
         // PEN Student
@@ -1019,6 +1027,7 @@ public class StudentProcess extends StudentBaseService {
         }
         if (gradStudent != null) {
             studentData.setProgram(gradStudent.getProgram());
+            studentData.setGradDate(gradStudent.getProgramCompletionDate());
             studentData.setStudentGrade(gradStudent.getStudentGrade());
             studentData.setStudentStatus(gradStudent.getStudentStatus());
             studentData.setSchoolOfRecord(gradStudent.getSchoolOfRecord());
@@ -1078,11 +1087,21 @@ public class StudentProcess extends StudentBaseService {
         return codes;
     }
 
+    /**
+     * Save Graduation Student Record
+     *      for Ongoing Updates from TRAX to GRAD
+     *
+     * @param gradStudent
+     * @param accessToken
+     */
     public void saveGraduationStudent(StudentGradDTO gradStudent, String accessToken) {
         GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
         if (object != null) {
             if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
                 object.setProgram(gradStudent.getNewProgram());
+            }
+            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
+                object.setProgramCompletionDate(gradStudent.getNewGradDate());
             }
             if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
                 object.setStudentGrade(gradStudent.getNewStudentGrade());
@@ -1093,8 +1112,8 @@ public class StudentProcess extends StudentBaseService {
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
                 object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewSchoolAtGrad())) {
-                object.setSchoolAtGrad(gradStudent.getNewSchoolAtGrad());
+            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
+                object.setStudentCitizenship(gradStudent.getNewCitizenship());
             }
             if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
                 object.setAdultStartDate(gradStudent.getNewAdultStartDate());
@@ -1109,8 +1128,10 @@ public class StudentProcess extends StudentBaseService {
             restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
         }
 
-        removeAndReCreateOptionalPrograms(gradStudent, accessToken);
-        handleFIorDDOptionalProgram(gradStudent, accessToken);
+        if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
+            removeAndReCreateOptionalPrograms(gradStudent, accessToken);
+            handleFIorDDOptionalProgram(gradStudent, accessToken);
+        }
     }
 
     private void removeAndReCreateOptionalPrograms(StudentGradDTO gradStudent, String accessToken) {
@@ -1128,7 +1149,7 @@ public class StudentProcess extends StudentBaseService {
 
         // Recreate nonFI & nonDD optional programs
         optionalProgramCodes.forEach(opc -> {
-            log.info(" => [{}] optional program will be added if not exist.", opc);
+            log.info(" => [{}] optional program will be re-created.", opc);
             addStudentOptionalProgram(opc, gradStudent, true, accessToken);
         });
     }
