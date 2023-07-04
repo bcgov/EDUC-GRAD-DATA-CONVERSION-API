@@ -3869,7 +3869,6 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("2018-PF");
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -3918,7 +3917,6 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("2018-EN");
         requestStudent.setNewStudentGrade("12");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -3954,11 +3952,12 @@ public class StudentProcessTest {
         requestStudent.setNewProgram("1950");
         requestStudent.setNewStudentGrade("AD");
         requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolAtGrad("333456");
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
         requestStudent.setNewAdultStartDate("2010-01-01");
+        requestStudent.setNewCitizenship("C");
+        requestStudent.setNewGradDate("2022/06/01");
 
         boolean exceptionIsThrown = false;
         try {
