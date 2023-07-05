@@ -71,9 +71,20 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         boolean isChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-        // Grad Program
-        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord(), null);
-        if (!currentStudent.isGraduated() && !StringUtils.equals(gradProgram, currentStudent.getProgram())) {
+        // Order is important for first 3 items below!!!
+        // 1. School of record
+        if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
+            currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+            // TVR
+            currentStudent.setNewRecalculateProjectedGrad("Y");
+            log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
+            isChanged = true;
+        }
+        // 2. Grad Program
+        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecord(), null);
+        if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
             handleProgramChange(gradProgram, currentStudent, updateGrad.getPen(), accessToken);
             handleAdultStartDate(currentStudent);
             // Transcript
@@ -83,25 +94,16 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
             isChanged = true;
         }
-        // SLP Date
+        // 3. SLP Date
         String slpDate = updateGrad.getSlpDateWithDefaultFormat();
-        if (slpDate != null && !currentStudent.isGraduated() && !StringUtils.equals(slpDate, currentStudent.getGradDate())) {
+        if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())
+            && !StringUtils.equals(slpDate, currentStudent.getGradDate())) {
             currentStudent.setNewGradDate(slpDate);
             // Transcript
             currentStudent.setNewRecalculateGradStatus("Y");
             // TVR
             currentStudent.setNewRecalculateProjectedGrad("Y");
             log.info(" => student slp date : current = {}, request = {}", currentStudent.getGradDate(), slpDate);
-            isChanged = true;
-        }
-        // School of record
-        if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
-            currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-            log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
             isChanged = true;
         }
         // Student Grade
@@ -145,15 +147,11 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         boolean addDualDogwood = false;
         boolean addFrenchImmersion = false;
 
-        // if a student is graduated, then skip
-        // gradDate format:  yyyy/MM
-        // slpDate format: yyyyMMdd
-        if (!StringUtils.isBlank(currentStudent.getGradDate())) {
+        if (!currentStudent.isSCCP() && currentStudent.isGraduated()) {
             currentStudent.setNewProgram(null);
             return;
         }
 
-        // if a student is ungraduated && gradProgram is *-PF, then skip
         if (newGradProgram.endsWith("-PF")) {
             // from EN to PF
             // from PF to PF
