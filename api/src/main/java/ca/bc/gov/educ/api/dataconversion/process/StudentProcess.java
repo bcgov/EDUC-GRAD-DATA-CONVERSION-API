@@ -1135,23 +1135,25 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private void removeAndReCreateOptionalPrograms(StudentGradDTO gradStudent, String accessToken) {
-        List<String> optionalProgramCodes = new ArrayList<>();
-
         // Remove all optional programs
         List<StudentOptionalProgram> studentOptionalPrograms = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), accessToken);
-        studentOptionalPrograms.forEach(op -> {
-            log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
-            removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
-            if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
-                optionalProgramCodes.add(op.getOptionalProgramCode());
-            }
-        });
+        if (studentOptionalPrograms != null && !studentOptionalPrograms.isEmpty()) {
+            List<String> optionalProgramCodes = new ArrayList<>();
 
-        // Recreate nonFI & nonDD optional programs
-        optionalProgramCodes.forEach(opc -> {
-            log.info(" => [{}] optional program will be re-created.", opc);
-            addStudentOptionalProgram(opc, gradStudent, true, accessToken);
-        });
+            studentOptionalPrograms.forEach(op -> {
+                log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
+                removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
+                if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
+                    optionalProgramCodes.add(op.getOptionalProgramCode());
+                }
+            });
+
+            // Recreate nonFI & nonDD optional programs
+            optionalProgramCodes.forEach(opc -> {
+                log.info(" => [{}] optional program will be re-created.", opc);
+                addStudentOptionalProgram(opc, gradStudent, true, accessToken);
+            });
+        }
     }
 
     private void handleFIorDDOptionalProgram(StudentGradDTO gradStudent, String accessToken) {
