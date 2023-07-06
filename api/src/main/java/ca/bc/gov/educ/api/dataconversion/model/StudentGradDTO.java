@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,14 +14,14 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     // new values for update
     private boolean addDualDogwood = false;
-    private boolean deleteDualDogwood = false;
-    private boolean deleteFrenchImmersion = false;
+    private boolean addFrenchImmersion = false;
 
     private String newProgram;
+    private String newGradDate;
     private String newSchoolOfRecord;
-    private String newSchoolAtGrad;
     private String newStudentGrade;
     private String newStudentStatus;
+    private String newCitizenship;
     private String newAdultStartDate;
 
     // new flags
@@ -29,4 +30,13 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     private List<String> addedProgramCodes = new ArrayList<>();
     private List<String> removedProgramCodes = new ArrayList<>();
+
+    public String getUpToDateGradProgram() {
+        return StringUtils.isNotBlank(newProgram)? newProgram : this.getProgram();
+    }
+
+    public String getUpToDateSchoolOfRecord() {
+        return StringUtils.isNotBlank(newSchoolOfRecord)? newSchoolOfRecord : this.getSchoolOfRecord();
+    }
+
 }

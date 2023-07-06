@@ -24,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants.DEFAULT_CREATED_BY;
@@ -985,6 +984,14 @@ public class StudentProcess extends StudentBaseService {
         return ConversionResultType.SUCCESS;
     }
 
+    /**
+     * Load Student Data in GRAD
+     *      for ongoing updates from TRAX to GRAD
+     *
+     * @param pen
+     * @param accessToken
+     * @return
+     */
     public StudentGradDTO loadStudentData(String pen, String accessToken) {
         Student penStudent;
         // PEN Student
@@ -1020,6 +1027,7 @@ public class StudentProcess extends StudentBaseService {
         }
         if (gradStudent != null) {
             studentData.setProgram(gradStudent.getProgram());
+            studentData.setGradDate(gradStudent.getProgramCompletionDate());
             studentData.setStudentGrade(gradStudent.getStudentGrade());
             studentData.setStudentStatus(gradStudent.getStudentStatus());
             studentData.setSchoolOfRecord(gradStudent.getSchoolOfRecord());
@@ -1079,11 +1087,21 @@ public class StudentProcess extends StudentBaseService {
         return codes;
     }
 
+    /**
+     * Save Graduation Student Record
+     *      for Ongoing Updates from TRAX to GRAD
+     *
+     * @param gradStudent
+     * @param accessToken
+     */
     public void saveGraduationStudent(StudentGradDTO gradStudent, String accessToken) {
         GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
         if (object != null) {
             if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
                 object.setProgram(gradStudent.getNewProgram());
+            }
+            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
+                object.setProgramCompletionDate(gradStudent.getNewGradDate());
             }
             if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
                 object.setStudentGrade(gradStudent.getNewStudentGrade());
@@ -1094,8 +1112,8 @@ public class StudentProcess extends StudentBaseService {
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
                 object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewSchoolAtGrad())) {
-                object.setSchoolAtGrad(gradStudent.getNewSchoolAtGrad());
+            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
+                object.setStudentCitizenship(gradStudent.getNewCitizenship());
             }
             if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
                 object.setAdultStartDate(gradStudent.getNewAdultStartDate());
@@ -1110,17 +1128,41 @@ public class StudentProcess extends StudentBaseService {
             restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
         }
 
+        if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
+            removeAndReCreateOptionalPrograms(gradStudent, accessToken);
+            handleFIorDDOptionalProgram(gradStudent, accessToken);
+        }
+    }
+
+    private void removeAndReCreateOptionalPrograms(StudentGradDTO gradStudent, String accessToken) {
+        List<String> optionalProgramCodes = new ArrayList<>();
+
+        // Remove all optional programs
+        List<StudentOptionalProgram> studentOptionalPrograms = restUtils.getStudentOptionalPrograms(gradStudent.getStudentID().toString(), accessToken);
+        studentOptionalPrograms.forEach(op -> {
+            log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
+            removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
+            if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
+                optionalProgramCodes.add(op.getOptionalProgramCode());
+            }
+        });
+
+        // Recreate nonFI & nonDD optional programs
+        optionalProgramCodes.forEach(opc -> {
+            log.info(" => [{}] optional program will be re-created.", opc);
+            addStudentOptionalProgram(opc, gradStudent, true, accessToken);
+        });
+    }
+
+    private void handleFIorDDOptionalProgram(StudentGradDTO gradStudent, String accessToken) {
         if (gradStudent.isAddDualDogwood()) {
             log.info(" => [DD] optional program will be added if not exist.");
             // new grad program has to be used
-            gradStudent.setProgram(gradStudent.getNewProgram());
-            addStudentOptionalProgram("DD", gradStudent, accessToken);
-        } else if (gradStudent.isDeleteDualDogwood()) {
-            log.info(" => [DD] optional program will be removed if exist.");
-            removeStudentOptionalProgram("DD", gradStudent, accessToken);
-        } else if (gradStudent.isDeleteFrenchImmersion()) {
-            log.info(" => [FI] optional program will be removed if exist.");
-            removeStudentOptionalProgram("FI", gradStudent, accessToken);
+            addStudentOptionalProgram("DD", gradStudent, true, accessToken);
+        } else if (gradStudent.isAddFrenchImmersion()) {
+            log.info(" => [FI] optional program will be added if not exist.");
+            // new grad program has to be used
+            addStudentOptionalProgram("FI", gradStudent, true, accessToken);
         }
     }
 
@@ -1136,10 +1178,10 @@ public class StudentProcess extends StudentBaseService {
         restUtils.removeStudentOptionalProgram(optionalProgramID, gradStudent.getStudentID(), accessToken);
     }
 
-    public void addStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, String accessToken) {
+    public void addStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, boolean isNewGradProgram, String accessToken) {
         StudentOptionalProgramRequestDTO object = new StudentOptionalProgramRequestDTO();
         object.setStudentID(gradStudent.getStudentID());
-        object.setMainProgramCode(gradStudent.getProgram());
+        object.setMainProgramCode(isNewGradProgram && gradStudent.getNewProgram() != null? gradStudent.getNewProgram() : gradStudent.getProgram());
         object.setOptionalProgramCode(optionalProgramCode);
         restUtils.saveStudentOptionalProgram(object, accessToken);
     }

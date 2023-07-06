@@ -25,6 +25,7 @@ public class StudentBaseService {
 
     // Optional Program Codes
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
+    private static final List<String> OPTIONAL_PROGRAM_CODES_FOR_RECREATION = Arrays.asList("AD", "BC", "BD", "CP");
 
     protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
         ConversionAlert error = new ConversionAlert();
@@ -141,6 +142,10 @@ public class StudentBaseService {
 
     public boolean isOptionalProgramCode(String code) {
         return OPTIONAL_PROGRAM_CODES.contains(code);
+    }
+
+    public boolean isOptionalProgramRecreationRequired(String code) {
+        return OPTIONAL_PROGRAM_CODES_FOR_RECREATION.contains(code);
     }
 
     // GRAD2-2103: applied to 2023 & 2018 programs.

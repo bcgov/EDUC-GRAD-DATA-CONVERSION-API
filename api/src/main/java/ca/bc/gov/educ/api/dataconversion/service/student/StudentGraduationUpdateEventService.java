@@ -71,21 +71,8 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         boolean isChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-        // Grad Program
-        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), updateGrad.getSchoolOfRecord(), null);
-        if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
-            handleProgramChange(gradProgram, currentStudent);
-            handleAdultStartDate(currentStudent);
-            if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-            }
-            log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
-            isChanged = true;
-        }
-        // School of record
+        // Order is important for first 3 items below!!!
+        // 1. School of record
         if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
             currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());
             // Transcript
@@ -95,10 +82,34 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
             isChanged = true;
         }
+        // 2. Grad Program
+        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecord(), null);
+        if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
+            handleProgramChange(gradProgram, currentStudent, updateGrad.getPen(), accessToken);
+            handleAdultStartDate(currentStudent);
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+            // TVR
+            currentStudent.setNewRecalculateProjectedGrad("Y");
+            log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
+            isChanged = true;
+        }
+        // 3. SLP Date
+        String slpDate = updateGrad.getSlpDateWithDefaultFormat();
+        if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())
+            && !StringUtils.equals(slpDate, currentStudent.getGradDate())) {
+            currentStudent.setNewGradDate(slpDate);
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+            // TVR
+            currentStudent.setNewRecalculateProjectedGrad("Y");
+            log.info(" => student slp date : current = {}, request = {}", currentStudent.getGradDate(), slpDate);
+            isChanged = true;
+        }
         // Student Grade
         if (!StringUtils.equals(updateGrad.getStudentGrade(), currentStudent.getStudentGrade())) {
             currentStudent.setNewStudentGrade(updateGrad.getStudentGrade());
-            if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
+            if (!currentStudent.isGraduated() ) { // non grad
                 // Transcript
                 currentStudent.setNewRecalculateGradStatus("Y");
                 // TVR
@@ -110,22 +121,10 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             log.info(" => student grade : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
             isChanged = true;
         }
-        // SLP Date
-        if (!StringUtils.equals(updateGrad.getSlpDate(), currentStudent.getGradDate())) {
-            if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-            }
-            log.info(" => student slp date : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
-            isChanged = true;
-        }
-
-        // citizenship
+        // Citizenship
         if (!StringUtils.equals(updateGrad.getCitizenship(), currentStudent.getCitizenship())) {
-            currentStudent.setCitizenship(updateGrad.getCitizenship());
-            if (StringUtils.isBlank(currentStudent.getGradDate())) { // non grad
+            currentStudent.setNewCitizenship(updateGrad.getCitizenship());
+            if (!currentStudent.isGraduated() ) { // non grad
                 // Transcript
                 currentStudent.setNewRecalculateGradStatus("Y");
                 // TVR
@@ -134,7 +133,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
                 // TVR
                 currentStudent.setNewRecalculateProjectedGrad("Y");
             }
-            log.info(" => student citizenship : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
+            log.info(" => student citizenship : current = {}, request = {}", currentStudent.getCitizenship(), currentStudent.getNewCitizenship());
             isChanged = true;
         }
 
@@ -144,36 +143,39 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         }
     }
 
-    private void handleProgramChange(String newGradProgram, StudentGradDTO currentStudent) {
+    private void handleProgramChange(String newGradProgram, StudentGradDTO currentStudent, String pen, String accessToken) {
         boolean addDualDogwood = false;
-        boolean deleteDualDogwood = false;
-        boolean deleteFrenchImmersion = false;
+        boolean addFrenchImmersion = false;
 
-        if (currentStudent.getProgram().endsWith("-EN") && newGradProgram.endsWith("-PF")) {
-            // From EN to PF
-            addDualDogwood = true;
+        if (!currentStudent.isSCCP() && currentStudent.isGraduated()) {
+            currentStudent.setNewProgram(null);
+            return;
         }
 
-        if (currentStudent.getProgram().endsWith("-PF") && isNonPF(newGradProgram)) {
-            // From PF to non-PF
-            deleteDualDogwood = true;
-        } else if (currentStudent.getProgram().endsWith("-EN") && isNonEN(newGradProgram)) {
-            // From EN to non-EN
-            deleteFrenchImmersion = true;
+        if (newGradProgram.endsWith("-PF")) {
+            // from EN to PF
+            // from PF to PF
+            // from 1950 to PF
+            // from SCCP to PF
+            addDualDogwood = true;
+        } else if (newGradProgram.endsWith("-EN")) {
+            // from PF to EN - not allowed
+            if (currentStudent.getProgram().endsWith("-PF")) {
+                currentStudent.setNewProgram(null);
+                return;
+            }
+            // from EN to EN
+            // from 1950 to EN
+            // from SCCP to EN
+            if (studentProcess.hasAnyFrenchImmersionCourse(newGradProgram, pen, accessToken)) {
+                addFrenchImmersion = true;
+            }
         }
 
         currentStudent.setAddDualDogwood(addDualDogwood);
-        currentStudent.setDeleteDualDogwood(deleteDualDogwood);
-        currentStudent.setDeleteFrenchImmersion(deleteFrenchImmersion);
+        currentStudent.setAddFrenchImmersion(addFrenchImmersion);
+
         currentStudent.setNewProgram(newGradProgram);
-    }
-
-    private boolean isNonPF(String program) {
-        return program.endsWith("-EN") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
-    }
-
-    private boolean isNonEN(String program) {
-        return program.endsWith("-PF") || "1950".equalsIgnoreCase(program) || "SCCP".equalsIgnoreCase(program);
     }
 
     private void handleAdultStartDate(StudentGradDTO currentStudent) {
