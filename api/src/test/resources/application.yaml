@@ -89,6 +89,7 @@ cron:
           run: 0 0/5 * * * *
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
+          threshold: 100
 
 #Endpoints
 endpoint:

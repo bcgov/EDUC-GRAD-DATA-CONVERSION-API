@@ -206,4 +206,17 @@ public class EducGradDataConversionApiConstants {
     // Splunk LogHelper Enabled
     @Value("${splunk.log-helper.enabled}")
     private boolean splunkLogHelperEnabled;
+
+    // Scheduler: ongoing updates from TRAX to GRAD
+    @Value("${cron.scheduled.process.events.stan.run}")
+    private String traxToGradCronRun;
+
+    @Value("${cron.scheduled.process.events.stan.lockAtLeastFor}")
+    private String traxToGradLockAtLeastFor;
+
+    @Value("${cron.scheduled.process.events.stan.lockAtMostFor}")
+    private String traxToGradLockAtMostFor;
+
+    @Value("${cron.scheduled.process.events.stan.threshold}")
+    private int traxToGradProcessingThreshold;
 }
