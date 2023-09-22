@@ -1248,7 +1248,7 @@ public class StudentProcess extends StudentBaseService {
             if ("AD".equalsIgnoreCase(gradStudent.getStudentGrade())) {
                 adultStartDate = DateUtils.addYears(dob, student.isAdult19Rule() ? 19 : 18);
             } else {
-                adultStartDate = DateUtils.addYears(dob, 18);
+                adultStartDate = getAdultStartDate(dob);
             }
             gradStudent.setAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
