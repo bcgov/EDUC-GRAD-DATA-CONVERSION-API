@@ -178,7 +178,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
     }
 
     private void handleAdultStartDate(StudentGradDTO currentStudent) {
-        if (StringUtils.equalsIgnoreCase(currentStudent.getNewProgram(), "1950")) { // && StringUtils.isBlank(currentStudent.getAdultStartDate())) {
+        if (StringUtils.equalsIgnoreCase(currentStudent.getNewProgram(), "1950") && StringUtils.isBlank(currentStudent.getAdultStartDate())) {
             Date dob = EducGradDataConversionApiUtils.parseDate(currentStudent.getBirthday());
             Date adultStartDate = getAdultStartDate(dob);
             currentStudent.setNewAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
