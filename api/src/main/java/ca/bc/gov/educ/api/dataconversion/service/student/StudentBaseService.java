@@ -5,9 +5,13 @@ import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.time.DateUtils;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class StudentBaseService {
@@ -153,4 +157,19 @@ public class StudentBaseService {
         return schoolOfRecord.startsWith("093") || "09898009".equalsIgnoreCase(schoolOfRecord) || "09898047".equalsIgnoreCase(schoolOfRecord);
     }
 
+    /**
+     *
+     * @param  dob
+     * @return adultStartDate
+     */
+    protected Date getAdultStartDate(Date dob) {
+        Date adultStartDate;
+        String year = EducGradDataConversionApiUtils.formatDate(dob, "yyyy");
+        if (NumberUtils.isCreatable(year) && Integer.parseInt(year) < 1994) {
+            adultStartDate = DateUtils.addYears(dob, 19);
+        } else {
+            adultStartDate = DateUtils.addMonths(dob, (12*18) + 1);
+        }
+        return adultStartDate;
+    }
 }
