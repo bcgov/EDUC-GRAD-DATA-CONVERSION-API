@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -178,9 +179,9 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
     }
 
     private void handleAdultStartDate(StudentGradDTO currentStudent) {
-        if (StringUtils.equalsIgnoreCase(currentStudent.getNewProgram(), "1950")) { // && StringUtils.isBlank(currentStudent.getAdultStartDate())) {
+        if (StringUtils.equalsIgnoreCase(currentStudent.getNewProgram(), "1950") && StringUtils.isBlank(currentStudent.getAdultStartDate())) {
             Date dob = EducGradDataConversionApiUtils.parseDate(currentStudent.getBirthday());
-            Date adultStartDate = getAdultStartDate(dob);
+            Date adultStartDate = DateUtils.addYears(dob, 18);
             currentStudent.setNewAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
     }
