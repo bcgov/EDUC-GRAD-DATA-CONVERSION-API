@@ -373,17 +373,19 @@ public class ReportProcess {
 	public void saveStudentTranscriptReportJasper(ReportData sample, Date distributionDate, String accessToken, UUID studentID, boolean isGraduated, boolean reload) {
 
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken);
-		GradStudentTranscripts requestObj = new GradStudentTranscripts();
-		requestObj.setTranscript(encodedPdfReportTranscript);
-		requestObj.setStudentID(studentID);
-		requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
-		requestObj.setDocumentStatusCode("IP");
-		requestObj.setDistributionDate(distributionDate);
-		requestObj.setOverwrite(reload);
-		if (isGraduated)
-			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
+		if(encodedPdfReportTranscript != null) {
+			GradStudentTranscripts requestObj = new GradStudentTranscripts();
+			requestObj.setTranscript(encodedPdfReportTranscript);
+			requestObj.setStudentID(studentID);
+			requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
+			requestObj.setDocumentStatusCode("IP");
+			requestObj.setDistributionDate(distributionDate);
+			requestObj.setOverwrite(reload);
+			if (isGraduated)
+				requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
-		this.restUtils.saveGradStudentTranscript(requestObj, isGraduated, accessToken);
+			this.restUtils.saveGradStudentTranscript(requestObj, isGraduated, accessToken);
+		}
 	}
 
 	private String generateStudentTranscriptReportJasper(ReportData sample,String accessToken) {
@@ -394,8 +396,11 @@ public class ReportProcess {
 		reportParams.setOptions(options);
 		reportParams.setData(sample);
 		byte[] bytesSAR = this.restUtils.getTranscriptReport(reportParams, accessToken);
-		byte[] encoded = org.apache.commons.codec.binary.Base64.encodeBase64(bytesSAR);
-		return new String(encoded, StandardCharsets.US_ASCII);
+		if(bytesSAR != null && bytesSAR.length > 0) {
+			byte[] encoded = org.apache.commons.codec.binary.Base64.encodeBase64(bytesSAR);
+			return new String(encoded, StandardCharsets.US_ASCII);
+		}
+		return null;
 	}
 
 	public List<ProgramCertificateTranscript> getCertificateList(GraduationData graduationDataStatus, String schoolCategoryCode, String accessToken) {
