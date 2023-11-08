@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.*;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.Generated;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -309,6 +310,7 @@ public class ReportProcess {
 		return data;
 	}
 
+	@Generated
 	private void setGraduationDataSpecialPrograms(ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData data, List<StudentCareerProgram> studentCareerPrograms) {
 		if (studentCareerPrograms != null) {
 			for (StudentCareerProgram cp : studentCareerPrograms) {
@@ -436,6 +438,7 @@ public class ReportProcess {
 		return data;
 	}
 
+	@Generated
 	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, ConvGradStudent convStudent,
 												   String accessToken, ProgramCertificateTranscript certType, boolean reload) {
 		ReportData certData = prepareCertificateData(graduationDataStatus, certType, convStudent, accessToken);
@@ -476,6 +479,7 @@ public class ReportProcess {
 		return cert;
 	}
 
+	@Generated
 	private String generateStudentCertificateReportJasper(ReportData sample,
 														  String accessToken) {
 		ReportOptions options = new ReportOptions();
