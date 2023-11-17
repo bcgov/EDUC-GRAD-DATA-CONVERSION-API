@@ -230,7 +230,7 @@ public class ReportProcess {
 	}
 
 	private String getCredits(String program, String courseCode, Integer totalCredits, boolean isRestricted) {
-		if (((program.contains("2004") || program.contains("2018")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
+		if (((program.contains("2004") || program.contains("2018") || program.contains("2023")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
 			return String.format("(%s)", totalCredits);
 		}
 		return String.valueOf(totalCredits);
