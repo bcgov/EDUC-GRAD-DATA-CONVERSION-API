@@ -1135,6 +1135,22 @@ public class CourseProcess {
         createCourseRequirement(populate("DAKE", "11", "119"), summary);
         createCourseRequirement(populate("DAKE", "12", "119"), summary);
         createCourseRequirement(populate("IDAKE", "11", "119"), summary);
+
+        // GRAD2-2402: Rule 200
+        createCourseRequirement(populate("QFRAP", "12", "200"), summary);
+        createCourseRequirement(populate("FCTF", "12", "200"), summary);
+        createCourseRequirement(populate("FRALP", "12", "200"), summary);
+        // GRAD2-2402: Rule 201
+        createCourseRequirement(populate("ELNMF", "11", "201"), summary);
+        createCourseRequirement(populate("ELSLF", "11", "201"), summary);
+        createCourseRequirement(populate("EFLSF", "11", "201"), summary);
+        createCourseRequirement(populate("FRALP", "11", "201"), summary);
+        // GRAD2-2402: Rule 202
+        createCourseRequirement(populate("QFRAP", "10", "202"), summary);
+        createCourseRequirement(populate("LANMF", "10", "202"), summary);
+        createCourseRequirement(populate("LAEOF", "10", "202"), summary);
+        createCourseRequirement(populate("LACWF", "10", "202"), summary);
+        createCourseRequirement(populate("FRALP", "10", "202"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
