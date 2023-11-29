@@ -76,30 +76,30 @@ public class StudentXProgramEventService extends StudentBaseService implements E
 
         currentStudent.getRemovedProgramCodes().forEach(p -> {
             if (isOptionalProgramCode(p)) {
-                log.info(" => removed optional program code : {}", p);
+                log.info(" => [{}] optional program will be removed if exist for {}.", p, currentStudent.getProgram());
                 studentProcess.removeStudentOptionalProgram(p, currentStudent, accessToken);
             } else {
-                log.info(" => removed career program code : {}", p);
+                log.info(" => [{}] career program will be removed if exist for {}.", p, currentStudent.getProgram());
                 studentProcess.removeStudentCareerProgram(p, currentStudent, accessToken);
             }
         });
 
         currentStudent.getAddedProgramCodes().forEach(p -> {
             if (isOptionalProgramCode(p)) {
-                log.info(" => new optional program code : {}", p);
+                log.info(" => [{}] optional program will be added if not exist for {}.", p, currentStudent.getProgram());
                 studentProcess.addStudentOptionalProgram(p, currentStudent, false, accessToken);
             } else {
-                log.info(" => new career program code : {}", p);
+                log.info(" => [{}] career program will be added if not exist for {}.", p, currentStudent.getProgram());
                 studentProcess.addStudentCareerProgram(p, currentStudent.getStudentID(), accessToken);
             }
         });
 
         // No Career Program?  then remove CP optional program
         if (studentProcess.existsCareerProgram(currentStudent.getStudentID(), accessToken)) {
-            log.info(" => [CP] optional program will be added if not exist.");
+            log.info(" => [CP] optional program will be added if not exist for {}.", currentStudent.getProgram());
             studentProcess.addStudentOptionalProgram("CP", currentStudent, false, accessToken);
         } else {
-            log.info(" => [CP] optional program will be removed if exist.");
+            log.info(" => [CP] optional program will be removed if exist for {}.", currentStudent.getProgram());
             studentProcess.removeStudentOptionalProgram("CP", currentStudent, accessToken);
         }
 

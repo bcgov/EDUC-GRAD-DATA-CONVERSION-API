@@ -66,7 +66,7 @@ public class StudentProcess extends StudentBaseService {
         specialCaseMap.clear();
     }
 
-    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload) throws Exception {
+    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) throws Exception {
         long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
 
@@ -91,7 +91,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // Student conversion process
-        process(convGradStudent, students, summary, reload);
+        process(convGradStudent, students, summary, reload, ongoingUpdate);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
         log.info("** PEN: {} - {} secs", convGradStudent.getPen(), diff);
@@ -155,16 +155,16 @@ public class StudentProcess extends StudentBaseService {
         return true;
     }
 
-    private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+    private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) {
         convGradStudent.setOriginalStudentLoadType(convGradStudent.getStudentLoadType());
         switch (convGradStudent.getStudentLoadType()) {
             case UNGRAD -> {
                 log.debug("Process Non-Graduated Student for pen# : " + convGradStudent.getPen());
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
             }
             case GRAD_ONE -> {
                 log.debug("Process Graduated Student - 1 Program for pen# : " + convGradStudent.getPen());
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
             }
             case GRAD_TWO -> {
                 log.debug("Process Graduated Student - 2 Programs for pen# : " + convGradStudent.getPen());
@@ -172,7 +172,7 @@ public class StudentProcess extends StudentBaseService {
                 String graduationRequirementYear = convGradStudent.getGraduationRequirementYear();
                 convGradStudent.setGraduationRequirementYear("SCCP");
                 convGradStudent.setStudentLoadType(StudentLoadType.GRAD_ONE);
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
                 // phase 2
                 convGradStudent.setGraduationRequirementYear(graduationRequirementYear);
                 convGradStudent.setSccDate(null);
@@ -182,20 +182,20 @@ public class StudentProcess extends StudentBaseService {
                 } else {
                     convGradStudent.setStudentLoadType(StudentLoadType.UNGRAD);
                 }
-                processConversion(convGradStudent, students, summary, false);
+                processConversion(convGradStudent, students, summary, false, ongoingUpdate);
             }
             default -> log.debug("skip process");
         }
     }
 
-    private void processConversion(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+    private void processConversion(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) {
         students.forEach(st -> {
             if (reload) {
                 restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), summary.getAccessToken());
             }
-            GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, summary);
+            GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, ongoingUpdate, summary);
             if (gradStudent != null) {
-                processDependencies(convGradStudent, gradStudent, st, summary, reload);
+                processDependencies(convGradStudent, gradStudent, st, summary, reload, ongoingUpdate);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -204,7 +204,7 @@ public class StudentProcess extends StudentBaseService {
         });
     }
 
-    private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, ConversionStudentSummaryDTO summary) {
+    private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, boolean ongoingUpdate, ConversionStudentSummaryDTO summary) {
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         GraduationStudentRecord gradStudent = null;
         try {
@@ -225,7 +225,7 @@ public class StudentProcess extends StudentBaseService {
                 gradStudent.setUpdateDate(null);
                 gradStudent.setUpdateUser(null);
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -244,7 +244,7 @@ public class StudentProcess extends StudentBaseService {
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -264,7 +264,7 @@ public class StudentProcess extends StudentBaseService {
                                      GraduationStudentRecord gradStudent,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary,
-                                     boolean reload) {
+                                     boolean reload, boolean ongoingUpdate) {
         ConversionResultType result;
 
         // process dependencies
@@ -291,7 +291,7 @@ public class StudentProcess extends StudentBaseService {
                 log.error("Json Parsing Error for StudentGradData: " + jpe.getLocalizedMessage());
             }
             try {
-                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
+                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
             } catch (Exception e) {
                 handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "updating a GraduationStudentRecord with clob data : " + e.getLocalizedMessage());
             }
@@ -1179,16 +1179,16 @@ public class StudentProcess extends StudentBaseService {
             List<String> optionalProgramCodes = new ArrayList<>();
 
             studentOptionalPrograms.forEach(op -> {
-                log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
+                log.info(" => [{}] optional program will be removed if exist for {}.", op.getOptionalProgramCode(), gradStudent.getProgram());
                 removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
-                if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
+                if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode(), gradStudent.getNewProgram())) {
                     optionalProgramCodes.add(op.getOptionalProgramCode());
                 }
             });
 
             // Recreate nonFI & nonDD optional programs
             optionalProgramCodes.forEach(opc -> {
-                log.info(" => [{}] optional program will be re-created.", opc);
+                log.info(" => [{}] optional program will be re-created for {}.", opc, gradStudent.getNewProgram());
                 addStudentOptionalProgram(opc, gradStudent, true, accessToken);
             });
         }
@@ -1196,11 +1196,11 @@ public class StudentProcess extends StudentBaseService {
 
     private void handleFIorDDOptionalProgram(StudentGradDTO gradStudent, String accessToken) {
         if (gradStudent.isAddDualDogwood()) {
-            log.info(" => [DD] optional program will be added if not exist.");
+            log.info(" => [DD] optional program will be added if not exist for {}.", gradStudent.getNewProgram());
             // new grad program has to be used
             addStudentOptionalProgram("DD", gradStudent, true, accessToken);
         } else if (gradStudent.isAddFrenchImmersion()) {
-            log.info(" => [FI] optional program will be added if not exist.");
+            log.info(" => [FI] optional program will be added if not exist for {}.", gradStudent.getNewProgram());
             // new grad program has to be used
             addStudentOptionalProgram("FI", gradStudent, true, accessToken);
         }
@@ -1209,7 +1209,6 @@ public class StudentProcess extends StudentBaseService {
     public void removeStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, String accessToken) {
         OptionalProgram optionalProgram = restUtils.getOptionalProgram(gradStudent.getProgram(), optionalProgramCode, accessToken);
         if (optionalProgram != null) {
-            log.info(" => removed optional program code : {}", optionalProgramCode);
             removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), gradStudent, accessToken);
         }
     }

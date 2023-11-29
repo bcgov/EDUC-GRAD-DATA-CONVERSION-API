@@ -89,7 +89,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -109,7 +109,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -136,7 +136,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -163,7 +163,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -195,7 +195,7 @@ public class StudentProcessTest {
         gradStudent.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -207,7 +207,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -238,7 +238,7 @@ public class StudentProcessTest {
         gradStudent.setStudentStatus("CUR");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
@@ -250,7 +250,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -305,7 +305,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(null);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -319,7 +319,7 @@ public class StudentProcessTest {
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -382,7 +382,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -396,7 +396,7 @@ public class StudentProcessTest {
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -459,7 +459,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -472,7 +472,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -535,7 +535,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -548,7 +548,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -611,7 +611,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -625,7 +625,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -688,7 +688,7 @@ public class StudentProcessTest {
         studentCareerProgram.setCareerProgramCode("XC");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourseForEN(pen, "11", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram);
@@ -702,7 +702,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -741,7 +741,7 @@ public class StudentProcessTest {
         school.setCertificateEligibility("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
@@ -766,7 +766,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -804,7 +804,7 @@ public class StudentProcessTest {
         school.setCertificateEligibility("Y");
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
@@ -830,7 +830,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -874,7 +874,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
@@ -900,7 +900,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -943,7 +943,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenThrow(new RuntimeException("GRAD Student API is down!"));
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
@@ -968,7 +968,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1019,7 +1019,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
@@ -1045,7 +1045,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1096,7 +1096,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenThrow(new RuntimeException("Grad Student API is down!"));
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
@@ -1122,7 +1122,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1333,7 +1333,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
@@ -1375,7 +1375,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -1589,7 +1589,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
@@ -1631,7 +1631,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -1845,7 +1845,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
@@ -1887,7 +1887,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2087,7 +2087,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
@@ -2129,7 +2129,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2328,7 +2328,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
@@ -2369,7 +2369,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2569,7 +2569,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(null);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getCareerProgram("XC", "123")).thenReturn(careerProgram);
         when(this.restUtils.getStudentOptionalPrograms(studentID.toString(), "123")).thenReturn(Arrays.asList(studentOptionalProgram1, studentOptionalProgram2));
         when(this.restUtils.saveStudentOptionalProgram(specialProgramReq, "123")).thenReturn(studentOptionalProgram1);
@@ -2610,7 +2610,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2760,7 +2760,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("1950", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -2792,7 +2792,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2959,7 +2959,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("1950", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -2992,7 +2992,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3141,7 +3141,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("1950", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -3173,7 +3173,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3321,7 +3321,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -3355,7 +3355,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3504,7 +3504,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.courseProcess.isFrenchImmersionCourse(pen, "10", "123")).thenReturn(true);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("2018-EN", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
@@ -3538,7 +3538,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3687,7 +3687,7 @@ public class StudentProcessTest {
 
         when(this.restUtils.getTokenResponseObject()).thenReturn(responseObj);
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
-        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq("123"))).thenReturn(gradStudent);
+        when(this.restUtils.saveStudentGradStatus(eq(studentID.toString()), any(GraduationStudentRecord.class), eq(false), eq("123"))).thenReturn(gradStudent);
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
         when(this.restUtils.getGradProgramRules("1950", "123")).thenReturn(Arrays.asList(pr10, pr11, pr15));
         when(this.restUtils.getAllSpecialCases("123")).thenReturn(Arrays.asList(sc));
@@ -3720,7 +3720,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);

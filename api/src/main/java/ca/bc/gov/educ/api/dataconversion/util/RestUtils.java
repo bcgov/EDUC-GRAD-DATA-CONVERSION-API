@@ -534,10 +534,10 @@ public class RestUtils {
 
     // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
     @Retry(name = "rt-saveStudentGradStatus", fallbackMethod = "rtSaveStudentGradStatusFallback")
-    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, String accessToken) {
+    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, boolean ongoingUpdate, String accessToken) {
         return webClient.post()
                 .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
-                        uri -> uri.queryParam("ongoingUpdate", false)
+                        uri -> uri.queryParam("ongoingUpdate", ongoingUpdate)
                                 .build())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
