@@ -68,7 +68,7 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
         if (studentProcess.hasAnyFrenchImmersionCourse(currentStudent.getProgram(), frenchImmersionUpdate.getPen(), accessToken)) {
             log.info(" => create FI optional program");
             studentProcess.addStudentOptionalProgram("FI", currentStudent, false, accessToken);
-            studentProcess.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
+            studentProcess.triggerGraduationBatchRun(FI10ADD, currentStudent.getStudentID(), frenchImmersionUpdate.getPen(), "Y", "Y", accessToken);
         }
     }
 

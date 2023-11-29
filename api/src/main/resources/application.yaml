@@ -230,6 +230,7 @@ endpoint:
     save-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram
     remove-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram/%s/%s
     read-student-career-programs: ${GRAD_STUDENT_API}api/v1/student/studentcareerprogram/studentid/%s
+    save-grad-student-record-for-ongoing-updates: ${GRAD_STUDENT_API}api/v1/student/conv/ongoingupdate/gradstatus
   grad-assessment-api:
     assessment-requirement:
       url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement

@@ -1,8 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
-import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.constant.EventType;
-import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
+import ca.bc.gov.educ.api.dataconversion.constant.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
@@ -1091,57 +1089,82 @@ public class StudentProcess extends StudentBaseService {
     /**
      * Save Graduation Student Record
      *      for Ongoing Updates from TRAX to GRAD
-     *
-     * @param gradStudent
-     * @param accessToken
      */
-    public void saveGraduationStudent(StudentGradDTO gradStudent, EventType eventType, String accessToken) {
-        GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
-        if (object != null) {
-            // UPD_GRAD ====================================================
-            if (eventType == EventType.UPD_GRAD) {
-                // School of Record
-                if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
-                    object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
-                }
-                // GRAD Program
-                if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
-                    object.setProgram(gradStudent.getNewProgram());
-                }
-                // Adult Start Date when GRAD program is changed
-                if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
-                    object.setAdultStartDate(gradStudent.getNewAdultStartDate());
-                }
-                // SLP Date
-                if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
-                    object.setProgramCompletionDate(gradStudent.getNewGradDate());
-                }
-                // Student Grade
-                if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
-                    object.setStudentGrade(gradStudent.getNewStudentGrade());
-                }
-                // Citizenship
-                if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
-                    object.setStudentCitizenship(gradStudent.getNewCitizenship());
-                }
+    public void saveGraduationStudent(String pen, StudentGradDTO gradStudent, EventType eventType, String accessToken) {
+        OngoingUpdateRequestDTO requestDTO = new OngoingUpdateRequestDTO();
+        requestDTO.setStudentID(gradStudent.getStudentID().toString());
+        requestDTO.setPen(pen);
+        requestDTO.setEventType(eventType);
+        // UPD_GRAD ====================================================
+        if (eventType == EventType.UPD_GRAD) {
+            // School of Record
+            if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.SCHOOL_OF_RECORD).value(gradStudent.getNewSchoolOfRecord())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            // UPD_GRAD ====================================================
-            // Student Status
-            if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
-                object.setStudentStatus(gradStudent.getNewStudentStatus());
+            // GRAD Program
+            if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.GRAD_PROGRAM).value(gradStudent.getNewProgram())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-
-            // Others ======================================================
-            // Batch Flags
-            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
-                object.setRecalculateGradStatus(gradStudent.getNewRecalculateGradStatus());
+            // Adult Start Date when GRAD program is changed
+            if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.DATE).name(FieldName.ADULT_START_DATE).value(gradStudent.getNewAdultStartDate())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateProjectedGrad())) {
-                object.setRecalculateProjectedGrad(gradStudent.getNewRecalculateProjectedGrad());
+            // SLP Date
+            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.DATE).name(FieldName.SLP_DATE).value(gradStudent.getNewGradDate())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-
-            restUtils.updateStudentGradStatus(gradStudent.getStudentID().toString(), object, eventType, accessToken);
+            // Student Grade
+            if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.STUDENT_GRADE).value(gradStudent.getNewStudentGrade())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
+            // Citizenship
+            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.CITIZENSHIP).value(gradStudent.getNewCitizenship())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
         }
+        // UPD_GRAD ====================================================
+        // Student Status
+        if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.STUDENT_STATUS).value(gradStudent.getNewStudentStatus())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+
+        // Others ======================================================
+        // Batch Flags
+        if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.RECALC_GRAD_ALG).value(gradStudent.getNewRecalculateGradStatus())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+        if (StringUtils.isNotBlank(gradStudent.getNewRecalculateProjectedGrad())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.RECALC_TVR).value(gradStudent.getNewRecalculateProjectedGrad())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+
+        restUtils.updateStudentGradStatusByFields(requestDTO, accessToken);
 
         if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
             removeAndReCreateOptionalPrograms(gradStudent, accessToken);
@@ -1219,17 +1242,30 @@ public class StudentProcess extends StudentBaseService {
         return list != null && !list.isEmpty();
     }
 
-    public void triggerGraduationBatchRun(UUID studentID, String recalculateGradStatus, String recalculateProjectedGrad, String accessToken) {
+    public void triggerGraduationBatchRun(EventType eventType, UUID studentID, String pen, String recalculateGradStatus, String recalculateProjectedGrad, String accessToken) {
         GraduationStudentRecord object = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
         if (object != null) {
-            if (StringUtils.equals(object.getStudentStatus(), STUDENT_STATUS_MERGED)) {
-                object.setRecalculateGradStatus(null);
-                object.setRecalculateProjectedGrad(null);
-            } else {
-                object.setRecalculateGradStatus(recalculateGradStatus == null? "Y" : recalculateGradStatus);
-                object.setRecalculateProjectedGrad(recalculateProjectedGrad == null? "Y" : recalculateProjectedGrad);
+            OngoingUpdateRequestDTO requestDTO = new OngoingUpdateRequestDTO();
+            requestDTO.setStudentID(studentID.toString());
+            requestDTO.setPen(pen);
+            requestDTO.setEventType(eventType);
+
+            boolean isMerged = StringUtils.equals(object.getStudentStatus(), STUDENT_STATUS_MERGED);
+            // Batch Flags
+            if (StringUtils.isNotBlank(recalculateGradStatus)) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.RECALC_GRAD_ALG).value(isMerged ? null : recalculateGradStatus)
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            restUtils.saveStudentGradStatus(studentID.toString(), object, accessToken);
+            if (StringUtils.isNotBlank(recalculateProjectedGrad)) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.RECALC_TVR).value(isMerged ? null : recalculateProjectedGrad)
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
+
+            restUtils.updateStudentGradStatusByFields(requestDTO, accessToken);
         }
     }
 

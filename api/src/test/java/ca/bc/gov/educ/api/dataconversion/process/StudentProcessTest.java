@@ -3839,7 +3839,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenENisChangedToPF_then_returnAPICallSuccess() {
         String program = "2018-EN";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3877,7 +3877,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, EventType.UPD_GRAD, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -3887,7 +3887,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenPFisChangedToEN_then_returnAPICallSuccess() {
         String program = "2018-PF";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3925,7 +3925,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, EventType.UPD_GRAD, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -3935,7 +3935,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenENisChangedTo1950Adult_then_returnAPICallSuccess() {
         String program = "2018-EN";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3962,7 +3962,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, EventType.UPD_GRAD, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -4242,7 +4242,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         boolean isExceptionThrown = false;
         try {
-            studentProcess.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
+            studentProcess.triggerGraduationBatchRun(EventType.XPROGRAM, studentID, pen, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }
@@ -4275,7 +4275,7 @@ public class StudentProcessTest {
 
         boolean isExceptionThrown = false;
         try {
-            studentProcess.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
+            studentProcess.triggerGraduationBatchRun(EventType.XPROGRAM, studentID, pen, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }

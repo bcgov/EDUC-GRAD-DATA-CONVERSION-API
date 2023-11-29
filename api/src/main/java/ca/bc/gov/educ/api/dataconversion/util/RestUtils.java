@@ -1,6 +1,5 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.constant.EventType;
 import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
@@ -548,16 +547,13 @@ public class RestUtils {
 
     // Update GraduationStudentRecord  - POST /student/conv/studentid/{id}?ongoingUpdate=true&eventType=UPD_GRAD
     @Retry(name = "rt-updateStudentGradStatus", fallbackMethod = "rtUpdateStudentGradStatusFallback")
-    public GraduationStudentRecord updateStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, EventType eventType, String accessToken) {
+    public GraduationStudentRecord updateStudentGradStatusByFields(OngoingUpdateRequestDTO requestDTO, String accessToken) {
         return webClient.post()
-                .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
-                        uri -> uri.queryParam("ongoingUpdate", true)
-                                .queryParam("eventType", eventType.name())
-                                .build())
+                .uri(constants.getSaveGraduationStudentRecordForOngoingUpdates())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+                }).body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}

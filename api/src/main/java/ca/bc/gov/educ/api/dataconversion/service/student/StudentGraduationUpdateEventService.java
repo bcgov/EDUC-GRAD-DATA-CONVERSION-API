@@ -139,7 +139,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-            studentProcess.saveGraduationStudent(currentStudent, UPD_GRAD, accessToken);
+            studentProcess.saveGraduationStudent(updateGrad.getPen(), currentStudent, UPD_GRAD, accessToken);
         }
     }
 
