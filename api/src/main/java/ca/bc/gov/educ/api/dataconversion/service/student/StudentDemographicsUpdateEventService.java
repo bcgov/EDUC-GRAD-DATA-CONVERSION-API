@@ -109,7 +109,7 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateDemog.getPen());
-            studentProcess.saveGraduationStudent(currentStudent, accessToken);
+            studentProcess.saveGraduationStudent(currentStudent, UPD_DEMOG, accessToken);
         }
     }
 

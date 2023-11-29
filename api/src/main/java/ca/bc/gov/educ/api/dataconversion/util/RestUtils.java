@@ -1,9 +1,10 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
+import ca.bc.gov.educ.api.dataconversion.constant.EventType;
 import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
-import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -534,10 +535,24 @@ public class RestUtils {
 
     // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
     @Retry(name = "rt-saveStudentGradStatus", fallbackMethod = "rtSaveStudentGradStatusFallback")
-    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, boolean ongoingUpdate, String accessToken) {
+    public GraduationStudentRecord saveStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, String accessToken) {
         return webClient.post()
                 .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
-                        uri -> uri.queryParam("ongoingUpdate", ongoingUpdate)
+                        uri -> uri.queryParam("ongoingUpdate", false)
+                                .build())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
+    // Update GraduationStudentRecord  - POST /student/conv/studentid/{id}?ongoingUpdate=true&eventType=UPD_GRAD
+    @Retry(name = "rt-updateStudentGradStatus", fallbackMethod = "rtUpdateStudentGradStatusFallback")
+    public GraduationStudentRecord updateStudentGradStatus(String studentID, GraduationStudentRecord toBeSaved, EventType eventType, String accessToken) {
+        return webClient.post()
+                .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
+                        uri -> uri.queryParam("ongoingUpdate", true)
+                                .queryParam("eventType", eventType.name())
                                 .build())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
@@ -619,6 +634,11 @@ public class RestUtils {
 
     public ConvGradStudent rtSaveStudentGradStatusFallback(HttpServerErrorException exception){
         log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception);
+        return null;
+    }
+
+    public ConvGradStudent rtUpdateStudentGradStatusFallback(HttpServerErrorException exception){
+        log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception);
         return null;
     }
 }

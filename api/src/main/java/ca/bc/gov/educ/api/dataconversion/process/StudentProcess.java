@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.EventType;
 import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
@@ -226,7 +227,7 @@ public class StudentProcess extends StudentBaseService {
                 gradStudent.setUpdateDate(null);
                 gradStudent.setUpdateUser(null);
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -245,7 +246,7 @@ public class StudentProcess extends StudentBaseService {
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -292,7 +293,7 @@ public class StudentProcess extends StudentBaseService {
                 log.error("Json Parsing Error for StudentGradData: " + jpe.getLocalizedMessage());
             }
             try {
-                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, summary.getAccessToken());
             } catch (Exception e) {
                 handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "updating a GraduationStudentRecord with clob data : " + e.getLocalizedMessage());
             }
@@ -1094,30 +1095,44 @@ public class StudentProcess extends StudentBaseService {
      * @param gradStudent
      * @param accessToken
      */
-    public void saveGraduationStudent(StudentGradDTO gradStudent, String accessToken) {
+    public void saveGraduationStudent(StudentGradDTO gradStudent, EventType eventType, String accessToken) {
         GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
         if (object != null) {
-            if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
-                object.setProgram(gradStudent.getNewProgram());
+            // UPD_GRAD ====================================================
+            if (eventType == EventType.UPD_GRAD) {
+                // School of Record
+                if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
+                    object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
+                }
+                // GRAD Program
+                if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
+                    object.setProgram(gradStudent.getNewProgram());
+                }
+                // Adult Start Date when GRAD program is changed
+                if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
+                    object.setAdultStartDate(gradStudent.getNewAdultStartDate());
+                }
+                // SLP Date
+                if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
+                    object.setProgramCompletionDate(gradStudent.getNewGradDate());
+                }
+                // Student Grade
+                if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
+                    object.setStudentGrade(gradStudent.getNewStudentGrade());
+                }
+                // Citizenship
+                if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
+                    object.setStudentCitizenship(gradStudent.getNewCitizenship());
+                }
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
-                object.setProgramCompletionDate(gradStudent.getNewGradDate());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
-                object.setStudentGrade(gradStudent.getNewStudentGrade());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
+            // UPD_GRAD ====================================================
+            // Student Status
+            if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
                 object.setStudentStatus(gradStudent.getNewStudentStatus());
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
-                object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
-                object.setStudentCitizenship(gradStudent.getNewCitizenship());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
-                object.setAdultStartDate(gradStudent.getNewAdultStartDate());
-            }
+
+            // Others ======================================================
+            // Batch Flags
             if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
                 object.setRecalculateGradStatus(gradStudent.getNewRecalculateGradStatus());
             }
@@ -1125,7 +1140,7 @@ public class StudentProcess extends StudentBaseService {
                 object.setRecalculateProjectedGrad(gradStudent.getNewRecalculateProjectedGrad());
             }
 
-            restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
+            restUtils.updateStudentGradStatus(gradStudent.getStudentID().toString(), object, eventType, accessToken);
         }
 
         if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
@@ -1214,7 +1229,7 @@ public class StudentProcess extends StudentBaseService {
                 object.setRecalculateGradStatus(recalculateGradStatus == null? "Y" : recalculateGradStatus);
                 object.setRecalculateProjectedGrad(recalculateProjectedGrad == null? "Y" : recalculateProjectedGrad);
             }
-            restUtils.saveStudentGradStatus(studentID.toString(), object, false, accessToken);
+            restUtils.saveStudentGradStatus(studentID.toString(), object, accessToken);
         }
     }
 
