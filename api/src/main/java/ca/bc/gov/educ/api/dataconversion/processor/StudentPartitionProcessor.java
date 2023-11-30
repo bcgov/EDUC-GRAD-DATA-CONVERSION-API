@@ -55,7 +55,7 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 					return null;
 				}
 				// convert
-				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO, StringUtils.equalsIgnoreCase(reload, "Y"));
+				responseStudent = studentProcess.convertStudent(students.get(0), summaryDTO, StringUtils.equalsIgnoreCase(reload, "Y"), false);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

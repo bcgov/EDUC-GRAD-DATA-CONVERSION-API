@@ -84,7 +84,7 @@ public class ChoreographEventHandler {
             break;
         }
       } catch (final Exception exception) {
-        log.error("Exception while processing event :: {}", event, exception);
+        log.error("Exception while processing event :: {} - {}", event, exception.getMessage());
       }
     });
   }

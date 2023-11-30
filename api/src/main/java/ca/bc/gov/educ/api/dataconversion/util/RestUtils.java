@@ -1,9 +1,9 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
-import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
 import io.github.resilience4j.retry.annotation.Retry;
@@ -545,6 +545,17 @@ public class RestUtils {
                 }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
+    // Update GraduationStudentRecord  - POST /student/conv/studentid/{id}?ongoingUpdate=true&eventType=UPD_GRAD
+    @Retry(name = "rt-updateStudentGradStatus", fallbackMethod = "rtUpdateStudentGradStatusFallback")
+    public GraduationStudentRecord updateStudentGradStatusByFields(OngoingUpdateRequestDTO requestDTO, String accessToken) {
+        return webClient.post()
+                .uri(constants.getSaveGraduationStudentRecordForOngoingUpdates())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
     public void removeAllStudentRelatedData(UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getSaveGraduationStudentRecord(),studentID))
@@ -619,6 +630,11 @@ public class RestUtils {
 
     public ConvGradStudent rtSaveStudentGradStatusFallback(HttpServerErrorException exception){
         log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception);
+        return null;
+    }
+
+    public ConvGradStudent rtUpdateStudentGradStatusFallback(HttpServerErrorException exception){
+        log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception);
         return null;
     }
 }
