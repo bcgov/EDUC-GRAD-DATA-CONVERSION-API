@@ -52,6 +52,8 @@ public class StudentFrenchImmersionEventService extends StudentBaseService imple
             StudentGradDTO currentStudent = studentProcess.loadStudentData(frenchImmersionUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processFrenchImmersion(frenchImmersionUpdate, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 

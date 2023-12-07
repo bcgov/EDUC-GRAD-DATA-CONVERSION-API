@@ -36,9 +36,7 @@ import java.util.concurrent.Executor;
 @Slf4j
 public class Subscriber {
 
-  private final Executor subscriberExecutor = new EnhancedQueueExecutor.Builder()
-      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("jet-stream-subscriber-%d").build())
-      .setCorePoolSize(2).setMaximumPoolSize(2).setKeepAliveTime(Duration.ofMillis(1000)).build();
+  private final Executor subscriberExecutor;
   private final EventHandlerDelegatorService eventHandlerDelegatorService;
   private final Map<String, List<String>> streamTopicsMap = new HashMap<>(); // one stream can have multiple topics.
   private final Connection natsConnection;
@@ -55,6 +53,9 @@ public class Subscriber {
     this.eventHandlerDelegatorService = eventHandlerDelegatorService;
     this.natsConnection = natsConnection;
     this.constants = constants;
+    this.subscriberExecutor = new EnhancedQueueExecutor.Builder()
+            .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("jet-stream-subscriber-%d").build())
+            .setCorePoolSize(10).setMaximumPoolSize(10).setKeepAliveTime(Duration.ofSeconds(60)).build();
     this.initializeStreamTopicMap();
   }
 

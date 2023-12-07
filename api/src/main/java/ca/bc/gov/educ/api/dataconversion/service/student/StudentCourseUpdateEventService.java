@@ -54,6 +54,8 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
             StudentGradDTO currentStudent = studentProcess.loadStudentData(studentCourseUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processCourse(studentCourseUpdate, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 

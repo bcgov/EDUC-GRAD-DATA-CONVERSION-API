@@ -56,6 +56,8 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             StudentGradDTO currentStudent = studentProcess.loadStudentData(updateGrad.getPen(), accessToken);
             if (currentStudent != null) {
                 processStudent(updateGrad, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 

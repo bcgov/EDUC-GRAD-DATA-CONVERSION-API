@@ -195,7 +195,7 @@ public class StudentFrenchImmersionEventServiceTest {
         studentFrenchImmersionEventService.processEvent(traxFrenchImmersion, event);
 
         assertThat(event).isNotNull();
-        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.DB_COMMITTED.name());
     }
 
 }

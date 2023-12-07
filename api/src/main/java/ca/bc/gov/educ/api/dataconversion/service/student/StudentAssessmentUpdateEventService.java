@@ -55,6 +55,8 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
             StudentGradDTO currentStudent = studentProcess.loadStudentData(studentAssessmentUpdate.getPen(), accessToken);
             if (currentStudent != null) {
                 processAssessment(studentAssessmentUpdate, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 

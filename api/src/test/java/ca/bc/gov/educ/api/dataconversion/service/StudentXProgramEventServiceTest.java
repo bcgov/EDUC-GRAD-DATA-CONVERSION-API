@@ -467,6 +467,6 @@ public class StudentXProgramEventServiceTest {
         studentXProgramEventService.processEvent(traxXProgram, event);
 
         assertThat(event).isNotNull();
-        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.DB_COMMITTED.name());
     }
 }
