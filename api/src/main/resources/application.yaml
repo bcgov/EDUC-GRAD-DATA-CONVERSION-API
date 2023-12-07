@@ -142,6 +142,13 @@ resilience4j.retry:
         - org.springframework.web.client.HttpServerErrorException
       ignoreExceptions:
         - java.lang.NullPointerException
+    rt-updateStudentGradStatus:
+      maxAttempts: ${MAX_RETRY_ATTEMPTS}
+      waitDuration: 5s
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+      ignoreExceptions:
+        - java.lang.NullPointerException
     rt-conversionStatus:
       maxAttempts: ${MAX_RETRY_ATTEMPTS}
       waitDuration: 5s
@@ -223,6 +230,7 @@ endpoint:
     save-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram
     remove-student-career-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentcareerprogram/%s/%s
     read-student-career-programs: ${GRAD_STUDENT_API}api/v1/student/studentcareerprogram/studentid/%s
+    save-grad-student-record-for-ongoing-updates: ${GRAD_STUDENT_API}api/v1/student/conv/ongoingupdate/gradstatus
   grad-assessment-api:
     assessment-requirement:
       url: ${GRAD_ASSESSMENT_API}api/v1/assessment/requirement

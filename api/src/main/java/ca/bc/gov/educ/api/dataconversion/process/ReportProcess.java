@@ -10,6 +10,7 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.*;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.Generated;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -230,7 +231,7 @@ public class ReportProcess {
 	}
 
 	private String getCredits(String program, String courseCode, Integer totalCredits, boolean isRestricted) {
-		if (((program.contains("2004") || program.contains("2018")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
+		if (((program.contains("2004") || program.contains("2018") || program.contains("2023")) && (courseCode.startsWith("X") || courseCode.startsWith("CP"))) || isRestricted) {
 			return String.format("(%s)", totalCredits);
 		}
 		return String.valueOf(totalCredits);
@@ -309,6 +310,7 @@ public class ReportProcess {
 		return data;
 	}
 
+	@Generated
 	private void setGraduationDataSpecialPrograms(ca.bc.gov.educ.api.dataconversion.model.tsw.report.GraduationData data, List<StudentCareerProgram> studentCareerPrograms) {
 		if (studentCareerPrograms != null) {
 			for (StudentCareerProgram cp : studentCareerPrograms) {
@@ -373,17 +375,19 @@ public class ReportProcess {
 	public void saveStudentTranscriptReportJasper(ReportData sample, Date distributionDate, String accessToken, UUID studentID, boolean isGraduated, boolean reload) {
 
 		String encodedPdfReportTranscript = generateStudentTranscriptReportJasper(sample, accessToken);
-		GradStudentTranscripts requestObj = new GradStudentTranscripts();
-		requestObj.setTranscript(encodedPdfReportTranscript);
-		requestObj.setStudentID(studentID);
-		requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
-		requestObj.setDocumentStatusCode("IP");
-		requestObj.setDistributionDate(distributionDate);
-		requestObj.setOverwrite(reload);
-		if (isGraduated)
-			requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
+		if(encodedPdfReportTranscript != null) {
+			GradStudentTranscripts requestObj = new GradStudentTranscripts();
+			requestObj.setTranscript(encodedPdfReportTranscript);
+			requestObj.setStudentID(studentID);
+			requestObj.setTranscriptTypeCode(sample.getTranscript().getTranscriptTypeCode().getCode());
+			requestObj.setDocumentStatusCode("IP");
+			requestObj.setDistributionDate(distributionDate);
+			requestObj.setOverwrite(reload);
+			if (isGraduated)
+				requestObj.setDocumentStatusCode(DOCUMENT_STATUS_COMPLETED);
 
-		this.restUtils.saveGradStudentTranscript(requestObj, isGraduated, accessToken);
+			this.restUtils.saveGradStudentTranscript(requestObj, isGraduated, accessToken);
+		}
 	}
 
 	private String generateStudentTranscriptReportJasper(ReportData sample,String accessToken) {
@@ -394,8 +398,11 @@ public class ReportProcess {
 		reportParams.setOptions(options);
 		reportParams.setData(sample);
 		byte[] bytesSAR = this.restUtils.getTranscriptReport(reportParams, accessToken);
-		byte[] encoded = org.apache.commons.codec.binary.Base64.encodeBase64(bytesSAR);
-		return new String(encoded, StandardCharsets.US_ASCII);
+		if(bytesSAR != null && bytesSAR.length > 0) {
+			byte[] encoded = org.apache.commons.codec.binary.Base64.encodeBase64(bytesSAR);
+			return new String(encoded, StandardCharsets.US_ASCII);
+		}
+		return null;
 	}
 
 	public List<ProgramCertificateTranscript> getCertificateList(GraduationData graduationDataStatus, String schoolCategoryCode, String accessToken) {
@@ -431,6 +438,7 @@ public class ReportProcess {
 		return data;
 	}
 
+	@Generated
 	public void saveStudentCertificateReportJasper(GraduationData graduationDataStatus, ConvGradStudent convStudent,
 												   String accessToken, ProgramCertificateTranscript certType, boolean reload) {
 		ReportData certData = prepareCertificateData(graduationDataStatus, certType, convStudent, accessToken);
@@ -471,6 +479,7 @@ public class ReportProcess {
 		return cert;
 	}
 
+	@Generated
 	private String generateStudentCertificateReportJasper(ReportData sample,
 														  String accessToken) {
 		ReportOptions options = new ReportOptions();

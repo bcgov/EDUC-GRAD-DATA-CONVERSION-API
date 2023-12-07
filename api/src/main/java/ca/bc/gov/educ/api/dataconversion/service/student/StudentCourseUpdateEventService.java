@@ -67,7 +67,7 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
 
     public void processCourse(TraxStudentUpdateDTO studentCourseUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process Course : studentID = {}, pen = {} ", currentStudent.getStudentID(), studentCourseUpdate.getPen());
-        studentProcess.triggerGraduationBatchRun(currentStudent.getStudentID(), "Y", "Y", accessToken);
+        studentProcess.triggerGraduationBatchRun(COURSE, currentStudent.getStudentID(), studentCourseUpdate.getPen(), "Y", "Y", accessToken);
     }
 
     @Override

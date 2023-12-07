@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
-import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
+import ca.bc.gov.educ.api.dataconversion.constant.*;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
@@ -67,7 +66,7 @@ public class StudentProcess extends StudentBaseService {
         specialCaseMap.clear();
     }
 
-    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload) throws Exception {
+    public ConvGradStudent convertStudent(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) throws Exception {
         long startTime = System.currentTimeMillis();
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
 
@@ -92,7 +91,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // Student conversion process
-        process(convGradStudent, students, summary, reload);
+        process(convGradStudent, students, summary, reload, ongoingUpdate);
 
         long diff = (System.currentTimeMillis() - startTime) / 1000L;
         log.info("** PEN: {} - {} secs", convGradStudent.getPen(), diff);
@@ -156,16 +155,16 @@ public class StudentProcess extends StudentBaseService {
         return true;
     }
 
-    private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+    private void process(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) {
         convGradStudent.setOriginalStudentLoadType(convGradStudent.getStudentLoadType());
         switch (convGradStudent.getStudentLoadType()) {
             case UNGRAD -> {
                 log.debug("Process Non-Graduated Student for pen# : " + convGradStudent.getPen());
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
             }
             case GRAD_ONE -> {
                 log.debug("Process Graduated Student - 1 Program for pen# : " + convGradStudent.getPen());
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
             }
             case GRAD_TWO -> {
                 log.debug("Process Graduated Student - 2 Programs for pen# : " + convGradStudent.getPen());
@@ -173,7 +172,7 @@ public class StudentProcess extends StudentBaseService {
                 String graduationRequirementYear = convGradStudent.getGraduationRequirementYear();
                 convGradStudent.setGraduationRequirementYear("SCCP");
                 convGradStudent.setStudentLoadType(StudentLoadType.GRAD_ONE);
-                processConversion(convGradStudent, students, summary, reload);
+                processConversion(convGradStudent, students, summary, reload, ongoingUpdate);
                 // phase 2
                 convGradStudent.setGraduationRequirementYear(graduationRequirementYear);
                 convGradStudent.setSccDate(null);
@@ -183,20 +182,20 @@ public class StudentProcess extends StudentBaseService {
                 } else {
                     convGradStudent.setStudentLoadType(StudentLoadType.UNGRAD);
                 }
-                processConversion(convGradStudent, students, summary, false);
+                processConversion(convGradStudent, students, summary, false, ongoingUpdate);
             }
             default -> log.debug("skip process");
         }
     }
 
-    private void processConversion(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload) {
+    private void processConversion(ConvGradStudent convGradStudent, List<Student> students, ConversionStudentSummaryDTO summary, boolean reload, boolean ongoingUpdate) {
         students.forEach(st -> {
             if (reload) {
                 restUtils.removeAllStudentRelatedData(UUID.fromString(st.getStudentID()), summary.getAccessToken());
             }
-            GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, summary);
+            GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, ongoingUpdate, summary);
             if (gradStudent != null) {
-                processDependencies(convGradStudent, gradStudent, st, summary, reload);
+                processDependencies(convGradStudent, gradStudent, st, summary, reload, ongoingUpdate);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -205,7 +204,7 @@ public class StudentProcess extends StudentBaseService {
         });
     }
 
-    private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, ConversionStudentSummaryDTO summary) {
+    private GraduationStudentRecord processStudent(ConvGradStudent convGradStudent, Student penStudent, boolean ongoingUpdate, ConversionStudentSummaryDTO summary) {
         UUID studentID = UUID.fromString(penStudent.getStudentID());
         GraduationStudentRecord gradStudent = null;
         try {
@@ -226,7 +225,7 @@ public class StudentProcess extends StudentBaseService {
                 gradStudent.setUpdateDate(null);
                 gradStudent.setUpdateUser(null);
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -245,7 +244,7 @@ public class StudentProcess extends StudentBaseService {
             }
             if (ConversionResultType.FAILURE != convGradStudent.getResult()) {
                 try {
-                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                    gradStudent = restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
                 } catch (Exception e) {
                     log.error(EXCEPTION_MSG, e);
                     handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "saving a GraduationStudentRecord : " + e.getLocalizedMessage());
@@ -265,7 +264,7 @@ public class StudentProcess extends StudentBaseService {
                                      GraduationStudentRecord gradStudent,
                                      Student penStudent,
                                      ConversionStudentSummaryDTO summary,
-                                     boolean reload) {
+                                     boolean reload, boolean ongoingUpdate) {
         ConversionResultType result;
 
         // process dependencies
@@ -292,7 +291,7 @@ public class StudentProcess extends StudentBaseService {
                 log.error("Json Parsing Error for StudentGradData: " + jpe.getLocalizedMessage());
             }
             try {
-                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, false, summary.getAccessToken());
+                restUtils.saveStudentGradStatus(penStudent.getStudentID(), gradStudent, ongoingUpdate, summary.getAccessToken());
             } catch (Exception e) {
                 handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, GRAD_STUDENT_API_ERROR_MSG + "updating a GraduationStudentRecord with clob data : " + e.getLocalizedMessage());
             }
@@ -1090,43 +1089,82 @@ public class StudentProcess extends StudentBaseService {
     /**
      * Save Graduation Student Record
      *      for Ongoing Updates from TRAX to GRAD
-     *
-     * @param gradStudent
-     * @param accessToken
      */
-    public void saveGraduationStudent(StudentGradDTO gradStudent, String accessToken) {
-        GraduationStudentRecord object = restUtils.getStudentGradStatus(gradStudent.getStudentID().toString(), accessToken);
-        if (object != null) {
-            if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
-                object.setProgram(gradStudent.getNewProgram());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
-                object.setProgramCompletionDate(gradStudent.getNewGradDate());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
-                object.setStudentGrade(gradStudent.getNewStudentGrade());
-            }
-            if (StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
-                object.setStudentStatus(gradStudent.getNewStudentStatus());
-            }
+    public void saveGraduationStudent(String pen, StudentGradDTO gradStudent, EventType eventType, String accessToken) {
+        OngoingUpdateRequestDTO requestDTO = new OngoingUpdateRequestDTO();
+        requestDTO.setStudentID(gradStudent.getStudentID().toString());
+        requestDTO.setPen(pen);
+        requestDTO.setEventType(eventType);
+        // UPD_GRAD ====================================================
+        if (eventType == EventType.UPD_GRAD) {
+            // School of Record
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
-                object.setSchoolOfRecord(gradStudent.getNewSchoolOfRecord());
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.SCHOOL_OF_RECORD).value(gradStudent.getNewSchoolOfRecord())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
-                object.setStudentCitizenship(gradStudent.getNewCitizenship());
+            // GRAD Program
+            if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.GRAD_PROGRAM).value(gradStudent.getNewProgram())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
+            // Adult Start Date when GRAD program is changed
             if (StringUtils.isNotBlank(gradStudent.getNewAdultStartDate())) {
-                object.setAdultStartDate(gradStudent.getNewAdultStartDate());
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.DATE).name(FieldName.ADULT_START_DATE).value(gradStudent.getNewAdultStartDate())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
-                object.setRecalculateGradStatus(gradStudent.getNewRecalculateGradStatus());
+            // SLP Date
+            if (StringUtils.isNotBlank(gradStudent.getNewGradDate())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.DATE).name(FieldName.SLP_DATE).value(gradStudent.getNewGradDate())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            if (StringUtils.isNotBlank(gradStudent.getNewRecalculateProjectedGrad())) {
-                object.setRecalculateProjectedGrad(gradStudent.getNewRecalculateProjectedGrad());
+            // Student Grade
+            if (StringUtils.isNotBlank(gradStudent.getNewStudentGrade())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.STUDENT_GRADE).value(gradStudent.getNewStudentGrade())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-
-            restUtils.saveStudentGradStatus(gradStudent.getStudentID().toString(), object, true, accessToken);
+            // Citizenship
+            if (StringUtils.isNotBlank(gradStudent.getNewCitizenship())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.CITIZENSHIP).value(gradStudent.getNewCitizenship())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
         }
+        // UPD_GRAD ====================================================
+        // Student Status
+        if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.STUDENT_STATUS).value(gradStudent.getNewStudentStatus())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+
+        // Others ======================================================
+        // Batch Flags
+        if (StringUtils.isNotBlank(gradStudent.getNewRecalculateGradStatus())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.RECALC_GRAD_ALG).value(gradStudent.getNewRecalculateGradStatus())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+        if (StringUtils.isNotBlank(gradStudent.getNewRecalculateProjectedGrad())) {
+            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                    .type(FieldType.STRING).name(FieldName.RECALC_TVR).value(gradStudent.getNewRecalculateProjectedGrad())
+                    .build();
+            requestDTO.getUpdateFields().add(field);
+        }
+
+        restUtils.updateStudentGradStatusByFields(requestDTO, accessToken);
 
         if (StringUtils.isNotBlank(gradStudent.getNewProgram())) {
             removeAndReCreateOptionalPrograms(gradStudent, accessToken);
@@ -1141,16 +1179,16 @@ public class StudentProcess extends StudentBaseService {
             List<String> optionalProgramCodes = new ArrayList<>();
 
             studentOptionalPrograms.forEach(op -> {
-                log.info(" => [{}] optional program will be removed if exist.", op.getOptionalProgramCode());
+                log.info(" => [{}] optional program will be removed if exist for {}.", op.getOptionalProgramCode(), gradStudent.getProgram());
                 removeStudentOptionalProgram(op.getOptionalProgramID(), gradStudent, accessToken);
-                if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode())) {
+                if (isOptionalProgramRecreationRequired(op.getOptionalProgramCode(), gradStudent.getNewProgram())) {
                     optionalProgramCodes.add(op.getOptionalProgramCode());
                 }
             });
 
             // Recreate nonFI & nonDD optional programs
             optionalProgramCodes.forEach(opc -> {
-                log.info(" => [{}] optional program will be re-created.", opc);
+                log.info(" => [{}] optional program will be re-created for {}.", opc, gradStudent.getNewProgram());
                 addStudentOptionalProgram(opc, gradStudent, true, accessToken);
             });
         }
@@ -1158,11 +1196,11 @@ public class StudentProcess extends StudentBaseService {
 
     private void handleFIorDDOptionalProgram(StudentGradDTO gradStudent, String accessToken) {
         if (gradStudent.isAddDualDogwood()) {
-            log.info(" => [DD] optional program will be added if not exist.");
+            log.info(" => [DD] optional program will be added if not exist for {}.", gradStudent.getNewProgram());
             // new grad program has to be used
             addStudentOptionalProgram("DD", gradStudent, true, accessToken);
         } else if (gradStudent.isAddFrenchImmersion()) {
-            log.info(" => [FI] optional program will be added if not exist.");
+            log.info(" => [FI] optional program will be added if not exist for {}.", gradStudent.getNewProgram());
             // new grad program has to be used
             addStudentOptionalProgram("FI", gradStudent, true, accessToken);
         }
@@ -1171,7 +1209,6 @@ public class StudentProcess extends StudentBaseService {
     public void removeStudentOptionalProgram(String optionalProgramCode, StudentGradDTO gradStudent, String accessToken) {
         OptionalProgram optionalProgram = restUtils.getOptionalProgram(gradStudent.getProgram(), optionalProgramCode, accessToken);
         if (optionalProgram != null) {
-            log.info(" => removed optional program code : {}", optionalProgramCode);
             removeStudentOptionalProgram(optionalProgram.getOptionalProgramID(), gradStudent, accessToken);
         }
     }
@@ -1204,17 +1241,30 @@ public class StudentProcess extends StudentBaseService {
         return list != null && !list.isEmpty();
     }
 
-    public void triggerGraduationBatchRun(UUID studentID, String recalculateGradStatus, String recalculateProjectedGrad, String accessToken) {
+    public void triggerGraduationBatchRun(EventType eventType, UUID studentID, String pen, String recalculateGradStatus, String recalculateProjectedGrad, String accessToken) {
         GraduationStudentRecord object = restUtils.getStudentGradStatus(studentID.toString(), accessToken);
         if (object != null) {
-            if (StringUtils.equals(object.getStudentStatus(), STUDENT_STATUS_MERGED)) {
-                object.setRecalculateGradStatus(null);
-                object.setRecalculateProjectedGrad(null);
-            } else {
-                object.setRecalculateGradStatus(recalculateGradStatus == null? "Y" : recalculateGradStatus);
-                object.setRecalculateProjectedGrad(recalculateProjectedGrad == null? "Y" : recalculateProjectedGrad);
+            OngoingUpdateRequestDTO requestDTO = new OngoingUpdateRequestDTO();
+            requestDTO.setStudentID(studentID.toString());
+            requestDTO.setPen(pen);
+            requestDTO.setEventType(eventType);
+
+            boolean isMerged = StringUtils.equals(object.getStudentStatus(), STUDENT_STATUS_MERGED);
+            // Batch Flags
+            if (StringUtils.isNotBlank(recalculateGradStatus)) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.RECALC_GRAD_ALG).value(isMerged ? null : recalculateGradStatus)
+                        .build();
+                requestDTO.getUpdateFields().add(field);
             }
-            restUtils.saveStudentGradStatus(studentID.toString(), object, false, accessToken);
+            if (StringUtils.isNotBlank(recalculateProjectedGrad)) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.RECALC_TVR).value(isMerged ? null : recalculateProjectedGrad)
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
+
+            restUtils.updateStudentGradStatusByFields(requestDTO, accessToken);
         }
     }
 

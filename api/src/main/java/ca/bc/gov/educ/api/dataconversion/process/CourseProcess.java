@@ -43,6 +43,7 @@ public class CourseProcess {
     private static final String QFRAL_STR = "QFRAL";
     private static final String ZFRAL_STR = "ZFRAL";
     private static final String IBFAS_STR = "IBFAS";
+    private static final String QFRAP_STR = "QFRAP";
 
     private static final String ERR_MSG_FORMAT = "For {} : {}";
 
@@ -567,8 +568,8 @@ public class CourseProcess {
         createCourseRequirement(populate(QFRAL_STR, "12", "915"), summary);
 
         // QFRAP 12
-        createCourseRequirement(populate("QFRAP", "12", "910"), summary);
-        createCourseRequirement(populate("QFRAP", "12", "915"), summary);
+        createCourseRequirement(populate(QFRAP_STR, "12", "910"), summary);
+        createCourseRequirement(populate(QFRAP_STR, "12", "915"), summary);
 
         // ZFRAL 12
         createCourseRequirement(populate(ZFRAL_STR, "12", "819"), summary);
@@ -1135,6 +1136,22 @@ public class CourseProcess {
         createCourseRequirement(populate("DAKE", "11", "119"), summary);
         createCourseRequirement(populate("DAKE", "12", "119"), summary);
         createCourseRequirement(populate("IDAKE", "11", "119"), summary);
+
+        // GRAD2-2402: Rule 200
+        createCourseRequirement(populate(QFRAP_STR, "12", "200"), summary);
+        createCourseRequirement(populate("FCTF", "12", "200"), summary);
+        createCourseRequirement(populate(FRALP_STR, "12", "200"), summary);
+        // GRAD2-2402: Rule 201
+        createCourseRequirement(populate("ELNMF", "11", "201"), summary);
+        createCourseRequirement(populate("ELSLF", "11", "201"), summary);
+        createCourseRequirement(populate("EFLSF", "11", "201"), summary);
+        createCourseRequirement(populate(FRALP_STR, "11", "201"), summary);
+        // GRAD2-2402: Rule 202
+        createCourseRequirement(populate(QFRAP_STR, "10", "202"), summary);
+        createCourseRequirement(populate("LANMF", "10", "202"), summary);
+        createCourseRequirement(populate("LAEOF", "10", "202"), summary);
+        createCourseRequirement(populate("LACWF", "10", "202"), summary);
+        createCourseRequirement(populate(FRALP_STR, "10", "202"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {

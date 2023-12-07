@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
 	<artifactId>educ-grad-data-conversion-api</artifactId>
-	<version>1.8.48</version>
+	<version>1.8.50</version>
 	<name>educ-grad-data-conversion-api</name>
 	<description>Ministry of Education GRAD DATA CONVERSION API</description>
 
@@ -65,6 +65,10 @@
                     <artifactId>spring-boot-starter-tomcat</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

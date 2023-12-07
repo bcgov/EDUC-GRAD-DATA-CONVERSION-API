@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
+import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
-import ca.bc.gov.educ.api.dataconversion.model.StudentCareerProgram;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -471,11 +473,27 @@ public class RestUtils {
     }
 
     public byte[] getTranscriptReport(ReportRequest reportParams, String accessToken) {
-        return webClient.post().uri(constants.getTranscriptReport())
+        try {
+            return webClient.post().uri(constants.getTranscriptReport())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
+                }).body(BodyInserters.fromValue(reportParams))
+                .retrieve()
+                .onStatus(HttpStatusCode::is5xxServerError,
+                        response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
+                .onStatus(
+                        HttpStatus.NO_CONTENT::equals,
+                        response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
+                )
+                .bodyToMono(byte[].class).block();
+        } catch (ServiceException ex) {
+            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
+                return new byte[0];
+            } else {
+                throw ex;
+            }
+        }
     }
 
     public List<ProgramCertificateTranscript> getProgramCertificateTranscriptList(ProgramCertificateReq req, String accessToken) {
@@ -525,6 +543,17 @@ public class RestUtils {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
+    // Update GraduationStudentRecord  - POST /student/conv/studentid/{id}?ongoingUpdate=true&eventType=UPD_GRAD
+    @Retry(name = "rt-updateStudentGradStatus", fallbackMethod = "rtUpdateStudentGradStatusFallback")
+    public GraduationStudentRecord updateStudentGradStatusByFields(OngoingUpdateRequestDTO requestDTO, String accessToken) {
+        return webClient.post()
+                .uri(constants.getSaveGraduationStudentRecordForOngoingUpdates())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
@@ -601,6 +630,11 @@ public class RestUtils {
 
     public ConvGradStudent rtSaveStudentGradStatusFallback(HttpServerErrorException exception){
         log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception);
+        return null;
+    }
+
+    public ConvGradStudent rtUpdateStudentGradStatusFallback(HttpServerErrorException exception){
+        log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception);
         return null;
     }
 }

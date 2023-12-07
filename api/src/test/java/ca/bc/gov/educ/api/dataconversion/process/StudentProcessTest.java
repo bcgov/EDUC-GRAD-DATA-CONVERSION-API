@@ -1,6 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
+import ca.bc.gov.educ.api.dataconversion.constant.EventType;
 import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
@@ -88,7 +89,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -108,7 +109,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -135,7 +136,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -162,7 +163,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -206,7 +207,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -249,7 +250,7 @@ public class StudentProcessTest {
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -318,7 +319,7 @@ public class StudentProcessTest {
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -395,7 +396,7 @@ public class StudentProcessTest {
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -471,7 +472,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -547,7 +548,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -624,7 +625,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -701,7 +702,7 @@ public class StudentProcessTest {
                 .transcriptSchool(school).programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -765,7 +766,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -829,7 +830,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -899,7 +900,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -967,7 +968,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1044,7 +1045,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1121,7 +1122,7 @@ public class StudentProcessTest {
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getResult()).isEqualTo(ConversionResultType.FAILURE);
@@ -1374,7 +1375,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -1630,7 +1631,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -1886,7 +1887,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2128,7 +2129,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2368,7 +2369,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2609,7 +2610,7 @@ public class StudentProcessTest {
 
         when(this.reportProcess.prepareTranscriptData(any(), any(), any(), eq(summary.getAccessToken()))).thenReturn(new ReportData());
 
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2791,7 +2792,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -2991,7 +2992,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3172,7 +3173,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3354,7 +3355,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3537,7 +3538,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3719,7 +3720,7 @@ public class StudentProcessTest {
 
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
-        var result = studentProcess.convertStudent(student, summary, false);
+        var result = studentProcess.convertStudent(student, summary, false, false);
 
         assertThat(result).isNotNull();
         assertThat(result.getPen()).isEqualTo(pen);
@@ -3838,7 +3839,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenENisChangedToPF_then_returnAPICallSuccess() {
         String program = "2018-EN";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3876,7 +3877,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -3886,7 +3887,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenPFisChangedToEN_then_returnAPICallSuccess() {
         String program = "2018-PF";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3924,7 +3925,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -3934,7 +3935,7 @@ public class StudentProcessTest {
     @Test
     public void testSaveGraduationStudent_whenENisChangedTo1950Adult_then_returnAPICallSuccess() {
         String program = "2018-EN";
-
+        String pen = "111222333";
         UUID studentID = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
@@ -3961,7 +3962,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(requestStudent, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
@@ -4241,7 +4242,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
         boolean isExceptionThrown = false;
         try {
-            studentProcess.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
+            studentProcess.triggerGraduationBatchRun(EventType.XPROGRAM, studentID, pen, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }
@@ -4274,7 +4275,7 @@ public class StudentProcessTest {
 
         boolean isExceptionThrown = false;
         try {
-            studentProcess.triggerGraduationBatchRun(studentID, "Y", "Y", "123");
+            studentProcess.triggerGraduationBatchRun(EventType.XPROGRAM, studentID, pen, "Y", "Y", "123");
         } catch (Exception e) {
             isExceptionThrown = true;
         }

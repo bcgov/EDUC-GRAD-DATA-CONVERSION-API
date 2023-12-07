@@ -88,7 +88,7 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
 
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), studentStatusUpdate.getPen());
-            studentProcess.saveGraduationStudent(currentStudent, accessToken);
+            studentProcess.saveGraduationStudent(studentStatusUpdate.getPen(), currentStudent, UPD_STD_STATUS, accessToken);
         }
     }
 
