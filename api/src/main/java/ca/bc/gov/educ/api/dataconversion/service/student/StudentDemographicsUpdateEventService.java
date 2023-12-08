@@ -53,6 +53,8 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
             StudentGradDTO currentStudent = studentProcess.loadStudentData(updateDemog.getPen(), accessToken);
             if (currentStudent != null) {
                 processStudentDemographics(updateDemog, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 
