@@ -10,6 +10,7 @@ import org.jboss.threads.EnhancedQueueExecutor;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,19 +25,20 @@ import static ca.bc.gov.educ.api.dataconversion.constant.EventType.*;
 @Component
 @Slf4j
 public class ChoreographEventHandler {
-  private final Executor singleTaskExecutor = new EnhancedQueueExecutor.Builder()
-      .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("single-task-executor-%d").build())
-      .setCorePoolSize(1).setMaximumPoolSize(1).build();
+  private final Executor eventExecutor;
   private final Map<String, EventService> eventServiceMap;
 
   public ChoreographEventHandler(final List<EventService> eventServices) {
     this.eventServiceMap = new HashMap<>();
+    this.eventExecutor = new EnhancedQueueExecutor.Builder()
+            .setThreadFactory(new ThreadFactoryBuilder().setNameFormat("multi-task-executor-%d").build())
+            .setCorePoolSize(10).setMaximumPoolSize(20).setKeepAliveTime(Duration.ofSeconds(60)).build();
     eventServices.forEach(eventService -> this.eventServiceMap.put(eventService.getEventType(), eventService));
   }
 
   public void handleEvent(@NonNull final Event event) {
     //only one thread will process all the request. since RDB won't handle concurrent requests.
-    this.singleTaskExecutor.execute(() -> {
+    this.eventExecutor.execute(() -> {
       try {
         switch (event.getEventType()) {
           case "NEWSTUDENT":

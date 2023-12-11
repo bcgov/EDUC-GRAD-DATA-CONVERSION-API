@@ -10,6 +10,8 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
+
 import static ca.bc.gov.educ.api.dataconversion.constant.EventStatus.DB_COMMITTED;
 
 /**
@@ -46,12 +48,13 @@ public class JetStreamEventScheduler {
     @Scheduled(cron = "${cron.scheduled.process.events.stan.run}") // minimum = every 5 minute
     @SchedulerLock(name = "PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM", lockAtLeastFor = "${cron.scheduled.process.events.stan.lockAtLeastFor}", lockAtMostFor = "${cron.scheduled.process.events.stan.lockAtMostFor}")
     public void findAndProcessEvents() {
-        log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
         LockAssert.assertLocked();
+        log.debug("PROCESS_CHOREOGRAPHED_EVENTS_FROM_JET_STREAM: started - cron {}, lockAtMostFor {}", constants.getTraxToGradCronRun(), constants.getTraxToGradLockAtMostFor());
         final var results = this.eventRepository.findAllByEventStatusOrderByCreateDate(DB_COMMITTED.toString());
         if (!results.isEmpty()) {
+            var filteredList = results.stream().filter(el -> el.getUpdateDate().isBefore(LocalDateTime.now().minusMinutes(5))).toList();
             int cnt = 0;
-            for (Event e : results) {
+            for (Event e : filteredList) {
                 if (cnt++ >= constants.getTraxToGradProcessingThreshold()) {
                     log.info(" ==> Reached the processing threshold of {}", constants.getTraxToGradProcessingThreshold());
                     break;

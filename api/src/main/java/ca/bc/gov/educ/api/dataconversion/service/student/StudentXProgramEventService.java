@@ -54,6 +54,8 @@ public class StudentXProgramEventService extends StudentBaseService implements E
             StudentGradDTO currentStudent = studentProcess.loadStudentData(xprogram.getPen(), accessToken);
             if (currentStudent != null) {
                 processOptionalAndCareerPrograms(xprogram, currentStudent, accessToken);
+            } else {
+                return;
             }
         }
 
