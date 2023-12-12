@@ -1,13 +1,14 @@
 package ca.bc.gov.educ.api.dataconversion.process;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
 
 @Component
 @Slf4j
@@ -27,6 +28,24 @@ public class DataConversionProcess {
         return restUtils.getTraxStudentDemographicsDataByPen(pen, accessToken);
     }
 
+    public void processStudentTranscriptValidations(GradStudentTranscriptValidation gradStudentTranscriptValidation, ConversionStudentSummaryDTO summary) {
+        summary.setProcessedCount(summary.getProcessedCount() + 1L);
+        try {
+            String accessToken = summary.getAccessToken();
+            ReportData reportData = restUtils.getTranscriptReportData(gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getPen(), accessToken);
+            if(reportData != null && reportData.getTranscript().getResults().isEmpty()) {
+                gradStudentTranscriptValidation.setDocumentStatusCode("IP");
+                gradStudentTranscriptValidation.setValidationResult("Transcript without courses");
+                restUtils.saveStudentTranscriptValidation(gradStudentTranscriptValidation, accessToken);
+            }
+        } catch (Exception e) {
+            ConversionAlert error = new ConversionAlert();
+            error.setItem(gradStudentTranscriptValidation.toString());
+            error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
+            summary.getErrors().add(error);
+        }
+    }
+
     public TraxStudentNo readTraxStudentAndAddNewPen(TraxStudentNo traxStudentNo, ConversionStudentSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
@@ -38,19 +57,6 @@ public class DataConversionProcess {
                     if (StringUtils.equals(traxStudent.getStatusCode(), "M") && StringUtils.isNotBlank(traxStudent.getTruePen())) {
                         log.debug("Merged student is skipped: pen# {}", traxStudent.getPen());
                         return traxStudentNo;
-//                        // MergedToStudent
-//                        Student penMergedToStudent = getPenStudent(traxStudent.getTruePen(), accessToken, summary);
-//                        if (penMergedToStudent == null) {
-//                            // Create MergedToStudent
-//                            penMergedToStudent = readTraxStudent(traxStudent.getTruePen());
-//                            if (penMergedToStudent != null) {
-//                                penMergedToStudent.setDemogCode("A");
-//                                penMergedToStudent = createNewPen(penMergedToStudent, accessToken, summary);
-//                            }
-//                        }
-//                        // TrueStudentID
-//                        traxStudent.setTrueStudentID(penMergedToStudent != null? penMergedToStudent.getStudentID() : null);
-//                        traxStudent.setDemogCode("A");
                     }
                     // MergedFromStudent
                     createNewPen(traxStudent, accessToken, summary);

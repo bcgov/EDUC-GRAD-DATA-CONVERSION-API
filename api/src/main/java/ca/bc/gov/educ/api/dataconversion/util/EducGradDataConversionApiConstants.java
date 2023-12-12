@@ -24,6 +24,7 @@ public class EducGradDataConversionApiConstants {
 
     // Util
     public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";
+    public static final String TRANSCRIPTS_VALIDATION_PARALLEL_BATCH_JOB = "/studenttranscriptvalidation/parallel";
 
     //Default Date format constants
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
@@ -170,8 +171,14 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
     private String saveTraxStudentNoUrl;
 
+    @Value("${endpoint.grad-graduation-report-api.student-transcript-validation.url}")
+    private String studentTranscriptValidation;
+
+    @Value("${endpoint.grad-graduation-api.get-transcript-report-data.url}")
+    private String transcriptReportData;
+
     //Sree
-    @Value("${endpoint.grad-graduation-report-api.get-transcript}")
+    @Value("${endpoint.grad-graduation-report-api.get-transcript.url}")
     private String transcript;
     @Value("${endpoint.educ-school-api.url}")
     private String schoolCategoryCode;

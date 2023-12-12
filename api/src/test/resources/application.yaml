@@ -170,7 +170,8 @@ endpoint:
       get-course-requirements:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-requirements
   grad-graduation-report-api:
-    get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
+    get-transcript:
+      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
       url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studenttranscript?isGraduated=%s
     get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
@@ -178,6 +179,8 @@ endpoint:
       url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
     update-grad-student-report:
       url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
+    student-transcript-validation:
+      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studenttranscriptvalidation
   educ-school-api:
     url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
   grad-student-graduation-api:
@@ -187,6 +190,9 @@ endpoint:
     transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
     certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
     achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
+  grad-graduation-api:
+    get-transcript-report-data:
+      url: https://educ-grad-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduate/report/data/%s
 
 #Incremental Grad Update
 grad:

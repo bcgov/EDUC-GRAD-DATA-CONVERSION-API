@@ -1,10 +1,11 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
 import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
-import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
+import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
@@ -636,5 +637,39 @@ public class RestUtils {
     public ConvGradStudent rtUpdateStudentGradStatusFallback(HttpServerErrorException exception){
         log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception);
         return null;
+    }
+
+    public Integer getStudentTranscriptValidationCount(String accessToken) {
+        return webClient.put().uri(constants.getStudentTranscriptValidation())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(Integer.class).block();
+    }
+
+    public List<GradStudentTranscriptValidation> getStudentTranscriptValidation(int pageNumber, Integer pageSize, String accessToken) {
+        final ParameterizedTypeReference<List<GradStudentTranscriptValidation>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get().uri(String.format(constants.getStudentTranscriptValidation() + "?pageNumber=%s&pageSize=%s", pageNumber, pageSize))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(responseType).block();
+    }
+
+    public GradStudentTranscriptValidation saveStudentTranscriptValidation(GradStudentTranscriptValidation studentTranscriptValidation, String accessToken) {
+        return webClient.post().uri(constants.getStudentTranscriptValidation())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).body(BodyInserters.fromValue(studentTranscriptValidation)).retrieve().bodyToMono(GradStudentTranscriptValidation.class).block();
+    }
+
+    public ReportData getTranscriptReportData(String pen, String accessToken) {
+        return webClient.get().uri(String.format(constants.getTranscriptReportData(), pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(ReportData.class).block();
     }
 }

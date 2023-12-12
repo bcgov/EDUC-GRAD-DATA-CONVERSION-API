@@ -1,31 +1,33 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
 import ca.bc.gov.educ.api.dataconversion.listener.*;
+import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
 import ca.bc.gov.educ.api.dataconversion.model.GradCourse;
 import ca.bc.gov.educ.api.dataconversion.processor.*;
 import ca.bc.gov.educ.api.dataconversion.reader.*;
-
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-import ca.bc.gov.educ.api.dataconversion.writer.*;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
+import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRequirementWriter;
+import ca.bc.gov.educ.api.dataconversion.writer.DataConversionCourseRestrictionWriter;
+import ca.bc.gov.educ.api.dataconversion.writer.StudentPartitionWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
-import org.springframework.batch.core.configuration.annotation.*;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.batch.item.*;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -177,10 +179,29 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public Step masterStepTranscriptsValidation(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            RestUtils restUtils, EducGradDataConversionApiConstants constants) {
+        return new StepBuilder("masterStepTranscriptsValidation", jobRepository)
+                .partitioner(slaveStepTranscriptsValidation(jobRepository, transactionManager).getName(), transcriptsValidationpartitioner(restUtils))
+                .step(slaveStepTranscriptsValidation(jobRepository, transactionManager))
+                .gridSize(constants.getNumberOfPartitions())
+                .taskExecutor(taskExecutor(constants))
+                .build();
+    }
+
+    @Bean
     @StepScope
     public StudentLoadPartitioner partitioner(RestUtils restUtils) {
         // Reader to feed input data for each partition
         return new StudentLoadPartitioner(restUtils);
+    }
+
+    @Bean
+    @StepScope
+    public TranscriptsValidationPartitioner transcriptsValidationpartitioner(RestUtils restUtils) {
+        // Reader to feed input data for each partition
+        return new TranscriptsValidationPartitioner(restUtils);
     }
 
     @Bean
@@ -191,10 +212,24 @@ public class BatchJobConfig {
     }
 
     @Bean
+    public Step slaveStepTranscriptsValidation(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+        return new StepBuilder("slaveStepTranscriptsValidation", jobRepository)
+                .tasklet(transcriptsValidationPartitionHandler(), transactionManager)
+                .build();
+    }
+
+    @Bean
     @StepScope
     public PenUpdatesPartitionHandlerCreator penUpdatesPartitionHandler() {
         // Processor for each partition
         return new PenUpdatesPartitionHandlerCreator();
+    }
+
+    @Bean
+    @StepScope
+    public TranscriptsValidationPartitionHandlerCreator transcriptsValidationPartitionHandler() {
+        // Processor for each partition
+        return new TranscriptsValidationPartitionHandlerCreator();
     }
 
     @Bean
@@ -207,6 +242,20 @@ public class BatchJobConfig {
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
                 .flow(masterStepForPenUpdates(jobRepository, transactionManager, restUtils, constants))
+                .end()
+                .build();
+    }
+
+    @Bean
+    public Job transcriptsValidationJob(
+            JobRepository jobRepository, PlatformTransactionManager transactionManager,
+            RestUtils restUtils,
+            EducGradDataConversionApiConstants constants,
+            TranscriptsValidationJobCompletionNotificationListener listener) {
+        return new JobBuilder("transcriptsValidationJob", jobRepository)
+                .incrementer(new RunIdIncrementer())
+                .listener(listener)
+                .flow(masterStepTranscriptsValidation(jobRepository, transactionManager, restUtils, constants))
                 .end()
                 .build();
     }

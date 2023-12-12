@@ -257,7 +257,8 @@ endpoint:
       get-course-requirements:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-requirements
   grad-graduation-report-api:
-    get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
+    get-transcript:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
     update-grad-student-transcript:
       url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
     get-cert-list: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programcertificates
@@ -265,6 +266,8 @@ endpoint:
       url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentcertificate
     update-grad-student-report:
       url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
+    student-transcript-validation:
+      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscriptvalidation
   educ-school-api:
     url: ${EDUC_SCHOOL_API}api/v1/schools
   grad-student-graduation-api:
@@ -274,6 +277,9 @@ endpoint:
     transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
     certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
     achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
+  grad-graduation-api:
+    get-transcript-report-data:
+      url: ${GRAD_GRADUATION_API}api/v1/graduate/report/data/%s
 
 #Incremental Grad Update
 grad:

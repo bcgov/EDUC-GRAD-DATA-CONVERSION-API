@@ -1,8 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.controller;
 
-import ca.bc.gov.educ.api.dataconversion.constant.BatchStatusEnum;
 import ca.bc.gov.educ.api.dataconversion.model.BatchJobResponse;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.info.Info;
@@ -20,10 +20,6 @@ import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
-
-import java.util.Date;
 
 @RestController
 @RequestMapping(EducGradDataConversionApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
@@ -123,6 +119,27 @@ public class JobLauncherController {
             return ResponseEntity.ok(response);
         } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
                 | JobParametersInvalidException | NoSuchJobException e) {
+            response.setException(e.getLocalizedMessage());
+            return ResponseEntity.status(500).body(response);
+        }
+    }
+
+    @GetMapping(EducGradDataConversionApiConstants.TRANSCRIPTS_VALIDATION_PARALLEL_BATCH_JOB)
+    @Operation(summary = "TranscriptsValidation in Async Parallel Processing", description = "Run transcripts validation job in Parallel using the partitions that are getting the paginated result", tags = { "Utils" })
+    public ResponseEntity<BatchJobResponse> launchTranscriptsValidationJob() {
+        logger.info("Inside launch Transcripts Validation Job");
+        BatchJobResponse response = new BatchJobResponse();
+        response.setJobType("transcriptsValidationJob");
+        JobParametersBuilder builder = new JobParametersBuilder();
+        builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
+        builder.addString(JOB_PARAM, "transcriptsValidationJob");
+        try {
+            JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("transcriptsValidationJob"), builder.toJobParameters());
+            ExecutionContext jobContext = jobExecution.getExecutionContext();
+            response.setBatchId(jobExecution.getId());
+            return ResponseEntity.ok(response);
+        } catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException
+                 | JobParametersInvalidException | NoSuchJobException e) {
             response.setException(e.getLocalizedMessage());
             return ResponseEntity.status(500).body(response);
         }
