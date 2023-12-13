@@ -34,7 +34,7 @@ public class TranscriptsValidationPartitionHandlerCreator extends BasePartitionH
         // Process partitioned data in parallel asynchronously
         gradStudentTranscriptValidationPartitionData.forEach(gradStudentTranscriptValidation -> {
             conversionSummaryDTO.setAccessToken(fetchAccessToken());
-            LOGGER.info(" ==> GradStudentTranscriptValidation = " + gradStudentTranscriptValidation);
+            LOGGER.debug(" ==> GradStudentTranscriptValidation = {}", gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getStudentID());
             try {
                 dataConversionProcess.processStudentTranscriptValidations(gradStudentTranscriptValidation, conversionSummaryDTO);
             } catch (Exception e) {

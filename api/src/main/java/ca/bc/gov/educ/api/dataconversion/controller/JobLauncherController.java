@@ -32,6 +32,7 @@ public class JobLauncherController {
     private static final String TIME="time";
     private static final String JOB_PARAM="job";
     private static final String RELOAD_PARAM="reload";
+    private static final String COUNT_PARAM="count";
 
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
@@ -126,13 +127,16 @@ public class JobLauncherController {
 
     @GetMapping(EducGradDataConversionApiConstants.TRANSCRIPTS_VALIDATION_PARALLEL_BATCH_JOB)
     @Operation(summary = "TranscriptsValidation in Async Parallel Processing", description = "Run transcripts validation job in Parallel using the partitions that are getting the paginated result", tags = { "Utils" })
-    public ResponseEntity<BatchJobResponse> launchTranscriptsValidationJob() {
+    public ResponseEntity<BatchJobResponse> launchTranscriptsValidationJob(@RequestParam(required = false) Integer totalRecords) {
         logger.info("Inside launch Transcripts Validation Job");
         BatchJobResponse response = new BatchJobResponse();
         response.setJobType("transcriptsValidationJob");
         JobParametersBuilder builder = new JobParametersBuilder();
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
         builder.addString(JOB_PARAM, "transcriptsValidationJob");
+        if(totalRecords != null) {
+            builder.addLong(COUNT_PARAM, totalRecords.longValue());
+        }
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("transcriptsValidationJob"), builder.toJobParameters());
             ExecutionContext jobContext = jobExecution.getExecutionContext();

@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.partition.support.SimplePartitioner;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptsValidationPartitioner.class);
 
     private static final int GRID_SIZE = 1000;
+    private static final String COUNT_PARAM="count";
 
     @Value("#{stepExecution.jobExecution}")
     JobExecution jobExecution;
@@ -31,13 +33,16 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
 
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
-        Integer total = restUtils.getStudentTranscriptValidationCount(restUtils.getAccessToken());
-        gridSize = GRID_SIZE;
-        Integer pageSize = 5;//(total / gridSize) + 1;
-        LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, pageSize);
-
-        Map<String, ExecutionContext> map = new HashMap<>(gridSize);
-        for (int i = 0; i < 1; i++) {
+        JobParameters jobParameters = jobExecution.getJobParameters();
+        Integer total = jobParameters.getLong(COUNT_PARAM, 0L).intValue();
+        if(total == 0) {
+            total = restUtils.getStudentTranscriptValidationCount(restUtils.getAccessToken());
+        }
+        int jobGridSize = Math.min(GRID_SIZE, total);
+        Integer pageSize = (total / jobGridSize);
+        LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, jobGridSize, pageSize);
+        Map<String, ExecutionContext> map = new HashMap<>(jobGridSize);
+        for (int i = 0; i < jobGridSize; i++) {
             ExecutionContext executionContext = new ExecutionContext();
             ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
             List<GradStudentTranscriptValidation> data = restUtils.getStudentTranscriptValidation(i, pageSize, restUtils.getAccessToken());

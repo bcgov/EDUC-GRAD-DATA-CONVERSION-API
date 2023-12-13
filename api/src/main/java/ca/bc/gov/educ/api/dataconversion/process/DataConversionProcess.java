@@ -5,6 +5,8 @@ import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,8 @@ import java.util.List;
 @Component
 @Slf4j
 public class DataConversionProcess {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataConversionProcess.class);
     private final RestUtils restUtils;
 
     @Autowired
@@ -32,18 +36,25 @@ public class DataConversionProcess {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
             String accessToken = summary.getAccessToken();
-            GraduationStudentRecord graduationStudentRecord = restUtils.getStudentByStudentId(gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getStudentID().toString(), accessToken);
+            String studentGuid = gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getStudentID().toString();
+            LOGGER.debug("Get Student pen for guid: {}", studentGuid);
+            GraduationStudentRecord graduationStudentRecord = restUtils.getStudentByStudentId(studentGuid, accessToken);
+            LOGGER.debug("Get Report Data for Student pen: {}", graduationStudentRecord.getPen());
             ReportData reportData = restUtils.getTranscriptReportData(graduationStudentRecord.getPen(), accessToken);
             if(reportData != null) {
+                LOGGER.debug("Get Graduation Data for Student pen: {}", graduationStudentRecord.getPen());
                 if(reportData.getTranscript() == null || reportData.getTranscript().getResults() == null || reportData.getTranscript().getResults().isEmpty()) {
                     gradStudentTranscriptValidation.setDocumentStatusCode("IP");
                     gradStudentTranscriptValidation.setValidationResult("Transcript without courses");
+                    LOGGER.debug("Transcript for Student pen {} is NOT valid: {}", graduationStudentRecord.getPen(), gradStudentTranscriptValidation.getValidationResult());
                 } else {
                     gradStudentTranscriptValidation.setDocumentStatusCode("ARCH");
                     gradStudentTranscriptValidation.setValidationResult("Transcript Validated");
+                    LOGGER.debug("Transcript for Student pen {} is valid", graduationStudentRecord.getPen());
                 }
                 gradStudentTranscriptValidation.getStudentTranscriptValidationKey().setPen(reportData.getStudent().getPen().getPen());
                 gradStudentTranscriptValidation.setBatchId(summary.getBatchId());
+                LOGGER.debug("Save transcript validation result", graduationStudentRecord.getPen());
                 restUtils.saveStudentTranscriptValidation(gradStudentTranscriptValidation, accessToken);
             }
         } catch (Exception e) {
