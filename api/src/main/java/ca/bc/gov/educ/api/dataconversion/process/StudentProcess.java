@@ -923,9 +923,11 @@ public class StudentProcess extends StudentBaseService {
     private Pair<ConversionResultType, Boolean> handleProgramCode(String programCode, GraduationStudentRecord student, StudentLoadType studentLoadType, StudentLoadType originalStudentLoadType, ConversionStudentSummaryDTO summary) {
         ConversionResultType resultType;
         boolean isCareerProgramCreated = false;
+        if (isStudentSCCPForTwoPrograms(student.getProgram(), originalStudentLoadType)) {
+            return Pair.of(ConversionResultType.SUCCESS, isCareerProgramCreated);
+        }
         if (isOptionalProgramCode(programCode)) {
-            resultType = isStudentSCCPForTwoPrograms(student.getProgram(), originalStudentLoadType)? ConversionResultType.SUCCESS :
-                createStudentOptionalProgram(programCode, student, studentLoadType, summary);
+            resultType = createStudentOptionalProgram(programCode, student, studentLoadType, summary);
         } else {
             resultType = createStudentCareerProgram(programCode, student, summary);
             if (ConversionResultType.SUCCESS == resultType) {
