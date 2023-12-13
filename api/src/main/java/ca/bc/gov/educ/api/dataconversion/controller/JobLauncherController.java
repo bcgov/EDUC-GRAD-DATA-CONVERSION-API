@@ -32,7 +32,7 @@ public class JobLauncherController {
     private static final String TIME="time";
     private static final String JOB_PARAM="job";
     private static final String RELOAD_PARAM="reload";
-    private static final String COUNT_PARAM="count";
+    private static final String NUMBER_OF_RECORDS_TO_PROCEED ="numberOfRecords";
 
     private final JobLauncher jobLauncher;
     private final JobRegistry jobRegistry;
@@ -135,7 +135,7 @@ public class JobLauncherController {
         builder.addLong(TIME, System.currentTimeMillis()).toJobParameters();
         builder.addString(JOB_PARAM, "transcriptsValidationJob");
         if(totalRecords != null) {
-            builder.addLong(COUNT_PARAM, totalRecords.longValue());
+            builder.addLong(NUMBER_OF_RECORDS_TO_PROCEED, totalRecords.longValue());
         }
         try {
             JobExecution jobExecution = jobLauncher.run(jobRegistry.getJob("transcriptsValidationJob"), builder.toJobParameters());

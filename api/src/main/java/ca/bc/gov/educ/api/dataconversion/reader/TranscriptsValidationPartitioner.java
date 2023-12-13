@@ -22,7 +22,7 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptsValidationPartitioner.class);
 
     private static final int PAGE_SIZE = 1500;
-    private static final String COUNT_PARAM="count";
+    private static final String NUMBER_OF_RECORDS_TO_PROCEED ="numberOfRecords";
 
     @Value("#{stepExecution.jobExecution}")
     JobExecution jobExecution;
@@ -36,7 +36,7 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         JobParameters jobParameters = jobExecution.getJobParameters();
-        Integer total = jobParameters.getLong(COUNT_PARAM, 0L).intValue();
+        Integer total = jobParameters.getLong(NUMBER_OF_RECORDS_TO_PROCEED, 0L).intValue();
         if(total == 0) {
             total = restUtils.getStudentTranscriptValidationCount(restUtils.getAccessToken());
         }
