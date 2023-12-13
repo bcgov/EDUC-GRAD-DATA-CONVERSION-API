@@ -34,11 +34,16 @@ public class DataConversionProcess {
             String accessToken = summary.getAccessToken();
             GraduationStudentRecord graduationStudentRecord = restUtils.getStudentByStudentId(gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getStudentID().toString(), accessToken);
             ReportData reportData = restUtils.getTranscriptReportData(graduationStudentRecord.getPen(), accessToken);
-            if(reportData != null && (reportData.getTranscript() == null || reportData.getTranscript().getResults() == null || reportData.getTranscript().getResults().isEmpty())) {
+            if(reportData != null) {
+                if(reportData.getTranscript() == null || reportData.getTranscript().getResults() == null || reportData.getTranscript().getResults().isEmpty()) {
+                    gradStudentTranscriptValidation.setDocumentStatusCode("IP");
+                    gradStudentTranscriptValidation.setValidationResult("Transcript without courses");
+                } else {
+                    gradStudentTranscriptValidation.setDocumentStatusCode("ARCH");
+                    gradStudentTranscriptValidation.setValidationResult("Transcript Validated");
+                }
                 gradStudentTranscriptValidation.getStudentTranscriptValidationKey().setPen(reportData.getStudent().getPen().getPen());
                 gradStudentTranscriptValidation.setBatchId(summary.getBatchId());
-                gradStudentTranscriptValidation.setDocumentStatusCode("IP");
-                gradStudentTranscriptValidation.setValidationResult("Transcript without courses");
                 restUtils.saveStudentTranscriptValidation(gradStudentTranscriptValidation, accessToken);
             }
         } catch (Exception e) {
