@@ -2,7 +2,6 @@ package ca.bc.gov.educ.api.dataconversion.reader;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionCourseSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.CourseRestriction;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,11 +79,6 @@ public class DataConversionCourseRestrictionReader implements ItemReader<CourseR
     }
 
     private void fetchAccessToken() {
-        LOGGER.info("Fetching the access token from KeyCloak API");
-        ResponseObj res = restUtils.getTokenResponseObject();
-        if (res != null) {
-            summaryDTO.setAccessToken(res.getAccess_token());
-            LOGGER.info("Setting the new access token in summaryDTO.");
-        }
+        summaryDTO.setAccessToken(restUtils.getAccessToken());
     }
 }

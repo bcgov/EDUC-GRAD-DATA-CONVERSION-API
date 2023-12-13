@@ -1,6 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.listener;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -27,7 +27,7 @@ public class TranscriptsValidationJobCompletionNotificationListener implements J
 	    	LOGGER.info("Transcripts Validation - Batch Job completed in {} s with jobExecution status {}", elapsedTimeMillis/1000, jobExecution.getStatus());
 
 			ExecutionContext jobContext = jobExecution.getExecutionContext();
-			ConversionStudentSummaryDTO summaryDTO = (ConversionStudentSummaryDTO)jobContext.get("transcriptsValidationSummaryDTO");
+			ConversionSummaryDTO summaryDTO = (ConversionSummaryDTO)jobContext.get("transcriptsValidationSummaryDTO");
 
 			LOGGER.info("Records read:		{}", summaryDTO.getReadCount());
 			LOGGER.info("Processed count:	{}", summaryDTO.getProcessedCount());

@@ -137,6 +137,7 @@ endpoint:
       url: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student
     save-grad-student-record: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentid/%s
     read-grad-student-record: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentid/%s/algorithm
+    read-grad-student-record-student-id: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/stdid/%s
     save-student-optional-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentoptionalprogram
     remove-student-optional-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentoptionalprogram/%s/%s
     read-student-optional-programs: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/optionalprogram/studentid/%s

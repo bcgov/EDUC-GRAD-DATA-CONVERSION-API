@@ -1,8 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.reader;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradStudentTranscriptValidation;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +18,8 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptsValidationPartitioner.class);
 
+    private static final int GRID_SIZE = 1000;
+
     @Value("#{stepExecution.jobExecution}")
     JobExecution jobExecution;
 
@@ -30,25 +31,21 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
 
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
-        ResponseObj res = restUtils.getTokenResponseObject();
-        String accessToken = null;
-        if (res != null) {
-            accessToken = res.getAccess_token();
-        }
-
-        Integer total = restUtils.getStudentTranscriptValidationCount(accessToken);
-        Integer pageSize = (total / gridSize) + 1;
+        Integer total = restUtils.getStudentTranscriptValidationCount(restUtils.getAccessToken());
+        gridSize = GRID_SIZE;
+        Integer pageSize = 5;//(total / gridSize) + 1;
         LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, pageSize);
 
         Map<String, ExecutionContext> map = new HashMap<>(gridSize);
-        for (int i = 0; i < gridSize; i++) {
+        for (int i = 0; i < 1; i++) {
             ExecutionContext executionContext = new ExecutionContext();
-            ConversionStudentSummaryDTO summaryDTO = new ConversionStudentSummaryDTO();
-            List<GradStudentTranscriptValidation> data = restUtils.getStudentTranscriptValidation(i, pageSize, accessToken);
+            ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
+            List<GradStudentTranscriptValidation> data = restUtils.getStudentTranscriptValidation(i, pageSize, restUtils.getAccessToken());
             executionContext.put("data", data);
             summaryDTO.setReadCount(data.size());
+            summaryDTO.setBatchId(jobExecution.getId());
             executionContext.put("summary", summaryDTO);
-            executionContext.put("index", Integer.valueOf(0));
+            executionContext.put("index", i);
             String key = "partition" + i;
             map.put(key, executionContext);
         }

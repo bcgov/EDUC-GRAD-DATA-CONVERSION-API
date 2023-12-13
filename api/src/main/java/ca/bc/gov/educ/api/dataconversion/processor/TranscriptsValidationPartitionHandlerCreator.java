@@ -1,6 +1,8 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.GradStudentTranscriptValidation;
 import ca.bc.gov.educ.api.dataconversion.process.DataConversionProcess;
 import org.slf4j.Logger;
@@ -20,32 +22,48 @@ public class TranscriptsValidationPartitionHandlerCreator extends BasePartitionH
     @Value("#{stepExecutionContext['data']}")
     List<GradStudentTranscriptValidation> gradStudentTranscriptValidationPartitionData;
 
+    @Value("#{stepExecutionContext['summary']}")
+    ConversionSummaryDTO conversionSummaryDTO;
+
     @Autowired
     DataConversionProcess dataConversionProcess;
 
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
-        LOGGER.info("=======> start partition : read count = {}", partitionData.size());
+        LOGGER.info("=======> start partition : read count = {}", gradStudentTranscriptValidationPartitionData.size());
         // Process partitioned data in parallel asynchronously
         gradStudentTranscriptValidationPartitionData.forEach(gradStudentTranscriptValidation -> {
-            if (summaryDTO.getProcessedCount() % 500 == 0) {
-                summaryDTO.setAccessToken(fetchAccessToken());
-            }
+            conversionSummaryDTO.setAccessToken(fetchAccessToken());
             LOGGER.info(" ==> GradStudentTranscriptValidation = " + gradStudentTranscriptValidation);
             try {
-                dataConversionProcess.processStudentTranscriptValidations(gradStudentTranscriptValidation, summaryDTO);
+                dataConversionProcess.processStudentTranscriptValidations(gradStudentTranscriptValidation, conversionSummaryDTO);
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(gradStudentTranscriptValidation.toString());
                 error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
-                summaryDTO.getErrors().add(error);
+                conversionSummaryDTO.getErrors().add(error);
                 LOGGER.error("unknown exception: " + e.getLocalizedMessage());
             }
         });
-        LOGGER.info("=======> end partition : processed count = " + summaryDTO.getProcessedCount());
+        LOGGER.info("=======> end partition : processed count = " + conversionSummaryDTO.getProcessedCount());
 
         // Aggregate summary
         aggregate(contribution, "TRANSCRIPTS_VALIDATION", "transcriptsValidationSummaryDTO");
         return RepeatStatus.FINISHED;
+    }
+
+    protected void aggregate(StepContribution contribution, String tableName, String summaryContextName) {
+        ConversionSummaryDTO totalSummaryDTO = (ConversionSummaryDTO)contribution.getStepExecution().getJobExecution().getExecutionContext().get(summaryContextName);
+        if (totalSummaryDTO == null) {
+            totalSummaryDTO = new ConversionStudentSummaryDTO();
+            totalSummaryDTO.setTableName(tableName);
+            contribution.getStepExecution().getJobExecution().getExecutionContext().put(summaryContextName, totalSummaryDTO);
+        }
+
+        totalSummaryDTO.setReadCount(totalSummaryDTO.getReadCount() + conversionSummaryDTO.getReadCount());
+        totalSummaryDTO.setProcessedCount(totalSummaryDTO.getProcessedCount() + conversionSummaryDTO.getProcessedCount());
+        totalSummaryDTO.setAddedCount(totalSummaryDTO.getAddedCount() + conversionSummaryDTO.getAddedCount());
+        totalSummaryDTO.setUpdatedCount(totalSummaryDTO.getUpdatedCount() + conversionSummaryDTO.getUpdatedCount());
+        totalSummaryDTO.getErrors().addAll(conversionSummaryDTO.getErrors());
     }
 }

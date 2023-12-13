@@ -224,6 +224,7 @@ endpoint:
       url: ${GRAD_STUDENT_API}api/v1/student
     save-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/conv/studentid/%s
     read-grad-student-record: ${GRAD_STUDENT_API}api/v1/student/studentid/%s/algorithm
+    read-grad-student-record-student-id: ${GRAD_STUDENT_API}api/v1/student/stdid/%s
     save-student-optional-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentoptionalprogram
     remove-student-optional-program: ${GRAD_STUDENT_API}api/v1/student/conv/studentoptionalprogram/%s/%s
     read-student-optional-programs: ${GRAD_STUDENT_API}api/v1/student/optionalprogram/studentid/%s

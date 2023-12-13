@@ -5,12 +5,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
 @JsonSerialize
-public class ConversionStudentSummaryDTO extends ConversionBaseSummaryDTO implements Serializable {
+public class ConversionStudentSummaryDTO extends ConversionSummaryDTO implements Serializable {
 
   // stats
   private Map<String, Long> programCountMap = new LinkedHashMap<>() {{

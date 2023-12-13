@@ -50,6 +50,10 @@ public class RestUtils {
         return responseObjCache.getResponseObj();
     }
 
+    public String getAccessToken() {
+        return getTokenResponseObject().getAccess_token();
+    }
+
     @Retry(name = "rt-getToken", fallbackMethod = "rtGetTokenFallback")
     private ResponseObj getTokenResponseObj() {
         log.info("Fetching the access token from KeyCloak API");
@@ -527,6 +531,15 @@ public class RestUtils {
     @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
     public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
         return webClient.get().uri(String.format(constants.getReadGraduationStudentRecord(),studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+    }
+
+    @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
+    public GraduationStudentRecord getStudentByStudentId(String studentID, String accessToken) {
+        return webClient.get().uri(String.format(constants.getReadGraduationStudentRecordByStudentId(),studentID))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());

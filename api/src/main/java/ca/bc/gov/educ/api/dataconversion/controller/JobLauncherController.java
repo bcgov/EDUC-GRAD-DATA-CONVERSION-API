@@ -1,7 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.controller;
 
 import ca.bc.gov.educ.api.dataconversion.model.BatchJobResponse;
-import ca.bc.gov.educ.api.dataconversion.model.ConversionBaseSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.ConversionSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -145,13 +145,13 @@ public class JobLauncherController {
         }
     }
 
-    private ConversionBaseSummaryDTO handleSuccess(ExecutionContext jobContext , String summaryDtoName) throws JobParametersInvalidException {
-        return (ConversionBaseSummaryDTO)jobContext.get(summaryDtoName);
+    private ConversionSummaryDTO handleSuccess(ExecutionContext jobContext , String summaryDtoName) throws JobParametersInvalidException {
+        return (ConversionSummaryDTO)jobContext.get(summaryDtoName);
     }
 
-    private ConversionBaseSummaryDTO handleException(Exception e) {
+    private ConversionSummaryDTO handleException(Exception e) {
         e.printStackTrace();
-        ConversionBaseSummaryDTO summaryDTO = new ConversionBaseSummaryDTO();
+        ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
         summaryDTO.setException(e.getLocalizedMessage());
         return summaryDTO;
     }

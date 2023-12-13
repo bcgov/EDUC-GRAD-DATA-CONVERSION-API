@@ -1,11 +1,12 @@
 package ca.bc.gov.educ.api.dataconversion.model;
 
-import java.util.Date;
-
 import lombok.Data;
 
+import java.io.Serializable;
+import java.util.Date;
+
 @Data
-public class BaseModel {
+public class BaseModel implements Serializable {
 	private String createUser;
 	private Date createDate;
 	private String updateUser;

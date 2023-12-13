@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
-public class ConversionBaseSummaryDTO {
+public class ConversionSummaryDTO implements Serializable {
+  private Long batchId;
   private String tableName;
 
   private long readCount = 0L;

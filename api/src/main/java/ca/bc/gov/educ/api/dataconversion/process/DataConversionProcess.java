@@ -28,12 +28,15 @@ public class DataConversionProcess {
         return restUtils.getTraxStudentDemographicsDataByPen(pen, accessToken);
     }
 
-    public void processStudentTranscriptValidations(GradStudentTranscriptValidation gradStudentTranscriptValidation, ConversionStudentSummaryDTO summary) {
+    public void processStudentTranscriptValidations(GradStudentTranscriptValidation gradStudentTranscriptValidation, ConversionSummaryDTO summary) {
         summary.setProcessedCount(summary.getProcessedCount() + 1L);
         try {
             String accessToken = summary.getAccessToken();
-            ReportData reportData = restUtils.getTranscriptReportData(gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getPen(), accessToken);
-            if(reportData != null && reportData.getTranscript().getResults().isEmpty()) {
+            GraduationStudentRecord graduationStudentRecord = restUtils.getStudentByStudentId(gradStudentTranscriptValidation.getStudentTranscriptValidationKey().getStudentID().toString(), accessToken);
+            ReportData reportData = restUtils.getTranscriptReportData(graduationStudentRecord.getPen(), accessToken);
+            if(reportData != null && (reportData.getTranscript() == null || reportData.getTranscript().getResults() == null || reportData.getTranscript().getResults().isEmpty())) {
+                gradStudentTranscriptValidation.getStudentTranscriptValidationKey().setPen(reportData.getStudent().getPen().getPen());
+                gradStudentTranscriptValidation.setBatchId(summary.getBatchId());
                 gradStudentTranscriptValidation.setDocumentStatusCode("IP");
                 gradStudentTranscriptValidation.setValidationResult("Transcript without courses");
                 restUtils.saveStudentTranscriptValidation(gradStudentTranscriptValidation, accessToken);

@@ -3,15 +3,13 @@ package ca.bc.gov.educ.api.dataconversion.model.tsw.report;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import lombok.Data;
-import org.springframework.stereotype.Component;
-
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlSeeAlso;
 import jakarta.xml.bind.annotation.XmlType;
+import lombok.Data;
+import org.springframework.stereotype.Component;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,10 +28,6 @@ import java.util.Map;
 		NonGradReason.class,
 		Certificate.class
 })
-@JsonSerialize(include=JsonSerialize.Inclusion.NON_NULL)
-//@JsonPropertyOrder(alphabetic = true)
-//@JsonRootName("generateReport")
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
 		@JsonSubTypes.Type(value = Student.class),
 		@JsonSubTypes.Type(value = School.class),

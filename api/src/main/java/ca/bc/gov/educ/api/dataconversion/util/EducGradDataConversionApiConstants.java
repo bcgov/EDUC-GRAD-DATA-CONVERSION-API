@@ -90,6 +90,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-student-api.read-grad-student-record}")
     private String readGraduationStudentRecord;
 
+    @Value("${endpoint.grad-student-api.read-grad-student-record-student-id}")
+    private String readGraduationStudentRecordByStudentId;
+
     @Value("${endpoint.grad-student-api.save-grad-student-record}")
     private String saveGraduationStudentRecord;
 
