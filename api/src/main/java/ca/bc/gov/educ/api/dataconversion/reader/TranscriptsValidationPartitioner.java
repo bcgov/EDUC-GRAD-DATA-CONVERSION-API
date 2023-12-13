@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Value;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.IntStream;
 
 public class TranscriptsValidationPartitioner extends SimplePartitioner {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TranscriptsValidationPartitioner.class);
 
-    private static final int GRID_SIZE = 1000;
+    private static final int PAGE_SIZE = 1500;
     private static final String COUNT_PARAM="count";
 
     @Value("#{stepExecution.jobExecution}")
@@ -38,22 +40,34 @@ public class TranscriptsValidationPartitioner extends SimplePartitioner {
         if(total == 0) {
             total = restUtils.getStudentTranscriptValidationCount(restUtils.getAccessToken());
         }
-        int jobGridSize = Math.min(GRID_SIZE, total);
-        Integer pageSize = (total / jobGridSize);
-        LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, jobGridSize, pageSize);
-        Map<String, ExecutionContext> map = new HashMap<>(jobGridSize);
-        for (int i = 0; i < jobGridSize; i++) {
-            ExecutionContext executionContext = new ExecutionContext();
-            ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
-            List<GradStudentTranscriptValidation> data = restUtils.getStudentTranscriptValidation(i, pageSize, restUtils.getAccessToken());
-            executionContext.put("data", data);
-            summaryDTO.setReadCount(data.size());
-            summaryDTO.setBatchId(jobExecution.getId());
-            executionContext.put("summary", summaryDTO);
-            executionContext.put("index", i);
-            String key = "partition" + i;
-            map.put(key, executionContext);
+        LOGGER.info("Partition setup: total number of records = {}, partition size = {}, page size = {}", total, gridSize, PAGE_SIZE);
+        Map<String, ExecutionContext> map = new HashMap<>(gridSize);
+        List<Integer> range = IntStream.range(0, gridSize).boxed().toList();
+        List<CompletableFuture<Map<String, ExecutionContext>>> futures = range.stream()
+                .map(i -> CompletableFuture.supplyAsync(() -> populatePartitions(i)))
+                .toList();
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        CompletableFuture<List<Map<String, ExecutionContext>>> result = allFutures.thenApply(v -> futures.stream()
+                .map(CompletableFuture::join).toList());
+        List<Map<String, ExecutionContext>> finalList = result.join();
+        for(Map<String, ExecutionContext> m: finalList) {
+            map.putAll(m);
         }
+        return map;
+    }
+
+    private Map<String, ExecutionContext> populatePartitions(Integer pageNumber) {
+        Map<String, ExecutionContext> map = new HashMap<>();
+        ExecutionContext executionContext = new ExecutionContext();
+        ConversionSummaryDTO summaryDTO = new ConversionSummaryDTO();
+        List<GradStudentTranscriptValidation> data = restUtils.getStudentTranscriptValidation(pageNumber, PAGE_SIZE, restUtils.getAccessToken());
+        executionContext.put("data", data);
+        summaryDTO.setReadCount(data.size());
+        summaryDTO.setBatchId(jobExecution.getId());
+        executionContext.put("summary", summaryDTO);
+        executionContext.put("index", pageNumber);
+        String key = "partition" + pageNumber;
+        map.put(key, executionContext);
         return map;
     }
 }
