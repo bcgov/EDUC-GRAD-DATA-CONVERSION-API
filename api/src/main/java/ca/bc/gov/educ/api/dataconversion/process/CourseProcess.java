@@ -44,6 +44,9 @@ public class CourseProcess {
     private static final String ZFRAL_STR = "ZFRAL";
     private static final String IBFAS_STR = "IBFAS";
     private static final String QFRAP_STR = "QFRAP";
+    private static final String CPWE_STR = "CPWE";
+    private static final String CPCOW_STR = "CPCOW";
+    private static final String CPSSA_STR = "CPSSA";
 
     private static final String ERR_MSG_FORMAT = "For {} : {}";
 
@@ -627,7 +630,7 @@ public class CourseProcess {
         createCourseRequirement(populate(LTSTF_STR, "11", "201"), summary);
 
         // Adult Work Experience
-        createCourseRequirement(populate("CPWE", "12", "506"), summary);
+        createCourseRequirement(populate(CPWE_STR, "12", "506"), summary);
         createCourseRequirement(populate("SSA", "12A", "506"), summary);
         createCourseRequirement(populate("SSA", "12B", "506"), summary);
         createCourseRequirement(populate("WEX", "12A", "506"), summary);
@@ -1145,13 +1148,24 @@ public class CourseProcess {
         createCourseRequirement(populate("ELNMF", "11", "201"), summary);
         createCourseRequirement(populate("ELSLF", "11", "201"), summary);
         createCourseRequirement(populate("EFLSF", "11", "201"), summary);
-        createCourseRequirement(populate(FRALP_STR, "11", "201"), summary);
         // GRAD2-2402: Rule 202
         createCourseRequirement(populate(QFRAP_STR, "10", "202"), summary);
         createCourseRequirement(populate("LANMF", "10", "202"), summary);
         createCourseRequirement(populate("LAEOF", "10", "202"), summary);
         createCourseRequirement(populate("LACWF", "10", "202"), summary);
-        createCourseRequirement(populate(FRALP_STR, "10", "202"), summary);
+        // GRAD2-2386: Rule 600
+        createCourseRequirement(populate(CPWE_STR, "12", "600"), summary);
+        createCourseRequirement(populate(CPWE_STR, "12A", "600"), summary);
+        createCourseRequirement(populate(CPWE_STR, "12B", "600"), summary);
+        createCourseRequirement(populate(CPWE_STR, "12C", "600"), summary);
+        createCourseRequirement(populate(CPWE_STR, "12D", "600"), summary);
+        createCourseRequirement(populate(CPCOW_STR, "12", "600"), summary);
+        createCourseRequirement(populate(CPCOW_STR, "12A", "600"), summary);
+        createCourseRequirement(populate(CPCOW_STR, "12B", "600"), summary);
+        createCourseRequirement(populate(CPSSA_STR, "11A", "600"), summary);
+        createCourseRequirement(populate(CPSSA_STR, "11B", "600"), summary);
+        createCourseRequirement(populate(CPSSA_STR, "12A", "600"), summary);
+        createCourseRequirement(populate(CPSSA_STR, "12B", "600"), summary);
     }
 
     private CourseRequirement populate(String courseCode, String courseLevel, String courseRequirementCode) {
