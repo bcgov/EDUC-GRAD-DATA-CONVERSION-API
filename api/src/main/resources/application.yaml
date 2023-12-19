@@ -13,7 +13,7 @@ spring:
     username: ${CONV_USERNAME}
     password: ${CONV_PASSWORD}
     url: ${CONNECTION_STRING}
-    driver-class: oracle.jdbc.driver.OracleDriver
+    driver-class-name: oracle.jdbc.driver.OracleDriver
   jpa:
     show-sql: ${SHOW_SQL_LOGS}
     database-platform: org.hibernate.dialect.Oracle12cDialect
@@ -177,6 +177,9 @@ cron:
           lockAtLeastFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_LEAST_FOR}
           lockAtMostFor: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_LOCK_AT_MOST_FOR}
           threshold: ${CRON_SCHEDULED_PROCESS_EVENTS_STAN_THRESHOLD}
+      purge-old-records:
+        run: ${CRON_SCHEDULED_PURGE_OLD_RECORDS}
+        staleInDays: ${RECORDS_STALE_IN_DAYS}
 
 #Endpoints
 endpoint:
