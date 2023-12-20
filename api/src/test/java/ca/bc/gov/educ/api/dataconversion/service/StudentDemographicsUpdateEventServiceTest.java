@@ -86,7 +86,53 @@ public class StudentDemographicsUpdateEventServiceTest {
         currentStudent.setStudentID(studentID);
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
-        currentStudent.setStudentStatus("A");
+        currentStudent.setStudentStatus("CUR");
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentDemographicsUpdateEventService.processEvent(traxDemogUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessStudentDemographicsForArchivedGrad2018ENProgram_givenUpdated_UPD_DEMOG_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String updateType = "UPD_DEMOG";
+
+        // TraxUpdateInGrad
+        TraxDemographicsUpdateDTO traxDemogUpdate = new TraxDemographicsUpdateDTO();
+        traxDemogUpdate.setPen(pen);
+        traxDemogUpdate.setFirstName("Test");
+        traxDemogUpdate.setMiddleNames("and");
+        traxDemogUpdate.setLastName("QA");
+        traxDemogUpdate.setBirthday("19960601");
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_DEMOG.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("ARC");
         currentStudent.setSchoolOfRecord(mincode);
         currentStudent.setSchoolAtGrad(mincode);
 

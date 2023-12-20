@@ -82,7 +82,7 @@ public class StudentFrenchImmersionEventServiceTest {
         currentStudent.setStudentID(studentID);
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
-        currentStudent.setStudentStatus("A");
+        currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
@@ -141,7 +141,7 @@ public class StudentFrenchImmersionEventServiceTest {
         currentStudent.setStudentID(studentID);
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
-        currentStudent.setStudentStatus("A");
+        currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes

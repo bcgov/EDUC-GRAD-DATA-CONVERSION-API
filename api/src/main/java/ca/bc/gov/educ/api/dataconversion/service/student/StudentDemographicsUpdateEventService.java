@@ -70,41 +70,25 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
         boolean isChanged = false;
         // Last Name
         if (!StringUtils.equals(updateDemog.getLastName(), currentStudent.getLastName())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-
+            populateNewBatchFlags(currentStudent);
             isChanged = true;
             log.info(" => student last name : current = {}, request = {}", currentStudent.getLastName(), updateDemog.getLastName());
         }
         // First Name
         if (!StringUtils.equals(updateDemog.getFirstName(), currentStudent.getFirstName())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-
+            populateNewBatchFlags(currentStudent);
             isChanged = true;
             log.info(" => student first name : current = {}, request = {}", currentStudent.getFirstName(), updateDemog.getFirstName());
         }
         // Middle Names
         if (!StringUtils.equals(updateDemog.getMiddleNames(), currentStudent.getMiddleName())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-
+            populateNewBatchFlags(currentStudent);
             isChanged = true;
             log.info(" => student middle name : current = {}, request = {}", currentStudent.getMiddleName(), updateDemog.getMiddleNames());
         }
         // Date of Birth
         if (!StringUtils.equals(updateDemog.getBirthday(), currentStudent.getBirthday())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-
+            populateNewBatchFlags(currentStudent);
             isChanged = true;
             log.info(" => student dob : current = {}, request = {}", currentStudent.getBirthday(), updateDemog.getBirthday());
         }
@@ -112,6 +96,18 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
         if (isChanged) {
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateDemog.getPen());
             studentProcess.saveGraduationStudent(updateDemog.getPen(), currentStudent, UPD_DEMOG, accessToken);
+        }
+    }
+
+    private void populateNewBatchFlags(StudentGradDTO currentStudent) {
+        if ("ARC".equalsIgnoreCase(currentStudent.getStudentStatus())) {
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+        } else {
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+            // TVR
+            currentStudent.setNewRecalculateProjectedGrad("Y");
         }
     }
 
