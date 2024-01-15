@@ -73,6 +73,9 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         boolean isChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
+        if ("ARC".equalsIgnoreCase(currentStudent.getStudentStatus())) {
+            return;
+        }
         // Order is important for first 3 items below!!!
         // 1. School of record
         if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {

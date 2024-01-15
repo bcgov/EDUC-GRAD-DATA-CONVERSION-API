@@ -10,7 +10,7 @@ spring:
       minimum-idle: 1
       idle-timeout: 300000
       max-lifetime: 600000
-    driver-class: org.h2.Driver
+    driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test
   jpa:
     show-sql: true
@@ -90,6 +90,9 @@ cron:
           lockAtLeastFor: 800ms
           lockAtMostFor: 900ms
           threshold: 100
+      purge-old-records:
+        run: 0 30 0 * * *
+        staleInDays: 90
 
 #Endpoints
 endpoint:

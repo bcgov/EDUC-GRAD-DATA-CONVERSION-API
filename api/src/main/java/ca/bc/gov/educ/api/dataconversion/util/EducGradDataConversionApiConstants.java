@@ -222,4 +222,7 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${cron.scheduled.process.events.stan.threshold}")
     private int traxToGradProcessingThreshold;
+
+    @Value("${cron.scheduled.process.purge-old-records.staleInDays}")
+    private int recordsStaleInDays;
 }
