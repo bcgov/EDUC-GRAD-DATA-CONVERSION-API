@@ -164,15 +164,11 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             // from SCCP to PF
             addDualDogwood = true;
         } else if (newGradProgram.endsWith("-EN")) {
-            // from PF to EN - not allowed
-            if (currentStudent.getProgram().endsWith("-PF")) {
-                currentStudent.setNewProgram(null);
-                return;
-            }
+            // from PF to EN - allowed for SD93/Yukon PF schools
             // from EN to EN
             // from 1950 to EN
             // from SCCP to EN
-            if (studentProcess.hasAnyFrenchImmersionCourse(newGradProgram, pen, accessToken)) {
+            if (currentStudent.getProgram().endsWith("-PF") || studentProcess.hasAnyFrenchImmersionCourse(newGradProgram, pen, accessToken)) {
                 addFrenchImmersion = true;
             }
         }
