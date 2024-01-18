@@ -99,18 +99,6 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
         }
     }
 
-    private void populateNewBatchFlags(StudentGradDTO currentStudent) {
-        if ("ARC".equalsIgnoreCase(currentStudent.getStudentStatus())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-        } else {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
-        }
-    }
-
     @Override
     public String getEventType() {
         return UPD_DEMOG.toString();

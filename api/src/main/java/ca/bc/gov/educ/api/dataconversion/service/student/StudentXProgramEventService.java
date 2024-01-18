@@ -105,10 +105,8 @@ public class StudentXProgramEventService extends StudentBaseService implements E
             studentProcess.removeStudentOptionalProgram("CP", currentStudent, accessToken);
         }
 
-        // Transcript
-        currentStudent.setNewRecalculateGradStatus("Y");
-        // TVR
-        currentStudent.setNewRecalculateProjectedGrad("Y");
+        // Transcript & TVR
+        populateNewBatchFlags(currentStudent);
 
         studentProcess.triggerGraduationBatchRun(XPROGRAM, currentStudent.getStudentID(), xprogram.getPen(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
     }

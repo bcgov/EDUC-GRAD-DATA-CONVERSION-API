@@ -70,7 +70,11 @@ public class StudentAssessmentUpdateEventService extends StudentBaseService impl
 
     public void processAssessment(TraxStudentUpdateDTO studentAssessmentUpdate, StudentGradDTO currentStudent, String accessToken) {
         log.info(" Process Assessment : studentID = {}, pen = {} ", currentStudent.getStudentID(),studentAssessmentUpdate.getPen());
-        studentProcess.triggerGraduationBatchRun(ASSESSMENT, currentStudent.getStudentID(), studentAssessmentUpdate.getPen(), "Y", "Y", accessToken);
+
+        // Transcript & TVR
+        populateNewBatchFlags(currentStudent);
+
+        studentProcess.triggerGraduationBatchRun(ASSESSMENT, currentStudent.getStudentID(), studentAssessmentUpdate.getPen(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
     }
 
     @Override
