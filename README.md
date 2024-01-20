@@ -1,5 +1,5 @@
 [![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) &nbsp;
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bcgov/educ-grad-data-conversion-api/Build) &nbsp; 
+[![Build](https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API/actions/workflows/on.pr.yml/badge.svg)](https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API/actions/workflows/on.pr.yml) &nbsp;
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=bugs)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
 ![Sonar Tests](https://img.shields.io/sonar/tests/bcgov_EDUC-GRAD-DATA-CONVERSION-API?compact_message&server=https%3A%2F%2Fsonarcloud.io) &nbsp;
@@ -13,6 +13,6 @@
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
 
-# EDUC-GRAD-DATA-CONVERSION-API
+# EDUC-GRAD-DATA-CONVERSION-API &nbsp; ![GitHub repo size](https://img.shields.io/github/repo-size/bcgov/EDUC-GRAD-DATA-CONVERSION-API)
 Data Conversion API for GRAD team - migrate data from TRAX to GRAD.
 
