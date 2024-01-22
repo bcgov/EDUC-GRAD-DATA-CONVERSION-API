@@ -54,7 +54,7 @@ oc create -n "$BUSINESS_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map 
   --from-literal=APP_LOG_LEVEL="$APP_LOG_LEVEL" \
   --from-literal=BASELINE_ON_MIGRATE="false" \
   --from-literal=CONNECTION_TIMEOUT="90000" \
-  --from-literal=EDUC_SCHOOL_API="EDUC_SCHOOL_API.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
+  --from-literal=EDUC_SCHOOL_API="http://school-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
   --from-literal=ENABLE_FLYWAY="true" \
   --from-literal=ENABLE_GRAD_UPDATE="true" \
   --from-literal=ENABLE_SPLUNK_LOG_HELPER="false" \
