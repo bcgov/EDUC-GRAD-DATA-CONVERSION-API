@@ -1,4 +1,4 @@
-[![img](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) &nbsp;
+[![img](https://img.shields.io/badge/Lifecycle-Stable-97ca00)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) &nbsp;
 [![Build](https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API/actions/workflows/on.pr.yml/badge.svg)](https://github.com/bcgov/EDUC-GRAD-DATA-CONVERSION-API/actions/workflows/on.pr.yml) &nbsp;
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=bugs)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=bcgov_EDUC-GRAD-DATA-CONVERSION-API&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=bcgov_EDUC-GRAD-DATA-CONVERSION-API) &nbsp;
