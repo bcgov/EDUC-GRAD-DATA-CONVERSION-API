@@ -44,19 +44,18 @@ public class ReportProcess {
 		data.setGraduationData(getGraduationData(graduationDataStatus));
 		data.setLogo(StringUtils.startsWith(data.getSchool().getMincode(), "098") ? "YU" : "BC");
 		data.setTranscript(getTranscriptData(graduationDataStatus, gradResponse, convStudent, accessToken));
-		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getNonGradReasons()));
+		data.setNonGradReasons(getNonGradReasons(graduationDataStatus.getGradStatus().getProgram(), graduationDataStatus.getNonGradReasons()));
 		return data;
 	}
 
-	private List<NonGradReason> getNonGradReasons(List<GradRequirement> nonGradReasons) {
+	private List<NonGradReason> getNonGradReasons(String gradProgramCode, List<GradRequirement> nonGradReasons) {
+		nonGradReasons.removeIf(a -> "506".equalsIgnoreCase(a.getRule()) && (StringUtils.isNotBlank(gradProgramCode) && gradProgramCode.contains("1950")));
 		List<NonGradReason> nList = new ArrayList<>();
-		if (nonGradReasons != null) {
-			for (GradRequirement gR : nonGradReasons) {
-				NonGradReason obj = new NonGradReason();
-				obj.setCode(gR.getRule());
-				obj.setDescription(gR.getDescription());
-				nList.add(obj);
-			}
+		for (GradRequirement gR : nonGradReasons) {
+			NonGradReason obj = new NonGradReason();
+			obj.setCode(gR.getRule());
+			obj.setDescription(gR.getDescription());
+			nList.add(obj);
 		}
 		return nList;
 	}
