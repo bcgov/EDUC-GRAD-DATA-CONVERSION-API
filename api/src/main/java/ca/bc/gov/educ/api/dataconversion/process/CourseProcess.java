@@ -208,7 +208,7 @@ public class CourseProcess {
 
     private void processEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish10()) && StringUtils.equals(gradCourse.getEnglish10(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "101"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -223,7 +223,7 @@ public class CourseProcess {
     private void handleFrenchLanguageCourseForEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasFrenchLanguageCourse(gradCourse.getCourseCode(),
                 gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "302"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -236,7 +236,7 @@ public class CourseProcess {
     private void handleBlankLanguageCourseForEnglish10(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasBlankLanguageCourse(gradCourse.getCourseCode(),
                 gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "400"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -248,7 +248,7 @@ public class CourseProcess {
 
     private void processEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish11()) && StringUtils.equals(gradCourse.getEnglish11(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "102"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -268,7 +268,7 @@ public class CourseProcess {
 
     private void handleFrenchLanguageCourseForEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "301"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -284,7 +284,7 @@ public class CourseProcess {
 
     private void handleBlankLanguageCourseForEnglish11(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "401"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -296,7 +296,7 @@ public class CourseProcess {
 
     private void processEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (StringUtils.isNotBlank(gradCourse.getEnglish12()) && StringUtils.equals(gradCourse.getEnglish12(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "103"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -319,7 +319,7 @@ public class CourseProcess {
 
     private void handleFrenchLanguageCourseForEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasFrenchLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "300"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -334,7 +334,7 @@ public class CourseProcess {
 
     private void handleBlankLanguageCourseForEnglish12(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         if (hasBlankLanguageCourse(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), summary.getAccessToken())) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "402"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -347,7 +347,7 @@ public class CourseProcess {
     private void processSocials(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // socials10
         if (StringUtils.isNotBlank(gradCourse.getSocials10()) && StringUtils.equals(gradCourse.getSocials10(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "104"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -357,7 +357,7 @@ public class CourseProcess {
         }
         // socials
         if (StringUtils.isNotBlank(gradCourse.getSocials()) && StringUtils.equals(gradCourse.getSocials(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "105"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -379,7 +379,7 @@ public class CourseProcess {
     private void processMath(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // math10
         if (StringUtils.isNotBlank(gradCourse.getMath10()) && StringUtils.equals(gradCourse.getMath10(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "106"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -389,7 +389,7 @@ public class CourseProcess {
         }
         // math
         if (StringUtils.isNotBlank(gradCourse.getMath()) && StringUtils.equals(gradCourse.getMath(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "107"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -411,7 +411,7 @@ public class CourseProcess {
     private void processScience(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // science10
         if (StringUtils.isNotBlank(gradCourse.getScience10()) && StringUtils.equals(gradCourse.getScience10(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "108"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -421,7 +421,7 @@ public class CourseProcess {
         }
         // science
         if (StringUtils.isNotBlank(gradCourse.getScience()) && StringUtils.equals(gradCourse.getScience(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "109"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -440,7 +440,7 @@ public class CourseProcess {
     private void processCareerPersonal(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // careerPersonal10
         if (isCareerPersonal10(gradCourse)) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "112"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -475,7 +475,7 @@ public class CourseProcess {
     private void processPhysEd(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // physEd10
         if (StringUtils.isNotBlank(gradCourse.getPhysEd10()) && StringUtils.equals(gradCourse.getPhysEd10(), "Y")) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "110"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -488,7 +488,7 @@ public class CourseProcess {
     private void processAppliedSkills(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // appliedSkills
         if (isAppliedSkills(gradCourse)) {
-            if (RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+            if (isRecentGradProgram(gradCourse.getGradReqtYear())) {
                 createCourseRequirement(populate(gradCourse.getCourseCode(),
                     gradCourse.getCourseLevel(), "111"), summary);
             } else if (StringUtils.equals(gradCourse.getGradReqtYear(), "2004")) {
@@ -543,7 +543,7 @@ public class CourseProcess {
 
     private void processCareerLifeConnections(GradCourse gradCourse, ConversionCourseSummaryDTO summary) {
         // careerLifeConnections
-        if (isCareerLifeConnections(gradCourse) && RECENT_GRAD_PROGRAMS.contains(gradCourse.getGradReqtYear())) {
+        if (isCareerLifeConnections(gradCourse) && isRecentGradProgram(gradCourse.getGradReqtYear())) {
             createCourseRequirement(populate(gradCourse.getCourseCode(),
                 gradCourse.getCourseLevel(), "113"), summary);
         }
@@ -1207,7 +1207,7 @@ public class CourseProcess {
             ConversionAlert error = new ConversionAlert();
             error.setLevel(ConversionAlert.AlertLevelEnum.ERROR);
             error.setItem(courseRequirement.getCourseCode() + "/" + courseRequirement.getCourseLevel() + ", rule[" + courseRequirement.getRuleCode().getCourseRequirementCode() + "]");
-            error.setReason("GRAD Course API is failed to check Course Requirement exist!");
+            error.setReason("GRAD Course API is failed to check Course Requirement exists!");
             summary.getErrors().add(error);
             logger.error(ERR_MSG_FORMAT, error.getItem(), error.getReason());
             return null;
@@ -1281,6 +1281,10 @@ public class CourseProcess {
             && StringUtils.isNotBlank(gradCourse.getIndigenousFocused()) && StringUtils.equals(gradCourse.getIndigenousFocused(), "Y")) {
             createCourseRequirement(populate(gradCourse.getCourseCode(), gradCourse.getCourseLevel(), "119"), summary);
         }
+    }
+
+    private boolean isRecentGradProgram(String gradReqtYear) {
+        return RECENT_GRAD_PROGRAMS.contains(gradReqtYear);
     }
 
 }
