@@ -58,4 +58,6 @@ public class GradCourse {
     // career life connections
     private String careerLifeConnections;
 
+    // indigenous-focused
+    private String indigenousFocused;
 }
