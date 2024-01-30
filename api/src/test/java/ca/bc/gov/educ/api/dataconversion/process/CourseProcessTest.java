@@ -151,6 +151,22 @@ public class CourseProcessTest {
     }
 
     @Test
+    public void testConvertCourseRequirement_forEnglish10_2023() {
+        ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
+        summary.setAccessToken("123");
+
+        GradCourse traxCourse = prepareCourseRequirementData("2023", "ENG", "10", "101", null, false);
+        traxCourse.setEnglish10("Y");
+        traxCourse.setIndigenousFocused("Y");
+
+        when(this.restUtils.checkFrenchLanguageCourse("ENG", "10", "123")).thenReturn(false);
+        when(this.restUtils.checkBlankLanguageCourse("ENG", "10", "123")).thenReturn(false);
+
+        courseProcess.convertCourseRequirement(traxCourse, summary);
+        assertThat(summary.getAddedCountForCourseRequirement()).isEqualTo(2L); // "101" & "119" should be created.
+    }
+
+    @Test
     public void testConvertCourseRequirement_forEnglish10_2004() {
         ConversionCourseSummaryDTO summary = new ConversionCourseSummaryDTO();
         summary.setAccessToken("123");
