@@ -76,9 +76,9 @@ public class StudentStatusUpdateEventService extends StudentBaseService implemen
         // Student Status
         if (!StringUtils.equals(newStudentStatus, currentStudent.getStudentStatus())) {
             currentStudent.setNewStudentStatus(newStudentStatus);
-            if (StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), "CUR")
-                || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), "TER")
-                || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), "DEC")) {
+            if (StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_CURRENT)
+                || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_TERMINATED)
+                || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_DECEASED)) {
                 // Transcript
                 currentStudent.setNewRecalculateGradStatus("Y");
                 // TVR

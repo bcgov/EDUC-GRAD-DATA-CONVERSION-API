@@ -73,17 +73,19 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         boolean isChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-        if ("ARC".equalsIgnoreCase(currentStudent.getStudentStatus())) {
+        if (currentStudent.isArchived() && currentStudent.isGraduated()) {
             return;
         }
         // Order is important for first 3 items below!!!
         // 1. School of record
         if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
             currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
+            if (!currentStudent.isArchived()) {
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+            }
             log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
             isChanged = true;
         }
@@ -92,10 +94,12 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
             handleProgramChange(gradProgram, currentStudent, updateGrad.getPen(), accessToken);
             handleAdultStartDate(currentStudent);
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
+            if (!currentStudent.isArchived()) {
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+            }
             log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
             isChanged = true;
         }
@@ -104,24 +108,28 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())
             && !StringUtils.equals(slpDate, currentStudent.getGradDate())) {
             currentStudent.setNewGradDate(slpDate);
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
+            if (!currentStudent.isArchived()) {
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+            }
             log.info(" => student slp date : current = {}, request = {}", currentStudent.getGradDate(), slpDate);
             isChanged = true;
         }
         // Student Grade
         if (!StringUtils.equals(updateGrad.getStudentGrade(), currentStudent.getStudentGrade())) {
             currentStudent.setNewStudentGrade(updateGrad.getStudentGrade());
-            if (!currentStudent.isGraduated() ) { // non grad
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-            } else {
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
+            if (!currentStudent.isArchived()) {
+                if (!currentStudent.isGraduated()) { // non grad
+                    // Transcript
+                    currentStudent.setNewRecalculateGradStatus("Y");
+                    // TVR
+                    currentStudent.setNewRecalculateProjectedGrad("Y");
+                } else {
+                    // TVR
+                    currentStudent.setNewRecalculateProjectedGrad("Y");
+                }
             }
             log.info(" => student grade : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
             isChanged = true;
@@ -129,14 +137,16 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         // Citizenship
         if (!StringUtils.equals(updateGrad.getCitizenship(), currentStudent.getCitizenship())) {
             currentStudent.setNewCitizenship(updateGrad.getCitizenship());
-            if (!currentStudent.isGraduated() ) { // non grad
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-            } else {
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
+            if (!currentStudent.isArchived()) {
+                if (!currentStudent.isGraduated()) { // non grad
+                    // Transcript
+                    currentStudent.setNewRecalculateGradStatus("Y");
+                    // TVR
+                    currentStudent.setNewRecalculateProjectedGrad("Y");
+                } else {
+                    // TVR
+                    currentStudent.setNewRecalculateProjectedGrad("Y");
+                }
             }
             log.info(" => student citizenship : current = {}, request = {}", currentStudent.getCitizenship(), currentStudent.getNewCitizenship());
             isChanged = true;

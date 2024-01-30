@@ -128,7 +128,7 @@ public class StudentBaseService {
     }
 
     protected void populateNewBatchFlags(StudentGradDTO currentStudent) {
-        if ("ARC".equalsIgnoreCase(currentStudent.getStudentStatus())) {
+        if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(currentStudent.getStudentStatus())) {
             // Transcript
             currentStudent.setNewRecalculateGradStatus("Y");
         } else {
