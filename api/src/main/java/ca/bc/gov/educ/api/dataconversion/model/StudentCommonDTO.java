@@ -40,4 +40,8 @@ public class StudentCommonDTO extends StudentDemographicDTO {
     public boolean isSCCP() {
         return "SCCP".equalsIgnoreCase(program);
     }
+
+    public boolean isArchived() {
+        return "ARC".equalsIgnoreCase(studentStatus);
+    }
 }
