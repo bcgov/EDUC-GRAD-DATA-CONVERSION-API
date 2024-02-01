@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 
 import static ca.bc.gov.educ.api.dataconversion.constant.EventStatus.PROCESSED;
+import static ca.bc.gov.educ.api.dataconversion.constant.EventType.COURSE;
 import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPD_DEMOG;
 
 @Service
@@ -67,36 +68,12 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
     }
 
     public void processStudentDemographics(TraxDemographicsUpdateDTO updateDemog, StudentGradDTO currentStudent, String accessToken) {
-        boolean isChanged = false;
-        // Last Name
-        if (!StringUtils.equals(updateDemog.getLastName(), currentStudent.getLastName())) {
-            populateNewBatchFlags(currentStudent);
-            isChanged = true;
-            log.info(" => student last name : current = {}, request = {}", currentStudent.getLastName(), updateDemog.getLastName());
-        }
-        // First Name
-        if (!StringUtils.equals(updateDemog.getFirstName(), currentStudent.getFirstName())) {
-            populateNewBatchFlags(currentStudent);
-            isChanged = true;
-            log.info(" => student first name : current = {}, request = {}", currentStudent.getFirstName(), updateDemog.getFirstName());
-        }
-        // Middle Names
-        if (!StringUtils.equals(updateDemog.getMiddleNames(), currentStudent.getMiddleName())) {
-            populateNewBatchFlags(currentStudent);
-            isChanged = true;
-            log.info(" => student middle name : current = {}, request = {}", currentStudent.getMiddleName(), updateDemog.getMiddleNames());
-        }
-        // Date of Birth
-        if (!StringUtils.equals(updateDemog.getBirthday(), currentStudent.getBirthday())) {
-            populateNewBatchFlags(currentStudent);
-            isChanged = true;
-            log.info(" => student dob : current = {}, request = {}", currentStudent.getBirthday(), updateDemog.getBirthday());
-        }
+        log.info(" Process Demographics : studentID = {}, pen = {} ", currentStudent.getStudentID(), updateDemog.getPen());
 
-        if (isChanged) {
-            log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateDemog.getPen());
-            studentProcess.saveGraduationStudent(updateDemog.getPen(), currentStudent, UPD_DEMOG, accessToken);
-        }
+        // Transcript & TVR
+        populateNewBatchFlags(currentStudent);
+
+        studentProcess.triggerGraduationBatchRun(COURSE, currentStudent.getStudentID(), updateDemog.getPen(), currentStudent.getNewRecalculateGradStatus(), currentStudent.getNewRecalculateProjectedGrad(), accessToken);
     }
 
     @Override
