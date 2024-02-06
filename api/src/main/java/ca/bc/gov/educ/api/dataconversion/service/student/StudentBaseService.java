@@ -5,6 +5,7 @@ import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
+import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
@@ -124,6 +125,18 @@ public class StudentBaseService {
             case "SCCP" -> gradProgram = "SCCP";
         }
         return gradProgram;
+    }
+
+    protected void populateNewBatchFlags(StudentGradDTO currentStudent) {
+        if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(currentStudent.getStudentStatus())) {
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+        } else {
+            // Transcript
+            currentStudent.setNewRecalculateGradStatus("Y");
+            // TVR
+            currentStudent.setNewRecalculateProjectedGrad("Y");
+        }
     }
 
     private void updateProgramCountsInSummary(ConversionStudentSummaryDTO summary, String programCode, boolean isGraduated) {
