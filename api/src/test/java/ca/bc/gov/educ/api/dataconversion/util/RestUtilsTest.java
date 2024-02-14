@@ -4,14 +4,8 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportData;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportOptions;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.report.Transcript;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import lombok.val;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -352,227 +346,26 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void testGetGradProgramRulesByTraxReqNumber_givenValues_returnsGradRuleDetails_withAPICallSuccess() {
-        final String traxReqNumber = "5";
-
-        final GradRuleDetails ruleDetails = new GradRuleDetails();
-        ruleDetails.setRuleCode("100");
-        ruleDetails.setTraxReqNumber(traxReqNumber);
-        ruleDetails.setProgramCode("Test Program");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradProgramRulesByTraxReqNumberUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        final ParameterizedTypeReference<List<GradRuleDetails>> responseType = new ParameterizedTypeReference<>() {
-        };
-        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(ruleDetails)));
-
-        val result = this.restUtils.getGradProgramRulesByTraxReqNumber(traxReqNumber, "abc");
-        assertThat(result).isNotNull();
-        assertThat(result.size() > 0).isTrue();
-    }
-
-    @Test
-    public void testGetGradProgramCode_givenValues_returnsGraduationProgramCode_withAPICallSuccess() {
-        final GraduationProgramCode program = new GraduationProgramCode();
-        program.setProgramCode("Test");
-        program.setDescription("Test Program");
-        program.setProgramName("Test Name");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradProgramUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        when(this.responseMock.bodyToMono(GraduationProgramCode.class)).thenReturn(Mono.just(program));
-
-        val result = this.restUtils.getGradProgramCode(program.getProgramCode(), "abc");
-        assertThat(result).isNotNull();
-        assertThat(result.getProgramName()).isEqualTo(program.getProgramName());
-    }
-
-    @Test
-    public void testGetGradProgram_givenValues_returnsGradProgram_withAPICallSuccess() {
-        final GradProgram program = new GradProgram();
-        program.setProgramCode("Test");
-        program.setProgramName("Test Name");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(String.format(constants.getProgramNameEndpoint(), program.getProgramCode()))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        when(this.responseMock.bodyToMono(GradProgram.class)).thenReturn(Mono.just(program));
-
-        val result = this.restUtils.getGradProgram(program.getProgramCode(), "abc");
-        assertThat(result).isNotNull();
-        assertThat(result.getProgramName()).isEqualTo(program.getProgramName());
-    }
-
-    @Test
-    public void testGetProgramRules_givenValues_returnProgramRequirements_withAPICallSuccess() {
-        final ProgramRequirement programRequirement = new ProgramRequirement();
-        programRequirement.setGraduationProgramCode("2018-EN");
-        programRequirement.setProgramRequirementID(UUID.randomUUID());
-
-        final ProgramRequirementCode programRequirementCode = new ProgramRequirementCode();
-        programRequirementCode.setProReqCode("101");
-        programRequirementCode.setLabel("101 Label");
-        programRequirementCode.setDescription("101 Test Description");
-
-        final RequirementTypeCode requirementTypeCode = new RequirementTypeCode();
-        requirementTypeCode.setReqTypeCode("M");
-        requirementTypeCode.setLabel("Match");
-        requirementTypeCode.setDescription("Algorithm matches a specific course to a specific requirement");
-
-        programRequirementCode.setRequirementTypeCode(requirementTypeCode);
-        programRequirement.setProgramRequirementCode(programRequirementCode);
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getGradProgramRulesUrl()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-
-        final ParameterizedTypeReference<List<ProgramRequirement>> responseType = new ParameterizedTypeReference<>() {
-        };
-        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(programRequirement)));
-
-        val result = this.restUtils.getGradProgramRules(programRequirement.getGraduationProgramCode(), "abc");
-        assertThat(result).isNotNull();
-        assertThat(result.size() > 0).isTrue();
-    }
-
-    @Test
-    public void testGetSpecialCase_givenValue_returnSpecialCase_withAPICallSuccess() {
-        GradProgram gP = new GradProgram();
-        gP.setProgramCode("2018-EN");
-        gP.setProgramName("2018 Graduation Program");
-
-        SpecialCase sp = new SpecialCase();
-        sp.setSpCase("A");
-        sp.setLabel("AEG");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//        when(this.requestHeadersUriMock.uri(String.format(constants.getSpecialCase(),"A"))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getSpecialCase()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(SpecialCase.class)).thenReturn(Mono.just(sp));
-
-        val result = restUtils.getSpecialCase("A", "abc");
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void testGetSchoolCategoryCode_givenValue_returnString_withAPICallSuccess() {
-        CommonSchool commSch = new CommonSchool();
-        commSch.setSchlNo("1231123");
-        commSch.setSchoolCategoryCode("02");
-
-        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
-//        when(this.requestHeadersUriMock.uri(String.format(constants.getSchoolCategoryCode(),"06011033"))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersUriMock.uri(eq(this.constants.getSchoolCategoryCode()), any(Function.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(CommonSchool.class)).thenReturn(Mono.just(commSch));
-
-        val result = restUtils.getSchoolCategoryCode("06011033", "abc");
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void testGetTranscriptReport_givenValues_returnByteArray_withAPICallSuccess() {
-        byte[] bytesSAR = RandomUtils.nextBytes(20);
-
-        ReportRequest reportParams = new ReportRequest();
-        ReportOptions options = new ReportOptions();
-        options.setReportFile("transcript");
-        options.setReportName("Transcript Report.pdf");
-
-        reportParams.setOptions(options);
-
-        ReportData reportData = new ReportData();
-        reportData.setTranscript(new Transcript());
-
-        reportParams.setData(reportData);
-
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(constants.getTranscriptReport())).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.onStatus(any(), any())).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(byte[].class)).thenReturn(Mono.just(bytesSAR));
-
-        val result = restUtils.getTranscriptReport(reportParams, "abc");
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void testSaveGradStudentTranscript() {
-        String studentID = new UUID(1, 1).toString();
-        String accessToken = "accessToken";
-        boolean isGraduated= true;
-        GradStudentTranscripts rep = new GradStudentTranscripts();
-        rep.setStudentID(UUID.fromString(studentID));
-//        rep.setPen(pen);
-        byte[] bytesSAR = RandomUtils.nextBytes(20);
-
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(String.format(constants.getUpdateGradStudentTranscript(),isGraduated))).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(GradStudentTranscripts.class)).thenReturn(Mono.just(rep));
-
-        restUtils.saveGradStudentTranscript(rep, isGraduated, accessToken);
-        verify(this.webClient, times(1)).post();
-    }
-
-    @Test
-    public void testGetProgramCertificateTranscriptList() {
-        List<ProgramCertificateTranscript> clist= new ArrayList<ProgramCertificateTranscript>();
-        ProgramCertificateTranscript pc = new ProgramCertificateTranscript();
-        pc.setCertificateTypeCode("E");
-        pc.setSchoolCategoryCode(" ");
-        clist.add(pc);
-
-        when(this.webClient.post()).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.uri(constants.getCertList())).thenReturn(this.requestBodyUriMock);
-        when(this.requestBodyUriMock.headers(any(Consumer.class))).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.contentType(any())).thenReturn(this.requestBodyMock);
-        when(this.requestBodyMock.body(any(BodyInserter.class))).thenReturn(this.requestHeadersMock);
-        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
-        when(this.responseMock.bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>(){})).thenReturn(Mono.just(clist));
-
-        ProgramCertificateReq req = new ProgramCertificateReq();
-        req.setProgramCode("Test");
-        req.setOptionalProgram("OptionalTest");
-        req.setSchoolCategoryCode(" ");
-
-        val result = restUtils.getProgramCertificateTranscriptList(req, "123");
-        assertThat(result).isNotNull();
-    }
-
-    @Test
-    public void testTokenFallBackMethod_givenException_shouldReturnNull(){
-        val result = this.restUtils.rtGetTokenFallBack(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
+    public void testTokenFallbackMethod_givenException_shouldReturnNull(){
+        val result = this.restUtils.rtGetTokenFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
         assertThat(result).isNull();
     }
 
     @Test
-    public void testGetStudentFallBackMethod_givenException_shouldReturnNull(){
+    public void testGetStudentFallbackMethod_givenException_shouldReturnNull(){
         val result = this.restUtils.rtGetStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
         assertThat(result).isNull();
     }
 
     @Test
-    public void testSaveStudentFallBackMethod_givenException_shouldReturnNull(){
+    public void testSaveStudentFallbackMethod_givenException_shouldReturnNull(){
         val result = this.restUtils.rtSaveStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testUpdateStudentFallbackMethod_givenException_shouldReturnNull(){
+        val result = this.restUtils.rtUpdateStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
         assertThat(result).isNull();
     }
 }

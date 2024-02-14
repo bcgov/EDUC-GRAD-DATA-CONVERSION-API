@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
@@ -19,10 +18,6 @@ public class StudentBaseService {
     public static final String STUDENT_STATUS_DECEASED = "DEC";
     public static final String STUDENT_STATUS_MERGED = "MER";
     public static final String STUDENT_STATUS_TERMINATED = "TER";
-
-    // GRAD Messages
-    public static final String TSW_PF_GRAD_MSG = "Student has successfully completed the Programme Francophone.";
-    public static final String TSW_FI_GRAD_MSG = "Student has successfully completed the French Immersion program.";
 
     // Optional Program Codes
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
@@ -56,12 +51,10 @@ public class StudentBaseService {
     }
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
-        String gradProgram = student.getStudentLoadType() == StudentLoadType.UNGRAD?
-            getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood()) :
-            getGradProgramForGraduatedStudent(student.getGraduationRequirementYear(), student.getTranscriptStudentDemog().getGradMessage());
+        String gradProgram = getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
-            updateProgramCountsInSummary(summary, gradProgram, student.getStudentLoadType() != StudentLoadType.UNGRAD);
+            updateProgramCountsInSummary(summary, gradProgram, false);
             return true;
         } else {
             // error
@@ -114,19 +107,6 @@ public class StudentBaseService {
         return gradProgram;
     }
 
-    protected String getGradProgramForGraduatedStudent(String graduationRequirementYear, String gradMessage) {
-        String gradProgram = null;
-        switch (graduationRequirementYear) {
-            case "2018" -> gradProgram = isProgramFrancophone(gradMessage) ? "2018-PF" : "2018-EN";
-            case "2004" -> gradProgram = isProgramFrancophone(gradMessage) ? "2004-PF" : "2004-EN";
-            case "1996", "1995" -> gradProgram = isProgramFrancophone(gradMessage) ? "1996-PF" : "1996-EN";
-            case "1986" -> gradProgram = isProgramFrancophone(gradMessage) ? "1986-PF" : "1986-EN";
-            case "1950" -> gradProgram = "1950";
-            case "SCCP" -> gradProgram = "SCCP";
-        }
-        return gradProgram;
-    }
-
     protected void populateNewBatchFlags(StudentGradDTO currentStudent) {
         if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(currentStudent.getStudentStatus())) {
             // Transcript
@@ -143,15 +123,6 @@ public class StudentBaseService {
         if (summary != null) {
             summary.increment(programCode, isGraduated);
         }
-    }
-
-    public boolean isFrenchImmersion(String gradMessage) {
-        return StringUtils.contains(gradMessage, TSW_FI_GRAD_MSG);
-    }
-
-    // initial load
-    public boolean isProgramFrancophone(String gradMessage) {
-        return StringUtils.contains(gradMessage, TSW_PF_GRAD_MSG);
     }
 
     public boolean isOptionalProgramCode(String code) {
