@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.processor;
 
 import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
-import ca.bc.gov.educ.api.dataconversion.constant.StudentLoadType;
 import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
@@ -42,14 +41,7 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 				responseStudent = students.get(0);
 				if (responseStudent.getResult() != null &&
 					responseStudent.getResult().equals(ConversionResultType.FAILURE)) {
-					String reason = "";
-					if (responseStudent.getStudentLoadType() == StudentLoadType.NONE) {
-						reason = "ERROR-Bad data: student is not in [ungrad, grad_one, grad_two]";
-					} else if (responseStudent.getStudentLoadType() == StudentLoadType.NO_UTG) {
-						reason = "ERROR-Bad data: [graduated - two programs] UTG data is not found";
-					} else {
-						reason = "ERROR-Bad data: unknown error from TRAX";
-					}
+					String reason = "ERROR-Bad data: unknown error from TRAX";
 					summaryDTO.setErroredCount(summaryDTO.getErroredCount() + 1L);
 					restUtils.saveTraxStudentNo(new TraxStudentNo(pen, "F", reason), summaryDTO.getAccessToken());
 					return null;
@@ -65,7 +57,7 @@ public class StudentPartitionProcessor implements ItemProcessor<String, ConvGrad
 			error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
 			summaryDTO.getErrors().add(error);
 
-			LOGGER.error("unknown exception: " + e.getLocalizedMessage());
+			LOGGER.error("unknown exception: {}", e.getLocalizedMessage());
 			if (responseStudent == null) {
 				responseStudent = ConvGradStudent.builder().pen(pen).result(ConversionResultType.FAILURE).build();
 			}
