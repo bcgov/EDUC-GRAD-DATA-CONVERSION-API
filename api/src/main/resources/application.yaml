@@ -16,7 +16,7 @@ spring:
     driver-class-name: oracle.jdbc.driver.OracleDriver
   jpa:
     show-sql: ${SHOW_SQL_LOGS}
-    database-platform: org.hibernate.dialect.Oracle12cDialect
+    database-platform: org.hibernate.dialect.OracleDialect
     hibernate:
       ddl-auto: none
   mvc:
@@ -114,20 +114,6 @@ resilience4j.retry:
         - org.springframework.web.client.HttpServerErrorException
       ignoreExceptions:
         - java.lang.NullPointerException
-    rt-transcript:
-      maxAttempts: ${MAX_RETRY_ATTEMPTS}
-      waitDuration: 5s
-      retryExceptions:
-        - org.springframework.web.client.HttpServerErrorException
-      ignoreExceptions:
-        - java.lang.NullPointerException
-    rt-certificate:
-      maxAttempts: ${MAX_RETRY_ATTEMPTS}
-      waitDuration: 5s
-      retryExceptions:
-        - org.springframework.web.client.HttpServerErrorException
-      ignoreExceptions:
-        - java.lang.NullPointerException
     rt-getStudentGradStatus:
       maxAttempts: ${MAX_RETRY_ATTEMPTS}
       waitDuration: 5s
@@ -212,16 +198,6 @@ endpoint:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms
     optional-program-by-id:
       url: ${GRAD_PROGRAM_API}api/v1/program/optionalprograms/id
-    career-program:
-      url: ${GRAD_PROGRAM_API}api/v1/program/careerprogram
-    programs:
-      url: ${GRAD_PROGRAM_API}api/v1/program/programs
-    program-rules:
-      url: ${GRAD_PROGRAM_API}api/v1/program/programrules
-    program-rules-by-trax:
-      url: ${GRAD_PROGRAM_API}api/v1/program/programrules/by-trax
-    program_name_by_program_code:
-      url: ${GRAD_PROGRAM_API}api/v1/program/programs/%s
   grad-student-api:
     add-new-pen:
       url: ${GRAD_STUDENT_API}api/v1/student
@@ -240,8 +216,6 @@ endpoint:
     student-assessments:
       by-pen:
         url: ${GRAD_ASSESSMENT_API}api/v1/assessment/pen/%s
-      by-pen-and-assessment-code:
-        url: ${GRAD_ASSESSMENT_API}api/v1/assessment/%s/pen/%s
   grad-trax-api:
     student:
       get-student-no-list-by-page:
@@ -259,24 +233,6 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
       get-course-requirements:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-requirements
-  grad-graduation-report-api:
-    get-transcript: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programtranscripts
-    update-grad-student-transcript:
-      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studenttranscript?isGraduated=%s
-    get-cert-list: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/programcertificates
-    update-grad-student-certificate:
-      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/studentcertificate
-    update-grad-student-report:
-      url: ${GRAD_GRADUATION_REPORT_API}api/v1/graduationreports/schoolreport
-  educ-school-api:
-    url: ${EDUC_SCHOOL_API}api/v1/schools
-  grad-student-graduation-api:
-    get-special-cases:
-      url: ${GRAD_STUDENT_GRADUATION_API}api/v1/studentgraduation/lgSc/specialcase
-  report-api:
-    transcript_report: ${GRAD_REPORT_API}api/v1/reports/transcriptreport
-    certificate_report: ${GRAD_REPORT_API}api/v1/reports/certificate
-    achievement_report: ${GRAD_REPORT_API}api/v1/reports/achievementreport
 
 #Incremental Grad Update
 grad:

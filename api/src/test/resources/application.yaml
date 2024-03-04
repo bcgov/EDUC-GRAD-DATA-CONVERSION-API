@@ -125,16 +125,6 @@ endpoint:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms
     optional-program-by-id:
       url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/optionalprograms/id
-    career-program:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/careerprogram
-    programs:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programs
-    program-rules:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programrules
-    program-rules-by-trax:
-      url: https://educ-grad-program-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/program/programrules/by-trax
-    program_name_by_program_code:
-      url: https://educ-grad-program-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/program/programs/%s
   grad-student-api:
     add-new-pen:
       url: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student
@@ -153,8 +143,6 @@ endpoint:
     student-assessments:
       by-pen:
         url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/pen/%s
-      by-pen-and-assessment-code:
-        url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/%s/pen/%s
   grad-trax-api:
     student:
       get-student-no-list-by-page:
@@ -172,24 +160,6 @@ endpoint:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-restrictions
       get-course-requirements:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-requirements
-  grad-graduation-report-api:
-    get-transcript: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programtranscripts
-    update-grad-student-transcript:
-      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studenttranscript?isGraduated=%s
-    get-cert-list: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/programcertificates
-    update-grad-student-certificate:
-      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentcertificate
-    update-grad-student-report:
-      url: https://educ-grad-graduation-report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/schoolreport
-  educ-school-api:
-    url: https://school-api-75e61b-dev.apps.silver.devops.gov.bc.ca/api/v1/schools
-  grad-student-graduation-api:
-    get-special-cases:
-      url: https://educ-grad-student-graduation-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/studentgraduation/lgSc/specialcase
-  report-api:
-    transcript_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/transcriptreport
-    certificate_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/certificate
-    achievement_report: https://report-api-77c02f-test.apps.silver.devops.gov.bc.ca/api/v1/reports/achievementreport
 
 #Incremental Grad Update
 grad:

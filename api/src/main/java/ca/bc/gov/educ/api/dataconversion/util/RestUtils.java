@@ -1,18 +1,13 @@
 package ca.bc.gov.educ.api.dataconversion.util;
 
-import ca.bc.gov.educ.api.dataconversion.exception.ServiceException;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.*;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.report.ReportRequest;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
@@ -64,8 +59,8 @@ public class RestUtils {
                 .bodyToMono(ResponseObj.class).block();
     }
 
-    public ResponseObj rtGetTokenFallBack(HttpServerErrorException exception){
-        log.error("{} NOT REACHABLE after many attempts: {}", constants.getTokenUrl(), exception);
+    public ResponseObj rtGetTokenFallback(HttpServerErrorException exception){
+        log.error("{} NOT REACHABLE after many attempts: {}", constants.getTokenUrl(), exception.getLocalizedMessage());
         return null;
     }
 
@@ -101,17 +96,6 @@ public class RestUtils {
                 .retrieve().bodyToMono(OptionalProgram.class).block();
     }
 
-
-    public CareerProgram getCareerProgram(String careerProgramCode, String accessToken) {
-        return this.webClient.get()
-                .uri(constants.getGradCareerProgramUrl(), uri -> uri.path("/{careerProgramCode}").build(careerProgramCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(CareerProgram.class).block();
-    }
-
     public Student addNewPen(Student student, String accessToken) {
         return webClient.post()
                 .uri(constants.getAddNewPenFromGradStudentApiUrl())
@@ -132,18 +116,6 @@ public class RestUtils {
                 })
                 .body(BodyInserters.fromValue(assessmentRequirement))
                 .retrieve().bodyToMono(AssessmentRequirement.class).block();
-    }
-
-    public List<StudentAssessment> getStudentAssessmentsByPenAndAssessmentCode(String pen, String assessmentCode, String accessToken) {
-        final ParameterizedTypeReference<List<StudentAssessment>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(String.format(constants.getStudentAssessmentsByPenAndAssessmentCodeApiUrl(), assessmentCode, pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(responseType).block();
     }
 
     public List<StudentAssessment> getStudentAssessmentsByPen(String pen, String accessToken) {
@@ -374,154 +346,6 @@ public class RestUtils {
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
-    public GraduationProgramCode getGradProgramCode(String programCode, String accessToken) {
-        return this.webClient.get()
-                .uri(constants.getGradProgramUrl(), uri -> uri.path("/{programCode}").build(programCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(GraduationProgramCode.class).block();
-    }
-
-    public List<GradRuleDetails> getGradProgramRulesByTraxReqNumber(String traxReqNumber, String accessToken) {
-        final ParameterizedTypeReference<List<GradRuleDetails>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(constants.getGradProgramRulesByTraxReqNumberUrl(), uri -> uri.path("/{traxReqNumber}").build(traxReqNumber))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(responseType).block();
-    }
-
-    public List<ProgramRequirement> getGradProgramRules(String gradProgramCode, String accessToken) {
-        final ParameterizedTypeReference<List<ProgramRequirement>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(constants.getGradProgramRulesUrl(),
-                        uri -> uri.queryParam("programCode", gradProgramCode)
-                                .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(responseType).block();
-    }
-
-    public List<SpecialCase> getAllSpecialCases(String accessToken) {
-        final ParameterizedTypeReference<List<SpecialCase>> responseType = new ParameterizedTypeReference<>() {
-        };
-        return this.webClient.get()
-                .uri(constants.getSpecialCase())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
-                .retrieve().bodyToMono(responseType).block();
-    }
-
-    public SpecialCase getSpecialCase(String specialCode, String accessToken) {
-        return this.webClient.get()
-                .uri(constants.getSpecialCase(), uri -> uri.path("/{specialCode}").build(specialCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(SpecialCase.class).block();
-    }
-
-    public ProgramCertificateTranscript getTranscript(String gradProgram, String schoolCategoryCode, String accessToken) {
-        ProgramCertificateReq req = new ProgramCertificateReq();
-        req.setProgramCode(gradProgram);
-        req.setSchoolCategoryCode(schoolCategoryCode);
-        return webClient.post().uri(constants.getTranscript())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(ProgramCertificateTranscript.class).block();
-    }
-
-    public String getSchoolCategoryCode(String mincode, String accessToken) {
-        CommonSchool commonSchoolObj = webClient.get()
-                .uri(constants.getSchoolCategoryCode(), uri -> uri.path("/{mincode}").build(mincode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(CommonSchool.class).block();
-        if (commonSchoolObj != null) {
-            return commonSchoolObj.getSchoolCategoryCode();
-        }
-        return null;
-    }
-
-    public GradProgram getGradProgram(String gradProgram, String accessToken) {
-        return webClient.get().uri(String.format(constants.getProgramNameEndpoint(), gradProgram))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(GradProgram.class).block();
-    }
-
-    @Retry(name = "rt-transcript")
-    public void saveGradStudentTranscript(GradStudentTranscripts requestObj, boolean isGraduated, String accessToken) {
-        webClient.post().uri(String.format(constants.getUpdateGradStudentTranscript(), isGraduated))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentTranscripts.class).block();
-    }
-
-    public byte[] getTranscriptReport(ReportRequest reportParams, String accessToken) {
-        try {
-            return webClient.post().uri(constants.getTranscriptReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams))
-                .retrieve()
-                .onStatus(HttpStatusCode::is5xxServerError,
-                        response -> response.bodyToMono(String.class).thenReturn(new ServiceException("INTERNAL_SERVER_ERROR", response.statusCode().value())))
-                .onStatus(
-                        HttpStatus.NO_CONTENT::equals,
-                        response -> response.bodyToMono(String.class).thenReturn(new ServiceException("NO_CONTENT", response.statusCode().value()))
-                )
-                .bodyToMono(byte[].class).block();
-        } catch (ServiceException ex) {
-            if(HttpStatus.NO_CONTENT.value() == ex.getStatusCode()) {
-                return new byte[0];
-            } else {
-                throw ex;
-            }
-        }
-    }
-
-    public List<ProgramCertificateTranscript> getProgramCertificateTranscriptList(ProgramCertificateReq req, String accessToken) {
-        return webClient.post().uri(constants.getCertList())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(req)).retrieve().bodyToMono(new ParameterizedTypeReference<List<ProgramCertificateTranscript>>() {
-                }).block();
-    }
-
-    @Retry(name = "rt-certificate")
-    public void saveGradStudentCertificate(GradStudentCertificates requestObj, String accessToken) {
-        webClient.post().uri(constants.getUpdateGradStudentCertificate())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestObj)).retrieve().bodyToMono(GradStudentCertificates.class).block();
-    }
-
-    public byte[] getCertificateReport(ReportRequest reportParams, String accessToken) {
-        return webClient.post().uri(constants.getCertificateReport())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(reportParams)).retrieve().bodyToMono(byte[].class).block();
-    }
-
     // Read GraduationStudentRecord  - GET /student/studentid/{id}/algorithm
     @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
     public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
@@ -624,17 +448,17 @@ public class RestUtils {
     }
 
     public ConvGradStudent rtGetStudentGradStatusFallback(HttpServerErrorException exception){
-        log.error("STUDENT GRAD STATUS NOT Retrievable after many attempts: {}", exception);
+        log.error("STUDENT GRAD STATUS NOT Retrievable after many attempts: {}", exception.getLocalizedMessage());
         return null;
     }
 
     public ConvGradStudent rtSaveStudentGradStatusFallback(HttpServerErrorException exception){
-        log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception);
+        log.error("STUDENT GRAD STATUS NOT Saved after many attempts: {}", exception.getLocalizedMessage());
         return null;
     }
 
     public ConvGradStudent rtUpdateStudentGradStatusFallback(HttpServerErrorException exception){
-        log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception);
+        log.error("STUDENT GRAD STATUS NOT Updated after many attempts: {}", exception.getLocalizedMessage());
         return null;
     }
 }

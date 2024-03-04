@@ -65,23 +65,11 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.pen-student-api.by-pen.url}")
     private String penStudentApiByPenUrl;
 
-    @Value("${endpoint.grad-program-api.programs.url}")
-    private String gradProgramUrl;
-
     @Value("${endpoint.grad-program-api.special-program.url}")
     private String gradOptionalProgramUrl;
 
     @Value("${endpoint.grad-program-api.optional-program-by-id.url}")
     private String gradOptionalProgramByIDUrl;
-
-    @Value("${endpoint.grad-program-api.career-program.url}")
-    private String gradCareerProgramUrl;
-
-    @Value("${endpoint.grad-program-api.program-rules.url}")
-    private String gradProgramRulesUrl;
-
-    @Value("${endpoint.grad-program-api.program-rules-by-trax.url}")
-    private String gradProgramRulesByTraxReqNumberUrl;
 
     @Value("${endpoint.grad-student-api.add-new-pen.url}")
     private String addNewPenFromGradStudentApiUrl;
@@ -115,9 +103,6 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
     private String addAssessmentRequirementApiUrl;
-
-    @Value("${endpoint.grad-assessment-api.student-assessments.by-pen-and-assessment-code.url}")
-    private String studentAssessmentsByPenAndAssessmentCodeApiUrl;
 
     @Value("${endpoint.grad-assessment-api.student-assessments.by-pen.url}")
     private String studentAssessmentsByPenApiUrl;
@@ -169,30 +154,6 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
     private String saveTraxStudentNoUrl;
-
-    //Sree
-    @Value("${endpoint.grad-graduation-report-api.get-transcript}")
-    private String transcript;
-    @Value("${endpoint.educ-school-api.url}")
-    private String schoolCategoryCode;
-    @Value("${endpoint.grad-student-graduation-api.get-special-cases.url}")
-    private String specialCase;
-    @Value("${endpoint.grad-program-api.program_name_by_program_code.url}")
-    private String programNameEndpoint;
-    @Value("${endpoint.grad-graduation-report-api.update-grad-student-transcript.url}")
-    private String updateGradStudentTranscript;
-    @Value("${endpoint.report-api.transcript_report}")
-    private String transcriptReport;
-    @Value("${endpoint.grad-graduation-report-api.get-cert-list}")
-    private String certList;
-    @Value("${endpoint.report-api.certificate_report}")
-    private String certificateReport;
-    @Value("${endpoint.grad-graduation-report-api.update-grad-student-certificate.url}")
-    private String updateGradStudentCertificate;
-    @Value("${endpoint.grad-graduation-report-api.update-grad-student-report.url}")
-    private String updateGradStudentReport;
-    @Value("${endpoint.report-api.achievement_report}")
-    private String achievementReport;
 
     // Incremental Grad Update
     @Value("${grad.update.enabled}")
