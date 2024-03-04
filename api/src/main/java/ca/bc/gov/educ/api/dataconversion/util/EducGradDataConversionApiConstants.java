@@ -15,15 +15,14 @@ public class EducGradDataConversionApiConstants {
     public static final String CORRELATION_ID = "correlationID";
     public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
-    public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
-    public static final String GRAD_STUDENT_ROOT_MAPPING = "/api/" + API_VERSION + "/student";
+    public static final String GRAD_DATA_CONVERSION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
 
     // Data Conversion
     public static final String GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB = "/student/parallel";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
-    public static final String GRAD_STUDENT_BY_PEN_STUDENT_API = "/pen/{pen}";
-    public static final String GRAD_CASCADE_DELETE_STUDENT_BY_PEN = "/pen/{pen}";
+    public static final String GRAD_STUDENT_BY_PEN_STUDENT_API = "/student/pen/{pen}";
+    public static final String GRAD_CASCADE_DELETE_STUDENT_BY_PEN = "/student/pen/{pen}";
 
     // Util
     public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";

@@ -15,7 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(EducGradDataConversionApiConstants.GRAD_STUDENT_ROOT_MAPPING)
+@RequestMapping(EducGradDataConversionApiConstants.GRAD_DATA_CONVERSION_API_ROOT_MAPPING)
 @CrossOrigin
 @OpenAPIDefinition(info = @Info(title = "API for Adhoc Student Operations",
         description = "This API is for running adhoc student operations invoking the endpoints manually.", version = "1"))

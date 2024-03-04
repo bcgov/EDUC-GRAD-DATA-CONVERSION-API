@@ -26,7 +26,7 @@ import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants
 import java.util.Date;
 
 @RestController
-@RequestMapping(EducGradDataConversionApiConstants.GRAD_BATCH_API_ROOT_MAPPING)
+@RequestMapping(EducGradDataConversionApiConstants.GRAD_DATA_CONVERSION_API_ROOT_MAPPING)
 @CrossOrigin
 @OpenAPIDefinition(info = @Info(title = "API for Data Conversion & Ongoing Updates.",
         description = "This API is for Reading TRAX data and Persisting GRAD data.", version = "1"))
