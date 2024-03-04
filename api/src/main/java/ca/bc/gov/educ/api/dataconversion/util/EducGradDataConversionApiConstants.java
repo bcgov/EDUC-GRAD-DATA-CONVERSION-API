@@ -16,11 +16,14 @@ public class EducGradDataConversionApiConstants {
     public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRAD_BATCH_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
+    public static final String GRAD_STUDENT_ROOT_MAPPING = "/api/" + API_VERSION + "/student";
 
     // Data Conversion
     public static final String GRAD_STUDENT_PARALLEL_DATA_CONVERSION_BATCH_JOB = "/student/parallel";
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
+    public static final String GRAD_STUDENT_BY_PEN_STUDENT_API = "/pen/{pen}";
+    public static final String GRAD_CASCADE_DELETE_STUDENT_BY_PEN = "/pen/{pen}";
 
     // Util
     public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";
@@ -32,8 +35,6 @@ public class EducGradDataConversionApiConstants {
     public static final String SECONDARY_DATE_FORMAT = "yyyy/MM/dd";
     public static final String DEFAULT_CREATED_BY = "DATA_CONV";
     public static final String DEFAULT_UPDATED_BY = "DATA_CONV";
-
-    public static final String DEFAULT_END_DATE_FORMAT = "20991231"; // yyyyMMdd
 
     @Value("${authorization.user}")
     private String userName;
@@ -100,6 +101,12 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-student-api.remove-student-career-program}")
     private String removeStudentCareerProgram;
+
+    @Value("${endpoint.grad-student-api.get-student-by-pen}")
+    private String gradStudentByPenUrl;
+
+    @Value("${endpoint.grad-student-api.get-student-notes-by-studentID}")
+    private String gradStudentNotesByStudentID;
 
     @Value("${endpoint.grad-assessment-api.assessment-requirement.url}")
     private String addAssessmentRequirementApiUrl;

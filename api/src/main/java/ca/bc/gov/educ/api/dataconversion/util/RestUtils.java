@@ -76,6 +76,20 @@ public class RestUtils {
                 .retrieve().bodyToMono(responseType).block();
     }
 
+    public List<StudentNote> getStudentNotesByStudentId(String studentID, String accessToken) {
+
+        log.debug("GET student Notes: {}", String.format(constants.getGradStudentNotesByStudentID(), studentID));
+        final ParameterizedTypeReference<List<StudentNote>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(String.format(constants.getGradStudentNotesByStudentID(), studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
     public OptionalProgram getOptionalProgram(String programCode, String specialProgramCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradOptionalProgramUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
