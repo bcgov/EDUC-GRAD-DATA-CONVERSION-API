@@ -137,8 +137,8 @@ endpoint:
     remove-student-career-program: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/studentcareerprogram/%s/%s
     read-student-career-programs: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentcareerprogram/studentid/%s
     save-grad-student-record-for-ongoing-updates: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/conv/ongoingupdate/gradstatus
-    get-student-by-pen: ${GRAD_STUDENT_API}api/v1/student/pen/%s
-    get-student-notes-by-studentID: ${GRAD_STUDENT_API}api/v1/student/studentnotes/studentid/%s
+    get-student-by-pen: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/pen/%s
+    get-student-notes-by-studentID: https://educ-grad-student-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/student/studentnotes/studentid/%s
   grad-assessment-api:
     assessment-requirement:
       url: https://educ-grad-assessment-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/assessment/requirement
