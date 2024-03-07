@@ -35,9 +35,9 @@ public class StudentControllerTest {
 
         Student student = new Student();
 
-        Mockito.when(studentService.getStudentByPen(pen,accessToken)).thenReturn(student);
+        Mockito.when(studentService.getStudentByPen(pen,accessToken.replaceAll("Bearer ", accessToken))).thenReturn(student);
         studentService.getStudentByPen(pen,accessToken.replaceAll("Bearer ", accessToken));
-        Mockito.verify(studentService).getStudentByPen(pen, "accesstoken");
+        Mockito.verify(studentService).getStudentByPen(pen, accessToken.replaceAll("Bearer ", accessToken));
 
     }
 }
