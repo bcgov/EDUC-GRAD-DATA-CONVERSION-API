@@ -26,6 +26,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -81,5 +82,18 @@ public class StudentServiceTest {
         Student s = studentService.getStudentByPen(pen, accessToken);
 
         assertThat(s).isNull();
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetStudentByPen_given_PEN_throws_exception() {
+        String pen = "123456789";
+        String accessToken = "Bearer accesstoken";
+
+        Student student = new Student();
+        student.setPen(pen);
+        List<Student> penList = List.of(student);
+
+        when(this.restUtils.getStudentsByPen(pen, accessToken)).thenThrow(Exception.class);
+        Student s = studentService.getStudentByPen(pen, accessToken);
     }
 }
