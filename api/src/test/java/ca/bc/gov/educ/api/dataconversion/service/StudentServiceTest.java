@@ -44,6 +44,12 @@ public class StudentServiceTest {
     @MockBean
     WebClient webClient;
 
+    // NATS
+    @MockBean
+    private NatsConnection natsConnection;
+    @MockBean
+    private Subscriber subscriber;
+
     @Autowired
     private EducGradDataConversionApiConstants constants;
 
