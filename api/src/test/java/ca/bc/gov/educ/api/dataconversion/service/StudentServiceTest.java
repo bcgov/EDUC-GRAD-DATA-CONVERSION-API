@@ -68,6 +68,21 @@ public class StudentServiceTest {
         assertThat(penList).isNotNull();
     }
 
+    @Test
+    public void testGetStudentByPen_given_PEN_returnsNULL() {
+        String pen = "123456789";
+        String accessToken = "Bearer accesstoken";
+
+        Student student = new Student();
+        student.setPen(pen);
+        List<Student> penList = List.of(student);
+
+        when(this.restUtils.getStudentsByPen(pen, accessToken)).thenReturn(null);
+        Student s = studentService.getStudentByPen(pen, accessToken);
+
+        assertThat(s).isNull();
+    }
+
     /*@Test
     public void testProcessStudent_whenException_isThrown_returnsAPICallError() throws Exception {
         // ID
