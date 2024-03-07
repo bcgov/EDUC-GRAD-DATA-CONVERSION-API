@@ -27,8 +27,6 @@ public class StudentControllerTest {
 
     @Test
     public void testGetGradStudentByPenFromStudentAPI() {
-        // ID
-        UUID studentID = UUID.randomUUID();
 
         String pen = "123456789";
         String accessToken = "Bearer accesstoken";
@@ -38,6 +36,20 @@ public class StudentControllerTest {
         Mockito.when(studentService.getStudentByPen(pen,accessToken.replaceAll("Bearer ", accessToken))).thenReturn(student);
         studentService.getStudentByPen(pen,accessToken.replaceAll("Bearer ", accessToken));
         Mockito.verify(studentService).getStudentByPen(pen, accessToken.replaceAll("Bearer ", accessToken));
+
+    }
+
+    @Test
+    public void testCascadeDeleteStudent() {
+
+        String pen = "123456789";
+        String accessToken = "Bearer accesstoken";
+
+        Student student = new Student();
+
+        Mockito.when(studentService.cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", accessToken))).thenReturn(pen);
+        studentService.cascadeDeleteStudent(pen,accessToken.replaceAll("Bearer ", accessToken));
+        Mockito.verify(studentService).cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", accessToken));
 
     }
 }

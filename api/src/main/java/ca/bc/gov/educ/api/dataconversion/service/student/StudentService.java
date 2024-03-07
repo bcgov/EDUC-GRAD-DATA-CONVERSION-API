@@ -56,7 +56,7 @@ public class StudentService {
     }
 
     @Transactional
-    public void cascadeDeleteStudent(String pen, String accessToken) {
+    public String cascadeDeleteStudent(String pen, String accessToken) {
         logger.debug("Cascade Delete a Student [Service]");
 
         //GET Student by PEN
@@ -76,5 +76,6 @@ public class StudentService {
              */
             restUtils.removeAllStudentRelatedData(UUID.fromString(studentID), accessToken);
         }
+        return pen;
     }
 }
