@@ -78,7 +78,7 @@ public class StudentServiceTest {
         student.setPen(pen);
         List<Student> penList = List.of(student);
 
-        when(this.restUtils.getStudentsByPen(pen, accessToken)).thenReturn(null);
+        when(this.restUtils.getStudentsByPen(pen, accessToken)).thenReturn(new ArrayList<Student>());
         Student s = studentService.getStudentByPen(pen, accessToken);
 
         assertThat(s).isNull();
