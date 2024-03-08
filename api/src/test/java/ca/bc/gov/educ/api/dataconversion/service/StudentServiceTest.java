@@ -16,6 +16,7 @@ import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,9 +51,6 @@ public class StudentServiceTest {
     private NatsConnection natsConnection;
     @MockBean
     private Subscriber subscriber;
-
-    @Autowired
-    private EducGradDataConversionApiConstants constants;
 
     @Test
     public void testGetStudentByPen_given_PEN_returnsAPICallSuccess() {
@@ -95,5 +93,21 @@ public class StudentServiceTest {
 
         when(this.restUtils.getStudentsByPen(pen, accessToken)).thenThrow(Exception.class);
         Student s = studentService.getStudentByPen(pen, accessToken);
+    }
+
+    @Test
+    public void testCascadeDeleteStudentBy_given_PEN_returnsAPICallSuccess() {
+        String pen = "123456789";
+        String studentID = "0a614e84-7e27-1815-817e-fad384090090";
+        String accessToken = "Bearer accesstoken";
+
+        Student student = new Student();
+        student.setPen(pen);
+        student.setStudentID(studentID);
+        List<Student> penList = List.of(student);
+
+        when(this.restUtils.getStudentsByPen(pen, accessToken)).thenReturn(penList);
+        studentService.cascadeDeleteStudent(pen, accessToken);
+        Mockito.verify(restUtils).removeAllStudentRelatedData(UUID.fromString(studentID), accessToken);
     }
 }
