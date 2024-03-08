@@ -22,13 +22,11 @@ public class StudentService {
     private static final Logger logger = LoggerFactory.getLogger(StudentService.class);
 
     private final RestUtils restUtils;
-    private final EducGradDataConversionApiConstants constants;
     final WebClient webClient;
 
     @Autowired
-    public StudentService(RestUtils restUtils, EducGradDataConversionApiConstants constants, WebClient webClient) {
+    public StudentService(RestUtils restUtils, WebClient webClient) {
         this.restUtils = restUtils;
-        this.constants = constants;
         this.webClient = webClient;
     }
 
