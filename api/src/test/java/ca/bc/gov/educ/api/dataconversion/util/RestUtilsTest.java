@@ -392,7 +392,7 @@ public class RestUtilsTest {
 
         val result = this.restUtils.getStudentNotesByStudentId(studentID, accessToken);
         assertThat(result).isNotNull();
-        assertThat(result.size() > 0).isTrue();
+        assertThat(!result.isEmpty()).isTrue();
         assertThat(result.get(0).getStudentID()).isEqualTo(studentID);
     }
 }
