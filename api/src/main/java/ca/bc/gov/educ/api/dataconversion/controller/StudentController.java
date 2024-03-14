@@ -14,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping(EducGradDataConversionApiConstants.GRAD_DATA_CONVERSION_API_ROOT_MAPPING)
 @CrossOrigin
@@ -32,7 +35,7 @@ public class StudentController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public Student getGradStudentByPenFromStudentAPI(@PathVariable String pen, @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Get Student by PEN [Controller]");
-        return studentService.getStudentByPen(pen,accessToken.replaceAll("Bearer ", ""));
+        return studentService.getStudentByPen(pen, accessToken.replaceAll("Bearer ", ""));
     }
 
     @DeleteMapping(EducGradDataConversionApiConstants.GRAD_CASCADE_DELETE_STUDENT_BY_PEN)
@@ -41,6 +44,18 @@ public class StudentController {
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public void cascadeDeleteStudent(@PathVariable String pen, @RequestHeader(name="Authorization") String accessToken) {
         logger.debug("Cascade Delete a Student [Controller]");
-        studentService.cascadeDeleteStudent(pen,accessToken.replaceAll("Bearer ", ""));
+        studentService.cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", ""));
+    }
+
+    @DeleteMapping(EducGradDataConversionApiConstants.GRAD_CASCADE_DELETE_STUDENTS_BY_PENLIST)
+    @PreAuthorize("hasAuthority('SCOPE_READ_GRAD_STUDENT_DATA')")
+    @Operation(summary = "Delete multiple Students by PEN", description = "Delete a list of Students and all related data by PEN", tags = { "Students" })
+    @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
+    public void cascadeDeleteStudents(@RequestBody List<String> penList, @RequestHeader(name="Authorization") String accessToken) {
+        logger.debug("Cascade Delete a Student [Controller]");
+        penList.forEach(pen -> {
+                    studentService.cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", ""));
+                });
+
     }
 }

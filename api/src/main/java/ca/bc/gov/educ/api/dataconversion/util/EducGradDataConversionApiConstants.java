@@ -23,6 +23,7 @@ public class EducGradDataConversionApiConstants {
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
     public static final String GRAD_STUDENT_BY_PEN_STUDENT_API = "/student/pen/{pen}";
     public static final String GRAD_CASCADE_DELETE_STUDENT_BY_PEN = "/student/pen/{pen}";
+    public static final String GRAD_CASCADE_DELETE_STUDENTS_BY_PENLIST = "/student/penlist";
 
     // Util
     public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";
