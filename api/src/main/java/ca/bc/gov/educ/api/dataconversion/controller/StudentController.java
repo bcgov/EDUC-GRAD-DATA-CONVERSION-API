@@ -55,6 +55,5 @@ public class StudentController {
         penList.forEach(pen -> {
                     studentService.cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", ""));
                 });
-
     }
 }
