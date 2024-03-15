@@ -235,6 +235,10 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions
       get-course-requirements:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-requirements
+  grad-graduation-report-api:
+    delete-student-achievements:
+      url: ${GRAD_GRADUATION_REPORT_API}/api/v1/graduationreports/studentachievement/{studentID}
+
 
 #Incremental Grad Update
 grad:

@@ -22,8 +22,7 @@ public class EducGradDataConversionApiConstants {
     public static final String GRAD_COURSE_RESTRICTION_DATA_CONVERSION_BATCH_JOB = "/courseRestriction";
     public static final String GRAD_COURSE_REQUIREMENT_DATA_CONVERSION_BATCH_JOB = "/courseRequirement";
     public static final String GRAD_STUDENT_BY_PEN_STUDENT_API = "/student/pen/{pen}";
-    public static final String GRAD_CASCADE_DELETE_STUDENT_BY_PEN = "/student/pen/{pen}";
-    public static final String GRAD_CASCADE_DELETE_STUDENTS_BY_PENLIST = "/student/penlist";
+    public static final String GRAD_STUDENTS_BY_PENLIST_STUDENT_API = "/student/penlist";
 
     // Util
     public static final String PEN_UPDATES_PARALLEL_BATCH_JOB = "/penUpdates/parallel";
@@ -161,6 +160,9 @@ public class EducGradDataConversionApiConstants {
 
     @Value("${endpoint.grad-trax-api.student.save-trax-student-no.url}")
     private String saveTraxStudentNoUrl;
+
+    @Value("${endpoint.grad-graduation-report-api.delete-student-achievements.url}")
+    private String deleteStudentAchievementsUrl;
 
     // Incremental Grad Update
     @Value("${grad.update.enabled}")

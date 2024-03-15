@@ -73,6 +73,17 @@ public class StudentService {
                 STUDENT_OPTIONAL_PROGRAM, GRADUATION_STUDENT_RECORD_HISTORY, GRADUATION_STUDENT_RECORD
              */
             restUtils.removeAllStudentRelatedData(UUID.fromString(studentID), accessToken);
+
+            /*
+                Delete all Student certificates, transcripts and reports from API_GRAD_REPORT schema
+                Tables: STUDENT_CERTIFICATE, STUDENT_TRANSCRIPT and STUDENT_REPORT
+             */
+            restUtils.removeAllStudentAchievements(UUID.fromString(studentID), accessToken);
+
+            /*
+                Update TRAX_STUDENT_NO status to NULL
+             */
+            restUtils.updateTraxStudentNo(pen, accessToken);
         }
         return pen;
     }
