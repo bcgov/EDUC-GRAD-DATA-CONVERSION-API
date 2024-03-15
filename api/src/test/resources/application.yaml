@@ -162,6 +162,9 @@ endpoint:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-restrictions
       get-course-requirements:
         url: https://educ-grad-trax-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/trax/common/course-requirements
+  grad-graduation-report-api:
+    delete-student-achievements:
+      url: https://educ-grad-graduation-report-api-77c02f-dev.apps.silver.devops.gov.bc.ca/api/v1/graduationreports/studentachievement
 
 #Incremental Grad Update
 grad:
