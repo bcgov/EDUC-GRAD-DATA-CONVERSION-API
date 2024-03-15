@@ -15,7 +15,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping(EducGradDataConversionApiConstants.GRAD_DATA_CONVERSION_API_ROOT_MAPPING)
@@ -39,7 +38,7 @@ public class StudentController {
     }
 
     @DeleteMapping(EducGradDataConversionApiConstants.GRAD_CASCADE_DELETE_STUDENT_BY_PEN)
-    @PreAuthorize("hasAuthority('SCOPE_READ_GRAD_STUDENT_DATA')")
+    @PreAuthorize("hasAuthority('SCOPE_DELETE_GRAD_STUDENT_DATA')")
     @Operation(summary = "Delete a Student by PEN", description = "Delete a Student and all related data by PEN", tags = { "Students" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public void cascadeDeleteStudent(@PathVariable String pen, @RequestHeader(name="Authorization") String accessToken) {
@@ -48,7 +47,7 @@ public class StudentController {
     }
 
     @DeleteMapping(EducGradDataConversionApiConstants.GRAD_CASCADE_DELETE_STUDENTS_BY_PENLIST)
-    @PreAuthorize("hasAuthority('SCOPE_READ_GRAD_STUDENT_DATA')")
+    @PreAuthorize("hasAuthority('SCOPE_DELETE_GRAD_STUDENT_DATA')")
     @Operation(summary = "Delete multiple Students by PEN", description = "Delete a list of Students and all related data by PEN", tags = { "Students" })
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "OK")})
     public void cascadeDeleteStudents(@RequestBody List<String> penList, @RequestHeader(name="Authorization") String accessToken) {
