@@ -26,7 +26,7 @@ public class RestUtils {
 
     private final EducGradDataConversionApiConstants constants;
 
-    private ResponseObjCache responseObjCache;
+    private final ResponseObjCache responseObjCache;
 
     private final WebClient webClient;
 
@@ -360,13 +360,14 @@ public class RestUtils {
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
-    public TraxStudentNo updateTraxStudentNo(String pen, String accessToken) {
+    public TraxStudentNo updateTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
         return webClient.put()
-                .uri(String.format(constants.getSaveTraxStudentNoUrl(), pen))
+                .uri(constants.getSaveTraxStudentNoUrl())
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 })
+                .body(BodyInserters.fromValue(traxStudentNo))
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 

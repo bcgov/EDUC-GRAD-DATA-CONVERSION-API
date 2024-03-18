@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import io.github.resilience4j.retry.annotation.Retry;
 import jakarta.transaction.Transactional;
@@ -12,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +34,7 @@ public class StudentService {
         logger.debug("Get Student by PEN [Service]");
 
         Student student;
-        List<Student> gradStudentList = new ArrayList<>();
+        List<Student> gradStudentList;
 
         try {
             gradStudentList = restUtils.getStudentsByPen(pen, accessToken);
@@ -83,7 +81,7 @@ public class StudentService {
             /*
                 Update TRAX_STUDENT_NO status to NULL
              */
-            restUtils.updateTraxStudentNo(pen, accessToken);
+            restUtils.updateTraxStudentNo(new TraxStudentNo(pen, null, null), accessToken);
         }
         return pen;
     }
