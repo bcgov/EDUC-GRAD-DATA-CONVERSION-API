@@ -410,7 +410,7 @@ public class RestUtils {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Achievements Not Found"))).bodyToMono(Void.class).block();
+                }).retrieve().bodyToMono(Void.class).block();
     }
 
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
@@ -419,7 +419,7 @@ public class RestUtils {
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Data Not Found"))).bodyToMono(Void.class).block();
+                }).retrieve().bodyToMono(Void.class).block();
     }
 
     // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}
