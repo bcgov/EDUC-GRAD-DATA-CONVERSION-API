@@ -70,18 +70,30 @@ public class StudentService {
                 STUDENT_RECORD_NOTE, STUDENT_CAREER_PROGRAMS, STUDENT_OPTIONAL_PROGRAM_HISTORY,
                 STUDENT_OPTIONAL_PROGRAM, GRADUATION_STUDENT_RECORD_HISTORY, GRADUATION_STUDENT_RECORD
              */
-            restUtils.removeAllStudentRelatedData(UUID.fromString(studentID), accessToken);
+            try {
+                restUtils.removeAllStudentRelatedData(UUID.fromString(studentID), accessToken);
+            } catch (Exception e) {
+                logger.info("Exception thrown when trying to delete student related data from grad student API.");
+            }
 
             /*
                 Delete all Student certificates, transcripts and reports from API_GRAD_REPORT schema
                 Tables: STUDENT_CERTIFICATE, STUDENT_TRANSCRIPT and STUDENT_REPORT
              */
-            restUtils.removeAllStudentAchievements(UUID.fromString(studentID), accessToken);
+            try {
+                restUtils.removeAllStudentAchievements(UUID.fromString(studentID), accessToken);
+            } catch (Exception e) {
+                logger.info("Exception thrown when trying to delete student achievements.");
+            }
 
             /*
                 Update TRAX_STUDENT_NO status to NULL
              */
-            restUtils.updateTraxStudentNo(new TraxStudentNo(pen, null, null), accessToken);
+            try {
+                restUtils.updateTraxStudentNo(new TraxStudentNo(pen, null, null), accessToken);
+            } catch (Exception e) {
+                logger.info("Exception thrown when trying to update TraxStudentNo.");
+            }
         }
         return pen;
     }
