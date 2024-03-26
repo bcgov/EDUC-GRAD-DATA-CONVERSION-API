@@ -368,4 +368,31 @@ public class RestUtilsTest {
         val result = this.restUtils.rtUpdateStudentGradStatusFallback(new HttpServerErrorException(HttpStatus.I_AM_A_TEAPOT));
         assertThat(result).isNull();
     }
+
+    @Test
+    public void testGetStudentNotesByStudentId_returnsTrue_with_APICallSuccess() {
+
+        final String studentID = "0a614e84-7e27-1815-817e-fad384090090";
+        final String noteID = "0a614e84-7e27-1815-817e-fad384090090";
+        String accessToken = "Bearer accesstoken";
+        StudentNote note = new StudentNote();
+        note.setStudentID(studentID);
+        note.setNote("Sample Note");
+        note.setId(UUID.fromString(noteID));
+
+        when(this.webClient.get()).thenReturn(this.requestHeadersUriMock);
+        when(this.requestHeadersUriMock.uri(String.format(constants.getGradStudentNotesByStudentID(), studentID)))
+                .thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.headers(any(Consumer.class))).thenReturn(this.requestHeadersMock);
+        when(this.requestHeadersMock.retrieve()).thenReturn(this.responseMock);
+
+        final ParameterizedTypeReference<List<StudentNote>> responseType = new ParameterizedTypeReference<>() {
+        };
+        when(this.responseMock.bodyToMono(responseType)).thenReturn(Mono.just(Arrays.asList(note)));
+
+        val result = this.restUtils.getStudentNotesByStudentId(studentID, accessToken);
+        assertThat(result).isNotNull();
+        assertThat(!result.isEmpty()).isTrue();
+        assertThat(result.get(0).getStudentID()).isEqualTo(studentID);
+    }
 }

@@ -26,7 +26,7 @@ public class RestUtils {
 
     private final EducGradDataConversionApiConstants constants;
 
-    private ResponseObjCache responseObjCache;
+    private final ResponseObjCache responseObjCache;
 
     private final WebClient webClient;
 
@@ -69,6 +69,20 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getPenStudentApiByPenUrl(), pen))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .retrieve().bodyToMono(responseType).block();
+    }
+
+    public List<StudentNote> getStudentNotesByStudentId(String studentID, String accessToken) {
+
+        log.debug("GET student Notes: {}", String.format(constants.getGradStudentNotesByStudentID(), studentID));
+        final ParameterizedTypeReference<List<StudentNote>> responseType = new ParameterizedTypeReference<>() {
+        };
+        return this.webClient.get()
+                .uri(String.format(constants.getGradStudentNotesByStudentID(), studentID))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
@@ -346,6 +360,17 @@ public class RestUtils {
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
+    public TraxStudentNo updateTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
+        return webClient.put()
+                .uri(constants.getSaveTraxStudentNoUrl())
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                })
+                .body(BodyInserters.fromValue(traxStudentNo))
+                .retrieve().bodyToMono(TraxStudentNo.class).block();
+    }
+
     // Read GraduationStudentRecord  - GET /student/studentid/{id}/algorithm
     @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
     public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
@@ -380,13 +405,21 @@ public class RestUtils {
                 }).body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
+    public void removeAllStudentAchievements(UUID studentID, String accessToken) {
+        webClient.delete().uri(String.format(constants.getDeleteStudentAchievementsUrl(),studentID))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(Void.class).block();
+    }
+
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
     public void removeAllStudentRelatedData(UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getSaveGraduationStudentRecord(),studentID))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Data Not Found"))).bodyToMono(Void.class).block();
+                }).retrieve().bodyToMono(Void.class).block();
     }
 
     // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}
