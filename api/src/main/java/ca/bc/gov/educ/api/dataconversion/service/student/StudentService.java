@@ -90,7 +90,7 @@ public class StudentService {
                 Update TRAX_STUDENT_NO status to NULL
              */
             try {
-                restUtils.updateTraxStudentNo(new TraxStudentNo(pen, null, null), accessToken);
+                restUtils.deleteTraxStudentNo(new TraxStudentNo(pen, null, null), accessToken);
             } catch (Exception e) {
                 logger.info("Exception thrown when trying to update TraxStudentNo.");
             }
