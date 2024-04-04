@@ -230,6 +230,8 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/student-master
       save-trax-student-no:
         url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no
+      delete-trax-student-no:
+        url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no/%s
     course:
       get-course-restrictions:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions

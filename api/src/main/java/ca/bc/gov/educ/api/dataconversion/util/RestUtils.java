@@ -360,14 +360,13 @@ public class RestUtils {
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
-    public TraxStudentNo updateTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
-        return webClient.put()
-                .uri(constants.getSaveTraxStudentNoUrl())
+    public TraxStudentNo deleteTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
+        return webClient.delete()
+                .uri(String.format(constants.getDeleteTraxStudentNoUrl(),traxStudentNo))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 })
-                .body(BodyInserters.fromValue(traxStudentNo))
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
