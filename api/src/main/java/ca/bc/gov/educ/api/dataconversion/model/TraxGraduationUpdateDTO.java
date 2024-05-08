@@ -24,6 +24,10 @@ public class TraxGraduationUpdateDTO extends TraxStudentUpdateDTO {
     private String slpDate;
     // STUD_CITIZ
     private String citizenship;
+    // STUD_STATUS
+    private String studentStatus;
+    // ARCHIVE_FLAG
+    private String archiveFlag;
 
     public String getSlpDateWithDefaultFormat() {
         if (StringUtils.isBlank(slpDate)) {

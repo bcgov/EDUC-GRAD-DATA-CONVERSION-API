@@ -76,7 +76,22 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
         if (currentStudent.isArchived() && currentStudent.isGraduated()) {
             return;
         }
-        // Order is important for first 3 items below!!!
+        // Processing order is important for the first 3 fields below.
+        String newStudentStatus = getGradStudentStatus(updateGrad.getStudentStatus(), updateGrad.getArchiveFlag());
+        // 0. Student Status
+        if (!StringUtils.equals(newStudentStatus, currentStudent.getStudentStatus())) {
+            currentStudent.setNewStudentStatus(newStudentStatus);
+            if (StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_CURRENT)
+                    || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_TERMINATED)
+                    || StringUtils.equalsIgnoreCase(currentStudent.getNewStudentStatus(), STUDENT_STATUS_DECEASED)) {
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+            }
+            log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
+            isChanged = true;
+        }
         // 1. School of record
         if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
             currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());

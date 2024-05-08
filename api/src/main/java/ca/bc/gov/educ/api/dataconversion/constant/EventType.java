@@ -13,7 +13,7 @@ public enum EventType {
   NEWSTUDENT,
   UPD_DEMOG,
   UPD_GRAD,
-  UPD_STD_STATUS,
+  UPD_STD_STATUS, // UPD_STD_STATUS will be deprecated
   XPROGRAM,
   ASSESSMENT,
   COURSE,
