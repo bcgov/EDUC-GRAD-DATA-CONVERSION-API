@@ -21,6 +21,7 @@ import static ca.bc.gov.educ.api.dataconversion.constant.EventType.UPD_STD_STATU
 
 @Service
 @Slf4j
+// UPD_STD_STATUS will be deprecated
 public class StudentStatusUpdateEventService extends StudentBaseService implements EventService {
 
     private final EventRepository eventRepository;

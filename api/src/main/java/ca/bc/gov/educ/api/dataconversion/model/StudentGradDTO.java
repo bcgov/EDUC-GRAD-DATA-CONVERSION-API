@@ -39,4 +39,13 @@ public class StudentGradDTO extends  StudentCommonDTO {
         return StringUtils.isNotBlank(newSchoolOfRecord)? newSchoolOfRecord : this.getSchoolOfRecord();
     }
 
+    @Override
+    public boolean isArchived() {
+        if (StringUtils.isNotBlank(newStudentStatus) && "ARC".equalsIgnoreCase(newStudentStatus)) { // Student Status from TRAX
+            return true;
+        } else {
+            return super.isArchived(); // Student Status from GRAD
+        }
+    }
+
 }

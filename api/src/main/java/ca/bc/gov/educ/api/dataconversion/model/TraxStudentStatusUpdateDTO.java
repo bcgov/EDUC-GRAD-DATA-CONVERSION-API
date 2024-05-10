@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+// UPD_STD_STATUS will be deprecated
 public class TraxStudentStatusUpdateDTO extends TraxStudentUpdateDTO {
 
     // STUD_STATUS
