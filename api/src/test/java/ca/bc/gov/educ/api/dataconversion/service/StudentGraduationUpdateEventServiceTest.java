@@ -75,6 +75,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -141,6 +143,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -183,7 +187,7 @@ public class StudentGraduationUpdateEventServiceTest {
     }
 
     @Test
-    public void testProcessStudentForGrad2018ENProgram_givenUpdated_Archived_STUDENT_whenGradeAndSchoolAreChanged_then_returnsAPICallSuccess() {
+    public void testProcessArchivedStudentForGrad2018ENProgram_givenUpdated_Archived_STUDENT_whenGradeAndSchoolAreChanged_then_returnsAPICallSuccess() {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -203,6 +207,201 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("I");
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_GRAD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("ARC");
+        currentStudent.setCitizenship("C");
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+        // Optional Program Codes
+        currentStudent.getProgramCodes().add("XC");
+        currentStudent.getProgramCodes().add("FI");
+        // Courses
+        StudentCourse course1 = new StudentCourse();
+        course1.setCourseCode("Test");
+        course1.setCourseLevel("12");
+        course1.setCourseName("Test Course");
+        course1.setCreditsUsedForGrad(Integer.valueOf("4"));
+        course1.setCompletedCoursePercentage(Double.valueOf("92.00"));
+        course1.setCredits(Integer.valueOf("4"));
+        course1.setPen(pen);
+        currentStudent.getCourses().add(course1);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessCurrentGraduatedStudentForGrad2018ENProgram_givenUpdated_Archived_STUDENT_whenGradeAndSchoolAreChanged_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String newMincode = "333444";
+
+        String updateType = "UPD_GRAD";
+
+        // TraxGraduationUpdateDTO
+        TraxGraduationUpdateDTO traxGraduationUpdate = new TraxGraduationUpdateDTO();
+        traxGraduationUpdate.setPen(pen);
+        traxGraduationUpdate.setGraduationRequirementYear("2018");
+        traxGraduationUpdate.setCitizenship("C");
+        traxGraduationUpdate.setStudentGrade("11");
+        traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("I");
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_GRAD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("CUR");
+        currentStudent.setCitizenship("C");
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setGradDate("2022/02");
+        // Optional Program Codes
+        currentStudent.getProgramCodes().add("XC");
+        currentStudent.getProgramCodes().add("FI");
+        // Courses
+        StudentCourse course1 = new StudentCourse();
+        course1.setCourseCode("Test");
+        course1.setCourseLevel("12");
+        course1.setCourseName("Test Course");
+        course1.setCreditsUsedForGrad(Integer.valueOf("4"));
+        course1.setCompletedCoursePercentage(Double.valueOf("92.00"));
+        course1.setCredits(Integer.valueOf("4"));
+        course1.setPen(pen);
+        currentStudent.getCourses().add(course1);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessCurrentStudentForGrad2018ENProgram_givenUpdated_Archived_STUDENT_whenGradeAndSchoolAreChanged_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String newMincode = "333444";
+
+        String updateType = "UPD_GRAD";
+
+        // TraxGraduationUpdateDTO
+        TraxGraduationUpdateDTO traxGraduationUpdate = new TraxGraduationUpdateDTO();
+        traxGraduationUpdate.setPen(pen);
+        traxGraduationUpdate.setGraduationRequirementYear("2018");
+        traxGraduationUpdate.setCitizenship("C");
+        traxGraduationUpdate.setStudentGrade("11");
+        traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("I");
+
+        // Event
+        Event event = new Event();
+        event.setEventType(EventType.UPD_GRAD.name());
+        event.setEventStatus(EventStatus.DB_COMMITTED.name());
+        event.setActivityCode(updateType);
+        event.setEventId(UUID.randomUUID());
+
+        // current GRAD Student
+        StudentGradDTO currentStudent = new StudentGradDTO();
+        // GraduationStudentRecord
+        currentStudent.setStudentID(studentID);
+        currentStudent.setProgram(program);
+        currentStudent.setStudentGrade("12");
+        currentStudent.setStudentStatus("CUR");
+        currentStudent.setCitizenship("C");
+        currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolAtGrad(mincode);
+        // Optional Program Codes
+        currentStudent.getProgramCodes().add("XC");
+        currentStudent.getProgramCodes().add("FI");
+        // Courses
+        StudentCourse course1 = new StudentCourse();
+        course1.setCourseCode("Test");
+        course1.setCourseLevel("12");
+        course1.setCourseName("Test Course");
+        course1.setCreditsUsedForGrad(Integer.valueOf("4"));
+        course1.setCompletedCoursePercentage(Double.valueOf("92.00"));
+        course1.setCredits(Integer.valueOf("4"));
+        course1.setPen(pen);
+        currentStudent.getCourses().add(course1);
+
+        when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
+        when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+
+        studentGraduationUpdateEventService.processEvent(traxGraduationUpdate, event);
+
+        assertThat(event).isNotNull();
+        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+    }
+
+    @Test
+    public void testProcessArchivedStudentForGrad2018ENProgram_givenUpdated_Current_STUDENT_whenGradeAndSchoolAreChangedAndStatusIsArchived_then_returnsAPICallSuccess() {
+        // ID
+        UUID studentID = UUID.randomUUID();
+        String pen = "111222333";
+
+        // Program & School
+        String program = "2018-EN";
+        String mincode = "222333";
+
+        String newMincode = "333444";
+
+        String updateType = "UPD_GRAD";
+
+        // TraxGraduationUpdateDTO
+        TraxGraduationUpdateDTO traxGraduationUpdate = new TraxGraduationUpdateDTO();
+        traxGraduationUpdate.setPen(pen);
+        traxGraduationUpdate.setGraduationRequirementYear("2018");
+        traxGraduationUpdate.setCitizenship("C");
+        traxGraduationUpdate.setStudentGrade("11");
+        traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -265,6 +464,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
         traxGraduationUpdate.setCitizenship(newCitizenship);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -327,6 +528,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -387,6 +590,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -447,6 +652,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -508,6 +715,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("1950");
         traxGraduationUpdate.setStudentGrade("AD");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -572,6 +781,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
         traxGraduationUpdate.setSlpDate(newSlpDate);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -636,6 +847,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
         traxGraduationUpdate.setSlpDate(newSlpDate);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -698,6 +911,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -791,6 +1006,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -853,6 +1070,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
         traxGraduationUpdate.setSlpDate(newSlpDate);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -917,6 +1136,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();
@@ -980,6 +1201,8 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
         traxGraduationUpdate.setCitizenship(newCitizenship);
+        traxGraduationUpdate.setStudentStatus("A");
+        traxGraduationUpdate.setArchiveFlag("A");
 
         // Event
         Event event = new Event();

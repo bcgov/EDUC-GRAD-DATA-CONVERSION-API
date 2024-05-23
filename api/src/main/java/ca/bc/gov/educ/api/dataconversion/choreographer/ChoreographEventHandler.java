@@ -56,7 +56,7 @@ public class ChoreographEventHandler {
             final TraxGraduationUpdateDTO updateGrad = JsonUtil.getJsonObjectFromString(TraxGraduationUpdateDTO.class, event.getEventPayload());
             this.eventServiceMap.get(UPD_GRAD.toString()).processEvent(updateGrad, event);
             break;
-          case "UPD_STD_STATUS":
+          case "UPD_STD_STATUS": // UPD_STD_STATUS will be deprecated
             log.debug("Processing UPD_STD_STATUS event record :: {} ", event);
             final TraxStudentStatusUpdateDTO updateStudentStatus = JsonUtil.getJsonObjectFromString(TraxStudentStatusUpdateDTO.class, event.getEventPayload());
             this.eventServiceMap.get(UPD_STD_STATUS.toString()).processEvent(updateStudentStatus, event);

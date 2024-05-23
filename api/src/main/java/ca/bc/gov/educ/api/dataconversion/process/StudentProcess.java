@@ -440,6 +440,13 @@ public class StudentProcess extends StudentBaseService {
         requestDTO.setEventType(eventType);
         // UPD_GRAD ====================================================
         if (eventType == EventType.UPD_GRAD) {
+            // Student Status
+            if (StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.STRING).name(FieldName.STUDENT_STATUS).value(gradStudent.getNewStudentStatus())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
             // School of Record
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
                 OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
@@ -483,7 +490,7 @@ public class StudentProcess extends StudentBaseService {
                 requestDTO.getUpdateFields().add(field);
             }
         }
-        // UPD_GRAD ====================================================
+        // UPD_STD_STATUS will be deprecated
         // Student Status
         if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
             OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
