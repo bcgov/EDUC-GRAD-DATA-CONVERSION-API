@@ -490,14 +490,6 @@ public class StudentProcess extends StudentBaseService {
                 requestDTO.getUpdateFields().add(field);
             }
         }
-        // UPD_STD_STATUS will be deprecated
-        // Student Status
-        if (eventType == EventType.UPD_STD_STATUS && StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
-            OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
-                    .type(FieldType.STRING).name(FieldName.STUDENT_STATUS).value(gradStudent.getNewStudentStatus())
-                    .build();
-            requestDTO.getUpdateFields().add(field);
-        }
 
         // Others ======================================================
         // Batch Flags
