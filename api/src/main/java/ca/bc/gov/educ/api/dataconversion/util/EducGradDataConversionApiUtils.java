@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Date;
 
 public class EducGradDataConversionApiUtils {
@@ -76,18 +77,14 @@ public class EducGradDataConversionApiUtils {
 
     public static String parsingNFormating(String inDate) {
         String actualDate = inDate + "/01";
-        String sDates = null;
-        Date temp = EducGradDataConversionApiUtils.parseDate(actualDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT);
-        sDates = EducGradDataConversionApiUtils.formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
-        return sDates;
+        Date temp = toLastDayOfMonth(EducGradDataConversionApiUtils.parseDate(actualDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT));
+        return EducGradDataConversionApiUtils.formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
     }
 
     public static String parsingDateForCertificate(String sessionDate) {
         String actualSessionDate = sessionDate + "/01";
-        String sDates = null;
-        Date temp = parseDate(actualSessionDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT);
-        sDates = formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
-        return sDates;
+        Date temp = toLastDayOfMonth(parseDate(actualSessionDate, EducGradDataConversionApiConstants.SECONDARY_DATE_FORMAT));
+        return formatDate(temp, EducGradDataConversionApiConstants.DEFAULT_DATE_FORMAT);
     }
 
     public static String formatDateForReportJasper(String updatedTimestamp) {
@@ -162,5 +159,12 @@ public class EducGradDataConversionApiUtils {
             return Double.valueOf(percentage.trim());
         }
         return null;
+    }
+
+    private static Date toLastDayOfMonth(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+        return cal.getTime();
     }
 }
