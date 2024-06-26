@@ -916,7 +916,7 @@ public class StudentProcessTest {
 
         boolean exceptionIsThrown = false;
         try {
-            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_STD_STATUS, "123");
+            studentProcess.saveGraduationStudent(pen, requestStudent, EventType.UPD_GRAD, "123");
         } catch (Exception e) {
             exceptionIsThrown = true;
         }
