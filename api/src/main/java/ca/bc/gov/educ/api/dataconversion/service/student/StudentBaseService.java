@@ -43,9 +43,10 @@ public class StudentBaseService {
             return STUDENT_STATUS_DECEASED;
         } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "M")) {
             return STUDENT_STATUS_MERGED;
-        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") &&
-                (StringUtils.equalsIgnoreCase(traxArchiveFlag, "A") || StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) ) {
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "A")) {
             return STUDENT_STATUS_TERMINATED;
+        } else if (StringUtils.equalsIgnoreCase(traxStudentStatus, "T") && StringUtils.equalsIgnoreCase(traxArchiveFlag, "I")) {
+            return STUDENT_STATUS_ARCHIVED;
         }
         return null;
     }
