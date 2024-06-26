@@ -43,7 +43,7 @@ on:
 jobs:
   openshift-ci-cd:
     name: Build and deploy to OpenShift DEV from release branch
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     environment: dev
 
     steps:
