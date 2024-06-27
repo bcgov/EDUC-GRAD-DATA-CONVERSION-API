@@ -161,10 +161,13 @@ public class EducGradDataConversionApiUtils {
         return null;
     }
 
-    private static Date toLastDayOfMonth(Date date) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
-        return cal.getTime();
+    static Date toLastDayOfMonth(Date date) {
+        if(date != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH));
+            return cal.getTime();
+        }
+        return null;
     }
 }
