@@ -90,7 +90,7 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
             isChanged = true;
         }
         if (!currentStudent.isArchived() || !currentStudent.isGraduated()) {
-            // 1. School of record
+            // 1.1 School of record
             if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
                 currentStudent.setNewSchoolOfRecord(updateGrad.getSchoolOfRecord());
                 // Transcript
@@ -100,6 +100,18 @@ public class StudentGraduationUpdateEventService extends StudentBaseService impl
                     currentStudent.setNewRecalculateProjectedGrad("Y");
                 }
                 log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
+                isChanged = true;
+            }
+            // 1.2 SchoolOfRecordId
+            if (updateGrad.getSchoolOfRecordId() != null &&  updateGrad.getSchoolOfRecordId() != currentStudent.getSchoolOfRecordId()) {
+                currentStudent.setNewSchoolOfRecordId(updateGrad.getSchoolOfRecordId());
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                if (!currentStudent.isArchived()) {
+                    // TVR
+                    currentStudent.setNewRecalculateProjectedGrad("Y");
+                }
+                log.info(" => school of record id : current = {}, request = {}", currentStudent.getSchoolOfRecordId(), currentStudent.getNewSchoolOfRecordId());
                 isChanged = true;
             }
             // 2. Grad Program
