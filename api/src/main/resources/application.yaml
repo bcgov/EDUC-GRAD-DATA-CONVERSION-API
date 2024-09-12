@@ -88,6 +88,7 @@ server:
       worker: 128
       io: 16
   #port: ${HTTP_PORT}
+  max-http-request-header-size: 20000
 
 #API Documentation
 springdoc:
