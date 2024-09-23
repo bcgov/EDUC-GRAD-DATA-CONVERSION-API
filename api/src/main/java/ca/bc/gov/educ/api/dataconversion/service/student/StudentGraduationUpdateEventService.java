@@ -68,7 +68,6 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
 
     public void processStudent(TraxGraduationUpdateDTO updateGrad, StudentGradDTO currentStudent, String accessToken) {
         boolean isChanged = false;
-        boolean isStudentStatusChanged = false;
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
         // Processing order is important for the first 3 fields below.
@@ -114,13 +113,9 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
             processStudentStatus(currentStudent, newStudentStatus);
             log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
             isChanged = true;
-            isStudentStatusChanged = true;
         }
 
         if (isChanged) {
-            if (isStudentStatusChanged) {
-                validateAndAdjustNewBatchFlags(currentStudent);
-            }
             log.info(" Save Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
             studentProcess.saveGraduationStudent(updateGrad.getPen(), currentStudent, UPD_GRAD, accessToken);
         }

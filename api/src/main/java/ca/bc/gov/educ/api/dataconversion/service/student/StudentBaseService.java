@@ -130,29 +130,6 @@ public abstract class StudentBaseService {
         }
     }
 
-    protected void validateAndAdjustNewBatchFlags(StudentGradDTO currentStudent) {
-        String currentStudentStatus = currentStudent.getStudentStatus();
-        String newStudentStatus = currentStudent.getNewStudentStatus();
-        // 1. If a student in GRAD is ARC/TER then do not set TVR flag
-        if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(currentStudentStatus) || STUDENT_STATUS_TERMINATED.equalsIgnoreCase(currentStudentStatus)) {
-            currentStudent.setNewRecalculateProjectedGrad(null);
-        }
-        // 2. If a student in GRAD is MER then do not set Transcript & TVR flags
-        if (STUDENT_STATUS_MERGED.equalsIgnoreCase(currentStudentStatus)) {
-            currentStudent.setNewRecalculateGradStatus(null);
-            currentStudent.setNewRecalculateProjectedGrad(null);
-        }
-        // 3. If a student in GRAD is changed to ARC/TER then set TVR flag to NULL
-        if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(newStudentStatus) || STUDENT_STATUS_TERMINATED.equalsIgnoreCase(newStudentStatus)) {
-            currentStudent.setNewRecalculateProjectedGrad(NULL_VALUE);
-        }
-        // 4. If a student in GRAD is changed to MER then set Transcript & TVR flags to NULL
-        if (STUDENT_STATUS_MERGED.equalsIgnoreCase(newStudentStatus)) {
-            currentStudent.setNewRecalculateGradStatus(NULL_VALUE);
-            currentStudent.setNewRecalculateProjectedGrad(NULL_VALUE);
-        }
-    }
-
     private void updateProgramCountsInSummary(ConversionStudentSummaryDTO summary, String programCode, boolean isGraduated) {
         if (summary != null) {
             summary.increment(programCode, isGraduated);
