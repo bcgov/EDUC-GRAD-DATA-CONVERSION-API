@@ -185,7 +185,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
-        handleAdultStartRule(student, penStudent, gradStudent);
+        handleAdultStartRule(penStudent, gradStudent);
 
         // flags
         if (StringUtils.equalsIgnoreCase(gradStudent.getStudentStatus(), STUDENT_STATUS_MERGED)) {
@@ -610,7 +610,7 @@ public class StudentProcess extends StudentBaseService {
         }
     }
 
-    private void handleAdultStartRule(ConvGradStudent student, Student penStudent, GraduationStudentRecord gradStudent) {
+    private void handleAdultStartRule(Student penStudent, GraduationStudentRecord gradStudent) {
         if ("1950".equalsIgnoreCase(gradStudent.getProgram())) {
             Date dob = EducGradDataConversionApiUtils.parseDate(penStudent.getDob());
             Date adultStartDate = DateUtils.addYears(dob, 18);

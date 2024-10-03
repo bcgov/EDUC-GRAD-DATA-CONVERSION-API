@@ -10,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.List;
 
-public class StudentBaseService {
+public abstract class StudentBaseService {
+
+    // NULL String => Nullify (set to NULL)
+    public static final String NULL_VALUE = "NULL";
 
     // Student Status
     public static final String STUDENT_STATUS_CURRENT = "CUR";
@@ -109,14 +112,21 @@ public class StudentBaseService {
     }
 
     protected void populateNewBatchFlags(StudentGradDTO currentStudent) {
-        if (STUDENT_STATUS_ARCHIVED.equalsIgnoreCase(currentStudent.getStudentStatus())) {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-        } else {
-            // Transcript
-            currentStudent.setNewRecalculateGradStatus("Y");
-            // TVR
-            currentStudent.setNewRecalculateProjectedGrad("Y");
+        switch(currentStudent.getStudentStatus()) {
+            case STUDENT_STATUS_CURRENT -> {
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+            }
+            case STUDENT_STATUS_ARCHIVED, STUDENT_STATUS_TERMINATED ->
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+            default -> {
+                // do not set flags to Y
+                currentStudent.setNewRecalculateGradStatus(null);
+                currentStudent.setNewRecalculateProjectedGrad(null);
+            }
         }
     }
 
