@@ -19,6 +19,7 @@ public class StudentGradDTO extends  StudentCommonDTO {
     private String newProgram;
     private String newGradDate;
     private String newSchoolOfRecord;
+    private UUID newSchoolOfRecordId;
     private String newStudentGrade;
     private String newStudentStatus;
     private String newCitizenship;

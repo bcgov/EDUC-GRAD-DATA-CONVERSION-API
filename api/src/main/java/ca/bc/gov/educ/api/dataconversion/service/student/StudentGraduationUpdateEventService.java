@@ -71,10 +71,15 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
 
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
         // Processing order is important for the first 3 fields below.
-        // 1. School of record
+        // 1.1 School of Record
         if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
             isChanged = processSchoolOfRecord(currentStudent, updateGrad.getSchoolOfRecord());
             log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
+        }
+        // 1.2 School of Record Guid
+        if (updateGrad.getSchoolOfRecordId() != null &&  updateGrad.getSchoolOfRecordId() != currentStudent.getSchoolOfRecordId()) {
+            isChanged = processSchoolOfRecordId(currentStudent, updateGrad.getSchoolOfRecordId());
+            log.info(" => school of record id : current = {}, request = {}", currentStudent.getSchoolOfRecordId(), currentStudent.getNewSchoolOfRecordId());
         }
         // 2. Grad Program
         String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecord(), null);

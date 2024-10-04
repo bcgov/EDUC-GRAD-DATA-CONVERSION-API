@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.util.Date;
+import java.util.UUID;
 
 public abstract class StudentGraduationUpdateBaseService extends StudentBaseService {
 
@@ -79,6 +80,44 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
             default -> { // MER or DEC
                 // UpdData
                 currentStudent.setNewSchoolOfRecord(value);
+                // Do not set flags to Y
+                isChanged = true;
+            }
+        }
+        return isChanged;
+    }
+
+    protected boolean processSchoolOfRecordId(StudentGradDTO currentStudent, UUID value) {
+        boolean isChanged = false;
+        switch(currentStudent.getStudentStatus()) {
+            case STUDENT_STATUS_CURRENT -> {
+                // UpdData
+                currentStudent.setNewSchoolOfRecordId(value);
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                // TVR
+                currentStudent.setNewRecalculateProjectedGrad("Y");
+                isChanged = true;
+            }
+            case STUDENT_STATUS_ARCHIVED -> {
+                if (!currentStudent.isGraduated()) {
+                    // UpdData
+                    currentStudent.setNewSchoolOfRecordId(value);
+                    // Transcript
+                    currentStudent.setNewRecalculateGradStatus("Y");
+                    isChanged = true;
+                }
+            }
+            case STUDENT_STATUS_TERMINATED -> {
+                // UpdData
+                currentStudent.setNewSchoolOfRecordId(value);
+                // Transcript
+                currentStudent.setNewRecalculateGradStatus("Y");
+                isChanged = true;
+            }
+            default -> { // MER or DEC
+                // UpdData
+                currentStudent.setNewSchoolOfRecordId(value);
                 // Do not set flags to Y
                 isChanged = true;
             }

@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Data
@@ -14,6 +15,7 @@ public class StudentCommonDTO extends StudentDemographicDTO {
     private String program;
     private String gradDate;
     private String schoolOfRecord;
+    private UUID schoolOfRecordId;
     private String schoolAtGrad;
     private String studentGrade;
     private String studentStatus;
