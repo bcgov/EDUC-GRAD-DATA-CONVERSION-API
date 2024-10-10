@@ -1,5 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
+import ca.bc.gov.educ.api.dataconversion.constant.ConversionResultType;
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
@@ -41,6 +42,7 @@ public class NewStudentEventService extends StudentBaseService implements EventS
     @Override
     public <T extends Object> void processEvent(T request, Event event) {
         ConvGradStudent convStudent = (ConvGradStudent) request;
+        ConvGradStudent result = null;
         if (convStudent != null && constants.isGradUpdateEnabled()) {
             // Get Access Token
             ResponseObj res = restUtils.getTokenResponseObject();
@@ -51,13 +53,17 @@ public class NewStudentEventService extends StudentBaseService implements EventS
             ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
             summary.setAccessToken(accessToken);
             try {
-                studentProcess.convertStudent(convStudent, summary, false, true);
+                result = studentProcess.convertStudent(convStudent, summary, false, true);
             } catch (Exception e) {
                 ConversionAlert error = new ConversionAlert();
                 error.setItem(convStudent.getPen());
                 error.setReason("Unexpected Exception is occurred: " + e.getLocalizedMessage());
                 summary.getErrors().add(error);
                 log.error("unknown exception: " + e.getLocalizedMessage());
+                return;
+            }
+            if (result == null || ConversionResultType.FAILURE.equals(result.getResult())) {
+                return;
             }
         }
 
