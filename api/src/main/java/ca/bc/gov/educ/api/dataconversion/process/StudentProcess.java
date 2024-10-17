@@ -53,11 +53,6 @@ public class StudentProcess extends StudentBaseService {
             return convGradStudent;
         }
 
-        // Program Completion for graduated student
-        if (!validateProgramCompletionDate(convGradStudent, summary)) {
-            return convGradStudent;
-        }
-
         // Student conversion process
         process(convGradStudent, students, summary, reload, ongoingUpdate);
 
@@ -617,20 +612,6 @@ public class StudentProcess extends StudentBaseService {
             Date adultStartDate = DateUtils.addYears(dob, 18);
             gradStudent.setAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
-    }
-
-    /**
-     *
-     * @return true             Valid
-     *         false            Bad data (programCompletionDate is null)
-     */
-    private boolean validateProgramCompletionDate(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
-        if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-                StringUtils.isBlank(convGradStudent.getSlpDate())) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
-            return false;
-        }
-        return true;
     }
 
     /**
