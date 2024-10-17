@@ -63,6 +63,9 @@ public class NewStudentEventService extends StudentBaseService implements EventS
                 return;
             }
             if (result == null || ConversionResultType.FAILURE.equals(result.getResult())) {
+                if (!summary.getErrors().isEmpty()) {
+                    summary.getErrors().forEach(e -> log.error("Load is failed for {} - {}", e.getItem(), e.getReason()));
+                }
                 return;
             }
         }
