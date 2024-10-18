@@ -6,7 +6,7 @@
 
     <groupId>ca.bc.gov.educ</groupId>
 	<artifactId>educ-grad-data-conversion-api</artifactId>
-	<version>1.8.59</version>
+	<version>1.8.60</version>
 	<name>educ-grad-data-conversion-api</name>
 	<description>Ministry of Education GRAD DATA CONVERSION API</description>
 
