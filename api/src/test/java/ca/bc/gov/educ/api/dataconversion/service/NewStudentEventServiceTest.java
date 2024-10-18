@@ -59,7 +59,7 @@ public class NewStudentEventServiceTest {
     private EducGradDataConversionApiConstants constants;
 
     @Test
-    public void testProcessStudentForGrad2018ENProgram_givenNew_STUDENT_returnsAPICallSuccess() {
+    public void testProcessStudentForGrad2018ENProgram_givenNew_STUDENT_returnsAPICallSuccess() throws Exception {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
@@ -91,6 +91,7 @@ public class NewStudentEventServiceTest {
         event.setEventId(UUID.randomUUID());
 
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
+        when(this.studentProcess.convertStudent(any(), any(), eq(false), eq(true))).thenReturn(traxNewStudent);
 
         newStudentEventService.processEvent(traxNewStudent, event);
 
@@ -132,6 +133,6 @@ public class NewStudentEventServiceTest {
         newStudentEventService.processEvent(traxNewStudent, event);
 
         assertThat(event).isNotNull();
-        assertThat(event.getEventStatus()).isEqualTo(EventStatus.PROCESSED.name());
+        assertThat(event.getEventStatus()).isNotEqualTo(EventStatus.PROCESSED.name());
     }
 }

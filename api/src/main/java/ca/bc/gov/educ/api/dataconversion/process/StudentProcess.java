@@ -53,11 +53,6 @@ public class StudentProcess extends StudentBaseService {
             return convGradStudent;
         }
 
-        // Program Completion for graduated student
-        if (!validateProgramCompletionDate(convGradStudent, summary)) {
-            return convGradStudent;
-        }
-
         // Student conversion process
         process(convGradStudent, students, summary, reload, ongoingUpdate);
 
@@ -86,7 +81,7 @@ public class StudentProcess extends StudentBaseService {
             }
             GraduationStudentRecord gradStudent = processStudent(convGradStudent, st, ongoingUpdate, summary);
             if (gradStudent != null) {
-                processDependencies(convGradStudent, gradStudent, summary);
+                processDependencies(convGradStudent, gradStudent, summary, ongoingUpdate);
             }
 
             if (convGradStudent.getResult() == null) {
@@ -145,13 +140,14 @@ public class StudentProcess extends StudentBaseService {
 
     private void processDependencies(ConvGradStudent convGradStudent,
                                      GraduationStudentRecord gradStudent,
-                                     ConversionStudentSummaryDTO summary) {
+                                     ConversionStudentSummaryDTO summary,
+                                     boolean ongoingUpdate) {
         ConversionResultType result;
 
         // process dependencies
         gradStudent.setPen(convGradStudent.getPen());
 
-        result = processOptionalPrograms(gradStudent, summary);
+        result = processOptionalPrograms(gradStudent, summary, ongoingUpdate);
         if (ConversionResultType.FAILURE != result) {
             result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), summary);
         }
@@ -208,7 +204,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setUpdateUser(DEFAULT_UPDATED_BY);
     }
 
-    private ConversionResultType processOptionalPrograms(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
+    private ConversionResultType processOptionalPrograms(GraduationStudentRecord student, ConversionStudentSummaryDTO summary, boolean ongoingUpdate) {
         if (StringUtils.isBlank(student.getProgram())) {
             return ConversionResultType.SUCCESS;
         }
@@ -219,7 +215,7 @@ public class StudentProcess extends StudentBaseService {
         }
 
         // French Immersion for 2018-EN, 2004-EN, 1996-EN, 1986-EN
-        if (hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), summary.getAccessToken())) {
+        if (!ongoingUpdate && hasAnyFrenchImmersionCourse(student.getProgram(), student.getPen(), summary.getAccessToken())) {
             return createStudentOptionalProgram("FI", student, summary);
         }
 
@@ -616,20 +612,6 @@ public class StudentProcess extends StudentBaseService {
             Date adultStartDate = DateUtils.addYears(dob, 18);
             gradStudent.setAdultStartDate(EducGradDataConversionApiUtils.formatDate(adultStartDate)); // yyyy-MM-dd
         }
-    }
-
-    /**
-     *
-     * @return true             Valid
-     *         false            Bad data (programCompletionDate is null)
-     */
-    private boolean validateProgramCompletionDate(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary) {
-        if ("SCCP".equalsIgnoreCase(convGradStudent.getGraduationRequirementYear()) &&
-                StringUtils.isBlank(convGradStudent.getSlpDate())) {
-            handleException(convGradStudent, summary, convGradStudent.getPen(), ConversionResultType.FAILURE, "Bad data: slp_date is null for SCCP");
-            return false;
-        }
-        return true;
     }
 
     /**
