@@ -148,7 +148,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setPen(convGradStudent.getPen());
 
         result = processOptionalPrograms(gradStudent, summary, ongoingUpdate);
-        if (ConversionResultType.FAILURE != result) {
+        if (!ongoingUpdate && ConversionResultType.FAILURE != result) {
             result = processProgramCodes(gradStudent, convGradStudent.getProgramCodes(), summary);
         }
         if (ConversionResultType.FAILURE != result) {
