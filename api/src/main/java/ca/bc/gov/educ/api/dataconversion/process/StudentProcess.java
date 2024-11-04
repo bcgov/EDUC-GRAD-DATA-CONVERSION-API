@@ -178,6 +178,7 @@ public class StudentProcess extends StudentBaseService {
         gradStudent.setSchoolAtGrad(null);
 
         gradStudent.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        gradStudent.setSchoolOfRecordId(student.getSchoolOfRecordId());
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
 
@@ -369,6 +370,7 @@ public class StudentProcess extends StudentBaseService {
             studentData.setStudentGrade(gradStudent.getStudentGrade());
             studentData.setStudentStatus(gradStudent.getStudentStatus());
             studentData.setSchoolOfRecord(gradStudent.getSchoolOfRecord());
+            studentData.setSchoolOfRecordId(gradStudent.getSchoolOfRecordId());
             studentData.setSchoolAtGrad(gradStudent.getSchoolAtGrad());
             studentData.setCitizenship(gradStudent.getStudentCitizenship());
             studentData.setAdultStartDate(gradStudent.getAdultStartDate());
@@ -447,6 +449,13 @@ public class StudentProcess extends StudentBaseService {
             if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
                 OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
                         .type(FieldType.STRING).name(FieldName.SCHOOL_OF_RECORD).value(gradStudent.getNewSchoolOfRecord())
+                        .build();
+                requestDTO.getUpdateFields().add(field);
+            }
+            // SchoolId
+            if (gradStudent.getNewSchoolOfRecordId() != null) {
+                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
+                        .type(FieldType.GUID).name(FieldName.SCHOOL_OF_RECORD_ID).value(gradStudent.getNewSchoolOfRecordId())
                         .build();
                 requestDTO.getUpdateFields().add(field);
             }
