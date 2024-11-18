@@ -66,6 +66,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -75,6 +76,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -93,6 +95,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -131,8 +134,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -143,6 +148,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -162,6 +168,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -195,8 +202,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -207,6 +216,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -226,6 +236,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -259,8 +270,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -271,6 +284,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -290,6 +304,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
@@ -324,8 +339,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -336,6 +353,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -355,6 +373,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("TER");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
@@ -389,8 +408,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -401,6 +422,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -420,6 +442,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("DEC");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
@@ -455,8 +478,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -467,6 +492,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -486,6 +512,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -519,8 +546,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -531,6 +560,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -550,6 +580,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -583,8 +614,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -595,6 +628,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -614,6 +648,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -647,6 +682,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -658,6 +694,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -678,6 +715,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship(null);
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate(null);
         // Optional Program Codes
@@ -712,6 +750,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -723,6 +762,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -743,6 +783,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship(null);
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate(null);
         // Optional Program Codes
@@ -777,6 +818,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -788,6 +830,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -808,6 +851,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("TER");
         currentStudent.setCitizenship(null);
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate(null);
         // Optional Program Codes
@@ -842,6 +886,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -853,6 +898,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -873,6 +919,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("DEC");
         currentStudent.setCitizenship(null);
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate(null);
         // Optional Program Codes
@@ -907,8 +954,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "093444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -918,6 +967,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -936,6 +986,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -969,8 +1020,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "093444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -980,6 +1033,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -998,6 +1052,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1031,8 +1086,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "093444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1042,6 +1099,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -1060,6 +1118,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1093,8 +1152,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-PF";
         String mincode = "093333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1104,6 +1165,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1122,6 +1184,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1155,8 +1218,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "1950";
         String mincode = "111222";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1166,6 +1231,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1184,6 +1250,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1218,8 +1285,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1229,6 +1298,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("1950");
         traxGraduationUpdate.setStudentGrade("AD");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1248,6 +1318,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1282,8 +1353,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
         String newSlpDate = "202006";
 
         String updateType = "UPD_GRAD";
@@ -1294,6 +1367,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1314,6 +1388,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1348,8 +1423,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-PF";
         String mincode = "093333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
         String newSlpDate = "202006";
 
         String updateType = "UPD_GRAD";
@@ -1360,6 +1437,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1380,6 +1458,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1414,8 +1493,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1425,6 +1506,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1444,6 +1526,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/01");
         // Optional Program Codes
@@ -1475,10 +1558,6 @@ public class StudentGraduationUpdateEventServiceTest {
         // ID
         String pen = "111222333";
 
-        // Program & School
-        String program = "2018-EN";
-        String mincode = "222333";
-
         String updateType = "UPD_GRAD";
 
         TraxGraduationUpdateDTO traxStudentUpdate = new TraxGraduationUpdateDTO();
@@ -1509,8 +1588,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "093444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1520,6 +1601,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1538,6 +1620,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
@@ -1572,6 +1655,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newSlpDate = "202006";
 
@@ -1583,6 +1667,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1603,6 +1688,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
@@ -1638,6 +1724,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newSlpDate = "208006";
 
@@ -1669,6 +1756,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1703,6 +1791,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newSlpDate = "208006";
 
@@ -1734,6 +1823,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1768,8 +1858,10 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newMincode = "333444";
+        UUID newSchoolOfRecordId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1780,6 +1872,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
         traxGraduationUpdate.setSchoolOfRecord(newMincode);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1799,6 +1892,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
@@ -1833,6 +1927,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
+        UUID schoolOfRecordId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -1844,6 +1939,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
         traxGraduationUpdate.setSchoolOfRecord(mincode);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1864,6 +1960,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship(null);
         currentStudent.setSchoolOfRecord(mincode);
+        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
         currentStudent.setSchoolAtGrad(mincode);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
