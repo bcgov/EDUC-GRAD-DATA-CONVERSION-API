@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.modelmapper</groupId>
             <artifactId>modelmapper</artifactId>
-            <version>2.3.6</version>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
             <groupId>io.github.resilience4j</groupId>
