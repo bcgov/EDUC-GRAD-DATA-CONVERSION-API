@@ -6,29 +6,27 @@ labels:
 metadata:
   name: "${REPO_NAME}-deploy-template"
 objects:
-  - apiVersion: v1
-    kind: DeploymentConfig
+  - apiVersion: apps/v1
+    kind: Deployment
     metadata:
       labels:
         app: "${REPO_NAME}"
         app.kubernetes.io/part-of: GRAD-Backend-API
         app.openshift.io/runtime: spring-boot
-      name: "${REPO_NAME}-dc"
+      name: "${REPO_NAME}"
     spec:
-      replicas: 1
-      revisionHistoryLimit: 1
-      triggers: []
+      replicas: ${{MIN_REPLICAS}}
       selector:
-        app: "${REPO_NAME}"
-        deploymentConfig: "${REPO_NAME}-dc"
+        matchLabels:
+          app: "${REPO_NAME}"
       strategy:
-        resources: {}
-        type: Rolling
+        rollingUpdate:
+          maxUnavailable: 25%
+          maxSurge: 25%
       template:
         metadata:
           labels:
             app: "${REPO_NAME}"
-            deploymentConfig: "${REPO_NAME}-dc"
         spec:
           containers:
             - image: image-registry.openshift-image-registry.svc:5000/${IS_NAMESPACE}/${REPO_NAME}:${TAG_NAME}
@@ -133,16 +131,15 @@ objects:
           protocol: TCP
       selector:
         app: "${REPO_NAME}"
-        deploymentconfig: "${REPO_NAME}-dc"
   - apiVersion: autoscaling/v2
     kind: HorizontalPodAutoscaler
     metadata:
       name: "${REPO_NAME}-cpu-autoscaler"
     spec:
       scaleTargetRef:
-        apiVersion: apps.openshift.io/v1
-        kind: DeploymentConfig
-        name: "${REPO_NAME}-dc"
+        apiVersion: apps/v1
+        kind: Deployment
+        name: "${REPO_NAME}"
       minReplicas: ${{MIN_REPLICAS}}
       maxReplicas: ${{MAX_REPLICAS}}
       metrics:
