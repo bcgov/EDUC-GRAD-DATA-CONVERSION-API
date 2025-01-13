@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -9,6 +10,10 @@ import java.util.Date;
 import java.util.UUID;
 
 public abstract class StudentGraduationUpdateBaseService extends StudentBaseService {
+
+    protected StudentGraduationUpdateBaseService(RestUtils restUtils) {
+        super(restUtils);
+    }
 
     protected abstract boolean hasAnyFrenchImmersionCourse(String gradProgramCode, String pen, String accessToken);
 
@@ -305,4 +310,5 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
             }
         }
     }
+
 }

@@ -4,7 +4,7 @@ import ca.bc.gov.educ.api.dataconversion.constant.EventType;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
-import ca.bc.gov.educ.api.dataconversion.model.tsw.School;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.SchoolClob;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
@@ -76,9 +76,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
 
@@ -102,9 +102,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenThrow(new RuntimeException("Test"));
 
@@ -131,9 +131,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -171,9 +171,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -213,9 +213,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -284,9 +284,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -361,9 +361,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -438,9 +438,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -515,9 +515,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -593,9 +593,9 @@ public class StudentProcessTest {
         String mincode = "222333";
         UUID schoolOfRecordId = UUID.randomUUID();
 
-        School school = new School();
+        SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test School");
+        school.setSchoolName("Test SchoolClob");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());

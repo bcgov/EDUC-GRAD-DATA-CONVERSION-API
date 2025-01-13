@@ -40,6 +40,10 @@ public class StudentGradDTO extends  StudentCommonDTO {
         return StringUtils.isNotBlank(newSchoolOfRecord)? newSchoolOfRecord : this.getSchoolOfRecord();
     }
 
+    public UUID getUpToDateSchoolOfRecordId() {
+        return newSchoolOfRecordId != null? newSchoolOfRecordId : this.getSchoolOfRecordId();
+    }
+
     @Override
     public boolean isArchived() {
         if (StringUtils.isNotBlank(newStudentStatus) && "ARC".equalsIgnoreCase(newStudentStatus)) { // Student Status from TRAX

@@ -233,6 +233,8 @@ endpoint:
         url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no
       delete-trax-student-no:
         url: ${GRAD_TRAX_API}api/v1/trax/common/trax-student-no/%s
+      school-by-school-id:
+        url: ${GRAD_TRAX_API}api/v2/trax/school/%s
     course:
       get-course-restrictions:
         url: ${GRAD_TRAX_API}api/v1/trax/common/course-restrictions

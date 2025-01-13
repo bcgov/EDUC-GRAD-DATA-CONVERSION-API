@@ -33,6 +33,7 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
                                                  StudentProcess studentProcess,
                                                  RestUtils restUtils,
                                                  EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;
@@ -44,11 +45,7 @@ public class StudentDemographicsUpdateEventService extends StudentBaseService im
         TraxDemographicsUpdateDTO updateDemog  = (TraxDemographicsUpdateDTO) request;
         if (updateDemog != null && constants.isGradUpdateEnabled()) {
             // Get Access Token
-            ResponseObj res = restUtils.getTokenResponseObject();
-            String accessToken = null;
-            if (res != null) {
-                accessToken = res.getAccess_token();
-            }
+            String accessToken = restUtils.fetchAccessToken();
             // Load grad student
             StudentGradDTO currentStudent = studentProcess.loadStudentData(updateDemog.getPen(), accessToken);
             if (currentStudent != null) {

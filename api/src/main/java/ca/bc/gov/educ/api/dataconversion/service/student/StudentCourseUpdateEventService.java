@@ -1,7 +1,6 @@
 package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.entity.Event;
-import ca.bc.gov.educ.api.dataconversion.model.ResponseObj;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.model.TraxStudentUpdateDTO;
 import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
@@ -34,6 +33,7 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
                                            StudentProcess studentProcess,
                                            RestUtils restUtils,
                                            EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;
@@ -45,11 +45,7 @@ public class StudentCourseUpdateEventService extends StudentBaseService implemen
         TraxStudentUpdateDTO studentCourseUpdate = (TraxStudentUpdateDTO) request;
         if (studentCourseUpdate != null && constants.isGradUpdateEnabled()) {
             // Get Access Token
-            ResponseObj res = restUtils.getTokenResponseObject();
-            String accessToken = null;
-            if (res != null) {
-                accessToken = res.getAccess_token();
-            }
+            String accessToken = restUtils.fetchAccessToken();
             // Load grad student
             StudentGradDTO currentStudent = studentProcess.loadStudentData(studentCourseUpdate.getPen(), accessToken);
             if (currentStudent != null) {
