@@ -199,7 +199,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -275,7 +275,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -352,7 +352,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -429,7 +429,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -506,7 +506,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -583,7 +583,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -659,7 +659,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -735,7 +735,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1113,7 +1113,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1187,7 +1187,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1261,7 +1261,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1335,7 +1335,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1409,7 +1409,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.studentProcess.hasAnyFrenchImmersionCourse(eq("2018-EN"), eq(pen), any())).thenReturn(true);
@@ -1486,7 +1486,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1564,7 +1564,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1642,7 +1642,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1719,7 +1719,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1820,7 +1820,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -2124,7 +2124,7 @@ public class StudentGraduationUpdateEventServiceTest {
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("PUBLIC");
 
-        when(this.restUtils.getSchool(newSchoolOfRecordId, "accessToken")).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
