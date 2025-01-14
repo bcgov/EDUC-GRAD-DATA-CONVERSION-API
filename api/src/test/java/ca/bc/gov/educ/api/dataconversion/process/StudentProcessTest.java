@@ -78,7 +78,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
 
@@ -104,7 +104,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenThrow(new RuntimeException("Test"));
 
@@ -133,7 +133,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -173,7 +173,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -215,7 +215,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -286,7 +286,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -363,7 +363,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -440,7 +440,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -517,7 +517,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -595,7 +595,7 @@ public class StudentProcessTest {
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
-        school.setSchoolName("Test SchoolClob");
+        school.setSchoolName("Test School");
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
