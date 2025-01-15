@@ -6,6 +6,7 @@ import ca.bc.gov.educ.api.dataconversion.entity.Event;
 import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
+import ca.bc.gov.educ.api.dataconversion.model.institute.School;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
 import ca.bc.gov.educ.api.dataconversion.service.student.StudentGraduationUpdateEventService;
 import ca.bc.gov.educ.api.dataconversion.process.StudentProcess;
@@ -111,6 +112,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
         ResponseObj res = new ResponseObj();
@@ -184,6 +193,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -251,6 +268,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -321,6 +346,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -389,6 +422,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -459,6 +500,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -528,6 +577,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -595,6 +652,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -664,6 +729,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -731,6 +804,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -800,6 +881,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -867,6 +956,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -936,6 +1033,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1001,6 +1106,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1068,6 +1181,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1133,6 +1254,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1200,6 +1329,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1265,6 +1402,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.studentProcess.hasAnyFrenchImmersionCourse(eq("2018-EN"), eq(pen), any())).thenReturn(true);
@@ -1334,6 +1479,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1405,6 +1558,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1475,6 +1636,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1543,6 +1712,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1637,6 +1814,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1706,6 +1891,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1773,6 +1966,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1839,6 +2040,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("CSF");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1909,6 +2118,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
 
+        // School
+        School school = new School();
+        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setMincode(newMincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
 
@@ -1976,6 +2193,14 @@ public class StudentGraduationUpdateEventServiceTest {
         course1.setCredits(Integer.valueOf("4"));
         course1.setPen(pen);
         currentStudent.getCourses().add(course1);
+
+        // School
+        School school = new School();
+        school.setSchoolId(schoolOfRecordId.toString());
+        school.setMincode(mincode);
+        school.setSchoolReportingRequirementCode("PUBLIC");
+
+        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));

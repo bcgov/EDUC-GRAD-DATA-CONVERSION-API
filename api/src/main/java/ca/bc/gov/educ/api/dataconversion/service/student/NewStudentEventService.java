@@ -33,6 +33,7 @@ public class NewStudentEventService extends StudentBaseService implements EventS
                                   StudentProcess studentProcess,
                                   RestUtils restUtils,
                                   EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;

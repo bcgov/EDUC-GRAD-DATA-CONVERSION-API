@@ -3,6 +3,8 @@ package ca.bc.gov.educ.api.dataconversion.util;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.model.StudentAssessment;
 import ca.bc.gov.educ.api.dataconversion.model.StudentCourse;
+import ca.bc.gov.educ.api.dataconversion.model.institute.School;
+import ca.bc.gov.educ.api.dataconversion.model.tsw.SchoolClob;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +44,15 @@ public class RestUtils {
             responseObjCache.setResponseObj(getTokenResponseObj());
         }
         return responseObjCache.getResponseObj();
+    }
+
+    public String fetchAccessToken() {
+        log.info("Fetching the access token from KeyCloak API");
+        ResponseObj res = getTokenResponseObject();
+        if (res != null) {
+            return res.getAccess_token();
+        }
+        return null;
     }
 
     @Retry(name = "rt-getToken", fallbackMethod = "rtGetTokenFallback")
@@ -419,6 +430,15 @@ public class RestUtils {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
                 }).retrieve().bodyToMono(Void.class).block();
+    }
+
+    public School getSchool(UUID schoolId, String accessToken) {
+        if (schoolId == null) return null;
+        return this.webClient.get().uri(String.format(constants.getSchoolBySchoolIdUrl(), schoolId))
+                .headers(h -> {
+                    h.setBearerAuth(accessToken);
+                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
+                }).retrieve().bodyToMono(School.class).block();
     }
 
     // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}

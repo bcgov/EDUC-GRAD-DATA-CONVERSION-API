@@ -35,6 +35,7 @@ public class StudentProcess extends StudentBaseService {
     public StudentProcess(RestUtils restUtils,
                           AssessmentProcess assessmentProcess,
                           CourseProcess courseProcess) {
+        super(restUtils);
         this.restUtils = restUtils;
         this.assessmentProcess = assessmentProcess;
         this.courseProcess = courseProcess;
@@ -281,10 +282,8 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
-        if (StringUtils.equals(student.getProgram(), "SCCP")
-            && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
-                 && student.getSchoolOfRecord().startsWith("093") )
-        ) {
+        if (StringUtils.equals(student.getProgram(), "SCCP") && student.getSchoolOfRecordId() != null
+            && isSchoolForProgramFrancophone(student.getSchoolOfRecordId())) {
             return createStudentOptionalProgram("FR", student, summary);
         }
         return ConversionResultType.SUCCESS;

@@ -33,6 +33,7 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
                                                StudentProcess studentProcess,
                                                RestUtils restUtils,
                                                EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;
@@ -72,7 +73,7 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
         // Processing order is important for the first 3 fields below.
         // 1.1 School of Record
-        if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
+        if (StringUtils.isNotBlank(updateGrad.getSchoolOfRecord()) && !StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
             isChanged = processSchoolOfRecord(currentStudent, updateGrad.getSchoolOfRecord());
             log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
         }
@@ -82,7 +83,7 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
             log.info(" => school of record id : current = {}, request = {}", currentStudent.getSchoolOfRecordId(), currentStudent.getNewSchoolOfRecordId());
         }
         // 2. Grad Program
-        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecord(), null);
+        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecordId(), null);
         if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
             isChanged = processGraduationProgram(currentStudent, updateGrad.getPen(), gradProgram, accessToken);
             if (isChanged && StringUtils.isNotBlank(currentStudent.getNewProgram())) {
@@ -135,5 +136,4 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
     public boolean hasAnyFrenchImmersionCourse(String gradProgramCode, String pen, String accessToken) {
         return studentProcess.hasAnyFrenchImmersionCourse(gradProgramCode, pen, accessToken);
     }
-
 }
