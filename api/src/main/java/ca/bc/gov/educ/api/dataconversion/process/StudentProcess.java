@@ -282,7 +282,7 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
-        if (StringUtils.equals(student.getProgram(), "SCCP")
+        if (StringUtils.equals(student.getProgram(), "SCCP") && student.getSchoolOfRecordId() != null
             && isSchoolForProgramFrancophone(student.getSchoolOfRecordId())) {
             return createStudentOptionalProgram("FR", student, summary);
         }
