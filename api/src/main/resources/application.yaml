@@ -89,6 +89,11 @@ server:
       io: 16
   #port: ${HTTP_PORT}
   max-http-request-header-size: 20000
+  compression:
+    enabled: ${ENABLE_COMPRESSION}
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain,text/css,text/javascript,application/javascript
+    min-response-size: 2048
+    excluded-user-agents: MSIE 6.0,UCBrowser
 
 #API Documentation
 springdoc:
