@@ -65,7 +65,7 @@ public class StudentFrenchImmersionEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "FI10ADD";
 
@@ -87,8 +87,7 @@ public class StudentFrenchImmersionEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("ID");
@@ -122,7 +121,7 @@ public class StudentFrenchImmersionEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "FI10DELETE";
 
@@ -146,8 +145,7 @@ public class StudentFrenchImmersionEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");

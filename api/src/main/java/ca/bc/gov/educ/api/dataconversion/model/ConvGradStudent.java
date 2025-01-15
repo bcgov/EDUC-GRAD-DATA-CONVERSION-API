@@ -25,9 +25,8 @@ public class ConvGradStudent {
   private String gpa;
   private String honoursStanding; // inc
   private String studentGradData;
-  private String schoolOfRecord; // inc
   private UUID schoolOfRecordId; // inc
-  private String schoolAtGrad; // inc
+  private UUID schoolAtGradId; // inc
   private String studentGrade; // inc
   private String studentStatus; // inc
   private String archiveFlag; // inc

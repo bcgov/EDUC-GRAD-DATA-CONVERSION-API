@@ -67,7 +67,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -76,8 +76,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -95,9 +94,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -114,11 +111,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
 
@@ -142,11 +139,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -156,8 +152,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -176,9 +171,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -195,11 +188,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -218,11 +211,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -232,8 +224,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -252,9 +243,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -271,11 +260,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -294,11 +283,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -308,8 +296,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -328,9 +315,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -348,11 +333,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -371,11 +356,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -385,8 +369,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -405,9 +388,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("TER");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -425,11 +406,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -448,11 +429,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -462,8 +442,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -482,9 +461,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/02");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -502,11 +479,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -526,11 +503,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -540,8 +516,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -560,9 +535,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -579,11 +552,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -602,11 +575,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -616,8 +588,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -636,9 +607,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -655,11 +624,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -678,11 +647,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -692,8 +660,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -712,9 +679,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -731,11 +696,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -755,7 +720,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -766,8 +731,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -787,9 +751,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship(null);
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate(null);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -807,11 +769,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -831,7 +793,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -842,8 +804,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -863,9 +824,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
         currentStudent.setCitizenship(null);
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate(null);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -883,11 +842,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -907,7 +866,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -918,8 +877,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("T");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -939,9 +897,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("TER");
         currentStudent.setCitizenship(null);
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate(null);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -959,11 +915,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -983,7 +939,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -994,8 +950,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -1015,9 +970,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
         currentStudent.setCitizenship(null);
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate(null);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1035,11 +988,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1058,11 +1011,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "093444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1071,8 +1023,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1090,9 +1041,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1109,11 +1058,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1132,11 +1081,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "093444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1145,8 +1093,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -1164,9 +1111,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1183,11 +1128,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1206,11 +1151,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "093444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1219,8 +1163,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
 
@@ -1238,9 +1181,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1257,11 +1198,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1280,11 +1221,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-PF";
-        String mincode = "093333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1293,8 +1233,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1312,9 +1251,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1331,11 +1268,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1354,11 +1291,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "1950";
-        String mincode = "111222";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1367,8 +1303,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1386,9 +1321,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1405,11 +1338,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.studentProcess.hasAnyFrenchImmersionCourse(eq("2018-EN"), eq(pen), any())).thenReturn(true);
@@ -1429,11 +1362,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1442,8 +1374,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("1950");
         traxGraduationUpdate.setStudentGrade("AD");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1462,9 +1393,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1482,11 +1411,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1505,11 +1434,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
         String newSlpDate = "202006";
 
         String updateType = "UPD_GRAD";
@@ -1519,8 +1447,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1540,9 +1467,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1560,11 +1485,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1583,11 +1508,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-PF";
-        String mincode = "093333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
         String newSlpDate = "202006";
 
         String updateType = "UPD_GRAD";
@@ -1597,8 +1521,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1618,9 +1541,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1638,11 +1559,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1661,11 +1582,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "SCCP";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1674,8 +1594,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1694,9 +1613,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/01");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1715,11 +1632,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1764,11 +1681,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "093444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -1777,8 +1693,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -1796,9 +1711,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1816,11 +1729,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1840,7 +1753,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newSlpDate = "202006";
 
@@ -1851,8 +1764,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(schoolId);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -1872,9 +1784,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -1893,11 +1803,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1917,7 +1827,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newSlpDate = "208006";
 
@@ -1928,7 +1838,6 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -1948,9 +1857,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -1968,11 +1875,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -1992,7 +1899,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "SCCP";
         String mincode = "093333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newSlpDate = "208006";
 
@@ -2003,7 +1910,6 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("SCCP");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
         traxGraduationUpdate.setSlpDate(newSlpDate);
         traxGraduationUpdate.setStudentStatus("D");
         traxGraduationUpdate.setArchiveFlag("I");
@@ -2023,9 +1929,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("DEC");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("DD");
@@ -2043,11 +1947,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
         school.setSchoolReportingRequirementCode("CSF");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -2066,11 +1970,10 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newMincode = "333444";
-        UUID newSchoolOfRecordId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         String updateType = "UPD_GRAD";
 
@@ -2080,8 +1983,7 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setCitizenship("C");
         traxGraduationUpdate.setStudentGrade("11");
-        traxGraduationUpdate.setSchoolOfRecord(newMincode);
-        traxGraduationUpdate.setSchoolOfRecordId(newSchoolOfRecordId);
+        traxGraduationUpdate.setSchoolOfRecordId(newSchoolId);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
 
@@ -2100,9 +2002,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship("C");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -2120,11 +2020,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(newSchoolOfRecordId.toString());
+        school.setSchoolId(newSchoolId.toString());
         school.setMincode(newMincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(newSchoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(newSchoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -2144,7 +2044,7 @@ public class StudentGraduationUpdateEventServiceTest {
         // Program & School
         String program = "2018-EN";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         String newCitizenship = "C";
 
@@ -2155,8 +2055,6 @@ public class StudentGraduationUpdateEventServiceTest {
         traxGraduationUpdate.setPen(pen);
         traxGraduationUpdate.setGraduationRequirementYear("2018");
         traxGraduationUpdate.setStudentGrade("12");
-        traxGraduationUpdate.setSchoolOfRecord(mincode);
-        traxGraduationUpdate.setSchoolOfRecordId(schoolOfRecordId);
         traxGraduationUpdate.setCitizenship(newCitizenship);
         traxGraduationUpdate.setStudentStatus("A");
         traxGraduationUpdate.setArchiveFlag("A");
@@ -2176,9 +2074,7 @@ public class StudentGraduationUpdateEventServiceTest {
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
         currentStudent.setCitizenship(null);
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolOfRecordId(schoolOfRecordId);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         currentStudent.setGradDate("2022/06");
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
@@ -2196,11 +2092,11 @@ public class StudentGraduationUpdateEventServiceTest {
 
         // School
         School school = new School();
-        school.setSchoolId(schoolOfRecordId.toString());
+        school.setSchoolId(schoolId.toString());
         school.setMincode(mincode);
-        school.setSchoolReportingRequirementCode("PUBLIC");
+        school.setSchoolReportingRequirementCode("REGULAR");
 
-        when(this.restUtils.getSchool(eq(schoolOfRecordId), any())).thenReturn(school);
+        when(this.restUtils.getSchool(eq(schoolId), any())).thenReturn(school);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));

@@ -74,7 +74,7 @@ public class StudentProcessTest {
     public void convertStudent_forPenStudentValidation_whenGivenPen_doesNotExist_thenReturnFailure() throws Exception {
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -83,7 +83,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(new ArrayList<>());
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("SCCP").programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -100,7 +100,7 @@ public class StudentProcessTest {
     public void convertStudent_forPenStudentValidation_whenPENAPI_isDown_thenReturnFailure() throws Exception {
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -109,7 +109,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenThrow(new RuntimeException("Test"));
 
         ConvGradStudent student = ConvGradStudent.builder().pen(pen).program("SCCP")
-                .studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("SCCP")
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -129,7 +129,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -152,7 +152,7 @@ public class StudentProcessTest {
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("SCCP")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("SCCP").programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
         summary.setAccessToken("123");
@@ -169,7 +169,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -193,7 +193,7 @@ public class StudentProcessTest {
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1950")
                 .studentGrade("AD").archiveFlag("A").studentStatus("A")
-                .schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("1950")
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -211,7 +211,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -262,7 +262,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -282,7 +282,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -339,7 +339,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("2018-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("2018-EN")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -359,7 +359,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -416,7 +416,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("1986-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .studentStatus("M").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .studentStatus("M").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -436,7 +436,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -493,7 +493,7 @@ public class StudentProcessTest {
         when(this.restUtils.getOptionalProgram("1996-EN", "FI", "123")).thenReturn(specialProgram);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1996-EN")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("1996")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -513,7 +513,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -571,7 +571,7 @@ public class StudentProcessTest {
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .archiveFlag("A").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("A").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -591,7 +591,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         SchoolClob school = new SchoolClob();
         school.setMinCode(mincode);
@@ -649,7 +649,7 @@ public class StudentProcessTest {
         when(this.restUtils.addNewPen(penStudent, "123")).thenReturn(penStudent);
 
         ConvGradStudent student = ConvGradStudent.builder().pen("111222333").program("1986-EN")
-                .archiveFlag("I").studentStatus("A").schoolOfRecord(mincode).schoolOfRecordId(schoolOfRecordId)
+                .archiveFlag("I").studentStatus("A").schoolOfRecordId(schoolId)
                 .graduationRequirementYear("1986")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -776,13 +776,15 @@ public class StudentProcessTest {
         String program = "2018-EN";
         String pen = "111222333";
         UUID studentID = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
         graduationStudentRecord.setStudentStatus("CUR");
-        graduationStudentRecord.setSchoolOfRecord("222336");
+        graduationStudentRecord.setSchoolOfRecordId(schoolId);
 
         StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
         studentOptionalProgram1.setId(UUID.randomUUID());
@@ -804,7 +806,7 @@ public class StudentProcessTest {
         requestStudent.setProgram(program);
         requestStudent.setNewProgram("2018-PF");
         requestStudent.setNewStudentGrade("12");
-        requestStudent.setNewSchoolOfRecord("333456");
+        requestStudent.setNewSchoolOfRecordId(newSchoolId);
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -824,14 +826,15 @@ public class StudentProcessTest {
         String program = "2018-PF";
         String pen = "111222333";
         UUID studentID = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
         graduationStudentRecord.setStudentStatus("CUR");
-        graduationStudentRecord.setSchoolOfRecord("222336");
-        graduationStudentRecord.setSchoolOfRecordId(UUID.randomUUID());
+        graduationStudentRecord.setSchoolOfRecordId(schoolId);
 
         StudentOptionalProgram studentOptionalProgram1 = new StudentOptionalProgram();
         studentOptionalProgram1.setId(UUID.randomUUID());
@@ -853,8 +856,7 @@ public class StudentProcessTest {
         requestStudent.setProgram(program);
         requestStudent.setNewProgram("2018-EN");
         requestStudent.setNewStudentGrade("12");
-        requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolOfRecordId(UUID.randomUUID());
+        requestStudent.setNewSchoolOfRecordId(newSchoolId);
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -874,14 +876,15 @@ public class StudentProcessTest {
         String program = "2018-EN";
         String pen = "111222333";
         UUID studentID = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
         graduationStudentRecord.setStudentStatus("CUR");
-        graduationStudentRecord.setSchoolOfRecord("222336");
-        graduationStudentRecord.setSchoolOfRecordId(UUID.randomUUID());
+        graduationStudentRecord.setSchoolOfRecordId(schoolId);
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
 
@@ -890,8 +893,7 @@ public class StudentProcessTest {
         requestStudent.setProgram(program);
         requestStudent.setNewProgram("1950");
         requestStudent.setNewStudentGrade("AD");
-        requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolOfRecordId(UUID.randomUUID());
+        requestStudent.setNewSchoolOfRecordId(newSchoolId);
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -913,14 +915,15 @@ public class StudentProcessTest {
         String program = "2018-EN";
         String pen = "111222333";
         UUID studentID = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
+        UUID newSchoolId = UUID.randomUUID();
 
         GraduationStudentRecord graduationStudentRecord = new GraduationStudentRecord();
         graduationStudentRecord.setStudentID(studentID);
         graduationStudentRecord.setProgram(program);
         graduationStudentRecord.setStudentGrade("11");
         graduationStudentRecord.setStudentStatus("CUR");
-        graduationStudentRecord.setSchoolOfRecord("222336");
-        graduationStudentRecord.setSchoolOfRecordId(UUID.randomUUID());
+        graduationStudentRecord.setSchoolOfRecordId(schoolId);
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(graduationStudentRecord);
 
@@ -929,8 +932,7 @@ public class StudentProcessTest {
         requestStudent.setProgram(program);
         requestStudent.setNewProgram("1950");
         requestStudent.setNewStudentGrade("AD");
-        requestStudent.setNewSchoolOfRecord("333456");
-        requestStudent.setNewSchoolOfRecordId(UUID.randomUUID());
+        requestStudent.setNewSchoolOfRecordId(newSchoolId);
         requestStudent.setNewStudentStatus("ARC");
         requestStudent.setNewRecalculateGradStatus("Y");
         requestStudent.setNewRecalculateProjectedGrad("Y");
@@ -1001,7 +1003,6 @@ public class StudentProcessTest {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
-        String mincode = "222333";
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1019,8 +1020,7 @@ public class StudentProcessTest {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1033,9 +1033,7 @@ public class StudentProcessTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("CUR");
         gradStudent.setHonoursStanding("Y");
-        gradStudent.setSchoolAtGrad(mincode);
-        gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setSchoolOfRecordId(schoolOfRecordId);
+        gradStudent.setSchoolOfRecordId(schoolId);
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentsByPen(pen, "123")).thenReturn(Arrays.asList(penStudent));
@@ -1052,7 +1050,7 @@ public class StudentProcessTest {
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
         String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1065,9 +1063,7 @@ public class StudentProcessTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("CUR");
         gradStudent.setHonoursStanding("Y");
-        gradStudent.setSchoolAtGrad(mincode);
-        gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setSchoolOfRecordId(schoolOfRecordId);
+        gradStudent.setSchoolOfRecordId(schoolId);
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram optionalProgram1 = new OptionalProgram();
@@ -1112,8 +1108,7 @@ public class StudentProcessTest {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1126,9 +1121,7 @@ public class StudentProcessTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("CUR");
         gradStudent.setHonoursStanding("Y");
-        gradStudent.setSchoolAtGrad(mincode);
-        gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setSchoolOfRecordId(schoolOfRecordId);
+        gradStudent.setSchoolOfRecordId(schoolId);
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         OptionalProgram optionalProgram1 = new OptionalProgram();
@@ -1206,8 +1199,7 @@ public class StudentProcessTest {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1220,9 +1212,7 @@ public class StudentProcessTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("MER");
         gradStudent.setHonoursStanding("Y");
-        gradStudent.setSchoolAtGrad(mincode);
-        gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setSchoolOfRecordId(schoolOfRecordId);
+        gradStudent.setSchoolOfRecordId(schoolId);
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);
@@ -1240,8 +1230,7 @@ public class StudentProcessTest {
         // ID
         UUID studentID = UUID.randomUUID();
         String pen = "111222333";
-        String mincode = "222333";
-        UUID schoolOfRecordId = UUID.randomUUID();
+        UUID schoolId = UUID.randomUUID();
 
         Student penStudent = new Student();
         penStudent.setStudentID(studentID.toString());
@@ -1254,9 +1243,7 @@ public class StudentProcessTest {
         gradStudent.setStudentGrade("12");
         gradStudent.setStudentStatus("CUR");
         gradStudent.setHonoursStanding("Y");
-        gradStudent.setSchoolAtGrad(mincode);
-        gradStudent.setSchoolOfRecord(mincode);
-        gradStudent.setSchoolOfRecordId(schoolOfRecordId);
+        gradStudent.setSchoolOfRecordId(schoolId);
         gradStudent.setProgramCompletionDate(EducGradDataConversionApiUtils.formatDate(new Date(System.currentTimeMillis() - 600000L)));
 
         when(this.restUtils.getStudentGradStatus(studentID.toString(), "123")).thenReturn(gradStudent);

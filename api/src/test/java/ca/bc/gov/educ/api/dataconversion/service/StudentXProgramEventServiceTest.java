@@ -67,7 +67,7 @@ public class StudentXProgramEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "XPROGRAM";
 
@@ -90,8 +90,7 @@ public class StudentXProgramEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("A");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -113,7 +112,7 @@ public class StudentXProgramEventServiceTest {
                 .program(program)
                 .studentGrade("12")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC","FI")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -136,7 +135,7 @@ public class StudentXProgramEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "XPROGRAM";
 
@@ -159,8 +158,7 @@ public class StudentXProgramEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("A");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
 
@@ -184,7 +182,7 @@ public class StudentXProgramEventServiceTest {
                 .program(program)
                 .studentGrade("12")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(new ArrayList<>()).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -207,7 +205,7 @@ public class StudentXProgramEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "XPROGRAM";
 
@@ -230,8 +228,7 @@ public class StudentXProgramEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("A");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         // None
 
@@ -255,7 +252,7 @@ public class StudentXProgramEventServiceTest {
                 .program(program)
                 .studentGrade("12")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -278,7 +275,7 @@ public class StudentXProgramEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "XPROGRAM";
 
@@ -301,8 +298,7 @@ public class StudentXProgramEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("ID");
 
@@ -333,7 +329,7 @@ public class StudentXProgramEventServiceTest {
                 .program(program)
                 .studentGrade("12")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("ID")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -356,7 +352,7 @@ public class StudentXProgramEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "XPROGRAM";
 
@@ -379,8 +375,7 @@ public class StudentXProgramEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("ID");
@@ -426,7 +421,7 @@ public class StudentXProgramEventServiceTest {
                 .program(program)
                 .studentGrade("12")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC","AD")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -445,10 +440,6 @@ public class StudentXProgramEventServiceTest {
     public void testProcessStudentForXPrograms_whenException_isThrown_returnsAPICallError() throws Exception {
         // ID
         String pen = "111222333";
-
-        // Program & School
-        String program = "2018-EN";
-        String mincode = "222333";
 
         String updateType = "XPROGRAM";
 

@@ -54,44 +54,6 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
         }
     }
 
-    protected boolean processSchoolOfRecord(StudentGradDTO currentStudent, String value) {
-        boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
-            case STUDENT_STATUS_CURRENT -> {
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-                isChanged = true;
-            }
-            case STUDENT_STATUS_ARCHIVED -> {
-                if (!currentStudent.isGraduated()) {
-                    // UpdData
-                    currentStudent.setNewSchoolOfRecord(value);
-                    // Transcript
-                    currentStudent.setNewRecalculateGradStatus("Y");
-                    isChanged = true;
-                }
-            }
-            case STUDENT_STATUS_TERMINATED -> {
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                isChanged = true;
-            }
-            default -> { // MER or DEC
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Do not set flags to Y
-                isChanged = true;
-            }
-        }
-        return isChanged;
-    }
-
     protected boolean processSchoolOfRecordId(StudentGradDTO currentStudent, UUID value) {
         boolean isChanged = false;
         switch(currentStudent.getStudentStatus()) {
