@@ -1,10 +1,7 @@
 package ca.bc.gov.educ.api.dataconversion.config;
 
-import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
-import ca.bc.gov.educ.api.dataconversion.model.GraduationStudentRecord;
 import net.javacrumbs.shedlock.core.LockProvider;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,16 +10,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
 public class GradDadaConversionApiConfig {
-
-    @Bean
-    public ModelMapper modelMapper() {
-        ModelMapper modelMapper = new ModelMapper();
-
-        modelMapper.typeMap(GraduationStudentRecord.class, ConvGradStudent.class);
-        modelMapper.typeMap(ConvGradStudent.class, GraduationStudentRecord.class);
-
-        return modelMapper;
-    }
 
     /**
      * Lock provider lock provider.

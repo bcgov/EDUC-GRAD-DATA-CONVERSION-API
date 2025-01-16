@@ -60,8 +60,8 @@ public class DataConversionProcessTest {
     public void testLoadInitialRawGradStudentData() {
         ConvGradStudent obj = ConvGradStudent.builder()
                 .pen("123456789")
-                .schoolOfRecord("12345678")
-                .schoolAtGrad("12345678")
+                .schoolOfRecordId(UUID.randomUUID())
+                .schoolAtGradId(UUID.randomUUID())
                 .studentGrade("12")
                 .studentStatus("A")
                 .archiveFlag("A")

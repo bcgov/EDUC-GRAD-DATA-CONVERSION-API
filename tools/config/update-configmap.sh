@@ -72,6 +72,7 @@ oc create -n "$BUSINESS_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map 
   --from-literal=NUMBER_OF_PARTITIONS="15" \
   --from-literal=PEN_STUDENT_API="http://student-api-master.$COMMON_NAMESPACE-$envValue.svc.cluster.local:8080/" \
   --from-literal=TOKEN_EXPIRY_OFFSET="90" \
+  --from-literal=ENABLE_COMPRESSION="true" \
   --dry-run=client -o yaml | oc apply -f -
 
 echo Creating config map "$APP_NAME"-flb-sc-config-map
