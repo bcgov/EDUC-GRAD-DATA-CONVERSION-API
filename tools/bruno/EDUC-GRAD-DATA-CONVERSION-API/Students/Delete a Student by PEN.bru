@@ -1,0 +1,19 @@
+meta {
+  name: Delete a Student by PEN
+  type: http
+  seq: 2
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/data-conversion/student/pen/:pen
+  body: none
+  auth: none
+}
+
+params:path {
+  pen: 
+}
+
+headers {
+  Authorization: 
+}

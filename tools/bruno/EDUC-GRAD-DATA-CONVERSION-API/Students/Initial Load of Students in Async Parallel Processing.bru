@@ -1,0 +1,15 @@
+meta {
+  name: Initial Load of Students in Async Parallel Processing
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/v1/data-conversion/student/parallel
+  body: none
+  auth: none
+}
+
+params:query {
+  ~reload: 
+}
