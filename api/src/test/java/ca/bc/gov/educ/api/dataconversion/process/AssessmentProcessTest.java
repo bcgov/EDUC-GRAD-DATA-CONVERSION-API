@@ -58,6 +58,7 @@ public class AssessmentProcessTest {
 
     @After
     public void tearDown() {
+        //Placeholder method
     }
 
     // Hard-Coded Assessment Requirements
@@ -87,7 +88,7 @@ public class AssessmentProcessTest {
         when(this.restUtils.addAssessmentRequirement(assessmentRequirement2, "123")).thenReturn(assessmentRequirement2);
 
         assessmentProcess.createAssessmentRequirements(summary);
-        assertThat(summary.getErrors()).hasSize(0);
+        assertThat(summary.getErrors()).isEmpty();
     }
 
 }
