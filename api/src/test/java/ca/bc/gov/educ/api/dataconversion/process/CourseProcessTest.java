@@ -4,10 +4,8 @@ import ca.bc.gov.educ.api.dataconversion.messaging.NatsConnection;
 import ca.bc.gov.educ.api.dataconversion.messaging.jetstream.Subscriber;
 import ca.bc.gov.educ.api.dataconversion.model.*;
 import ca.bc.gov.educ.api.dataconversion.repository.EventRepository;
-import ca.bc.gov.educ.api.dataconversion.process.CourseProcess;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
 import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +56,7 @@ public class CourseProcessTest {
 
     @After
     public void tearDown() {
+        //Placeholder method
     }
 
     @Test
@@ -999,7 +998,7 @@ public class CourseProcessTest {
         summary.setAccessToken("123");
 
         courseProcess.createCourseRequirements(summary);
-        assertThat(summary.getAddedCountForCourseRequirement()).isGreaterThan(0L);
+        assertThat(summary.getAddedCountForCourseRequirement()).isPositive();
     }
 
     @Test
@@ -1039,7 +1038,6 @@ public class CourseProcessTest {
         CourseRequirements courseRequirements = new CourseRequirements();
         courseRequirements.setCourseRequirementList(Arrays.asList(entity));
 
-//        when(this.courseRequirementCodeRepository.findById(ruleCode)).thenReturn(Optional.of(ruleCodeEntity));
         when(this.restUtils.checkCourseRequirementExists(courseCode, courseLevel, ruleCode,"123")).thenReturn(isUpdateMode? true : false);
         when(this.restUtils.saveCourseRequirement(entity, "123")).thenReturn(entity);
 

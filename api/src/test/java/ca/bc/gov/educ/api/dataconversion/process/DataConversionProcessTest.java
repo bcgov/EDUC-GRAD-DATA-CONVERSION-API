@@ -54,6 +54,7 @@ public class DataConversionProcessTest {
 
     @After
     public void tearDown() {
+        //Placeholder method
     }
 
     @Test
@@ -73,8 +74,7 @@ public class DataConversionProcessTest {
         when(this.restUtils.getTraxStudentMasterDataByPen("123456789", "123")).thenReturn(results);
 
         var result = dataConversionProcess.getStudentMasterDataFromTrax("123456789", "123");
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).isNotNull().hasSize(1);
         ConvGradStudent responseStudent = result.get(0);
         assertThat(responseStudent.getPen()).isEqualTo(obj.getPen());
     }
@@ -93,17 +93,13 @@ public class DataConversionProcessTest {
         when(this.restUtils.getTraxCourseRestrictions("123")).thenReturn(results);
 
         var result = dataConversionProcess.loadGradCourseRestrictionsDataFromTrax("123");
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).isNotNull().hasSize(1);
         CourseRestriction responseCourseRestriction = result.get(0);
         assertThat(responseCourseRestriction.getMainCourse()).isEqualTo("main");
     }
 
     @Test
     public void testGetStudentDemographicsDataFromTrax() {
-//        Object[] obj = new Object[] {
-//                "123456789", "Test", "QA", "", Character.valueOf('A'),Character.valueOf('A'), "12345678", "12", "V4N3Y2", Character.valueOf('M'), "19800111",  BigDecimal.valueOf(202005), null, "            "
-//        };
         Student obj = Student.builder()
                 .pen("123456789")
                 .legalFirstName("Test")
@@ -122,8 +118,7 @@ public class DataConversionProcessTest {
         when(this.restUtils.getTraxStudentDemographicsDataByPen("123456789", "123")).thenReturn(results);
 
         var result = dataConversionProcess.getStudentDemographicsDataFromTrax("123456789", "123");
-        assertThat(result).isNotNull();
-        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).isNotNull().hasSize(1);
         assertThat(result.get(0).getPen()).isEqualTo("123456789");
     }
 
@@ -292,7 +287,6 @@ public class DataConversionProcessTest {
     @Test
     public void testReadTraxStudentAndAddNewPen_whenStudentIsMerged() {
         // ID
-        UUID studentID = UUID.randomUUID();
         String pen = "123456789";
 
         // Trax Student Input

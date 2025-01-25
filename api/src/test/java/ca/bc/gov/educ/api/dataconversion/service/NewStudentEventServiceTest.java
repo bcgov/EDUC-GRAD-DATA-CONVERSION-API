@@ -61,7 +61,6 @@ public class NewStudentEventServiceTest {
     @Test
     public void testProcessStudentForGrad2018ENProgram_givenNew_STUDENT_returnsAPICallSuccess() throws Exception {
         // ID
-        UUID studentID = UUID.randomUUID();
         String pen = "111222333";
 
         // Program & School
