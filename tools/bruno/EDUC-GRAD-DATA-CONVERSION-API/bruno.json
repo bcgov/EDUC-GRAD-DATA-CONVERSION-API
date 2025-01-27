@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "EDUC-GRAD-DATA-CONVERSION-API",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}

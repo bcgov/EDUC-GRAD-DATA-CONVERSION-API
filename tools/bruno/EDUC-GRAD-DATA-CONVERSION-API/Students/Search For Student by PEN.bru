@@ -1,0 +1,19 @@
+meta {
+  name: Search For Student by PEN
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/v1/data-conversion/student/pen/:pen
+  body: none
+  auth: none
+}
+
+params:path {
+  pen: 
+}
+
+headers {
+  Authorization: 
+}

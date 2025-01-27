@@ -1,0 +1,21 @@
+meta {
+  name: Delete multiple Students by PEN
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/api/v1/data-conversion/student/penlist
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: 
+}
+
+body:json {
+  [
+    {}
+  ]
+}
