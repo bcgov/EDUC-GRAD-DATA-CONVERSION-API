@@ -70,6 +70,14 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
     public void processStudent(TraxGraduationUpdateDTO updateGrad, StudentGradDTO currentStudent, String accessToken) {
         boolean isChanged = false;
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
+
+        // Student Status - This step is moved to top to determine the update fields based on new status.
+        String newStudentStatus = getGradStudentStatus(updateGrad.getStudentStatus(), updateGrad.getArchiveFlag());
+        if (newStudentStatus != null) {
+            processStudentStatus(currentStudent, newStudentStatus);
+            log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
+            isChanged = true;
+        }
         // Processing order is important for the first 3 fields below.
         // 1. School of Record Guid
         if (updateGrad.getSchoolOfRecordId() != null) {
@@ -105,13 +113,6 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         if (StringUtils.isNotBlank(updateGrad.getCitizenship())) {
             isChanged = processCitizenship(currentStudent, updateGrad.getCitizenship());
             log.info(" => student citizenship : current = {}, request = {}", currentStudent.getCitizenship(), currentStudent.getNewCitizenship());
-        }
-        String newStudentStatus = getGradStudentStatus(updateGrad.getStudentStatus(), updateGrad.getArchiveFlag());
-        // 6. Student Status
-        if (newStudentStatus != null) {
-            processStudentStatus(currentStudent, newStudentStatus);
-            log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
-            isChanged = true;
         }
 
         if (isChanged) {
