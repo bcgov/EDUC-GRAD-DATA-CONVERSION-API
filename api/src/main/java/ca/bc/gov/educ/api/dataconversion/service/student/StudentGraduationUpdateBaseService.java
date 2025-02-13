@@ -56,7 +56,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processSchoolOfRecordId(StudentGradDTO currentStudent, UUID value) {
         boolean isChanged = false;
-        switch(currentStudent.getNewStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewSchoolOfRecordId(value);
@@ -94,7 +95,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processStudentGrade(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getNewStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewStudentGrade(value);
@@ -134,7 +136,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processGraduationProgram(StudentGradDTO currentStudent, String pen, String gradProgram, String accessToken) {
         boolean isChanged = false;
-        switch(currentStudent.getNewStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 if (!currentStudent.isGraduated() || currentStudent.isSCCP()) {
                     // UpdData
@@ -173,7 +176,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processSlpDate(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getNewStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 if (!currentStudent.isGraduated()) {
                     // UpdData
@@ -209,7 +213,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processCitizenship(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getNewStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewCitizenship(value);
