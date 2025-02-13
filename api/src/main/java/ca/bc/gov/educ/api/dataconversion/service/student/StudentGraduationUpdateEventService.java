@@ -81,13 +81,13 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         // Processing order is important for the first 3 fields below.
         // 1. School of Record Guid
         if (updateGrad.getSchoolOfRecordId() != null) {
-            isChanged = isChanged || processSchoolOfRecordId(currentStudent, updateGrad.getSchoolOfRecordId());
+            isChanged = processSchoolOfRecordId(currentStudent, updateGrad.getSchoolOfRecordId()) || isChanged;
             log.info(" => school of record id : current = {}, request = {}", currentStudent.getSchoolOfRecordId(), currentStudent.getNewSchoolOfRecordId());
         }
         // 2. Grad Program
         String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecordId(), null);
         if (gradProgram != null) {
-            isChanged = isChanged || processGraduationProgram(currentStudent, updateGrad.getPen(), gradProgram, accessToken);
+            isChanged = processGraduationProgram(currentStudent, updateGrad.getPen(), gradProgram, accessToken) || isChanged;
             if (isChanged && StringUtils.isNotBlank(currentStudent.getNewProgram())) {
                 log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
             } else {
@@ -97,7 +97,7 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         // 3. SLP Date
         String slpDate = updateGrad.getSlpDateWithDefaultFormat();
         if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())) {
-            isChanged = isChanged || processSlpDate(currentStudent, slpDate);
+            isChanged = processSlpDate(currentStudent, slpDate) || isChanged;
             if (isChanged) {
                 log.info(" => slp date : current = {}, request = {}", currentStudent.getGradDate(), slpDate);
             } else {
@@ -106,12 +106,12 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         }
         // 4. Student Grade
         if (StringUtils.isNotBlank(updateGrad.getStudentGrade())) {
-            isChanged = isChanged || processStudentGrade(currentStudent, updateGrad.getStudentGrade());
+            isChanged = processStudentGrade(currentStudent, updateGrad.getStudentGrade()) || isChanged;
             log.info(" => student grade : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
         }
         // 5. Citizenship
         if (StringUtils.isNotBlank(updateGrad.getCitizenship())) {
-            isChanged = isChanged || processCitizenship(currentStudent, updateGrad.getCitizenship());
+            isChanged = processCitizenship(currentStudent, updateGrad.getCitizenship()) || isChanged;
             log.info(" => student citizenship : current = {}, request = {}", currentStudent.getCitizenship(), currentStudent.getNewCitizenship());
         }
 
