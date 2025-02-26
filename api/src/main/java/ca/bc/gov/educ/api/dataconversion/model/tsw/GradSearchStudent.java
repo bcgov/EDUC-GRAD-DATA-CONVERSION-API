@@ -28,6 +28,7 @@ public class GradSearchStudent {
 	private String deceasedDate;
 	private String postalCode;
 	private String mincode;
+	
 	private String localID;
 	private String gradeCode;
 	private String gradeYear;
