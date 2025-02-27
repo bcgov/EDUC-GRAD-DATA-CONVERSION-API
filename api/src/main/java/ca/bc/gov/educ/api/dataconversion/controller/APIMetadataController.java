@@ -23,7 +23,6 @@ import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/v1")
 @OpenAPIDefinition(
