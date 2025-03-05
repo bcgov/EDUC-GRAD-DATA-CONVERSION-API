@@ -25,7 +25,7 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: 18
-      - uses: actions/cache@v1
+      - uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-5Jun-${{ hashFiles('**/pom.xml') }}
@@ -47,7 +47,7 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
