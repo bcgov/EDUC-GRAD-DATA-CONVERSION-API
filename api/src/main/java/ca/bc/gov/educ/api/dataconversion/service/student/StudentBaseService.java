@@ -5,10 +5,13 @@ import ca.bc.gov.educ.api.dataconversion.model.ConvGradStudent;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionAlert;
 import ca.bc.gov.educ.api.dataconversion.model.ConversionStudentSummaryDTO;
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
+import ca.bc.gov.educ.api.dataconversion.model.institute.School;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public abstract class StudentBaseService {
 
@@ -26,6 +29,12 @@ public abstract class StudentBaseService {
     private static final List<String> OPTIONAL_PROGRAM_CODES = Arrays.asList("AD", "BC", "BD");
     private static final List<String> OPTIONAL_PROGRAM_CODES_FOR_RECREATION = Arrays.asList("AD", "BC", "BD", "CP");
     private static final List<String> OPTIONAL_PROGRAM_CODES_FOR_SCCP_RECREATION = Arrays.asList("FR", "CP");
+
+    private final RestUtils restUtils;
+
+    protected StudentBaseService(RestUtils restUtils) {
+        this.restUtils = restUtils;
+    }
 
     protected void handleException(ConvGradStudent convGradStudent, ConversionStudentSummaryDTO summary, String pen, ConversionResultType type, String reason) {
         ConversionAlert error = new ConversionAlert();
@@ -55,7 +64,7 @@ public abstract class StudentBaseService {
     }
 
     protected boolean determineProgram(ConvGradStudent student, ConversionStudentSummaryDTO summary) {
-        String gradProgram = getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecord(), student.getFrenchDogwood());
+        String gradProgram = getGradProgram(student.getGraduationRequirementYear(), student.getSchoolOfRecordId(), student.getFrenchDogwood());
         if (StringUtils.isNotBlank(gradProgram)) {
             student.setProgram(gradProgram);
             updateProgramCountsInSummary(summary, gradProgram, false);
@@ -67,32 +76,32 @@ public abstract class StudentBaseService {
         }
     }
 
-    protected String getGradProgram(String graduationRequirementYear, String schoolOfRecord, String frenchDogwood) {
+    protected String getGradProgram(String graduationRequirementYear, UUID schoolOfRecordId, String frenchDogwood) {
         String gradProgram = null;
         switch (graduationRequirementYear) {
             case "2023" -> {
-                if (isSchoolForProgramFrancophone(schoolOfRecord)) {
+                if (isSchoolForProgramFrancophone(schoolOfRecordId)) {
                     gradProgram = "2023-PF";
                 } else {
                     gradProgram = "2023-EN";
                 }
             }
             case "2018" -> {
-                if (isSchoolForProgramFrancophone(schoolOfRecord)) {
+                if (isSchoolForProgramFrancophone(schoolOfRecordId)) {
                     gradProgram = "2018-PF";
                 } else {
                     gradProgram = "2018-EN";
                 }
             }
             case "2004" -> {
-                if (schoolOfRecord.startsWith("093")) {
+                if (isSchoolForProgramFrancophone(schoolOfRecordId)) {
                     gradProgram = "2004-PF";
                 } else {
                     gradProgram = "2004-EN";
                 }
             }
             case "1996", "1995" -> {
-                if (schoolOfRecord.startsWith("093")) {
+                if (isSchoolForProgramFrancophone(schoolOfRecordId)) {
                     gradProgram = "1996-PF";
                 } else {
                     gradProgram = "1996-EN";
@@ -144,9 +153,10 @@ public abstract class StudentBaseService {
         return "SCCP".equalsIgnoreCase(program)? OPTIONAL_PROGRAM_CODES_FOR_SCCP_RECREATION.contains(code) : OPTIONAL_PROGRAM_CODES_FOR_RECREATION.contains(code);
     }
 
-    // GRAD2-2103: applied to 2023 & 2018 programs.
-    private boolean isSchoolForProgramFrancophone(String schoolOfRecord) {
-        return schoolOfRecord.startsWith("093") || "09898009".equalsIgnoreCase(schoolOfRecord) || "09898047".equalsIgnoreCase(schoolOfRecord);
+    protected boolean isSchoolForProgramFrancophone(UUID schoolOfRecordId) {
+        String accessToken = restUtils.fetchAccessToken();
+        School school = restUtils.getSchool(schoolOfRecordId, accessToken);
+        return school != null && "CSF".equalsIgnoreCase(school.getSchoolReportingRequirementCode());
     }
 
 }

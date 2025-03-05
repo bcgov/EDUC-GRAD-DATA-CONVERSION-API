@@ -17,7 +17,7 @@ public class GraduationData {
     private GradSearchStudent gradStudent;
     private GradAlgorithmGraduationStudentRecord gradStatus;
     private List<GradAlgorithmOptionalStudentProgram> optionalGradStatus;
-    private School school;
+    private SchoolClob school;
     private StudentCourses studentCourses;
     private StudentAssessments studentAssessments;   // nullable
     private StudentExams studentExams; // nullable

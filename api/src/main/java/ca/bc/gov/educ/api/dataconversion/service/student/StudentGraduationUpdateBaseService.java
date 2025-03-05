@@ -2,6 +2,7 @@ package ca.bc.gov.educ.api.dataconversion.service.student;
 
 import ca.bc.gov.educ.api.dataconversion.model.StudentGradDTO;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiUtils;
+import ca.bc.gov.educ.api.dataconversion.util.RestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -9,6 +10,10 @@ import java.util.Date;
 import java.util.UUID;
 
 public abstract class StudentGraduationUpdateBaseService extends StudentBaseService {
+
+    protected StudentGraduationUpdateBaseService(RestUtils restUtils) {
+        super(restUtils);
+    }
 
     protected abstract boolean hasAnyFrenchImmersionCourse(String gradProgramCode, String pen, String accessToken);
 
@@ -49,47 +54,10 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
         }
     }
 
-    protected boolean processSchoolOfRecord(StudentGradDTO currentStudent, String value) {
-        boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
-            case STUDENT_STATUS_CURRENT -> {
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                // TVR
-                currentStudent.setNewRecalculateProjectedGrad("Y");
-                isChanged = true;
-            }
-            case STUDENT_STATUS_ARCHIVED -> {
-                if (!currentStudent.isGraduated()) {
-                    // UpdData
-                    currentStudent.setNewSchoolOfRecord(value);
-                    // Transcript
-                    currentStudent.setNewRecalculateGradStatus("Y");
-                    isChanged = true;
-                }
-            }
-            case STUDENT_STATUS_TERMINATED -> {
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Transcript
-                currentStudent.setNewRecalculateGradStatus("Y");
-                isChanged = true;
-            }
-            default -> { // MER or DEC
-                // UpdData
-                currentStudent.setNewSchoolOfRecord(value);
-                // Do not set flags to Y
-                isChanged = true;
-            }
-        }
-        return isChanged;
-    }
-
     protected boolean processSchoolOfRecordId(StudentGradDTO currentStudent, UUID value) {
         boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewSchoolOfRecordId(value);
@@ -127,7 +95,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processStudentGrade(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewStudentGrade(value);
@@ -167,7 +136,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processGraduationProgram(StudentGradDTO currentStudent, String pen, String gradProgram, String accessToken) {
         boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 if (!currentStudent.isGraduated() || currentStudent.isSCCP()) {
                     // UpdData
@@ -206,7 +176,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processSlpDate(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 if (!currentStudent.isGraduated()) {
                     // UpdData
@@ -242,7 +213,8 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
 
     protected boolean processCitizenship(StudentGradDTO currentStudent, String value) {
         boolean isChanged = false;
-        switch(currentStudent.getStudentStatus()) {
+        String studentStatus = StringUtils.defaultIfEmpty(currentStudent.getNewStudentStatus(), currentStudent.getStudentStatus());
+        switch(studentStatus) {
             case STUDENT_STATUS_CURRENT -> {
                 // UpdData
                 currentStudent.setNewCitizenship(value);
@@ -305,4 +277,5 @@ public abstract class StudentGraduationUpdateBaseService extends StudentBaseServ
             }
         }
     }
+
 }

@@ -18,7 +18,6 @@ public class StudentGradDTO extends  StudentCommonDTO {
 
     private String newProgram;
     private String newGradDate;
-    private String newSchoolOfRecord;
     private UUID newSchoolOfRecordId;
     private String newStudentGrade;
     private String newStudentStatus;
@@ -36,8 +35,8 @@ public class StudentGradDTO extends  StudentCommonDTO {
         return StringUtils.isNotBlank(newProgram)? newProgram : this.getProgram();
     }
 
-    public String getUpToDateSchoolOfRecord() {
-        return StringUtils.isNotBlank(newSchoolOfRecord)? newSchoolOfRecord : this.getSchoolOfRecord();
+    public UUID getUpToDateSchoolOfRecordId() {
+        return newSchoolOfRecordId != null? newSchoolOfRecordId : this.getSchoolOfRecordId();
     }
 
     @Override

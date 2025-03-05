@@ -1,0 +1,21 @@
+headers {
+  Authorization: Bearer {{token}}
+}
+
+auth {
+  mode: oauth2
+}
+
+auth:oauth2 {
+  grant_type: client_credentials
+  access_token_url: {{tokenRootUrl}}/auth/realms/master/protocol/openid-connect/token
+  client_id: {{clientId}}
+  client_secret: {{secret}}
+  scope: 
+}
+
+script:post-response {
+  if(req.getAuthMode() == 'oauth2' && res.body.access_token) {
+      bru.setVar('token', res.body.access_token);
+  }
+}

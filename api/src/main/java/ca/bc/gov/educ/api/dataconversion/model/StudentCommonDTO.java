@@ -14,9 +14,7 @@ public class StudentCommonDTO extends StudentDemographicDTO {
     // grad status
     private String program;
     private String gradDate;
-    private String schoolOfRecord;
     private UUID schoolOfRecordId;
-    private String schoolAtGrad;
     private String studentGrade;
     private String studentStatus;
 

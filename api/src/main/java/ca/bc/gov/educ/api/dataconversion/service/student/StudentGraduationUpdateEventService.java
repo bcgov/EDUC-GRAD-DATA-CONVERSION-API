@@ -33,6 +33,7 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
                                                StudentProcess studentProcess,
                                                RestUtils restUtils,
                                                EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;
@@ -68,23 +69,25 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
 
     public void processStudent(TraxGraduationUpdateDTO updateGrad, StudentGradDTO currentStudent, String accessToken) {
         boolean isChanged = false;
-
         log.info(" Process Student : studentID = {}, pen = {}", currentStudent.getStudentID(), updateGrad.getPen());
-        // Processing order is important for the first 3 fields below.
-        // 1.1 School of Record
-        if (!StringUtils.equals(updateGrad.getSchoolOfRecord(), currentStudent.getSchoolOfRecord())) {
-            isChanged = processSchoolOfRecord(currentStudent, updateGrad.getSchoolOfRecord());
-            log.info(" => school of record : current = {}, request = {}", currentStudent.getSchoolOfRecord(), currentStudent.getNewSchoolOfRecord());
+
+        // Student Status - This step is moved to top to determine the update fields based on new status.
+        String newStudentStatus = getGradStudentStatus(updateGrad.getStudentStatus(), updateGrad.getArchiveFlag());
+        if (newStudentStatus != null) {
+            processStudentStatus(currentStudent, newStudentStatus);
+            log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
+            isChanged = true;
         }
-        // 1.2 School of Record Guid
-        if (updateGrad.getSchoolOfRecordId() != null &&  updateGrad.getSchoolOfRecordId() != currentStudent.getSchoolOfRecordId()) {
-            isChanged = processSchoolOfRecordId(currentStudent, updateGrad.getSchoolOfRecordId());
+        // Processing order is important for the first 3 fields below.
+        // 1. School of Record Guid
+        if (updateGrad.getSchoolOfRecordId() != null) {
+            isChanged = processSchoolOfRecordId(currentStudent, updateGrad.getSchoolOfRecordId()) || isChanged;
             log.info(" => school of record id : current = {}, request = {}", currentStudent.getSchoolOfRecordId(), currentStudent.getNewSchoolOfRecordId());
         }
         // 2. Grad Program
-        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecord(), null);
-        if (!StringUtils.equals(gradProgram, currentStudent.getProgram())) {
-            isChanged = processGraduationProgram(currentStudent, updateGrad.getPen(), gradProgram, accessToken);
+        String gradProgram = getGradProgram(updateGrad.getGraduationRequirementYear(), currentStudent.getUpToDateSchoolOfRecordId(), null);
+        if (gradProgram != null) {
+            isChanged = processGraduationProgram(currentStudent, updateGrad.getPen(), gradProgram, accessToken) || isChanged;
             if (isChanged && StringUtils.isNotBlank(currentStudent.getNewProgram())) {
                 log.info(" => grad program : current = {}, request = {}", currentStudent.getProgram(), currentStudent.getNewProgram());
             } else {
@@ -93,9 +96,8 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
         }
         // 3. SLP Date
         String slpDate = updateGrad.getSlpDateWithDefaultFormat();
-        if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())
-                && !StringUtils.equals(slpDate, currentStudent.getGradDate())) {
-            isChanged = processSlpDate(currentStudent, slpDate);
+        if (slpDate != null && "SCCP".equalsIgnoreCase(currentStudent.getUpToDateGradProgram())) {
+            isChanged = processSlpDate(currentStudent, slpDate) || isChanged;
             if (isChanged) {
                 log.info(" => slp date : current = {}, request = {}", currentStudent.getGradDate(), slpDate);
             } else {
@@ -103,21 +105,14 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
             }
         }
         // 4. Student Grade
-        if (!StringUtils.equals(updateGrad.getStudentGrade(), currentStudent.getStudentGrade())) {
-            isChanged = processStudentGrade(currentStudent, updateGrad.getStudentGrade());
+        if (StringUtils.isNotBlank(updateGrad.getStudentGrade())) {
+            isChanged = processStudentGrade(currentStudent, updateGrad.getStudentGrade()) || isChanged;
             log.info(" => student grade : current = {}, request = {}", currentStudent.getStudentGrade(), currentStudent.getNewStudentGrade());
         }
         // 5. Citizenship
-        if (!StringUtils.equals(updateGrad.getCitizenship(), currentStudent.getCitizenship())) {
-            isChanged = processCitizenship(currentStudent, updateGrad.getCitizenship());
+        if (StringUtils.isNotBlank(updateGrad.getCitizenship())) {
+            isChanged = processCitizenship(currentStudent, updateGrad.getCitizenship()) || isChanged;
             log.info(" => student citizenship : current = {}, request = {}", currentStudent.getCitizenship(), currentStudent.getNewCitizenship());
-        }
-        String newStudentStatus = getGradStudentStatus(updateGrad.getStudentStatus(), updateGrad.getArchiveFlag());
-        // 6. Student Status
-        if (!StringUtils.equals(newStudentStatus, currentStudent.getStudentStatus())) {
-            processStudentStatus(currentStudent, newStudentStatus);
-            log.info(" => student status : current = {}, request = {}", currentStudent.getStudentStatus(), currentStudent.getNewStudentStatus());
-            isChanged = true;
         }
 
         if (isChanged) {
@@ -135,5 +130,4 @@ public class StudentGraduationUpdateEventService extends StudentGraduationUpdate
     public boolean hasAnyFrenchImmersionCourse(String gradProgramCode, String pen, String accessToken) {
         return studentProcess.hasAnyFrenchImmersionCourse(gradProgramCode, pen, accessToken);
     }
-
 }

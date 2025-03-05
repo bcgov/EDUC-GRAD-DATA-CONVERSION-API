@@ -66,7 +66,7 @@ public class NewStudentEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "NEWSTUDENT";
 
@@ -76,8 +76,7 @@ public class NewStudentEventServiceTest {
                 .program(program)
                 .studentGrade("11")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
-                .schoolAtGrad(mincode)
+                .schoolOfRecordId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC","FI")).build();
         ConversionStudentSummaryDTO summary = new ConversionStudentSummaryDTO();
@@ -106,7 +105,7 @@ public class NewStudentEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "NEWSTUDENT";
 
@@ -116,8 +115,8 @@ public class NewStudentEventServiceTest {
                 .program(program)
                 .studentGrade("11")
                 .studentStatus("A")
-                .schoolOfRecord(mincode)
-                .schoolAtGrad(mincode)
+                .schoolOfRecordId(schoolId)
+                .schoolAtGradId(schoolId)
                 .graduationRequirementYear("2018")
                 .programCodes(Arrays.asList("XC","FI")).build();
 

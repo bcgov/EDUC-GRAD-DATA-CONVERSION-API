@@ -35,6 +35,7 @@ public class StudentProcess extends StudentBaseService {
     public StudentProcess(RestUtils restUtils,
                           AssessmentProcess assessmentProcess,
                           CourseProcess courseProcess) {
+        super(restUtils);
         this.restUtils = restUtils;
         this.assessmentProcess = assessmentProcess;
         this.courseProcess = courseProcess;
@@ -175,9 +176,7 @@ public class StudentProcess extends StudentBaseService {
             gradStudent.setProgramCompletionDate(null);
         }
         gradStudent.setStudentGradData(null);
-        gradStudent.setSchoolAtGrad(null);
-
-        gradStudent.setSchoolOfRecord(StringUtils.isNotBlank(student.getSchoolOfRecord())? student.getSchoolOfRecord() : null);
+        gradStudent.setSchoolAtGradId(null);
         gradStudent.setSchoolOfRecordId(student.getSchoolOfRecordId());
         gradStudent.setStudentGrade(student.getStudentGrade());
         gradStudent.setStudentStatus(getGradStudentStatus(student.getStudentStatus(), student.getArchiveFlag()));
@@ -281,10 +280,8 @@ public class StudentProcess extends StudentBaseService {
     }
 
     private ConversionResultType processSccpFrenchCertificates(GraduationStudentRecord student, ConversionStudentSummaryDTO summary) {
-        if (StringUtils.equals(student.getProgram(), "SCCP")
-            && ( StringUtils.isNotBlank(student.getSchoolOfRecord())
-                 && student.getSchoolOfRecord().startsWith("093") )
-        ) {
+        if (StringUtils.equals(student.getProgram(), "SCCP") && student.getSchoolOfRecordId() != null
+            && isSchoolForProgramFrancophone(student.getSchoolOfRecordId())) {
             return createStudentOptionalProgram("FR", student, summary);
         }
         return ConversionResultType.SUCCESS;
@@ -369,9 +366,7 @@ public class StudentProcess extends StudentBaseService {
             studentData.setGradDate(gradStudent.getProgramCompletionDate());
             studentData.setStudentGrade(gradStudent.getStudentGrade());
             studentData.setStudentStatus(gradStudent.getStudentStatus());
-            studentData.setSchoolOfRecord(gradStudent.getSchoolOfRecord());
             studentData.setSchoolOfRecordId(gradStudent.getSchoolOfRecordId());
-            studentData.setSchoolAtGrad(gradStudent.getSchoolAtGrad());
             studentData.setCitizenship(gradStudent.getStudentCitizenship());
             studentData.setAdultStartDate(gradStudent.getAdultStartDate());
         } else {
@@ -442,13 +437,6 @@ public class StudentProcess extends StudentBaseService {
             if (StringUtils.isNotBlank(gradStudent.getNewStudentStatus())) {
                 OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
                         .type(FieldType.STRING).name(FieldName.STUDENT_STATUS).value(gradStudent.getNewStudentStatus())
-                        .build();
-                requestDTO.getUpdateFields().add(field);
-            }
-            // School of Record
-            if (StringUtils.isNotBlank(gradStudent.getNewSchoolOfRecord())) {
-                OngoingUpdateFieldDTO field = OngoingUpdateFieldDTO.builder()
-                        .type(FieldType.STRING).name(FieldName.SCHOOL_OF_RECORD).value(gradStudent.getNewSchoolOfRecord())
                         .build();
                 requestDTO.getUpdateFields().add(field);
             }

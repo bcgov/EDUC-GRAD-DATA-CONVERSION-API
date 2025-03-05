@@ -20,8 +20,6 @@ public class TraxGraduationUpdateDTO extends TraxStudentUpdateDTO {
     private String graduationRequirementYear;
     // STUD_GRAD
     private String studentGrade;
-    // MINCODE
-    private String schoolOfRecord;
     // SchoolId
     private UUID schoolOfRecordId;
     // SLP_DATE

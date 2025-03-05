@@ -167,6 +167,9 @@ public class EducGradDataConversionApiConstants {
     @Value("${endpoint.grad-graduation-report-api.delete-student-achievements.url}")
     private String deleteStudentAchievementsUrl;
 
+    @Value("${endpoint.grad-trax-api.student.school-by-school-id.url}")
+    private String schoolBySchoolIdUrl;
+
     // Incremental Grad Update
     @Value("${grad.update.enabled}")
     private boolean gradUpdateEnabled;

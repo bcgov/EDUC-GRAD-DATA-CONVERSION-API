@@ -65,7 +65,7 @@ public class StudentAssessmentUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "ASSESSMENT";
 
@@ -87,8 +87,7 @@ public class StudentAssessmentUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
         // Optional Program Codes
         currentStudent.getProgramCodes().add("XC");
         currentStudent.getProgramCodes().add("FI");
@@ -121,10 +120,6 @@ public class StudentAssessmentUpdateEventServiceTest {
     public void testProcessStudentAssessment_whenException_isThrown_returnsAPICallError() throws Exception {
         // ID
         String pen = "111222333";
-
-        // Program & School
-        String program = "2018-EN";
-        String mincode = "222333";
 
         String updateType = "ASSESSMENT";
 

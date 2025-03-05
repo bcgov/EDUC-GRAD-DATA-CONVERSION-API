@@ -34,6 +34,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
                                        StudentProcess studentProcess,
                                        RestUtils restUtils,
                                        EducGradDataConversionApiConstants constants) {
+        super(restUtils);
         this.eventRepository = eventRepository;
         this.studentProcess = studentProcess;
         this.restUtils = restUtils;
@@ -45,11 +46,7 @@ public class StudentXProgramEventService extends StudentBaseService implements E
         TraxXProgramDTO xprogram = (TraxXProgramDTO) request;
         if (xprogram != null && constants.isGradUpdateEnabled()) {
             // Get Access Token
-            ResponseObj res = restUtils.getTokenResponseObject();
-            String accessToken = null;
-            if (res != null) {
-                accessToken = res.getAccess_token();
-            }
+            String accessToken = restUtils.fetchAccessToken();
             // Load grad student
             StudentGradDTO currentStudent = studentProcess.loadStudentData(xprogram.getPen(), accessToken);
             if (currentStudent != null) {

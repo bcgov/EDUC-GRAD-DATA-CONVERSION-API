@@ -65,7 +65,7 @@ public class StudentDemographicsUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "UPD_DEMOG";
 
@@ -91,8 +91,7 @@ public class StudentDemographicsUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("CUR");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
@@ -111,7 +110,7 @@ public class StudentDemographicsUpdateEventServiceTest {
 
         // Program & School
         String program = "2018-EN";
-        String mincode = "222333";
+        UUID schoolId = UUID.randomUUID();
 
         String updateType = "UPD_DEMOG";
 
@@ -137,8 +136,7 @@ public class StudentDemographicsUpdateEventServiceTest {
         currentStudent.setProgram(program);
         currentStudent.setStudentGrade("12");
         currentStudent.setStudentStatus("ARC");
-        currentStudent.setSchoolOfRecord(mincode);
-        currentStudent.setSchoolAtGrad(mincode);
+        currentStudent.setSchoolOfRecordId(schoolId);
 
         when(this.studentProcess.loadStudentData(eq(pen), any())).thenReturn(currentStudent);
         when(this.eventRepository.findByEventId(event.getEventId())).thenReturn(Optional.of(event));
