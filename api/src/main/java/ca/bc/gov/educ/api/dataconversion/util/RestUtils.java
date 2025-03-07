@@ -80,10 +80,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getPenStudentApiByPenUrl(), pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -94,40 +91,28 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getGradStudentNotesByStudentID(), studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
     public OptionalProgram getOptionalProgram(String programCode, String specialProgramCode, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradOptionalProgramUrl(), uri -> uri.path("/{programCode}/{specialProgramCode}").build(programCode, specialProgramCode))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(OptionalProgram.class).block();
     }
 
     public OptionalProgram getOptionalProgramByID(UUID optionalProgramID, String accessToken) {
         return this.webClient.get()
                 .uri(constants.getGradOptionalProgramByIDUrl(), uri -> uri.path("/{optionalProgramID}").build(optionalProgramID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(OptionalProgram.class).block();
     }
 
     public Student addNewPen(Student student, String accessToken) {
         return webClient.post()
                 .uri(constants.getAddNewPenFromGradStudentApiUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(student))
                 .retrieve().bodyToMono(Student.class).block();
     }
@@ -135,10 +120,7 @@ public class RestUtils {
     public AssessmentRequirement addAssessmentRequirement(AssessmentRequirement assessmentRequirement, String accessToken) {
         return webClient.post()
                 .uri(constants.getAddAssessmentRequirementApiUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(assessmentRequirement))
                 .retrieve().bodyToMono(AssessmentRequirement.class).block();
     }
@@ -148,10 +130,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(String.format(constants.getStudentAssessmentsByPenApiUrl(), pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -160,10 +139,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getStudentCoursesByPenApiUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -179,20 +155,14 @@ public class RestUtils {
                             .queryParam("restrictedCourseCode", restrictedCourseCode)
                             .queryParam("restrictedCourseLevel", restrictedCourseLevel)
                             .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
 
     public CourseRestriction saveCourseRestriction(CourseRestriction courseRestriction, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveCourseRestrictionApiUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(courseRestriction))
                 .retrieve().bodyToMono(CourseRestriction.class).block();
     }
@@ -200,10 +170,7 @@ public class RestUtils {
     public CourseRequirement saveCourseRequirement(CourseRequirement courseRequirement, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveCourseRequirementApiUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(courseRequirement))
                 .retrieve().bodyToMono(CourseRequirement.class).block();
     }
@@ -218,10 +185,7 @@ public class RestUtils {
                                 .queryParam("courseLevel", courseLevel)
                                 .queryParam("ruleCode", ruleCode)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -233,10 +197,7 @@ public class RestUtils {
                         uri -> uri.queryParam("pen", pen)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -248,10 +209,7 @@ public class RestUtils {
                         uri -> uri.queryParam("pen", pen)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -263,10 +221,7 @@ public class RestUtils {
                         uri -> uri.queryParam("courseCode", courseCode)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -278,10 +233,7 @@ public class RestUtils {
                         uri -> uri.queryParam("courseCode", courseCode)
                                 .queryParam("courseLevel", courseLevel)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Boolean.class).block();
     }
 
@@ -291,10 +243,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getTraxStudentMasterDataByPenUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -303,10 +252,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getTraxStudentDemogDataByPenUrl(), uri -> uri.path("/{pen}").build(pen))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -318,20 +264,14 @@ public class RestUtils {
                         uri -> uri.queryParam("pageNumber", pageNumber)
                                 .queryParam("pageSize", pageSize)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
     public Integer getTotalNumberOfTraxStudentNoList(String accessToken) {
         return webClient.get()
                 .uri(constants.getTotalNumberOfTraxStudentNoListUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(Integer.class).block();
     }
 
@@ -340,10 +280,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getTraxCourseRestrictionsUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -352,10 +289,7 @@ public class RestUtils {
         };
         return this.webClient.get()
                 .uri(constants.getTraxCourseRequirementsUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(responseType).block();
     }
 
@@ -363,10 +297,7 @@ public class RestUtils {
     public TraxStudentNo saveTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveTraxStudentNoUrl())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .body(BodyInserters.fromValue(traxStudentNo))
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
@@ -374,10 +305,7 @@ public class RestUtils {
     public TraxStudentNo deleteTraxStudentNo(TraxStudentNo traxStudentNo, String accessToken) {
         return webClient.delete()
                 .uri(String.format(constants.getDeleteTraxStudentNoUrl(),traxStudentNo))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                })
+                .headers(h -> h.setBearerAuth(accessToken))
                 .retrieve().bodyToMono(TraxStudentNo.class).block();
     }
 
@@ -385,10 +313,8 @@ public class RestUtils {
     @Retry(name = "rt-getStudentGradStatus", fallbackMethod = "rtGetStudentGradStatusFallback")
     public GraduationStudentRecord getStudentGradStatus(String studentID, String accessToken) {
         return webClient.get().uri(String.format(constants.getReadGraduationStudentRecord(),studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
     // Save GraduationStudentRecord  - POST /student/conv/studentid/{id}
@@ -398,10 +324,8 @@ public class RestUtils {
                 .uri(String.format(constants.getSaveGraduationStudentRecord(),studentID),
                         uri -> uri.queryParam("ongoingUpdate", ongoingUpdate)
                                 .build())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
     // Update GraduationStudentRecord  - POST /student/conv/studentid/{id}?ongoingUpdate=true&eventType=UPD_GRAD
@@ -409,36 +333,28 @@ public class RestUtils {
     public GraduationStudentRecord updateStudentGradStatusByFields(OngoingUpdateRequestDTO requestDTO, String accessToken) {
         return webClient.post()
                 .uri(constants.getSaveGraduationStudentRecordForOngoingUpdates())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(requestDTO)).retrieve().bodyToMono(GraduationStudentRecord.class).block();
     }
 
     public void removeAllStudentAchievements(UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getDeleteStudentAchievementsUrl(),studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(Void.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Void.class).block();
     }
 
     // Remove All Student Related Data - DELETE /student/conv/studentid/{id}
     public void removeAllStudentRelatedData(UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getSaveGraduationStudentRecord(),studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(Void.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(Void.class).block();
     }
 
     public School getSchool(UUID schoolId, String accessToken) {
         if (schoolId == null) return null;
         return this.webClient.get().uri(String.format(constants.getSchoolBySchoolIdUrl(), schoolId))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(School.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(School.class).block();
     }
 
     // READ StudentOptionalProgram - GET /student/optionalprogram/studentid/{id}
@@ -446,28 +362,21 @@ public class RestUtils {
         final ParameterizedTypeReference<List<StudentOptionalProgram>> responseType = new ParameterizedTypeReference<>() {
         };
         return this.webClient.get().uri(String.format(constants.getReadStudentOptionalPrograms(), studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(responseType).block();
+                .headers(h -> h.setBearerAuth(accessToken)).retrieve().bodyToMono(responseType).block();
     }
 
     // Save StudentOptionalProgram - POST /student/conv/studentoptionalprogram
     public StudentOptionalProgram saveStudentOptionalProgram(StudentOptionalProgramRequestDTO toBeSaved, String accessToken) {
         return webClient.post().uri(constants.getSaveStudentOptionalProgram())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentOptionalProgram.class).block();
     }
 
     // Remove StudentOptionalProgram - DELETE /student/conv/studentoptionalprogram/{optionalProramID}/{studentID}
     public void removeStudentOptionalProgram(UUID optionalProgramID, UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getRemoveStudentOptionalProgram(), optionalProgramID, studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Optional Program Not Found"))).bodyToMono(Void.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Optional Program Not Found"))).bodyToMono(Void.class).block();
     }
 
     // READ StudentCareerProgram - GET /student/studentcareerprogram/studentid/{id}
@@ -475,28 +384,22 @@ public class RestUtils {
         final ParameterizedTypeReference<List<StudentCareerProgram>> responseType = new ParameterizedTypeReference<>() {
         };
         return this.webClient.get().uri(String.format(constants.getReadStudentCareerPrograms(), studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().bodyToMono(responseType).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().bodyToMono(responseType).block();
     }
 
     // Save StudentCareerProgram - NEW - POST /student/conv/studentcareerprogram
     public StudentCareerProgram saveStudentCareerProgram(StudentCareerProgram toBeSaved, String accessToken) {
         return webClient.post().uri(constants.getSaveStudentCareerProgram())
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentCareerProgram.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .body(BodyInserters.fromValue(toBeSaved)).retrieve().bodyToMono(StudentCareerProgram.class).block();
     }
 
     // Remove StudentCareerProgram - DELETE /student/conv/studentcareerprogram/{careerProgramCode}/{studentID}
     public void removeStudentCareerProgram(String careerProgramCode, UUID studentID, String accessToken) {
         webClient.delete().uri(String.format(constants.getRemoveStudentCareerProgram(), careerProgramCode, studentID))
-                .headers(h -> {
-                    h.setBearerAuth(accessToken);
-                    h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
-                }).retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Career Program Not Found"))).bodyToMono(Void.class).block();
+                .headers(h -> h.setBearerAuth(accessToken))
+                .retrieve().onStatus(p -> p.value() == 404, error -> Mono.error(new Exception("Student Career Program Not Found"))).bodyToMono(Void.class).block();
     }
 
     public ConvGradStudent rtGetStudentGradStatusFallback(HttpServerErrorException exception){

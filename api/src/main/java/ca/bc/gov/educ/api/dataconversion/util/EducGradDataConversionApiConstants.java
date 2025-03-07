@@ -13,6 +13,8 @@ public class EducGradDataConversionApiConstants {
     public static final String API_NAME = "GRAD-DATA-CONVERSION-API";
     public static final String TRAX_STREAM_NAME="TRAX_STATUS_EVENT_STREAM";
     public static final String CORRELATION_ID = "correlationID";
+    public static final String USER_NAME = "User-Name";
+    public static final String REQUEST_SOURCE = "Request-Source";
     public static final String API_ROOT_MAPPING = "";
     public static final String API_VERSION = "v1";
     public static final String GRAD_DATA_CONVERSION_API_ROOT_MAPPING = "/api/" + API_VERSION + "/data-conversion";
