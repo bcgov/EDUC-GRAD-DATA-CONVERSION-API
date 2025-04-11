@@ -42,7 +42,7 @@
         <springdoc.version>2.0.2</springdoc.version>
         <ojdbc.version>21.6.0.0.1</ojdbc.version>
         <nats.version>2.11.0</nats.version>
-        <guava.version>30.1.1-jre</guava.version>
+        <guava.version>32.0.0-jre</guava.version>
         <shedlock.version>4.20.0</shedlock.version>
         <junit>4.12</junit>
         <log4j.version>2.18.0</log4j.version>
