@@ -353,13 +353,6 @@ public class RestUtils {
     public School getSchool(UUID schoolId, String accessToken) {
         if (schoolId == null) return null;
         return this.webClient.get().uri(String.format(constants.getSchoolBySchoolIdUrl(), schoolId))
-                .headers(h -> h.setBearerAuth(accessToken))
-                .retrieve().bodyToMono(School.class).block();
-    }
-
-    public School getSchool(UUID schoolId, String accessToken) {
-        if (schoolId == null) return null;
-        return this.webClient.get().uri(String.format(constants.getSchoolBySchoolIdUrl(), schoolId))
                 .headers(h -> {
                     h.setBearerAuth(accessToken);
                     h.set(EducGradDataConversionApiConstants.CORRELATION_ID, ThreadLocalStateUtil.getCorrelationID());
