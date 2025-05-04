@@ -34,7 +34,6 @@ public class StudentControllerTest {
 
         String pen = "123456789";
         String accessToken = "Bearer accesstoken";
-        Student student = new Student();
 
         Mockito.when(studentService.cascadeDeleteStudent(pen, accessToken.replaceAll("Bearer ", accessToken))).thenReturn(pen);
         studentService.cascadeDeleteStudent(pen,accessToken.replaceAll("Bearer ", accessToken));

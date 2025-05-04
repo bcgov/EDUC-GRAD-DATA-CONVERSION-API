@@ -73,7 +73,7 @@ public class RestUtilsTest {
 
     @After
     public void tearDown() {
-
+        //Placeholder method
     }
 
     @Test
@@ -116,7 +116,7 @@ public class RestUtilsTest {
 
         val result = this.restUtils.getStudentsByPen(pen, "abc");
         assertThat(result).isNotNull();
-        assertThat(result.size() > 0).isTrue();
+        assertThat(result.size()).isPositive();
         assertThat(result.get(0).getPen()).isEqualTo(pen);
     }
 
@@ -165,7 +165,7 @@ public class RestUtilsTest {
 
         val result = this.restUtils.getStudentAssessmentsByPen(pen, "abc");
         assertThat(result).isNotNull();
-        assertThat(result.size() > 0).isTrue();
+        assertThat(result.size()).isPositive();
         assertThat(result.get(0).getPen()).isEqualTo(pen);
     }
 
@@ -291,8 +291,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
 
         val result = this.restUtils.checkFrenchImmersionCourse(pen, courseLevel, "abc");
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
+        assertThat(result).isNotNull().isTrue();
     }
 
     @Test
@@ -307,8 +306,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
 
         val result = this.restUtils.checkFrenchImmersionCourseForEN(pen, "11", "abc");
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
+        assertThat(result).isNotNull().isTrue();
     }
 
     @Test
@@ -324,8 +322,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
 
         val result = this.restUtils.checkBlankLanguageCourse(courseCode, courseLevel, "abc");
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
+        assertThat(result).isNotNull().isTrue();
     }
 
     @Test
@@ -341,8 +338,7 @@ public class RestUtilsTest {
         when(this.responseMock.bodyToMono(Boolean.class)).thenReturn(Mono.just(Boolean.TRUE));
 
         val result = this.restUtils.checkFrenchLanguageCourse(courseCode, courseLevel, "abc");
-        assertThat(result).isNotNull();
-        assertThat(result).isTrue();
+        assertThat(result).isNotNull().isTrue();
     }
 
     @Test
