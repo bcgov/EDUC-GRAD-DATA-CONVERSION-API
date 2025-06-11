@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: dev
     env:
-      OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-dev
+      OPENSHIFT_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}-dev
       TARGET_ENV: dev
       KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
       KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
@@ -162,7 +162,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: test
     env:
-      OPENSHIFT_NAMESPACE: ${{ vars.GRAD_NAMESPACE }}-test
+      OPENSHIFT_NAMESPACE: ${{ vars.GRAD_BUSINESS_NAMESPACE }}-test
       TARGET_ENV: test
       KEYCLOAK_URL: ${{ secrets.KEYCLOAK_URL }}
       KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
