@@ -16,5 +16,17 @@ public enum EventType {
   XPROGRAM,
   ASSESSMENT,
   COURSE,
-  FI10ADD
+  FI10ADD;
+
+  public static boolean isValid(String value) {
+    if (value == null) {
+      return false;
+    }
+    try {
+      EventType.valueOf(value);
+      return true;
+    } catch (IllegalArgumentException e) {
+      return false;
+    }
+  }
 }

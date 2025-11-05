@@ -1,9 +1,11 @@
 package ca.bc.gov.educ.api.dataconversion.messaging.jetstream;
 
 import ca.bc.gov.educ.api.dataconversion.constant.Topics;
+import ca.bc.gov.educ.api.dataconversion.exception.IgnoreEventException;
 import ca.bc.gov.educ.api.dataconversion.model.ChoreographedEvent;
 import ca.bc.gov.educ.api.dataconversion.service.EventHandlerDelegatorService;
 import ca.bc.gov.educ.api.dataconversion.util.EducGradDataConversionApiConstants;
+import ca.bc.gov.educ.api.dataconversion.util.EventUtils;
 import ca.bc.gov.educ.api.dataconversion.util.JsonUtil;
 import ca.bc.gov.educ.api.dataconversion.util.LogHelper;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -96,7 +98,7 @@ public class Subscriber {
       try {
         val eventString = new String(message.getData());
         LogHelper.logMessagingEventDetails(eventString, constants.isSplunkLogHelperEnabled());
-        final ChoreographedEvent event = JsonUtil.getJsonObjectFromString(ChoreographedEvent.class, eventString);
+        final ChoreographedEvent event = EventUtils.getChoreographedEventIfValid(eventString);
         if (event.getEventPayload() == null) {
           message.ack();
           log.warn("payload is null, ignoring event :: {}", event);
@@ -110,6 +112,9 @@ public class Subscriber {
           }
         });
         log.debug("received event :: {} ", event);
+      } catch (final IgnoreEventException ex) {
+        log.warn("Ignoring event with type :: {} :: and event outcome :: {}", ex.getEventType(), ex.getEventOutcome());
+        message.ack();
       } catch (final Exception ex) {
         log.error("Exception ", ex);
       }
