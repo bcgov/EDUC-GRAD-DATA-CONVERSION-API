@@ -55,7 +55,7 @@ oc create -n "$BUSINESS_NAMESPACE"-"$envValue" configmap "$APP_NAME"-config-map 
   --from-literal=BASELINE_ON_MIGRATE="false" \
   --from-literal=CONNECTION_TIMEOUT="90000" \
   --from-literal=ENABLE_FLYWAY="true" \
-  --from-literal=ENABLE_GRAD_UPDATE="true" \
+  --from-literal=ENABLE_GRAD_UPDATE="false" \
   --from-literal=ENABLE_SPLUNK_LOG_HELPER="false" \
   --from-literal=GRAD_ASSESSMENT_API="http://educ-grad-assessment-api.$GRAD_NAMESPACE-$envValue.svc.cluster.local:8080/" \
   --from-literal=GRAD_COURSE_API="http://educ-grad-course-api.$GRAD_NAMESPACE-$envValue.svc.cluster.local:8080/" \

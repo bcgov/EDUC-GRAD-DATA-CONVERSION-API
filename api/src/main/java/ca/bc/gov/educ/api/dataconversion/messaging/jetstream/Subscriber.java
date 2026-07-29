@@ -72,6 +72,11 @@ public class Subscriber {
 
   @PostConstruct
   public void subscribe() throws IOException, JetStreamApiException {
+    if (!this.constants.isGradUpdateEnabled()) {
+      log.info("TRAX event subscription is disabled because ENABLE_GRAD_UPDATE is false.");
+      return;
+    }
+
     val qName = EducGradDataConversionApiConstants.API_NAME.concat("-QUEUE");
     val autoAck = false;
     for (val entry : this.streamTopicsMap.entrySet()) {

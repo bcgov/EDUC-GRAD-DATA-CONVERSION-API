@@ -62,6 +62,11 @@ objects:
                 limits:
                   cpu: "${MAX_CPU}"
                   memory: "${MAX_MEM}"
+              env:
+                - name: CRON_SCHEDULED_PROCESS_EVENTS_STAN
+                  value: "-"
+                - name: CRON_SCHEDULED_PURGE_OLD_RECORDS
+                  value: "-"
               envFrom:
                 - configMapRef:
                     name: educ-grad-api-config-map
