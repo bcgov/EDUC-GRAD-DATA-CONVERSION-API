@@ -1,6 +1,7 @@
 name: API Build
 
 on:
+  workflow_dispatch: 
   pull_request:
     branches:
       - grad-release
@@ -33,6 +34,11 @@ jobs:
             ${{ runner.os }}-maven-5Jun-
       - name: Run unit tests
         run: mvn -f pom.xml clean package
+      - name: setup java 21 for sonar analysis
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 21
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
@@ -40,7 +46,7 @@ jobs:
           key: ${{ runner.os }}-sonar
       - name: Run Sonar Analysis
         run: mvn sonar:sonar
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
           -Dsonar.host.url=${{ vars.SONAR_HOST_URL }}
           -Dsonar.organization=${{ vars.SONAR_ORG }}
           -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
